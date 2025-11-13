@@ -16,3 +16,41 @@ p {
   text-align: justify;
   font-size: 1.1rem;
 }
+
+
+.video-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* 2 videos side-by-side filling full width */
+.video-row.two-up .video-box {
+  flex: 1;                /* each takes equal width */
+  max-width: 100%;        /* remove limiting */
+  text-align: center;
+}
+
+/* 1 full-width video */
+.video-row.single .video-box {
+  width: 100%;
+  text-align: center;
+}
+
+/* Video sizing — fill available width, maintain aspect ratio */
+.video-box video {
+  width: 100%;
+  height: auto;           /* keeps aspect ratio */
+  border-radius: 8px;
+}
+
+/* Subtitle styling */
+.video-box sub {
+  display: block;
+  margin-top: 8px;
+  font-style: italic;
+  font-size: 0.9rem;
+  text-align: center;
+}
