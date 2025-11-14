@@ -296,7 +296,7 @@
       <p>
         Our innovation strategy was guided by the useful design orientations and 
         functional gaps that were discovered through the examination of features 
-        and feedback across a number of commercially available solutions (Table 5). 
+        and feedback across a number of commercially available solutions (Table 4). 
         On-screen coaching, variety of strike zones, impact sensors, and a range of 
         training modes (e.g., cardio, sparring, mitts) are already features of existing 
         systems, such as interactive boxing trainers and AI-powered punch trackers. 
@@ -494,14 +494,48 @@
 
     <div id="system-overview">
       <h3>4.1 System Overview</h3>
-      <p>...</p>
+      <p>Building on the identified product needs, the BoxBunny robot is organised
+      into four key subsystems, each addressing a distinct set of functions
+      (Figure 5):</p>
+      <ul type="disc">
+          <li>
+              <strong>User Interface</strong> – touchscreen, visual      feedback, and
+              control logic for configuring and running training sessions.
+          </li>
+          <li>
+              <strong>Upper Mechanism</strong> – includes Punch Execution      (arms),
+              Contact Points (head/torso/arms), and Impact Sensors responsible
+              for safe, realistic striking interaction.
+          </li>
+          <li>
+              <strong>Lower Mechanism</strong> – comprises Footwork      Movement
+              (legs), Compact Footprint (base), and Height Adjustability, which
+              together position the robot correctly relative to the user.
+          </li>
+          <li>
+              <strong>Robot      Intelligence</strong> – primarily User Tracking,
+              enabling the robot to respond      to the boxer’s movement and adapt
+              drills in real time.
+          </li>
+      </ul>
+      <p>
+          Each of these subsystems is detailed in the following sections.
+      </p>
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/Lower_mechanism/0-full robot product feature - cad overview.png"
+        subtitle="Figure 5: Product Features of BoxBunny">
+      </image-component>
+
+
     </div>
 
     <div id="user-journey">
       <h3>4.2 User Journey</h3>
       <h4>4.2.1 End-to-End User Flow </h4>
       <p>
-        The flowchart in Figure 5 illustrates the complete user journey when interacting with the robot, 
+        The flowchart in Figure 6 illustrates the complete user journey when interacting with the robot, 
         from the start of a session to its conclusion. Each activity is color-coded according to its 
         corresponding product feature category, as indicated in the legend on the right. The session begins 
         with height adjustment and selecting the training parameters that match the user’s goals. Once training 
@@ -515,7 +549,7 @@
         width="70%"
         tag="image"
         source="assets/user_journey/User_Journey_Counter_Punch.png"
-        subtitle="Figure 5: User Journey Flowchart">
+        subtitle="Figure 6: User Journey Flowchart">
       </image-component>
 
     </div>
@@ -550,7 +584,7 @@
       <p>
         When the user selects the training parameters, they are interacting with the Skill Progression component of the 
         product. This feature determines the appropriate motor actuations and software activations (such as computer vision) 
-        required for the session. As shown in Figure 6, users can choose from several training categories such as Training, 
+        required for the session. As shown in Figure 7, users can choose from several training categories such as Training, 
         Performance, and Others with each serving different purposes. For clarity, this report focuses only on the green pathway, 
         as detailing every iteration would be unnecessarily exhaustive.
       </p>
@@ -571,7 +605,7 @@
         width="70%"
         tag="image"
         source="assets/user_journey/user_journey.png"
-        subtitle="Figure 6: Simplified User Journey to Counterpuncher Training">
+        subtitle="Figure 7: Simplified User Journey to Counterpuncher Training">
       </image-component>
     </div>
 
@@ -706,9 +740,10 @@
       </p>
       <h5>Striking Zones</h5>
       <image-component
+        width="40%"
         tag="image"
         source="assets/upper_mechanism/5.2.1.1strike_zones.png"
-        subtitle="Figure x: Strike Zones">
+        subtitle="Figure 8: Strike Zones">
       </image-component>
       <h5>Target Motion</h5>
       <p>
@@ -716,7 +751,7 @@
           guide the robotic arm's design. The system must be able to replicate these
           three distinct strikes.
       </p>
-      <table-component subtitle="Table x: Target Striking Motion">
+      <table-component subtitle="Table 7: Target Striking Motion">
         <div id="table-strike-types"></div>
       </table-component>
     </div>
@@ -729,13 +764,13 @@
           Based on the preceding research, the following performance metrics were
           established through physical measurements and validations.
       </p>            
-      <table-component subtitle="Table x: Robot Joint Specifications">
+      <table-component subtitle="Table 8: Robot Joint Specifications">
         <div id="table-robot-arm-specs"></div>
       </table-component>
     </div>
     <div>
       <h4>5.2.2.2.Design Considerations</h4>
-      <table-component subtitle="Table x: Design Considerations">
+      <table-component subtitle="Table 9: Design Considerations">
         <div id="table-fidelity-specs"></div>
       </table-component>
     </div>
@@ -744,9 +779,10 @@
           5.2.2.3. Final Concept
       </h4>
       <image-component
+        width="80%"
         tag="image"
         source="assets/upper_mechanism/5.2.2.3.final_concept.png"
-        subtitle="Figure x: Final Concept">
+        subtitle="Figure 9: Final Concept">
       </image-component>
       <p>
           The final design selection was a 2-Degrees-of-Freedom (2DOF) mechanism,
@@ -768,20 +804,20 @@
     </div>
     <div>
       <h3>
-          <a>1.1.3. Contact Points – Padding</a>
+          <a>5.2.3. Contact Points – Padding</a>
       </h3>
     </div>
     <div>
       <h4>
           5.2.3.1. Function Specifications
       </h4>
-      <table-component subtitle="Table x: Padding Specifications">
+      <table-component subtitle="Table 10: Padding Specifications">
         <div id="table-padding-specs"></div>
       </table-component>
       <image-component
         tag="image"
         source="assets/upper_mechanism/5.2.3.1padding_design_consi.png"
-        subtitle="Figure x: Padding">
+        subtitle="Figure 10: Padding">
       </image-component>
       <p>
           A crucial function specification pertains to the user's physical safety
@@ -807,7 +843,7 @@
         must possess a soft contact surface and be capable of absorbing the strike
         energy from average users.
       </p>
-      <table-component subtitle="Table x: Padding Design Considerations">
+      <table-component subtitle="Table 11: Padding Design Considerations">
         <div id="table-opponent-body-specs"></div>
       </table-component>
     </div>
@@ -818,7 +854,7 @@
       <image-component
         tag="image"
         source="assets/upper_mechanism/5.2.3.2padding_sol_princ.png"
-        subtitle="Figure x: Padding for Striking Areas">
+        subtitle="Figure 11: Padding for Striking Areas">
       </image-component>
       <p>
           This implementation will be achieved by first utilizing a standard
@@ -849,7 +885,7 @@
           time. Therefore, the sensor data must demonstrate high consistency and
           reliability, even during active robot use.
       </p>
-      <table-component subtitle="Table x: User Input Design Considerations">
+      <table-component subtitle="Table 12: User Input Design Considerations">
         <div id="table-reliability-specs"></div>
       </table-component>
       <p>
@@ -996,13 +1032,13 @@
           hazardous.
       </p>
       <div>
-        <table-component subtitle="Table x: Target Metric Specifications for
+        <table-component subtitle="Table 13: Target Metric Specifications for
     Footwork Movement">
         <div id="table-motion-specs"></div>
       </table-component>
       </div>
       <div>
-      <table-component subtitle="Table x: Design Considerations for Footwork Movement">
+      <table-component subtitle="Table 14: Design Considerations for Footwork Movement">
         <div id="table-control-specs"></div>
       </table-component>
       </div>
@@ -1038,11 +1074,11 @@
           The omnidirectional wheel concept is attractive in general mobile robotics
           because it provides full planar mobility and compact actuation, and it
           supports high-level commands such as “move forward”, or “rotate on the spot”
-          with a single hardware stack. However, as detailed in Appendix B 2)a)i), it
+          with a single hardware stack. However, as detailed in Appendix 2)a)i), it
           presents several drawbacks for a punch‑receiving boxing robot due to its
           dependence on floor conditions, limited positional stiffness, and coupled
           motions. These issues are reflected in the decision matrices in Appendix B
-          (Tables B9 and B10), where a <strong>decoupled-axis</strong> architecture
+          (Tables A9 and A10), where a <strong>decoupled-axis</strong> architecture
           using a <strong>slewing base</strong> at the bottom to provide yaw rotation
           and an <strong>independent linear sliding stage</strong> above it to provide
           forward–backward translation, is selected for BoxBunny’s footwork movement.
@@ -1051,16 +1087,16 @@
           The evaluation confirms that the decoupled architecture outperforms
           omnidirectional wheels in the high‑priority criteria of stiffness,
           repeatability, and impact robustness. Accordingly, near the bottom of the
-          robot (Figure 8a), BoxBunny adopts
+          robot (Figure 12a), BoxBunny adopts
           <strong>
               separate Slewing-Base Yaw and Linear Slide Range axes
           </strong>
-          (Figure 8b).
+          (Figure 12b).
       </p>
       <image-component
         tag="image"
         source="assets/Lower_mechanism/3footwork motion - cad overview.png"
-        subtitle="Figure x: (a) (left) CAD overview of Footwork
+        subtitle="Figure 12: (a) (left) CAD overview of Footwork
     Movement subsystem in BoxBunny; (b) (right) focused CAD of rotational and
     linear motion stages.">
       </image-component>
@@ -1080,9 +1116,9 @@
           <strong>
               motorised sliding-table linear rail driven by a ball screw
           </strong>
-          (Figure 9). This decision followed the evaluation of three power
+          (Figure 13). This decision followed the evaluation of three power
           transmission options (lead screw, ball screw, and belt drive), summarised in
-          Appendix B (Power Transmission Drive Selection, Table B11).
+          Appendix (Power Transmission Drive Selection, Table A11).
       </p>
       <p>
           The selected mechanism comprises:
@@ -1103,7 +1139,7 @@
           </li>
       </ul>
       <p>
-          The decision matrix in Appendix B (Table B11) shows that the ball
+          The decision matrix in Appendix (Table A11) shows that the ball
           screw–driven linear rail scores highest on the high-priority criteria of
           <strong>load and thrust capacity</strong>,
           <strong>
@@ -1119,7 +1155,7 @@
       <image-component
         tag="image"
         source="assets/Lower_mechanism/4linear motion - cad.png"
-        subtitle="Figure X: Focused CAD of selected linear motion
+        subtitle="Figure 13: Focused CAD of selected linear motion
     mechanism with sliding table, rails/blocks, and motor labelled.">
       </image-component>
     </div>
@@ -1130,7 +1166,7 @@
           <strong>
               slewing ring bearing with external gear teeth
           </strong>
-          , driven by a <strong>pinion gear and BLDC servo motor</strong> (Figure 10).
+          , driven by a <strong>pinion gear and BLDC servo motor</strong> (Figure 14).
           This solution emerged from the bearing and motor selection processes
           described in Appendix B (Bearing Selection, Table B13; Motor Selection,
           Table B14).
@@ -1149,7 +1185,7 @@
       <image-component
         tag="image"
         source="assets/Lower_mechanism/5rotation motion - cad.png"
-        subtitle="Figure X: Focused CAD of rotational
+        subtitle="Figure 14: Focused CAD of rotational
     motion mechanism showing slewing bearing, pinion gear, and motor.">
       </image-component>
     </div>
@@ -1165,7 +1201,7 @@
           parallel. It is therefore essential that BoxBunny’s base has requirements
           summarised in Table 9.
       </p>
-      <table-component subtitle="Table x: Design Considerations for Compact
+      <table-component subtitle="Table 15: Design Considerations for Compact
     Footprint">
         <div id="table-base-specs"></div>
       </table-component>
@@ -1178,7 +1214,7 @@
           <strong>
               trapezoidal platform
           </strong>
-          rather than a large circular or rectangular footprint (Figure 11). This
+          rather than a large circular or rectangular footprint (Figure 15). This
           geometry is chosen for the following reasons:
       </p>
       <ul type="disc">
@@ -1198,13 +1234,13 @@
               <strong>
                   intentionally offset towards the rear
               </strong>
-              of the base (Figure      12b).      This shifts the combined centre of
+              of the base (Figure      16b).      This shifts the combined centre of
               gravity backward, increasing resistance      to forward tipping under
               frontal punches.
           </li>
       </ul>
       <p>
-          Comparisons with alternative base shapes (Figure 12a) highlight that large
+          Comparisons with alternative base shapes (Figure 16a) highlight that large
           circular or rectangular bases tend to intrude into the boxer’s pivot space,
           increasing the likelihood of the user stepping on or kicking the base during
           movement. The trapezoidal layout, by contrast, maintains a compact yet
@@ -1221,15 +1257,16 @@
           to different deployment environments.
       </p>
       <image-component
+        width="50%"
         tag="image"
         source="assets/Lower_mechanism/6compact footprint - cad overview.png"
-        subtitle="Figure X: CAD overview of trapezoidal base
+        subtitle="Figure 15: CAD overview of trapezoidal base
     component on BoxBunny.">
       </image-component>
       <image-component
         tag="image"
         source="assets/Lower_mechanism/7 compact footprint - pivot space.png"
-        subtitle="Figure X: (a) Illustration of limited pivot
+        subtitle="Figure 16: (a) Illustration of limited pivot
     space for alternative base shapes; (b) off-centre placement of motion
     mechanisms relative to base centre axis for improved stability.">
       </image-component>
@@ -1242,14 +1279,14 @@
           accessible to a broad demographic of users. To do so, the robot must allow
           adjustment of the <strong>head and torso target heights</strong> to align
           with different user statures. The height-adjustment system requirements are
-          summarised in the target metric specifications (Table 10) alongside key
-          selection criteria (Table 11).
+          summarised in the target metric specifications (Table 16) alongside key
+          selection criteria (Table 17).
       </p>
-      <table-component subtitle="Table x: Target Metric Specifications for Height
+      <table-component subtitle="Table 16: Target Metric Specifications for Height
     Adjustability">
         <div id="table-stroke-length-specs"></div>
       </table-component>
-      <table-component subtitle="Table x: Design Considerations for Height
+      <table-component subtitle="Table 17: Design Considerations for Height
     Adjustability">
         <div id="table-vertical-lift-specs"></div>
       </table-component>
@@ -1278,12 +1315,12 @@
           <strong>
               Manual Screw Jack with Rear Vertical Linear Guides
           </strong>
-          concept is selected as the height adjustment mechanism (Figure 13).
+          concept is selected as the height adjustment mechanism (Figure 17).
       </p>
       <image-component
         tag="image"
         source="assets/Lower_mechanism/8height adjustment - cad overview.png"
-        subtitle="Figure X: (a) (left) CAD overview of height
+        subtitle="Figure 17: (a) (left) CAD overview of height
     adjustment component; (b) (right) focused CAD of screw jack and vertical
     linear guides.">
       </image-component>
@@ -1307,7 +1344,7 @@
           <strong>
               relative ordering of the linear and rotational axes
           </strong>
-          . If <strong>rotation is placed above linear</strong> (Figure 14a), the
+          . If <strong>rotation is placed above linear</strong> (Figure 18a), the
           robot rotates about a point that is fixed along the linear axis. This
           constrains the effective training area: rotation occurs around a single
           longitudinal position, limiting variability in the spatial envelope of
@@ -1315,7 +1352,7 @@
           <strong>
               linear motion is placed above rotation
           </strong>
-          (Figure 14b), the entire upper structure, including the height adjustment
+          (Figure 18b), the entire upper structure, including the height adjustment
           and torso, can translate relative to the rotating base. This configuration
           significantly
           <strong>
@@ -1326,7 +1363,7 @@
       <image-component
         tag="image"
         source="assets/Lower_mechanism/9bottom integration - orientation movement.png"
-        subtitle="Figure X: (a) (left) Area Capacity Coverage for
+        subtitle="Figure 18: (a) (left) Area Capacity Coverage for
     when rotation is placed above linear; (b) (right) Area Capacity Coverage for
     when linear is placed above rotation.">
       </image-component>
@@ -1336,7 +1373,7 @@
           .
       </p>
       <p>
-          The final integrated stack, from bottom to top in Figure 15, starts from the
+          The final integrated stack, from bottom to top in Figure 19, starts from the
           <strong>trapezoidal base</strong> providing a compact, stable footprint,
           with space at the rear for optional ballast and structural anchoring. The
           <strong>Slewing-ring yaw stage</strong> is mounted within the base,
@@ -1382,7 +1419,7 @@
       <image-component
         tag="image"
         source="assets/Lower_mechanism/10bottom integration - full overview.png"
-        subtitle="Figure X: CAD Overview of Full Bottom Integrated
+        subtitle="Figure 19: CAD Overview of Full Bottom Integrated
     Structure of BoxBunny.">
       </image-component>
     </div>
@@ -1410,7 +1447,7 @@
       </p>
 
       <!-- 5.4.1 FUNCTION SPECIFICATIONS TABLE -->
-      <table-component subtitle="Table 1: Robot Intelligence Performance Specifications">
+      <table-component subtitle="Table 18: Robot Intelligence Performance Specifications">
         <div id="table-robot-intelligence"></div>
       </table-component>
 
@@ -1453,7 +1490,7 @@
         width="40%"
         tag="image"
         source="assets/robot_intelligence/pose_estimation_model.jpg"
-        subtitle="Figure 5: Pose estimation model">
+        subtitle="Figure 20: Pose estimation model">
       </image-component>
     </div>
 
@@ -1475,13 +1512,13 @@
       <image-component
         tag="image"
         source="assets/robot_intelligence/training_pipeline.jpg"
-        subtitle="Figure 6: Training pipeline">
+        subtitle="Figure 21: Training pipeline">
       </image-component>
 
       <image-component
         tag="image"
         source="assets/robot_intelligence/inference_pipeline.jpg"
-        subtitle="Figure 7: Inference pipeline">
+        subtitle="Figure 22: Inference pipeline">
       </image-component>
     </div>
 
@@ -1549,7 +1586,7 @@
       <image-component
         tag="image"
         source="assets/control_system/component_overview.png"
-        subtitle="Figure 8: Component Overview">
+        subtitle="Figure 23: Component Overview">
       </image-component>
 
       <p>
@@ -1567,7 +1604,7 @@
       <image-component
         tag="image"
         source="assets/control_system/pid_block_diagram.png"
-        subtitle="Figure 9: PID block diagram">
+        subtitle="Figure 24: PID block diagram">
       </image-component>
 
       <p>
@@ -1588,6 +1625,7 @@
 
     <!-- 6. Future Work -->
     <div id="future-work">
+      <sl-divider></sl-divider>
       <h2>6. Future Work</h2>
     </div>
 
@@ -1601,7 +1639,7 @@
       This staged approach ensures that all components are tested under realistic
       conditions and refined progressively to achieve reliable, safe, and
       responsive performance.</p>
-      <table-component subtitle="Table X: Test Plan">
+      <table-component subtitle="Table 18: Test Plan">
         <div id="table-subsystem-validation"></div>
       </table-component>
     </div>
@@ -1616,34 +1654,13 @@
     <image-component
         tag="image"
         source="assets/future_work/important_milestone.png"
-        subtitle="Figure x: Important Milestones">
+        subtitle="Figure 25: Important Milestones">
       </image-component>
       <image-component
         tag="image"
         source="assets/future_work/overview_project_plan.png"
-        subtitle="Figure 9: Overview of Project Plan">
+        subtitle="Figure 26: Overview of Project Plan">
       </image-component>
-    </div>
-
-    <div>
-    <br />
-    <br />
-    <sl-divider></sl-divider>
-    <div>
-      <div id="sub-section-2-header-1">
-        <h3>example for youtube video</h3>
-        <p>
-          Pellentesque nec nam aliquam sem et tortor consequat. Et netus et malesuada fames ac turpis egestas maecenas.
-          Eu tincidunt tortor aliquam nulla facilisi. Nunc aliquet bibendum enim facilisis gravida. Elementum pulvinar
-          etiam non quam lacus (Moll et al., 2011; Parker & Fox, 2010). Blandit cursus risus at ultrices mi. Arcu dui
-          vivamus arcu felis bibendum ut tristique. Porttitor rhoncus dolor purus non enim praesent elementum facilisis.
-          Mauris in aliquam sem fringilla. Non quam lacus suspendisse faucibus. Tristique senectus et netus et malesuada
-          fames ac. <a href="#image">Link to the image above</a>
-        </p>
-        <!-- This is an example of how you might use the video component -->
-        <video-component tag="rick" source="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          subtitle="Video: Never gonna give you up?"></video-component>
-      </div>
     </div>
 
     <!-- This is an example of how you can use the references component to create references -->
@@ -1652,21 +1669,1935 @@
       <h2>References</h2>
       <ul>
         <li>
-          Brody, J. E. (2007, December 11). Mental reserves keep brain agile. The New York Times. Retrieved from
-          http://www.dowjones.com/factiva/
+          Boxing Mitts vs Boxing Sticks: What’s the Difference. (22 July, 2025). Retrieved from Bullsport Direct: https://www.bullsportsdirect.com/boxing-mitts-vs-sticks/
         </li>
         <li>
-          Chamberlin, J., Novotney, A., Packard, E., & Price, M. (2008, May). Enhancing worker well-being: Occupational
-          health psychologists convene to share their research on work, stress, and health. Monitor on Psychology,
-          39(5), 26-29.
+          Cheraghi, M., Alinejad, H. A., Arshi, A. R., & Shirzad, E. (2014). Kinematics of Straight Right Punch in Boxing. Annals of Applied Sport Science, vol. 2, no. 2, 39-50.
         </li>
         <li>
-          Jones, T. J., & Fields, N. (2003). Emotional quotient and personality. E-Journal of Applied Psychology, 2(2),
-          38-45. Retrieved from http://ejournalappliedpsyc/index.php/ejap
+          Collective, W. (5 May, 2022). Why do people start training in Martial Arts? I asked a 1000 people to find out! Retrieved from Warrior Collective: https://warriorcollective.co.uk/blogs/wcarticles/why-do-people-start-training-in-martial-arts-i-asked-a-1000-people-to-find-out
+        </li>
+        <li>
+         G., D. T., Magdalena, I., Lindsay, W., I., D. D., & M., H. A. (2019). Understanding the Consequences of Repetitive Subconcussive Head Impacts in Sport: Brain Changes and Dampened Motor Control Are Seen After Boxing Practice. Frontiers in Human Neuroscience, Volume 13.
+        </li>
+        <li>
+          Illsin, A. (1 February, 2025). 10 Expert Tips for Choosing the Best Focus Mitts: A Complete Buyer's Guide. Retrieved from mmawarehouse: https://www.mmawarehouse.com/blogs/gear/best-focus-mitts
+        </li>
+        <li>
+          IxDF, I. D. (25 May, 2016). What are User Interviews? Retrieved from Interaction Design Foundation - IxDF: https://www.interaction-design.org/literature/topics/user-interviews
+        </li>
+        <li>
+          Lystad, P. R., Alevras, A., Rudy, I., Soligard, T., & Engebretsen, L. (2021). Injury incidence, severity and profile in Olympic combat sports: a comparative analysis of 7712 athlete exposures from three consecutive Olympic Games. British Journal of Sports Medicine, 1077-1083.
+        </li>
+        <li>
+          Pahl, G., Beitz, W., Feldhusen, J., & Grote, K.-H. (2007). Engineering Design (3rd edition). Cambridge: Springer.
+        </li>
+        <li>
+          Stiller, J. W., Yu, S. S., Brenner, L. A., Langenberg, P., Scrofani, P., Pannella, P., . . . Postolache, T. T. (2014). Sparring and Neurological Function in Professional Boxers. Front Public Health, Volume 2.
+        </li>
+        <li>
+          Swenson, A. (4 January, 2022). Partner Training With Boxing Mitts, Pool Noodles, & Paddles. Retrieved from FightCamp: https://blog.joinfightcamp.com/boxing-equipment/partner-training-with-boxing-mitts-pool-noodles-paddles/
         </li>
       </ul>
     </div>
   </div>
+
+      <!-- Appendix -->
+    <div id="future-work">
+      <sl-divider></sl-divider>
+      <h2>Appendix</h2>
+      <h3>1) Upper Mechanisms</h3>
+      <h4>a) Punch Execution</h4>
+      <h5>i) Joint Selection</h5>
+      <p>
+          To determine a tangible function specification for our system, we
+          established 2 key matrices through physical measurements and validations.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/1-joint selection.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          The fidelity of a real boxing match must be maintained. This dictates that
+          the mechanism must not obstruct critical striking zones (like the liver or
+          head) when in its neutral position. A mechanism positioned too low, for
+          example, would render uppercuts to the celiac plexus impossible, thereby
+          training the boxer to aim at an incorrect, clear target rather than the true
+          one.
+      </p>
+      <p>
+          <strong><u>Concept 1: Multi-Actuator Rig</u></strong>
+          <strong>
+              <u></u>
+          </strong>
+      </p>
+      <p>
+          The first concept involved the adoption of multiple actuators, one for each
+          desired strike. To cover both the left and right sides, this would require a
+          total of six motors. While this could theoretically provide striking
+          fidelity, the solution was deemed mechanically complex, and high cost.
+          Furthermore, the additional motors and mechanisms would create a bulky
+          profile, likely culminating in the obstruction of the user's striking
+          points.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/2-joint selection-concept1.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+    <strong><u>Concept 2: Windmill Actuator</u></strong>
+      </p>
+      <p>
+          A second concept attempted to consolidate two strikes into one motor. It
+          utilized a "windmill" design, with a training stick extended on both ends of
+          a central motor. A downward rotation would execute a jab, and an upward
+          rotation would execute an uppercut. Although this design reduced the motor
+          count, its extended component for the uppercut would directly obstruct the
+          liver strike zone when in its default, neutral position. This constituted a
+          critical fidelity failure, as it would make one of the key strike zones
+          inaccessible.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/3-joint selection-concept2.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          <strong><u>Concept 3: 2-Degree-of-Freedom (2DOF) Actuator</u></strong>
+      </p>
+      <p>
+          The final design selection was a 2-Degrees-of-Freedom (2DOF) mechanism,
+          which was determined to offer the optimal balance of fidelity, complexity,
+          and cost by utilizing only two motors per arm. This 2DOF system is comprised
+          of two primary axes. The first is a pitch axis, which provides vertical
+          rotation and permits the execution of the standard downward jab. The
+          inclusion of a secondary yaw axis, providing horizontal rotation, enables
+          the system to execute both the horizontal hook and the diagonal uppercut.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/4-joint selection-concept3.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          <strong><u>Selection Criteria</u></strong>
+      </p>
+      <p>
+          Table A1 was created to aid the decision making for the appropriate concept
+          for the arm joint selection.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/5-matrix-Robot Arm Joint Concept.jpg"
+        subtitle="Table A1: Decision Matrix for Robot Arm Joint Concept">
+      </image-component>
+      <p>
+          Concept 3 (2-DOF Actuator) is the only solution that meets the requirements
+          of high training fidelity and zero obstruction of the striking zones. The
+          significant challenge of its high control-system complexity is accepted as a
+          trade-off to achieve a functional and effective training product.
+      </p>
+      <h5>
+          ii)      Torque Calculations
+      </h5>
+      <h6>
+          Arm System Characteristics
+      </h6>
+      <p>
+          Training Sticks
+      </p>
+      <p>
+          The training sticks, our target object of rotation, is firstly characterized
+          based on the existing polyethylene foam available to us. We first determine
+          the density of the current foam base on its dimensions and weight.
+      </p>
+      <table-component subtitle="Table A2: Existing Polyethylene Foam Dimensions">
+        <div id="table-foam-specs-1"></div>
+      </table-component>
+      <p>
+          The specification for the new training sticks is based on the desired reach
+          of the robot.
+      </p>
+      <table-component subtitle="Table A3: Desired Polyethylene Foam Dimensions">
+        <div id="table-foam-specs-2"></div>
+      </table-component>
+      <p>
+          Angular Speed and RPM
+      </p>
+      <p>
+          Our target matrix is to be able to match the striking tempo of a coach
+          during a training session. We have recreated a series of five 90° strikes
+          and recorded the total duration of these strikes.
+      </p>
+      <table-component subtitle="Table A4: Rotational Target Matrix for Arm Joint">
+        <div id="table-strike-speed-specs"></div>
+      </table-component>
+      <p>
+          Acceleration
+      </p>
+      <p>
+          The time it takes for the arms to accelerate to the desired speed is crucial
+          to determining the peak torque. A faster acceleration will result in a
+          larger peak torque. To accommodate the users, we base the acceleration time
+          on the human reaction time to visual stimulus, providing the users
+          sufficient time to react. The average human reaction time is typically 0.25
+          seconds to a visual stimulus (Crossley, 2021).
+      </p>
+      <table-component subtitle="Table A5: Acceleration Target Matrix for Arm Joint">
+        <div id="table-acceleration-specs"></div>
+      </table-component>
+    </div>
+    <div>
+      <h6>Arm System Torque Requirements</h6>
+      <p>Static Torque</p>
+      <p>
+          For rotation in a vertical plane, the maximum static torque happens as the
+          training sticks passes through the horizontal position (ф = 90). At this
+          point, the gravitational torque is at its maximum.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn1.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          Acceleration Torque
+      </p>
+      <p>
+          To determine the acceleration torque required, we first model the training
+          sticks as a uniform rod to calculate its inertia.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn2.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          The acceleration torque is the required to produce the angular acceleration
+          α.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn3.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          Drag Torque
+      </p>
+      <p>
+          During the rotation of the training sticks, it also experiences aerodynamic
+          drag which contributes an opposite torque. To maintain a constant rotation,
+          the motor must apply a continuous torque to oppose the opposing drag. The
+          drag force is determined by the following equation:
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn-.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          Where C <sub>d</sub> is the drag coefficient, and ρ <sub>air</sub> is the
+          density of air. To calculate the resultant torque because of drag, we must
+          consider two other factors. Firstly, the velocity of the rotating pool
+          noodle is not a constant but varies with length from the pivoting point.
+          Secondly, the resultant torque must account for the increasing distance
+          across the pool noodle while still accounting for the increase in velocity.
+          To derive the appropriate equation, we first consider the infinitesimal
+          force along the pool noodle as a function of its length.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn4.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          This force acts at a distance r from the pivot, so the infinitesimal torque
+          from drag is:
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn5.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          If we integrate from the pivot to the total length of the training sticks,
+          we can determine the equation to calculate the drag torque.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn6.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          The coefficient of drag is also not a constant and is dependent on the
+          Reynolds number. We account for the highest Reynolds number which occurs at
+          the tip speed, assuming that there is no wind present.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn7.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          Where ν <sub>air</sub> is the kinematic viscosity of air.
+      </p>
+      <a href="https://borgoltz.aoe.vt.edu/aoe3054/manual/expt3/index.html">
+              https://borgoltz.aoe.vt.edu/aoe3054/manual/expt3/index.html
+          </a>
+      <p>
+          The drag coefficient C <sub>d</sub> has been defined to be the drag of a
+          circular cylinder in sub-critical flow regime with a value of 1.2.
+      </p>
+      <a href="https://borgoltz.aoe.vt.edu/aoe3054/manual/expt3/index.html">
+              https://borgoltz.aoe.vt.edu/aoe3054/manual/expt3/index.html
+          </a>
+       <p></p>   
+      <table-component subtitle="Table A6: Drag Torque Evaluation">
+        <div id="table-drag-torque-specs"></div>
+      </table-component>
+      <p>
+          Peak vs. Continuous Torque Requirements
+      </p>
+      <p>
+          Based on the calculations, the system has two distinct torque requirements.
+      </p>
+      <p>
+          Peak torque is the maximum, intermittent torque required by the system. It
+          occurs only during the 0.25-second acceleration phase while the arm is
+          simultaneously lifting against the maximum gravitational load (at the
+          horizontal position).
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn8.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          Continuous torque is the torque required to maintain the arm's operation
+          after acceleration is complete. This load is highest when the arm is moving
+          through the horizontal position at full speed, where the motor must fight
+          both gravity and aerodynamic drag.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn9.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+          Final Arm System Specifications
+      </p>
+      <p>
+          It is standard engineering practice to apply a safety margin to account for
+          modelling inaccuracies, unforeseen friction, variations in material
+          properties, and voltage fluctuations. A safety factor of 1.5 is applied to
+          the required torque.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/eqn10.jpg"
+        subtitle="">
+      </image-component>
+      <table-component subtitle="Table B7: Peak Torque Evaluation">
+        <div id="table-torque-specs"></div>
+      </table-component>
+    </div>
+    <div>
+      <h5>iii) Motor Selection Criteria</h5>
+      <p>
+          Table A8 was created to aid the decision making for the appropriate motor
+          for the arm joints.
+      </p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/6-matrix-Motor Selection.jpg"
+        subtitle="">
+      </image-component>
+    </div>
+    <div>
+      <h3>
+    2)   Lower Mechanisms
+</h3>
+<h4>
+    a)    Footwork Movement
+</h4>
+<h5>
+    i)      Motion Axis Selection
+</h5>
+<p>
+    Having to accomplish two motions, decision has to be made to have both
+    controlled within one mechanism or decouple those axes into separate
+    control. One possible collective system is using omnidirectional wheels. The
+    omnidirectional wheel concept provides full planar mobility of the robot
+    base. A single drive system enables translations in both the X and Y
+    directions, as well as on-the-spot rotation, by appropriately commanding the
+    individual wheel speeds. At the control level, this appears attractive
+    because any desired planar velocity (forward, lateral, yaw) can be
+    synthesised from the same set of actuators.
+</p>
+<p>
+    <strong><u>Benefits of Omni-wheels for Boxing Application</u></strong>
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/7-lower mech-wheels benefit.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+    These advantages are well aligned with general mobile robotics applications,
+    where the primary design objective is flexible navigation in cluttered
+    environments.
+</p>
+<p>
+    <strong><u>Limitations of Omni-wheels for Boxing Application</u></strong>
+</p>
+<p>
+    However, this comes with limitations for a punch-receiving boxing robot. For
+    a boxing trainer robot that must repeatedly absorb impulsive loads from
+    punches while maintaining a stable stance, several limitations arise when
+    using omnidirectional wheels:
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/8-lower mech-wheels limit.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+    Most boxing gyms do not provide the ideal hard, polished surface assumed in
+    many mobile robotics applications. Instead, they commonly use interlocking
+    foam mats, rubber tiles, or sprung or cushioned flooring systems.
+</p>
+<p>
+    On these surfaces:
+</p>
+<ul type="disc">
+    <li>
+        Wheels      can sink slightly into the surface, changing the effective
+        rolling radius      and increasing rolling resistance.
+    </li>
+    <li>
+        The      floor itself adds another compliant layer beneath the robot,
+        amplifying      pose creep under repeated impacts.
+    </li>
+    <li>
+        Small shifts at the base      accumulate over rounds, making it
+        difficult to maintain a consistent      stance reference relative to the
+        user.
+    </li>
+</ul>
+<p>
+    Consequently, maintaining repeatable stance alignment, which is critical for
+    structured drills and quantitative training metrics, is challenging with an
+    omnidirectional base on typical gym flooring.
+</p>
+<p>
+    <strong><u>Benefits of Decoupled Axes for Boxing Application</u></strong>
+</p>
+<p>
+    A design that explicitly decouples the primary motions, e.g. a linear rail
+    for the forward–backward axis combined with a slewing bearing for rotation,
+    sacrifices omnidirectional mobility but introduces significant advantages
+    for this application:
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/9-lower mech-axes benefit.jpg"
+        subtitle="">
+      </image-component>
+<p>
+    <strong><u>Selection Matrix – Forward-Backward Range Motion</u></strong>
+</p>
+<p>
+    Table  shows the decision matrix created to aid the linear footwork movement
+    axis selection, assuming rating scale 1-5 (5 = best performance for
+    BoxBunny’s needs). Omnidirectional wheels score better on cost/simplicity as
+    one system that does everything. The linear rail is much stronger on
+    stiffness, repeatability, and independence from floor compliance, which are
+    critical for a punch-receiving training robot. Thus, for forward-backward
+    motion, the decoupled linear rail is the preferred solution.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/10-matrix-SingleSeparate Motion Control (Linear).jpg"
+        subtitle="Table A9: Decision Matrix for Single/Separate Motion Control (Linear)">
+      </image-component>
+<p>
+    <strong><u>Selection Matrix – Yaw Rotation (On-Spot Turning)</u></strong>
+</p>
+<p>
+    Table B10 shows the decision matrix created to aid the rotational footwork
+    movement axis selection. Omnidirectional wheels can rotate on the spot, but
+    yaw stiffness and angle repeatability are limited by wheel slip and floor
+    compliance. A slewing bearing driven by a motorised pinion offers high
+    rotational stiffness, well-defined backlash, and high moment capacity, all
+    independent of floor conditions. For on-spot rotation, the decoupled
+    rotating base is the preferred solution.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/11-matrix-SingleSeparate Motion Control (Rotation).jpg"
+        subtitle="Table A10: Decision Matrix for Single/Separate Motion Control (Rotation)">
+      </image-component>
+<p>
+    <strong><u>Motion Axis Selection for BoxBunny Footwork Movement</u></strong>
+    <u></u>
+</p>
+<p>
+    Across both motions, the selection matrices show that omnidirectional wheels
+    are attractive for general mobile robots but are penalised here by low
+    stiffness, pose creep, and strong dependence on floor conditions. Decoupled
+    axes (linear rail + slewing bearing) provide the stiff, repeatable,
+    floor-independent geometry needed for a boxing trainer that must reliably
+    hold stance under repeated punches. Therefore, for this application, the
+    project adopts a decoupled-axis architecture: Motorised linear rail for
+    forward–backward range, and slewing bearing with external gear and
+    pinion-driven motor for yaw rotation. <br clear="all"/>
+</p>
+    </div>
+    <div>
+<h5>
+    ii)    Linear Motion Selection
+</h5>
+<h6>
+    (1)   Power Transmission Drive Selection
+</h6>
+<p>
+    The power transmission drive for the linear stage must reliably move the
+    entire BoxBunny robot (≈ 20–25 kg including arms and torso) forward and
+    backward over a short stroke (~300 mm), while withstanding dynamic punching
+    loads. Key requirements for this axis are:
+</p>
+<ul type="disc">
+    <li>
+        <strong>Load      and thrust capacity</strong>:      Sufficient to
+        accelerate the robot mass and resist horizontal reaction      forces
+        during punches.
+    </li>
+    <li>
+        <strong>Positional      stiffness and repeatability</strong>:      The
+        base must return to the same stance positions for drills without
+        noticeable drift.
+    </li>
+    <li>
+        <strong>Moderate      travel speed</strong>:      Fast enough to
+        simulate a boxer stepping in/out, but not a high-speed      shuttle
+        (short strokes, &lt;1 m).
+    </li>
+    <li>
+        <strong>Robustness      under repeated duty</strong>:      Frequent
+        starts/stops and impulse loads during training sessions.
+    </li>
+    <li>
+        <strong>Compact integration</strong>: Drive must fit under the
+        rotating base and vertical structure without excessive footprint.
+    </li>
+</ul>
+<p>
+    Three common drive types were evaluated: <strong>lead screw</strong>,
+    <strong>ball screw</strong>, and <strong>timing belt</strong>.
+</p>
+<p>
+    <strong><u>Lead Screw Drive</u></strong> <u></u>
+</p>
+<p>
+    Lead screws convert rotary motion to linear motion via a threaded rod and
+    nut. They are generally <strong>low cost</strong>, mechanically simple, and
+    can use self-locking polymer or anti-backlash nuts, which reduces drift in
+    vertical axes and improves repeatability for light loads. However, for
+    BoxBunny’s application they present several drawbacks:
+</p>
+<ul type="disc">
+    <li>
+        <strong>Lower      efficiency and higher friction</strong>,      leading
+        to more heating at higher speeds or duty cycles.
+    </li>
+    <li>
+        <strong>Limited      load and speed capability</strong> with typical
+        polymer nuts; not ideal when combining moderate loads,      repeated
+        motion and dynamic impacts.
+    </li>
+    <li>
+        <strong>Moderate accuracy</strong> and life compared to ball
+        screws, especially under higher thrust and duty.
+    </li>
+</ul>
+<p>
+    Lead screws are therefore more suited to light-load, low-speed or low-duty
+    applications, and were not selected as the primary drive for BoxBunny’s main
+    footwork axis.
+</p>
+<p>
+    <strong><u>Ball Screw Drive</u></strong> <u></u>
+</p>
+<p>
+    Ball screws use recirculating balls between the screw and nut, providing
+    <strong>rolling contact</strong> instead of sliding. For BoxBunny, they
+    offer several key advantages:
+</p>
+<ul type="disc">
+    <li>
+        <strong>High      thrust and load capacity</strong> appropriate for
+        moving a ~20–25 kg robot and resisting horizontal reaction      forces.
+    </li>
+    <li>
+        <strong>High      stiffness, accuracy and repeatability</strong>, due to
+        low backlash and well-controlled      preload, which supports repeatable
+        stance positions.
+    </li>
+    <li>
+        <strong>High      mechanical efficiency</strong>,      reducing motor
+        torque requirements and heat build-up under frequent moves.
+    </li>
+    <li>
+        <strong>Good durability under repeated      duty</strong>, making
+        them suitable for regular training sessions with many cycles.
+    </li>
+</ul>
+<p>
+    The main limitations are <strong>higher cost</strong> and the need for
+    <strong>periodic lubrication</strong>, but these are acceptable trade-offs
+    given the short stroke and performance requirements.
+</p>
+<p>
+    <strong><u>Belt Drive</u></strong> <u></u>
+</p>
+<p>
+    Belt-driven actuators use a toothed belt and pulleys to generate linear
+    motion. Their strengths lie in:
+</p>
+<ul type="disc">
+    <li>
+        <strong>High      speed and long travel capability</strong>,
+        typically over several metres.
+    </li>
+    <li>
+        <strong>High efficiency</strong> and relatively simple      maintenance
+        for long-stroke, lower-load systems.
+    </li>
+</ul>
+<p>
+    However, for BoxBunny’s short-stroke footwork axis they are less suitable:
+</p>
+<ul type="disc">
+    <li>
+        <strong>Lower      positional stiffness and accuracy</strong> compared
+        to screw drives, due to belt elasticity.
+    </li>
+    <li>
+        <strong>Susceptibility      to elongation and shock loads</strong>,
+        which can degrade repeatability under punching impacts.
+    </li>
+    <li>
+        Need for <strong>periodic belt      re-tensioning</strong>, and
+        potential <strong>back-driving / drift</strong> in horizontal      or
+        inclined applications.
+    </li>
+</ul>
+<p>
+    Given the short stroke and high stiffness requirement, these disadvantages
+    outweigh the speed benefits.
+</p>
+<p>
+    <strong>
+        <u>Selection Matrix – Power Transmission Drive in Linear Rail</u>
+    </strong>
+</p>
+<p>
+    Table  shows the decision matrix created to aid the power transmission drive
+    in linear rail selection.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/12-matrix-Power Drive Linear Rail.jpg"
+        subtitle="Table A11: Decision Matrix for Power Drive in Linear Rail">
+      </image-component>
+<p>
+    <strong><u>Drive Selection for BoxBunny Linear Stage</u></strong> <u></u>
+</p>
+<p>
+    Considering BoxBunny’s specific requirements of moderate stroke, significant
+    mass, repeated dynamic loads, and the need for high positional stiffness and
+    repeatability, the <strong>ball screw drive</strong> is selected for the
+    linear stage. It provides:
+</p>
+<ul type="disc">
+    <li>
+        Sufficient      thrust and load capacity for the full robot mass,
+    </li>
+    <li>
+        High      stiffness and repeatability for consistent stance positions,
+        and
+    </li>
+    <li>
+        Robust performance under      repeated use, with manageable lubrication
+        requirements.
+    </li>
+</ul>
+<p>
+    This makes a <strong>ball screw–driven linear rail</strong> the most
+    appropriate power transmission solution for the BoxBunny footwork axis.
+</p>
+<h6>
+    (2)   Motor Selection
+</h6>
+<p>
+    The motor driving the ball-screw linear stage must translate the full
+    BoxBunny mass (~20–25 kg) over a short stroke (≈200–300 mm) while
+    maintaining precise, repeatable stance positions under punching
+    disturbances. Key requirements are:
+</p>
+<ul type="disc">
+    <li>
+        <strong>High      torque at low–medium speed</strong> to drive the ball
+        screw without stalling.
+    </li>
+    <li>
+        <strong>High      positioning accuracy and repeatability</strong> so
+        stored “stance distances” are consistent.
+    </li>
+    <li>
+        <strong>Good      disturbance rejection and stiffness</strong> to resist
+        position loss when the robot is      punched.
+    </li>
+    <li>
+        <strong>Realistic cost and integration      complexity</strong> for
+        a prototype.
+    </li>
+</ul>
+<p>
+    Three motor families were evaluated:
+    <strong>
+        Open-Loop Stepper Motor (NEMA-Frame)
+    </strong>
+    , <strong>Closed-Loop Stepper / Hybrid Servo (Stepper + Encoder)</strong>,
+    and <strong>Industrial AC/BLDC Servo Motor (Servo Pack)</strong>.
+</p>
+<p>
+    <strong><u>Open-Loop Stepper Motor</u></strong>
+</p>
+<p>
+    Standard NEMA-frame stepper motors, driven in microstepping mode, are widely
+    used in low-cost linear stages.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>High      holding torque at low speed</strong>,      matching
+        the ball screw’s operating range.
+    </li>
+    <li>
+        <strong>Simple</strong> step/direction interface; no      encoder
+        required.
+    </li>
+    <li>
+        <strong>Very low cost</strong> and excellent availability of
+        motors, drivers, and mounting hardware.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Open-loop      control:</strong> missed steps under sudden loads
+        or aggressive acceleration are not      detected.
+    </li>
+    <li>
+        Loss      of steps leads to <strong>silent position drift</strong>,
+        which directly undermines      stance repeatability.
+    </li>
+    <li>
+        Resonance and <strong>vibration</strong> can occur if not carefully
+        managed.
+    </li>
+</ul>
+<p>
+    Open-Loop Stepper Motor is therefore an attractive baseline for cost and
+    simplicity, but its vulnerability to undetected position loss is a concern
+    for a punch-receiving system.
+</p>
+<p>
+    <strong>
+        <u>Closed-Loop Stepper / Hybrid Servo (Stepper + Encoder)</u>
+    </strong>
+</p>
+<p>
+    Closed-loop steppers (often sold as “hybrid servos”) combine a stepper motor
+    with an integrated encoder and a driver that closes the position/velocity
+    loop.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Encoder      feedback allows detection and correction of missed steps,
+        <strong>improving      reliability under shock loads</strong>.
+    </li>
+    <li>
+        Similar      NEMA form factor and mounting as a standard stepper;
+        <strong>easy mechanical      integration with the ball screw</strong>.
+    </li>
+    <li>
+        Retains <strong>high low-speed torque</strong> while significantly
+        improving positioning      accuracy and stiffness.
+    </li>
+    <li>
+        Many drives still accept      simple step/direction commands,
+        <strong>
+            minimising software changes
+        </strong>
+        .
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Higher      cost</strong> than      open-loop steppers.
+    </li>
+    <li>
+        <strong>Some tuning of current limits      and loop gains</strong> may
+        be required, though typically
+        <strong>
+            simpler than full industrial servos
+        </strong>
+        .
+    </li>
+</ul>
+<p>
+    Closed-Loop Stepper / Hybrid Servo strikes a good balance between
+    performance and complexity for BoxBunny’s linear stage.
+</p>
+<p>
+    <strong><u>Industrial AC/BLDC Servo Motor (Servo Pack)</u></strong>
+</p>
+<p>
+    Industrial servo systems pair an AC/BLDC motor with a high-resolution
+    encoder and a matched servo drive. <strong></strong>
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Excellent      torque–speed characteristics and disturbance rejection.
+    </li>
+    <li>
+        Very      high positioning accuracy, repeatability, and configurable
+        stiffness.
+    </li>
+    <li>
+        Well suited to demanding      industrial positioning applications.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Highest      cost among the three options (motor, drive, cables).
+    </li>
+    <li>
+        Greater      integration complexity: power wiring, controller interface,
+        and tuning of      control loops.
+    </li>
+    <li>
+        Over-specified for a      short-stroke, low-speed axis in a student
+        prototype unless hardware is      already available.
+    </li>
+</ul>
+<p>
+    Industrial AC/BLDC Servo Motor offers the best raw performance, but at a
+    cost and complexity level that may not be justified for this application.
+</p>
+<p>
+    <strong><u>Selection Matrix – Motor in Linear Rail</u></strong>
+</p>
+<p>
+    Table shows the decision matrix created to aid the motor in linear rail
+    selection.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/13-matrix-Motor Linear Rail.jpg"
+        subtitle="Table A12: Decision Matrix for Motor in Linear Rail">
+      </image-component>
+<p>
+    <strong><u>Motor Selection for BoxBunny Linear Stage</u></strong> <u></u>
+</p>
+<p>
+    Considering BoxBunny’s need for
+    <strong>
+        high stiffness and repeatability under punching disturbances
+    </strong>
+    , while keeping integration feasible for a student project,
+    <strong>
+        Closed-Loop Stepper / Hybrid Servo
+    </strong>
+    is selected to drive the ball-screw linear stage. It provides a substantial
+    improvement in robustness over an open-loop stepper without the full cost
+    and integration burden of an industrial servo pack.
+</p>
+    </div>
+    <div>
+      <h5>
+    iii)  Rotational Motion Selection
+</h5>
+<h6>
+    (1)   Bearing Selection
+</h6>
+<p>
+    The yaw rotation system must support the full BoxBunny robot mass (≈ 20–25
+    kg), plus dynamic punching loads and overturning moments from the elevated
+    torso and arms. The bearing must:
+</p>
+<ul type="disc">
+    <li>
+        Carry <strong>combined axial, radial and moment loads</strong> from
+        punches and body      weight.
+    </li>
+    <li>
+        Provide <strong>high rotational stiffness</strong> so the robot does not
+        “wobble” or twist      when struck.
+    </li>
+    <li>
+        Remain <strong>durable under repeated shock and vibration</strong>.
+    </li>
+    <li>
+        Allow <strong>reasonably precise positioning</strong> when driven by an
+        external pinion      and motor.
+    </li>
+    <li>
+        Be <strong>cost-effective and readily available</strong> for a student
+        prototype
+    </li>
+</ul>
+<p>
+    ·       Fit within <strong>limited height</strong> of the lower structure
+    and interface cleanly with the rotating base plate.
+</p>
+<p>
+    Four bearing families were evaluated: a low-cost
+    <strong>
+        lazy-Susan bearing
+    </strong>
+    and three types of <strong>slewing-ring bearings</strong>.
+</p>
+<p>
+    <strong><u>Lazy-Susan Bearing</u></strong>
+</p>
+<p>
+    Lazy-Susan (turntable) bearings are inexpensive, thin-section assemblies
+    commonly used in furniture and light-duty turntables.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Very <strong>low cost</strong> and widely available.
+    </li>
+    <li>
+        <strong>Simple      mounting between two plates.</strong>
+    </li>
+    <li>
+        Compact axial height.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Intended mainly for <strong>light      axial loads</strong>, with
+        <strong>limited overturning-moment capacity</strong>.
+    </li>
+    <li>
+        Minimal preload      → <strong>noticeable play</strong> in tilt and
+        rotation; unsuitable for precise yaw      positioning.
+    </li>
+    <li>
+        Not designed for <strong>repeated      impacts</strong>; looseness and
+        wear are expected under punching loads.
+    </li>
+</ul>
+<p>
+    Lazy-Susan bearing is mechanically attractive for a toy turntable, but does
+    not offer the stiffness, moment capacity, or durability required for
+    BoxBunny.
+</p>
+<p>
+    <strong><u>Slewing-ring Bearing</u></strong>
+</p>
+<p>
+    <strong><em>Four-Point Contact Ball Slewing Ring Bearing</em></strong>
+</p>
+<p>
+    Four-point contact ball slewing rings use a single row of balls in a
+    specially profiled raceway, allowing each ball to carry load at up to four
+    contact points.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Designed      to support
+        <strong>
+            combined axial, radial and overturning moment loads
+        </strong>
+        ,      including varying and shock loads.
+    </li>
+    <li>
+        Can      be <strong>preloaded</strong> to reduce internal clearance and
+        improve stiffness.
+    </li>
+    <li>
+        Lower      friction than cross-roller designs → adequate speed with
+        smooth motion      (although high speed is not critical here).
+    </li>
+    <li>
+        Widely      used in light–medium duty slewing applications,
+        <strong>
+            readily available in      standard sizes
+        </strong>
+        and generally <strong>cheaper</strong> than cross-roller slewing
+        rings.
+    </li>
+    <li>
+        Provides <strong>sufficient      stiffness and load capacity</strong>
+        for a 20–25 kg robot with moderate      punching loads, with safety
+        margin.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Rotational stiffness is <strong>lower      than cross-roller</strong>
+        bearings for the same size and preload; small      elastic deflections
+        are still present under heavy impact.
+    </li>
+</ul>
+<p>
+    This<strong></strong>offers a <strong>good balance</strong> of load
+    capacity, stiffness, availability and cost, and satisfies BoxBunny’s yaw
+    requirements with adequate margin.
+</p>
+<p>
+    <strong><em>Cross-Roller Slewing Ring Bearing</em></strong>
+</p>
+<p>
+    Cross-roller slewing rings use cylindrical rollers arranged in alternating
+    orientations (X-pattern) between inner and outer rings.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Very      high <strong>tilting and rotational stiffness</strong> due to
+        line contact and      crossed layout.
+    </li>
+    <li>
+        Excellent      for
+        <strong>
+            combined axial, radial and moment loads
+        </strong>
+        in compact envelopes.
+    </li>
+    <li>
+        Commonly used in
+        <strong>
+            robot      joints and precision rotary stages
+        </strong>
+        requiring minimal play and high      rigidity.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Generally, <strong>more expensive</strong> than four-point ball slewing
+        rings.
+    </li>
+    <li>
+        Somewhat <strong>less readily available</strong> in suitable sizes from
+        mainstream suppliers      compared to four-point ball types.
+    </li>
+    <li>
+        Higher performance than      strictly required for this application.
+    </li>
+</ul>
+<p>
+    This is technically the stiffest option, but its
+    <strong>
+        cost and availability
+    </strong>
+    are not justified when Four-point contact ball slewing rings already meets
+    the design requirements.
+</p>
+<p>
+    <strong><em>Thrust Ball Slewing Rings</em></strong>
+</p>
+<p>
+    Thrust ball slewing rings are optimised mainly for
+    <strong>
+        axial loads
+    </strong>
+    , with limited radial and moment capacity.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Efficient support for <strong>vertical      loads</strong> with low
+        friction.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Not      optimised for <strong>large overturning moments</strong> from
+        an elevated torso and      punching impacts.
+    </li>
+    <li>
+        Usually requires <strong>additional      bearings</strong> to handle
+        radial and moment loads, increasing complexity.
+    </li>
+</ul>
+<p>
+    This does not match the combined-load and high-moment demands of BoxBunny’s
+    yaw joint without extra components.
+</p>
+<p>
+    <strong><u>Selection Matrix – Bearing in Yaw Rotation System</u></strong>
+</p>
+<p>
+    Table  shows the decision matrix created to aid the bearing in yaw rotation
+    system selection.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/14-matrix-Bearing Linear Rail.jpg"
+        subtitle="Table A13: Decision Matrix for Bearing in Yaw Rotation System">
+      </image-component>
+<p>
+    <strong><u>Bearing Selection for BoxBunny Yaw Rotation</u></strong> <u></u>
+</p>
+<p>
+    Given that <strong>Four-Point Contact Ball Slewing Ring
+    Bearing</strong>already meets BoxBunny’s load and stiffness requirements
+    with margin, and offers better
+    <strong>
+        cost-performance and procurement practicality
+    </strong>
+    , it is selected as the yaw bearing for the system.
+</p>
+<h6>
+    (2)   Gear Reduction Selection (Baseline)
+</h6>
+<p>
+    The gear reduction for the yaw axis is largely dictated by the choice of
+    <strong>slewing ring bearing with external gear teeth</strong>. Once the
+    bearing diameter and tooth form are fixed, the mating pinion and resulting
+    gear ratio follow naturally. The calculations in this section are presented
+    as a baseline template: when the final torque, speed, and load analysis for
+    BoxBunny are complete, the same steps can be repeated with updated values.
+</p>
+<p>
+    <strong><u>External Gear and Pinion Selection</u></strong>
+</p>
+<p>
+    Selected bearing: <strong>Four-Point Contact Ball Slewing Ring</strong>,
+    externally geared
+</p>
+<p>
+    Outer diameter (approx.): <strong>400 mm</strong>
+</p>
+<p>
+    Example model: <strong>LILY Bearing MTE-265X (externally geared)</strong>
+</p>
+<p>
+    Gear mesh: <strong>Module 5</strong> external gear
+</p>
+<p>
+    From the bearing datasheet, the external ring (driven gear) is specified
+    with:
+</p>
+<ul type="disc">
+    <li>
+        <strong>Driven      gear (slewing ring)</strong>:      84 teeth
+    </li>
+    <li>
+        <strong>Driving gear (pinion)</strong>: 17 teeth
+    </li>
+</ul>
+<p>
+    The pinion is mounted on the motor shaft (or via a short shaft + coupling),
+    driving the external gear on the slewing ring.
+</p>
+<p>
+    <strong><u>Gear Ratio Calculation</u></strong>
+</p>
+<p>
+    The <strong>gear ratio (GR)</strong> is defined as:
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/eqn11.jpg"
+        subtitle="">
+      </image-component>
+<p>
+    where
+</p>
+<p>
+    Ndriven = number of teeth on the external slewing ring,
+</p>
+<p>
+    Ndriving = number of teeth on the pinion.
+</p>
+<p>
+    For this configuration:
+</p>
+<ul type="disc">
+    <li>
+        Ndriven      = 84
+    </li>
+    <li>
+        Ndriving      = 17
+    </li>
+</ul>
+<image-component
+        tag="image"
+        source="assets/report appendix b/eqn12.jpg"
+        subtitle="">
+      </image-component>
+      <p>
+    This means the <strong>pinion (and motor)</strong> must rotate approximately
+    <strong>4.94 times faster</strong> than the slewing ring.
+</p>
+<p>
+    <strong><u>Baseline Motor Speed Requirement</u></strong>
+</p>
+<p>
+    Assume a <strong>target yaw speed</strong> at the slewing ring of:
+</p>
+<ul type="disc">
+    <li>
+        Desired output speed (slewing      ring):
+        <image-component
+        tag="image"
+        source="assets/report appendix b/eqn13.jpg"
+        subtitle="">
+      </image-component>
+    </li>
+</ul>
+<p>
+    The required motor (pinion) speed is:
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/eqn14.jpg"
+        subtitle="">
+      </image-component>
+<p>Convert to RPM:</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/eqn15.jpg"
+        subtitle="">
+      </image-component>
+<p>
+    So, <strong>for an output yaw speed of 150°/s</strong>, the motor driving
+    the 17-tooth pinion must run at approximately <strong>124 rpm</strong> with
+    this gear ratio. This is a
+    <strong>
+        reasonable speed range
+    </strong>
+    for many commercial motors and servo systems. When final requirements are
+    known, the same equations can be reused with updated ωout and tooth counts.
+</p>
+<p>
+    <strong><u>Baseline Torque Relationship</u></strong>
+</p>
+<p>
+    Once the required yaw torque at the slewing ring is known from the load
+    analysis (see below), the <strong>required motor torque</strong> can be
+    estimated as:
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/eqn16.jpg"
+        subtitle="">
+      </image-component>
+<p>where</p>
+<p>
+    Tslewing = required torque at the slewing ring (from loads),
+</p>
+<p>
+    GR = 4.94 (gear ratio),
+</p>
+<p>
+    η = efficiency of gear mesh (typically 0.90-0.95 for a well-lubricated spur gear pair).
+</p>
+<p>
+    This formula provides the baseline motor torque requirement once the yaw
+    moment demand has been quantified.
+</p>
+<p>
+    <strong><u>Load Calculation</u></strong>
+</p>
+<p>
+    To size the slewing ring and motor torque properly, the main loads on the
+    yaw bearing must be identified. Figure B1 illustrates the free-body diagram
+    of loads acting on the bearing.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/15-matrix-FBD Loads acting on Bearing.jpg"
+        subtitle="Figure A1: Free-Body Diagram of Loads acting on Bearing.">
+      </image-component>
+<ul type="disc">
+    <li>
+        <strong>Fa: Axial Load</strong>
+    </li>
+    <ul type="circle">
+        <li>
+            Total       vertical load acting along the axis of rotation.
+        </li>
+        <li>
+            Primarily       the
+            <strong>
+                weight of all rotating components
+            </strong>
+            above the bearing (torso       frame, arms, padding, sensors, etc.).
+        </li>
+    </ul>
+    <li>
+        <strong>Fr: Radial Load</strong>
+    </li>
+    <ul type="circle">
+        <li>
+            Forces       acting
+            <strong>
+                perpendicular to the axis of rotation
+            </strong>
+            in the horizontal       plane.
+        </li>
+        <li>
+            Includes <strong>horizontal components of punching forces</strong>
+            and any off-centre loads       due to asymmetric mass distribution.
+        </li>
+    </ul>
+    <li>
+        <strong>Mk: Tilting Moment (Overturning      Moment)</strong>
+    </li>
+    <ul type="circle">
+        <li>
+            Moment       about a horizontal axis through the bearing centre.
+        </li>
+        <li>
+            Arises       from:
+        </li>
+        <ul type="square">
+            <li>
+                The <strong>weight of the robot’s upper structure</strong>
+                acting at a vertical offset        from the bearing centre
+                (lever arm).
+            </li>
+            <li>
+                <strong>
+                    Punching        forces applied away from the bearing centre
+                </strong>
+                (e.g. at the head or torso        pad).
+            </li>
+        </ul>
+        <li>
+            Typically,       the <strong>most critical load</strong> for a
+            slewing ring.
+        </li>
+        <li>
+            Calculated       from the <strong>centre of gravity (CG)</strong>
+            location and impact points:
+        </li>
+    </ul>
+</ul>
+<image-component
+        tag="image"
+        source="assets/report appendix b/eqn--.jpg"
+        subtitle="">
+      </image-component>
+      <p>where F is the force (weight or impact) and d is the perpendicular distance from the bearing centre to the line of action.</p>
+<ul type="disc">
+    <li>
+        <strong>Impact/Shock      Loads</strong>
+    </li>
+    <ul type="circle">
+        <li>
+            Boxing       involves <strong>dynamic impacts</strong>. A peak punch
+            force (e.g. up to ~1.5 kN       for an average user) acting at a
+            certain radius from the bearing centre       will generate a short
+            duration tilting moment.
+        </li>
+        <li>
+            Such       impacts are typically accounted for using a
+            <strong>
+                service factor (SF)
+            </strong>
+            ,       multiplying the nominal static/dynamic loads by SF to ensure
+            the bearing       and gear are sized with sufficient margin.
+        </li>
+    </ul>
+    <li>
+        <strong>Mr: Friction Torque</strong>
+    </li>
+    <ul type="circle">
+        <li>
+            Internal       resistance to rotation within the bearing assembly,
+            dependent on bearing       diameter, preload, rolling element type,
+            and lubricant.
+        </li>
+        <li>
+            Contributes       to the <strong>baseline torque</strong> the motor
+            must overcome even without       external loads.
+        </li>
+    </ul>
+</ul>
+<p>
+    These load components form the <strong>input</strong> to the manufacturer’s
+    rating charts (axial load, radial load, tilting moment, friction torque).
+    Once the final BoxBunny mass distribution and impact assumptions are fixed,
+    the above framework can be used to:
+</p>
+<ol start="1" type="1">
+    <li>
+        Compute Fa, Fr, and Mk
+    </li>
+    <li>
+        Check      the slewing ring against its
+        <strong>
+            static and dynamic load ratings
+        </strong>
+        .
+    </li>
+    <li>
+        Derive the required <strong>yaw      torque</strong> at the bearing, and
+        from that, the <strong>motor torque</strong> using      the gear ratio
+        and efficiency relations described earlier.
+    </li>
+</ol>      
+    </div>
+    <div>
+<h6>
+    (3)   Motor Selection
+</h6>
+<p align="left">
+    The yaw motor, together with the pinion and slewing ring, must rotate the
+    full BoxBunny upper body about the vertical axis while resisting
+    punching-induced moments. Key requirements are:
+</p>
+<ul type="disc">
+    <li>
+        <strong>Sufficient torque</strong> at the pinion to overcome:
+    </li>
+    <ul type="circle">
+        <li>
+            Tilting moment transmitted       through the gear mesh
+        </li>
+        <li>
+            Bearing friction torque
+        </li>
+        <li>
+            Inertial torque during       acceleration/deceleration
+        </li>
+    </ul>
+    <li>
+        <strong>Target speed</strong>: ≈150°/s at the slewing ring      (≈124
+        rpm at the motor with GR ≈ 4.94).
+    </li>
+    <li>
+        <strong>Accurate, repeatable positioning</strong> for defined yaw angles
+        (e.g.      open/closed stance modes).
+    </li>
+    <li>
+        <strong>Good disturbance rejection</strong> so the robot does not
+        “twist” or      lose position under impacts.
+    </li>
+    <li>
+        <strong>Reasonable cost and manageable integration</strong> for a
+        student prototype.
+    </li>
+</ul>
+<p>
+    Three realistic motor options were evaluated:
+    <strong>
+        Brushed DC Gearmotor
+    </strong>
+    , <strong>Closed-Loop Stepper / Hybrid Servo</strong>, and
+    <strong>
+        BLDC Servo Motor with Encoder
+    </strong>
+    .
+</p>
+<p>
+    <strong><u>Brushed DC Gearmotor</u></strong>
+</p>
+<p>
+    Brushed DC motors with an integrated gearhead are common in low-cost rotary
+    stages.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Simple control</strong>: speed is roughly proportional to
+        applied voltage; direction via      polarity.
+    </li>
+    <li>
+        <strong>High torque at low output speed</strong> due to the gearhead,
+        potentially      matching the required 124 rpm.
+    </li>
+    <li>
+        Widely available and relatively low cost.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Poor inherent position control</strong>: without an encoder and
+        closed-loop controller, position is estimated indirectly (via
+        time/voltage), which is not precise enough for repeatable yaw angles.
+    </li>
+    <li>
+        Even with an encoder added, most low-cost gearmotors exhibit
+        <strong>
+            gearbox      backlash
+        </strong>
+        , causing play at the pinion and visible yaw “looseness” when
+        punched.
+    </li>
+    <li>
+        Brushed motors have <strong>brush wear</strong> and may require more
+        maintenance in long-term use.
+    </li>
+</ul>
+<p>
+    This<strong></strong>is attractive for torque and simplicity, but the
+    combination of backlash and weaker position control makes it unsuitable as
+    the primary yaw actuator for BoxBunny.
+</p>
+<p align="left">
+    <strong><u>Closed-Loop Stepper / Hybrid Servo</u></strong>
+</p>
+<p>
+    A closed-loop stepper (hybrid servo) combines a stepper motor, encoder and
+    smart driver. It accepts step commands but internally closes the loop on
+    position/velocity.
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Good low-speed torque</strong>, suitable for directly driving
+        the pinion through the 4.94:1      reduction.
+    </li>
+    <li>
+        Encoder feedback allows detection and correction of position error
+        under disturbances.
+    </li>
+    <li>
+        Relatively <strong>simple command interface</strong> (often still step)
+        compatible with typical motion controllers.
+    </li>
+    <li>
+        More compact and affordable than many industrial AC servos.
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Steppers have <strong>torque ripple and microstep non-linearity</strong>
+        ,      which can produce small angle “cogging” in very slow or static
+        positions;      this can be felt as slight chatter when the user
+        manipulates the robot.
+    </li>
+    <li>
+        Dynamic performance is good but not as smooth as a
+        sinusoidally-commutated BLDC servo under rapid direction changes.
+    </li>
+    <li>
+        Acoustic noise and vibration can be higher than BLDC at certain
+        operating points.
+    </li>
+</ul>
+<p>
+    This  is a solid option with closed-loop control and adequate torque, but
+    its torque ripple and dynamic smoothness are not ideal for a “human-facing”
+    yaw motion that should feel smooth and responsive.
+</p>
+<p align="left">
+    <strong><u>BLDC Servo Motor with Encoder</u></strong>
+</p>
+<p>
+    This option uses a <strong>brushless DC motor</strong> paired with a
+    <strong>rotary encoder</strong> and a <strong>FOC/servo driver</strong> that
+    closes the loop on current, velocity and position (i.e. a BLDC servo).
+</p>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Smooth, sinusoidal torque production</strong> via field-oriented
+        control,      reducing cogging and vibration at low speed.
+    </li>
+    <li>
+        <strong>Good torque–speed envelope</strong> easily meets ≈124 rpm at the
+        motor with margin for faster moves if      desired.
+    </li>
+    <li>
+        <strong>Closed-loop position control</strong> using encoder feedback →
+        high      yaw accuracy and repeatability, with active disturbance
+        rejection under      punching.
+    </li>
+    <li>
+        <strong>High efficiency and low maintenance</strong>, since there are no
+        brushes to      wear out.
+    </li>
+    <li>
+        Well suited to continuous rotary motion with frequent accelerations
+        and reversals.
+    </li>
+</ul>
+<p>
+    <strong>Limitations</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>Higher integration complexity</strong> than a simple DC
+        gearmotor:      requires encoder wiring and a suitable BLDC servo
+        driver.
+    </li>
+    <li>
+        Typically, <strong>more expensive</strong> than basic brushed motors,
+        though      often comparable to or slightly above closed-loop steppers
+        depending on      brand.
+    </li>
+</ul>
+<p>
+    This offers the best combination of
+    <strong>
+        smoothness, torque, precision and disturbance rejection
+    </strong>
+    for BoxBunny’s yaw axis, at a complexity level that is still manageable for
+    a student build using off-the-shelf BLDC servo drivers.
+</p>
+<p>
+    <strong><u>Selection Matrix – Motor in Yaw Rotation System</u></strong>
+</p>
+<p>
+    Table  shows the decision matrix created to aid the motor in yaw rotation
+    system selection.
+</p>
+      <image-component
+        tag="image"
+        source="assets/report appendix b/16-matrix-Motor Yaw Rotation System.jpg"
+        subtitle="Table A14: Decision Matrix for Motor in Yaw Rotation System">
+      </image-component>
+      <p>
+    <strong><u>Motor Selection for BoxBunny Yaw Rotation</u></strong> <u></u>
+</p>
+<p>
+    For the yaw axis, user perception and stability are critical: the robot
+    should rotate smoothly and feel “solid” under punches, without rattling or
+    drifting from its commanded angle. While brushed DC gearmotors and
+    closed-loop steppers can meet basic torque and speed needs, their drawbacks
+    in backlash and torque ripple/noise make them less suitable.
+</p>
+<p>
+    Given these requirements, <strong>BLDC Servo Motor with Encoder</strong> is
+    chosen as the yaw motor. It provides smooth and controlled yaw motion, high
+    positional stiffness and repeatability, and robust behaviour under
+    impact-induced disturbances, all of which align well with the BoxBunny
+    design goals.
+</p>
+    </div>
+    <div>
+<h4>
+    b)    Height Adjustment
+</h4>
+<p>
+    The height adjustment system must vary the BoxBunny torso/head height by
+    approximately <strong>300–400 mm</strong> to accommodate different user
+    heights, while:
+</p>
+<ul type="disc">
+    <li>
+        Carrying      the <strong>axial load</strong> of the upper structure
+        (~20–25 kg plus padding and      arms)
+    </li>
+    <li>
+        Resisting <strong>lateral forces and overturning moments</strong> from
+        punches
+    </li>
+    <li>
+        Remaining <strong>stiff and “non-bouncy”</strong> during training (once
+        set, the height should      not oscillate)
+    </li>
+    <li>
+        Being <strong>safe and simple</strong> for users to adjust occasionally
+        (not continuously      during a round)
+    </li>
+    <li>
+        Fitting within the available      vertical envelope above the linear
+        stage
+    </li>
+</ul>
+<p>
+    Three concepts were explored.
+</p>
+<p>
+    <strong>
+        <u>Concept #1: Office Chair Mechanism + Vertical Linear Guide</u>
+    </strong>
+</p>
+<p>
+    The first idea was to adapt the <strong>office chair mechanism</strong>
+    (Figure B2): a <strong>gas lift cylinder</strong> to carry the axial load,
+    combined with <strong>vertical linear guides</strong> at the back to resist
+    lateral punching forces.
+</p>
+<image-component
+        tag="image"
+        source="assets/report appendix b/17-height-concept1.png"
+        subtitle="Figure B2: Required Components + Drawing of Integration for Concept #1">
+      </image-component>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Gas      lifts are <strong>readily available and compact</strong>.
+    </li>
+    <li>
+        Can      carry the <strong>static axial load</strong> of the robot mass.
+    </li>
+    <li>
+        Vertical linear guides at the      back can be sized to take
+        <strong>
+            lateral loads and overturning moments
+        </strong>
+        .
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Gas      cylinders are inherently <strong>compliant</strong> – they
+        behave like a      spring/damper. Under repeated punches, this leads to
+        <strong>vertical      “bouncing”</strong> of the torso, which feels
+        unrealistic and reduces strike      rigidity.
+    </li>
+    <li>
+        The      internal gas spring force varies with stroke; stiffness is
+        <strong>not easily      tuned</strong> for the specific mass and dynamic
+        loads.
+    </li>
+    <li>
+        Conventional office-chair gas      lifts are designed for
+        <strong>
+            human seating comfort
+        </strong>
+        , not for resisting      repeated impact loads at an elevated lever arm.
+    </li>
+</ul>
+<p>
+    <strong>Conclusion:</strong> While mechanically simple, Concept #1 does not
+    provide sufficient <strong>vertical stiffness</strong>; the gas lift
+    introduces unwanted bounce under impact.
+</p>
+<p>
+    <strong>
+        <u>Concept #2: Electric Gas Strut + Motorised Vertical Linear Guide</u>
+    </strong>
+</p>
+<p>
+    The second concept combined an
+    <strong>
+        electrically actuated mechanism
+    </strong>
+    for height control with a <strong>gas strut</strong> at the bottom to assist
+    in carrying axial load (Figure B3):
+</p>
+<ul type="disc">
+    <li>
+        A <strong>motorised drive</strong> (e.g. screw or belt) to move the
+        upper carriage      along vertical linear guides.
+    </li>
+    <li>
+        A <strong>gas strut</strong> mounted      beneath to partially support
+        the robot’s weight.
+    </li>
+</ul>
+<image-component
+        tag="image"
+        source="assets/report appendix b/18-height-concept2.png"
+        subtitle="Figure B3: Required Components + Drawing of Integration for Concept #2">
+      </image-component>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        Allows <strong>push-button height adjustment</strong>, potentially even
+        mid-session.
+    </li>
+    <li>
+        The      gas strut can reduce the required motor torque by
+        <strong>
+            counterbalancing
+        </strong>
+        part of the robot’s weight.
+    </li>
+    <li>
+        Vertical linear guides again      provide
+        <strong>
+            lateral and moment support
+        </strong>
+        .
+    </li>
+</ul>
+<p>
+    <strong>Limitations for BoxBunny</strong>
+</p>
+<ul type="disc">
+    <li>
+        Mechanically      and electrically <strong>complex</strong>:
+        coordinating motor drive, gas strut      support, and guide loads is
+        non-trivial.
+    </li>
+    <li>
+        Multiple      elements share the load path (motor, screw/drive, gas
+        strut, guides),      making
+        <strong>
+            stiffness and reliability harder to predict
+        </strong>
+        .
+    </li>
+    <li>
+        For an application where      height is adjusted
+        <strong>
+            occasionally
+        </strong>
+        (between users, not continuously),      the added complexity and cost of
+        powered adjustment is not justified.
+    </li>
+</ul>
+<p>
+    <strong>Conclusion:</strong> Concept #2 offers convenience but at the cost
+    of <strong>high complexity</strong> and a more difficult load path. It is
+    unnecessarily sophisticated for a height setting that is changed only
+    occasionally.
+</p>
+<p>
+    <strong>
+        <u>Concept #3: Manual Screw Jack + Vertical Linear Guides</u>
+    </strong>
+</p>
+<p>
+    The final concept uses a <strong>manual screw jack with handwheel</strong>
+    mounted on top of the linear stage, combined with
+    <strong>
+        vertical linear rails
+    </strong>
+    as the primary guides.
+</p>
+<ul type="disc">
+    <li>
+        The <strong>screw jack</strong> carries the <strong>axial load</strong>
+        of the robot and provides      precise height adjustment via handwheel
+        rotation.
+    </li>
+    <li>
+        Two <strong>vertical linear rails</strong> (each with multiple long
+        blocks) mounted behind the robot carry
+        <strong>
+            lateral      forces and overturning moments
+        </strong>
+        from punches, ensuring the structure      does not tilt.
+    </li>
+</ul>
+<p>
+    <strong>Advantages</strong>
+</p>
+<ul type="disc">
+    <li>
+        <strong>High      axial load capacity and stiffness</strong>:      screw
+        jacks are designed for heavy-duty industrial applications; they
+        carry the full weight with minimal vertical compliance.
+    </li>
+    <li>
+        <strong>Self-locking</strong>: with an appropriately chosen      screw
+        lead and efficiency, the jack is <strong>non-backdrivable</strong>, so
+        the      height does not drift or bounce under impacts. No extra brake
+        is required.
+    </li>
+    <li>
+        <strong>Simple      load path</strong>:      axial loads go directly
+        through the screw jack; lateral and moment loads      are taken by the
+        vertical rails → easier to analyse and design.
+    </li>
+    <li>
+        <strong>Manual      but ergonomic</strong>:      height is adjusted via
+        a handwheel; this is acceptable because height      changes occur
+        <strong>between users or rounds</strong>, not continuously.
+    </li>
+    <li>
+        Mechanically <strong>robust and      maintainable</strong>, using
+        standard industrial components (jack + linear      guides).
+    </li>
+</ul>
+<p>
+    <strong>Limitations</strong>
+</p>
+<ul type="disc">
+    <li>
+        Requires <strong>manual effort</strong> to adjust height; not as
+        convenient as push-button      systems.
+    </li>
+    <li>
+        Adjustment speed is slower      than an electric actuator, though still
+        acceptable for occasional use.
+    </li>
+</ul>
+<strong>Conclusion:</strong>
+<p>
+    Concept #3 provides <strong>high holding stiffness</strong>, <strong>self-locking behaviour</strong>
+    , and a <strong>clear separation of axial vs lateral/moment support</strong>
+    . It meets BoxBunny’s functional requirements with moderate cost and
+    manageable complexity and is therefore selected as the height adjustment
+    solution.
+</p>    
+    </div>
+
 
   <!-- This is the code to display the scroll to top button for ergonomic -->
   <!-- You can leave it as it is, or if you don't like its aesthetics you can also just delete it, -->
@@ -1689,6 +3620,4 @@
   <script src="./components/data-chart/boxer-pie.js"></script>
   <script src="./components/data-chart/train-sp-pie.js"></script>
 </body>
-
 </html>
-

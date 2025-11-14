@@ -433,4 +433,316 @@ new gridjs.Grid({
       ["Minimum Frame Rate", "≥ 7 FPS", "Maintains smooth tracking for reliable pose estimation"],
     ],
   }).render(document.getElementById("table-robot-intelligence"));
+
+  // Foam Specifications Table 1 (Measured)
+new gridjs.Grid({
+  columns: [
+    { 
+      name: "Parameter",
+      width: "119px"
+    },
+    { 
+      name: "Symbol",
+      width: "110px"
+    },
+    { 
+      name: "Value",
+      width: "247px"
+    },
+    {
+      name: "Units",
+      width: "159px"
+    }
+  ],
+  
+  data: [
+    [
+      "Length",
+      "L",
+      "580",
+      "mm"
+    ],
+    [
+      "Diameter",
+      "D",
+      "60",
+      "mm"
+    ],
+    [
+      "Mass",
+      "M",
+      "49.25",
+      "g"
+    ],
+    [
+      "Calculated Density",
+      gridjs.html("Ρ <sub>mat</sub>"),
+      "30",
+      gridjs.html("kg/m <sup>3</sup>")
+    ]
+  ]
+}).render(document.getElementById("table-foam-specs-1"));
+
+// Foam Specifications Table 2 (Target)
+new gridjs.Grid({
+  columns: [
+    { 
+      name: "Parameter",
+      width: "120px"
+    },
+    { 
+      name: "Symbol",
+      width: "110px"
+    },
+    { 
+      name: "Value",
+      width: "247px"
+    },
+    {
+      name: "Units",
+      width: "159px"
+    }
+  ],
+  
+  data: [
+    [
+      "Length",
+      "L",
+      "900",
+      "mm"
+    ],
+    [
+      "Diameter",
+      "D",
+      "60",
+      "mm"
+    ],
+    [
+      "Density",
+      gridjs.html("Ρ <sub>mat</sub>"),
+      "30",
+      gridjs.html("kg/m <sup>3</sup>")
+    ],
+    [
+      "Calculated Mass",
+      "M",
+      "76.3",
+      gridjs.html("g <sup></sup>")
+    ]
+  ]
+}).render(document.getElementById("table-foam-specs-2"));
+
+// Strike Speed Specifications Table
+new gridjs.Grid({
+  columns: [
+    { 
+      name: "Parameter",
+      width: "120px"
+    },
+    { 
+      name: "Symbol",
+      width: "110px"
+    },
+    { 
+      name: "Value",
+      width: "248px"
+    },
+    {
+      name: "Units",
+      width: "160px"
+    }
+  ],
+  
+  data: [
+    [
+      "Strike Angle",
+      gridjs.html("ф <sub>strike</sub>"),
+      "90",
+      "degree"
+    ],
+    [
+      "Number of Strikes",
+      "n",
+      "5",
+      "Unitless"
+    ],
+    [
+      "Duration",
+      gridjs.html("T <sub>strikes</sub>"),
+      "2.62",
+      "s"
+    ],
+    [
+      "Calculated Angular Speed",
+      gridjs.html("ω"),
+      "6.04",
+      gridjs.html("rad/s <sup></sup>")
+    ],
+    [
+      "Rotation Per Minute",
+      "RPM",
+      "57.7",
+      "rotation/min"
+    ]
+  ]
+}).render(document.getElementById("table-strike-speed-specs"));
+
+// Angular Acceleration Specifications Table
+new gridjs.Grid({
+  columns: [
+    { 
+      name: "Parameter",
+      width: "121px"
+    },
+    { 
+      name: "Symbol",
+      width: "112px"
+    },
+    { 
+      name: "Value",
+      width: "251px"
+    },
+    {
+      name: "Units",
+      width: "161px"
+    }
+  ],
+  
+  data: [
+    [
+      "Time to full speed",
+      "t",
+      "0.25",
+      "s"
+    ],
+    [
+      "Angular Speed",
+      gridjs.html("ω"),
+      "6.04",
+      "rad/s"
+    ],
+    [
+      "Calculated Acceleration",
+      gridjs.html("α"),
+      "24.2",
+      gridjs.html("rad/s <sup>2</sup>")
+    ]
+  ]
+}).render(document.getElementById("table-acceleration-specs"));
+
+// Drag Torque Specifications Table
+new gridjs.Grid({
+  columns: [
+    { 
+      name: "Parameter",
+      width: "122px"
+    },
+    { 
+      name: "Symbol",
+      width: "112px"
+    },
+    { 
+      name: "Value",
+      width: "251px"
+    },
+    {
+      name: "Units",
+      width: "162px"
+    }
+  ],
+  
+  data: [
+    [
+      "Diameter",
+      "D",
+      "60",
+      "mm"
+    ],
+    [
+      "Calculated Angular Speed",
+      gridjs.html("ω"),
+      "6.04",
+      gridjs.html("rad/s <sup></sup>")
+    ],
+    [
+      gridjs.html("Calculated<br>Tip Speed"),
+      "u",
+      "5.43",
+      "m/s"
+    ],
+    [
+      "Dynamic Viscosity of Air",
+      gridjs.html("Ν <sub>air(15°)</sub>"),
+      gridjs.html("1.81 x 10 <sup>-5</sup>"),
+      gridjs.html("m<sup>2</sup>/s")
+    ],
+    [
+      "Air Density",
+      gridjs.html("Ρ <sub>air(15°)</sub>"),
+      "1.225",
+      gridjs.html("kg/m <sup>3</sup>")
+    ],
+    [
+      "Reynolds Number",
+      "Re",
+      gridjs.html("1.8 x 10 <sup>4</sup>"),
+      "unitless"
+    ],
+    [
+      "Drag Coeff",
+      gridjs.html("C <sub>d</sub>"),
+      "1.2",
+      "unitless"
+    ],
+    [
+      "Drag Torque",
+      gridjs.html("τ <sub>drag</sub>"),
+      "0.215",
+      "N∙m"
+    ]
+  ]
+}).render(document.getElementById("table-drag-torque-specs"));
+
+// Torque Specifications Table
+new gridjs.Grid({
+  columns: [
+    { 
+      name: "Parameter",
+      width: "121px"
+    },
+    { 
+      name: "Symbol",
+      width: "112px"
+    },
+    { 
+      name: "Value",
+      width: "251px"
+    },
+    {
+      name: "Units",
+      width: "162px"
+    }
+  ],
+  
+  data: [
+    [
+      "Peak Torque",
+      gridjs.html("Τ <sub>peak</sub>"),
+      "1.26",
+      gridjs.html("N∙m <sup></sup>")
+    ],
+    [
+      "Continuous Torque",
+      gridjs.html("T <sub>continuous</sub>"),
+      "0.828",
+      "N∙m"
+    ],
+    [
+      "Rotation Per Minute",
+      "RPM",
+      "57.7",
+      "rotation/minute"
+    ]
+  ]
+}).render(document.getElementById("table-torque-specs"));
   
