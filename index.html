@@ -193,8 +193,18 @@
           </p>
           <p>
             Questions are tailored accordingly and refined them into a concise set of
-            guiding questions (Appendix x; Figure y; Figure xx).
+            guiding questions (Table 1).
           </p>
+          <table-component subtitle="Table 1: User Interview Questions">
+            <div id="interview-qn"></div>
+          </table-component>
+
+          <!-- Load Grid.js -->
+          <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+          <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
+          <!-- Load your table generator -->
+          <script src="./components/table-component/interview-qn.js"></script>
         <h4>2.2.2 Insights</h4>
         <p>
           Our user interview and surveys of Boxing-Gym Boxers presented that sparring
@@ -214,14 +224,13 @@
           boxers constrained in development and those looking to improve constrained
           by inflexible class schedules.
         </p>
-        <p align="center">
-          <img
-              width="490"
-              height="175"
-              src=""
-              alt="Challenges Boxing Gym Boxers Face"
-          />
-        </p>
+
+        <div style="display: flex; justify-content: center;">
+          <div id="boxer-pie-container" style="width: 400px; height: 400px;">
+            <canvas id="boxer-pie"></canvas>
+          </div>
+        </div>
+
         <p>
           Approximately 33% of coaches within the ‘Training Support Stakeholders’
           group prioritized pad work, and 22% thought sparring training sessions were
@@ -231,25 +240,23 @@
           current boxing gym setups, such individualised attention is not possible as
           the coach to boxer ratio is uneven.
         </p>
-        <p align="center">
-          <img
-              width="490"
-              height="175"
-              src=""
-              alt="Training that Training Support Stakeholders Find Most Important"
-          />
-        </p>
+
+        <div style="display: flex; justify-content: center;">
+          <div id="train-sp-pie-container" style="width: 400px; height: 400px;">
+            <canvas id="train-sp-pie"></canvas>
+          </div>
+        </div>
+
         <p>
           As the basis for the Value Proposition Canvas, we provide insight summaries
           for Boxers at Boxing Gyms and Training Support Stakeholders, emphasizing
           their primary tasks, challenges, and rewards.
         </p>
-        <table border="1" cellspacing="0" cellpadding="0" width="624">
-          
-        </table>
-        <p>
-          Table 1: User Insights from Interviews
-        </p>
+
+        <table-component subtitle="Table 2: User Interview Questions">
+          <div id="user-insights"></div>
+        </table-component>
+
         <p>
           These realizations served as the basis for the Value Proposition Canvas's
           Customer Profile. Each group stands for a distinct set of jobs, pains, and
@@ -275,31 +282,149 @@
       <p>
         Three close competitors were chosen for a thorough comparison in order to
         guarantee relevancy; each was picked because of their high internet
-        presence, which indicated a sizeable percentage of user adoption (Table 2,
-        Table 3, Table 4). Furthermore, our competitor selection intentionally
-        focuses on ‘robotic’ training equipment as the primary problem identified in
-        our research is the lack of adaptive training partners. These contrasts gave
-        us a standard by which to measure our own value proposition and design
-        approach.
+        presence, which indicated a sizeable percentage of user adoption (Table 3). 
+        Furthermore, our competitor selection intentionally focuses on ‘robotic’ 
+        training equipment as the primary problem identified in our research is the 
+        lack of adaptive training partners. These contrasts gave us a standard by 
+        which to measure our own value proposition and design approach.
       </p>
-      <table border="1" cellspacing="0" cellpadding="0">
+
+      <table-component subtitle="Table 3: Competitor Analysis">
+        <div id="competitor-table"></div>
+      </table-component>
+      
+      <p>
+        Our innovation strategy was guided by the useful design orientations and 
+        functional gaps that were discovered through the examination of features 
+        and feedback across a number of commercially available solutions (Table 5). 
+        On-screen coaching, variety of strike zones, impact sensors, and a range of 
+        training modes (e.g., cardio, sparring, mitts) are already features of existing 
+        systems, such as interactive boxing trainers and AI-powered punch trackers. 
+        These features suited to various training preferences, offered quantifiable 
+        performance statistics, and successfully increased user motivation. Nevertheless, 
+        significant drawbacks remained, such as unreliable technology, no reactive or 
+        tactile feedback, irrational attack angles, and an inability to simulate defensive 
+        situations. Furthermore, a lot of sophisticated technologies were either too 
+        expensive, lacked adaptive intelligence, or were too immobile to accommodate dynamic 
+        boxing motions like footwork.
+      </p>
+
+      <table-component subtitle="Table 4: Design Improvement Opportunities">
+        <div id="design-improvement"></div>
+      </table-component>
+      
+      <p>
+        Analysing competitors revealed that although existing solutions effectively use 
+        digital coaching and quantifiable data, they frequently fail to provide realistic 
+        engagement, adaptability, and safety for a wide range of users. Many technologies are 
+        still too expensive for general use or too inflexible for practical training. Our team 
+        used these insights to create five integrated products that each addressed a distinct 
+        market gap: Intelligent Training System, Skill Progression Studio, Adaptive Fight 
+        Intelligence, Performance Analytics, and Modular Boxing Platform. When taken as a whole, 
+        these solutions transform boxing training by fusing accessibility, realism, and data
+        -driven feedback to benefit gym-based stakeholders as well as individual athletes.
+      </p>
     
-      </table>
-<p>
-    <a>Table</a>3: Competitor Analysis of STRYK RXT-1
-    Striking Robot
-</p>
-<table border="1" cellspacing="0" cellpadding="0">
+    <div id="value-proposition">
+      <h3>2.4 Value Proposition Canvas</h3>
+      <p>
+        Two Value Proposition Canvases were created to reflect the unique but related demands of 
+        Boxing-Gym Boxers (Figure 3) and Training Support Stakeholders (Figure 4) after-market gaps 
+        and user insights were identified. These canvases convert the recurrent themes, frustrations, 
+        and intended results from our secondary research and interviews into focused product 
+        opportunities.
+      </p>
+
+      <p>
+        For the Boxing Gym Boxers, the findings showed that boxers had a high demand for 
+        flexibility in training, quantifiable development, and realism. Many complained about the uneven 
+        quality of the sparring-drill sessions, the lack of feedback in class, and the challenge of 
+        striking a balance between safety and growth. This influenced the development of solutions that 
+        give controlled and flexible skill development, duplicate the intensity of sparring-drill sessions 
+        without the risks involved, and provide measurable feedback to maintain motivation and progress.
+      </p>
+
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/vpc/VPC Boxers in Boxing Gyms.png"
+        subtitle="Figure 3: Value Proposition Canvas - Boxing Gym Boxers">
+      </image-component>
     
-</table>
-<p>
-    <a>Table</a>4: Competitor Analysis of BotBoxer
-</p>
+      <p>
+        Safety, structure, and scalability were the main concerns for Training Support Stakeholders. 
+        Interviews brought to light issues such a lack of gym space, expensive operating expenses, and the 
+        difficulties of sustaining participation across a range of ability levels. In order to reassure 
+        parents and boxers about the efficacy of training, stakeholders looked for methods that enhance 
+        safety oversight, standardize the quality of instruction, and offer quantifiable performance data.
+      </p>
+    
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/vpc/VPC Training Support Stakeholders.png"
+        subtitle="Figure 4: Value Proposition Canvas - Training Support Stakeholders">
+      </image-component>
+
+      <p>
+        The Intelligent Training System, Skill Progression Studio, Adaptive Fight Intelligence, Performance 
+        Analytics, and Modular Boxing Platform are five interconnected solutions that were designed with the 
+        use of these insights.  Each addressing the challenges and successes noted in both canvases, striking 
+        a balance between the stakeholders' demands for safety, structure, and operational effectiveness and 
+        the boxers' desire for realism and advancement.
+      </p>      
+    </div>  
+      
+    <div id="problem-of-interest">
+      <h4>2.4.1 Problem of Interest</h4>
+      <p>
+        A basic problem that both boxers and training support stakeholders face is the absence of a thorough, 
+        secure, and flexible training program that combines the structure and quantifiability of contemporary 
+        coaching with the reality of sparring-drill sessions, according to the two Value Proposition Canvases.  
+        While boxers want flexible training, realistic involvement, and regular feedback, coaches and gym owners 
+        struggle to provide safety, personalized instruction, and efficiency in a constrained amount of time and 
+        space. Only specific elements of the training experience are addressed by current training technology.  
+        None offer a single platform that supports teaching, data tracking, and realistic skill development all 
+        at once, allowing for safe, intelligent training.  This restriction causes a disconnect between what 
+        coaches can provide during training sessions and what boxers want for realistic practice.
+      </p>
+
+      <p>
+        Only specific elements of the training experience are addressed by current training technology.  
+        None offer a single platform that supports teaching, data tracking, and realistic skill development all 
+        at once, allowing for safe, intelligent training.  This restriction causes a disconnect between what coaches 
+        can provide during training sessions and what boxers want for realistic practice. Therefore, our goal is to investigate 
+      </p>      
+
+      <p style="text-align: center; font-style: italic;">
+        "How might we design an intelligent boxing training system that can dynamically and safely strike with users while 
+        assisting coaches in guiding, monitoring, and sustaining boxer development both during and beyond training sessions."
+      </p>
+        This serves as the basis for our design direction, which aims to develop a human-assistive training ecosystem that 
+        redefines how boxing skills are learnt, practiced, and mastered by serving as a training partner for athletes and an 
+        educational extension for coaches.  
+      <p>
+
+      </p>
     </div>
 
-    <div id="value-proposition">
-      <h3>2.4 Value Proposition</h3>
-      <p>...</p>
+    <div id="value-proposition-statement">
+      <h4>2.4.2 Value Proposition Statement</h4>
+      <p>
+        Based on insights from interviews, surveys, and analysis of existing solutions, 
+        the proposed robot directly addresses challenges faced by boxers, including 
+        lack of training variety, misalignment with body types, and limited ways to 
+        track progress. At the same time, it enhances motivation and inclusivity by 
+        introducing interactivity and personalized feedback. Thus, our value proposition 
+        statement is defined as:
+      </p>
+
+      <p style="text-align: center; font-style: italic;">
+        “The boxing robot delivers a safe and dynamic training experience that adapts to 
+        each individual, offering the realism of training with a training partner, and 
+        the guidance of a coach while supporting users of all levels to train effectively, 
+        build confidence, and continuously improve.”
+      </p>      
     </div>
 
     <sl-divider></sl-divider>
@@ -307,12 +432,58 @@
     <!-- 3. Design Methodology -->
     <div id="design-methodology">
       <h2>3. Design Methodology</h2>
+      <p>
+        To translate the problem of interest and value propositions into actionable design 
+        outcomes, this project adopted Pahl and Beitz (Pahl, Beitz, Feldhusen, & Grote, 2007) 
+        approach to engineering design. Their framework emphasizes a logical, iterative progression
+        from problem definition to detailed realization, ensuring that all design decisions remain 
+        traceable to user needs, competitor insights, and technical requirements.
+      </p>
+      <p>
+       According to Pahl and Beitz (Pahl, Beitz, Feldhusen, & Grote, 2007), there are four main stages of design:
+      </p>
+      
+      <ul>
+        <li>Clarification of Task: Involves understanding and defining the design problem, identifying user and technical requirements, and outlining key system functions.</li>
+        <li>Conceptual Design: Focuses on developing alternative principles and mechanisms that could satisfy these functions.</li>
+        <li>Embodiment Design: Refines selected concepts, assessing feasibility, structure, and integration across subsystems.</li>
+        <li>Detail Design: Finalizes the chosen concept for prototyping and testing.</li>
+      </ul>
+    
+      <p>
+       Each phase is supported by specific design tools developed for this project:
+      </p>
+
+      <ul>
+        <li>Clarification of Task → Product Needs Translation</li>
+        <li>Conceptual Design → Solution Principles and Concept Generation</li>
+        <li>Embodiment Design → Concept Screening</li>
+        <li>Detail Design → Prototyping and Testing</li>
+      </ul>
+
+      <p>
+        Every choice, from determining market gaps to improving technical performance, was supported 
+        by methodical reasoning through this organized design technique. It offered the engineering 
+        expertise required to turn research findings into a logical, useful, and user-focused boxing 
+        training program.
+      </p>
+
     </div>
 
     <div id="clarification-of-task">
       <h3>3.1 Clarification of Task</h3>
-      <p>...</p>
-    </div>
+      <p>
+        Insights from the competition study were first translated into specific product requirements 
+        using the Product Needs Translation tool (Table 5), which identified important enhancements, 
+        performance standards, and user experience objectives. The Function Specifications, which included 
+        explicit functions, performance standards, and design justifications for the robot's subsystems 
+        (arms, head, legs, body, skeleton, and interface), were subsequently influenced by these translated 
+        needs. 
+      </p>
+
+      <table-component subtitle="Table 5: Product Needs Translation">
+        <div id="product-needs"></div>
+      </table-component>
 
     <sl-divider></sl-divider>
 
@@ -328,7 +499,80 @@
 
     <div id="user-journey">
       <h3>4.2 User Journey</h3>
-      <p>...</p>
+      <h4>4.2.1 End-to-End User Flow </h4>
+      <p>
+        The flowchart in Figure 5 illustrates the complete user journey when interacting with the robot, 
+        from the start of a session to its conclusion. Each activity is color-coded according to its 
+        corresponding product feature category, as indicated in the legend on the right. The session begins 
+        with height adjustment and selecting the training parameters that match the user’s goals. Once training 
+        starts, the robot functions as an intelligent training partner. The robot enables users to strike designated 
+        zones, defend against simulated punches through arm actuation, and move or orient itself in response to the 
+        user. At the end of the session, the robot generates performance analytics displayed on the dashboard. From 
+        there, users can choose to begin a new session or exit, depending on their needs.
+      </p>
+      
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/user_journey/User_Journey_Counter_Punch.png"
+        subtitle="Figure 5: User Journey Flowchart">
+      </image-component>
+
+    </div>
+
+    <div id="training-modes-overview">
+      <h4>4.2.2 Training Modes Overview</h4>
+      <p>
+        The robot offers two primary training modes: Training and Performance.
+      </p>
+      <p> 
+        Firstly, Training Mode includes Techniques and Spar.
+      </p>
+      <ul>
+        <li> Spar features five preset boxer types that simulate common opponent styles.</li>
+        <li> Techniques provides three categories: Punch Combination Library, Offensive Drills, and Defensive Drills.</li>
+        <ul>
+          <li> The Punch Combination Library includes multiple difficulty levels and also allows users to customise their own punch sequences.</li>
+          <li> o	Offensive and Defensive Drills focus on developing the user’s specific attacking and defensive skills respectively.</li>
+        </ul>
+      </ul>
+      <p>
+        Performance Mode measures key physical attributes such as stamina, punch power, and reaction time.
+      </p>
+      <p>
+         Additionally, the Others menu on the homepage enables users to adjust system settings such as switching 
+         between orthodox and southpaw, while the Insights feature provides a summary of training metrics and performance 
+         trends. 
+      </p>
+    </div>
+    <div> 
+      <h4>4.2.3 Movement Behavior</h4>
+      <p>
+        When the user selects the training parameters, they are interacting with the Skill Progression component of the 
+        product. This feature determines the appropriate motor actuations and software activations (such as computer vision) 
+        required for the session. As shown in Figure 6, users can choose from several training categories such as Training, 
+        Performance, and Others with each serving different purposes. For clarity, this report focuses only on the green pathway, 
+        as detailing every iteration would be unnecessarily exhaustive.
+      </p>
+      <p> 
+        The green pathway leads to the Counter Punch Mode, which is intentionally chosen because it engages the full range of the 
+        robot’s capabilities. This mode is for all skill levels, as it replicates one of the most common foundational sparring 
+        opponents: a reactive boxer who waits for the user to initiate an attack and responds with precise, well-timed counters 
+        (typically jabs and crosses). This style is characterized by low aggression, high timing sensitivity, and reactive movement.
+      </p>
+      <p>
+        Translated into robot behaviour, the system uses computer vision to detect the user’s punches. For every punch thrown by the 
+        user, the robot responds with a counter-punch by actuating its arm motors. Additionally, the robot adjusts its position by 
+        moving linearly when the user steps forward or backward, and it maintains proper orientation by rotating to face the user. 
+        This ensures a realistic and continuous sparring interaction.
+      </p>
+
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/user_journey/user_journey.png"
+        subtitle="Figure 6: Simplified User Journey to Counterpuncher Training">
+      </image-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -340,7 +584,62 @@
 
     <div id="user-interface">
       <h3>5.1 User Interface (GUI)</h3>
-      <p>...</p>
+      <p>
+        The Graphic User Interface (GUI) fulfils the product needs of Skill Progression and Performance Analytics by providing a 
+        modular, intuitive training environment that guides users through structured development pathways. It enables BoxBunny to 
+        select and execute progressive training modules from offensive and defensive drills to measuring performance. The interface 
+        organizes these programs into clear categories, ensuring balanced skill advancement across technique, sparring, and performance 
+        tasks. Additionally, the GUI serves as a comprehensive dashboard, visualizing user statistics across sessions to motivate 
+        improvement, support self-assessment, and foster healthy competition. Users can conveniently select training parameters, as 
+        shown in the demonstration below, making the GUI the central touchpoint for both training customization and performance insight.
+      </p>
+
+      <h4>5.1.1 Function Specifications</h4>
+      
+      <p>
+         The User Interface subsystem processes user input and delivers visual feedback with responsiveness suitable for real-time training 
+         interaction. To ensure clarity, comfort, and seamless user control, the system must meet the following performance targets:  
+      </p>
+
+      <table-component subtitle="Table 6: Function Specification for Graphical User Interface">
+        <div id="gui-func-spec"></div>
+      </table-component>      
+
+      <p>
+        Meeting these specifications ensures that the interface remains readable in various lighting conditions and responds quickly 
+        enough for real-time adjustments during training. This makes the User Interface subsystem a reliable control and feedback channel, 
+        supporting uninterrupted immersion and natural user–robot interaction.
+      </p>
+
+      <h4>5.1.2 Design Considerations</h4>
+      <p>
+        The principal design consideration for the screen-based user interface is achieving a reasonable resolution while ensuring the 
+        display remains easy to integrate into the overall system. The chosen display must provide sufficient clarity for users to read the 
+        screen without visual strain or complicate hardware compatibility. Equally important is seamless integration with the robot’s 
+        electronics and software stack; any display that requires complex interfacing, uncommon drivers, or extensive modification introduces 
+        unnecessary points of failure. Consequently, the primary design challenge lies in selecting a display that balances visual clarity with 
+        practical system integration, ensuring reliable performance without imposing additional hardware or software overhead.
+      </p>
+
+      <h4>5.1.3 Concept Generation</h4>
+      <h5>Concept 1: Developing a Mobile Application</h5>
+      <p>
+        The first concept explores the idea of using the user’s personal smartphone as the primary interface. This approach promises high-resolution 
+        visuals at minimal hardware cost to the robot. However, the development effort required to build and synchronise a mobile app with the robot’s 
+        embedded electronics was deemed excessively complex. In addition, this solution introduced significant usability constraints: in a gym environment, 
+        users would need to rotate their personal phones when taking turns, and coaches might not have their devices readily accessible during training. 
+        In some cases, facilities might even need to purchase a dedicated phone solely for operating the robot. These practical limitations made the concept 
+        unsuitable for reliable day-to-day use.
+      </p>
+      
+      <h5>Concept 2 (Selected Concept): A Dedicated Screen</h5>
+      <p>
+      The second concept proposed integrating a dedicated onboard display. This screen could interface directly with the robot’s electronics, greatly 
+      simplifying programming, communication, and system reliability. It also provides a consistent user experience without dependence on personal devices. 
+      However, this approach increases hardware cost and typically offers lower resolution compared to modern smartphones, as an affordable display must be 
+      chosen to keep overall system pricing reasonable. Despite these trade-offs, the dedicated screen avoids the operational and integration challenges 
+      present in Concept 1, making it the more practical solution.
+      </p>
     </div>
 
     <div id="upper-mechanism">
@@ -621,7 +920,17 @@
 
   <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
   <script type="module" src="./components/table-component/table-component.js"></script>
+  <script src="./components/table-component/user-insights.js"></script>
+  <script src="./components/table-component/competitor-analysis.js"></script>
+  <script src="./components/table-component/design-improvement.js"></script>
+  <script src="./components/table-component/product-needs.js"></script>
+  <script src="./components/table-component/ui-func-spec.js"></script>
+  <script src="./components/table-component/interview-qn.js"></script>
   <script src="./components/table-component/tables.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="./components/data-chart/boxer-pie.js"></script>
+  <script src="./components/data-chart/train-sp-pie.js"></script>
 </body>
 
 </html>
