@@ -1489,9 +1489,12 @@
     <h4>5.4.2.1. Reaction Time and Human Tracking</h4>
 
     <p>
-    Both functions use a pre-trained YOLO pose-estimation model, which provides continuous 3D keypoints
-    for real-time user tracking.
+        Both functions use a pre-trained YOLO pose-estimation model, which provides continuous 3D keypoints
+        for real-time user tracking. The pose-estimation framework is based on the Ultralytics YOLO Pose model, 
+        documented at 
+        <a href="https://docs.ultralytics.com/tasks/pose/" target="_blank">Ultralytics Pose Documentation</a>.
     </p>
+
 
     <ul style="margin-left: 1.5rem;">
     <li><strong>Human Tracking</strong>: Relies on stable frame-to-frame detection for accurate motion prediction and safe interaction.</li>
@@ -1510,12 +1513,12 @@
     <!-- 5.4.2.2 COUNTER PUNCH -->
     <div id="counter-punch">
     <h4>5.4.2.2. Counter Punch</h4>
-
     <p>
         The counter-punch function uses a custom-trained action-recognition model, 
         unlike reaction time and tracking, which rely on pre-trained YOLO pose estimation. 
-        The model classifies punch types from pose sequences which can be further mapped to a predefined counteraction,
-        enabling dynamic and progressive sparring behaviour.
+        The model classifies punch types from pose sequences and maps them to predefined counteractions,
+        enabling dynamic and adaptive sparring behaviour. Here is the link to our 
+        <a href="https://github.com/Yogee-s/boxing_ai_ws" target="_blank">full training and inference codebase</a>.
     </p>
     </div>
 
