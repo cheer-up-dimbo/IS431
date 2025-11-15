@@ -1555,12 +1555,14 @@
     <h4>5.4.2.4. Trained Model</h4>
 
     <p>
-        An initial LSTM-based model, a simple neural-network architecture designed to recognise patterns over time 
-        was trained on a small 2D keypoint dataset and achieved high accuracy on unseen videos as seen below, validating 
-        the end-to-end pipeline from pose extraction to temporal classification. Next, a larger dataset will be collected
-        using the robot’s depth camera to incorporate 3D keypoints (x, y, depth), which is expected to significantly improve accuracy.
-        The final model will also be benchmarked for real-time inference speed to guide processor and hardware selection for meeting reaction-time constraints.
+        An initial LSTM-based model (<a href="https://www.geeksforgeeks.org/deep-learning/deep-learning-introduction-to-long-short-term-memory/" target="_blank">Long Short-Term Memory</a>, 
+        a simple neural-network architecture designed to recognise patterns over time) 
+        was trained on a small 2D keypoint dataset and achieved high accuracy on unseen videos, validating the end-to-end pipeline 
+        from pose extraction to temporal classification. Next, a larger dataset will be collected using the robot’s depth camera to 
+        incorporate 3D keypoints (x, y, depth), which is expected to significantly improve accuracy. The final model will also be 
+        benchmarked for real-time inference speed to guide processor and hardware selection for meeting reaction-time constraints.
     </p>
+
 
     <div class="video-row">
         <div class="video-box">
