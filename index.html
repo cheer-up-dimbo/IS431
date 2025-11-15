@@ -1439,149 +1439,191 @@
       </image-component>
     </div>
 
+
     <!-- 5.4 ROBOT INTELLIGENCE -->
     <div id="robot-intelligence">
-      <h2>5.4. Robot Intelligence</h2>
-      <p>
+    <h2>5.4. Robot Intelligence</h2>
+    <p>
         The Robot Intelligence subsystem fulfils the product needs of Adaptive Fight Intelligence,
         Realistic Training Partner, and Performance Analytics by enabling BoxBunny to perceive,
         interpret, and respond to user movements in real time. Using computer vision and a trained
-        action-recognition model, it detects user punches, predicts responses, and provides performance
-        feedback to support adaptive skill development.
-      </p>
+        action-recognition model, it makes training more dynamic by detecting user punches, predicting
+        responses, and providing performance feedback to support adaptive skill development.
+    </p>
     </div>
 
     <!-- 5.4.1 FUNCTION SPECIFICATIONS -->
     <div id="robot-intelligence-specifications">
-      <h3>5.4.1. Function Specifications</h3>
+    <h3>5.4.1. Function Specifications</h3>
 
-      <p>
+    <p>
         The Robot Intelligence subsystem processes vision data and triggers responses with latency
         comparable to a human opponent. Based on reaction-time data from intermediate boxers, the system
         must achieve the following performance targets:
-      </p>
+    </p>
 
-      <!-- 5.4.1 FUNCTION SPECIFICATIONS TABLE -->
-      <table-component subtitle="Table 18: Robot Intelligence Performance Specifications">
+    <!-- FUNCTION SPECIFICATIONS TABLE -->
+    <table-component subtitle="Table 18: Robot Intelligence Performance Specifications">
         <div id="table-robot-intelligence"></div>
-      </table-component>
+    </table-component>
 
-      <p>
+    <p>
         A depth camera can be used to meet these requirements as it provides reliable detection,
-        stable tracking, and accurate spatial awareness. Its wide field of view and high depth
-        precision enable consistent 3D user tracking, making it an effective option for dynamic
-        real-time interaction.
-      </p>
+        stable tracking, and accurate spatial awareness. Its wide field of view and high depth precision 
+        enable consistent 3D user tracking, making it the most effective option for maintaining smooth,
+        dynamic real-time interaction between the user and the robot.
+    </p>
     </div>
 
     <!-- 5.4.2 COMPUTER VISION -->
     <div id="computer-vision">
-      <h3>5.4.2. Computer Vision</h3>
+    <h3>5.4.2. Computer Vision</h3>
 
-      <p><strong>Performance Analytics:</strong> Turns your training data into measurable insights.</p>
-      <p><strong>Adaptive Fight Intelligence:</strong> Reacts intelligently to movements.</p>
-      <p><strong>Realistic Training Partner:</strong> Delivers safe, reactive sparring drills without a partner.</p>
+    <image-component
+        tag="image"
+        source="assets/robot_intelligence/needs_to_features.png"
+        subtitle="">
+    </image-component>
 
-      <p>
-        Performance Analytics is driven by Reaction Time, which measures system responsiveness.
-        Adaptive Fight Intelligence is achieved through Human Tracking, enabling the robot to follow
-        user movement accurately. Realistic Training Partner is realised through Counter-punching,
-        allowing reactive sparring interactions without requiring a human partner.
-      </p>
+    <p>
+        This subsystem translates key product needs into specific perception features.  
+        Performance Analytics is achieved through Reaction Time, which measures and quantifies system responsiveness.  
+        Adaptive Fight Intelligence is met through Human Tracking, enabling the robot to follow user movement accurately.  
+        Realistic Training Partner is realised through Counter-punching, allowing safe, reactive sparring interactions
+        without a human partner.
+    </p>
     </div>
 
     <!-- 5.4.2.1 REACTION TIME & HUMAN TRACKING -->
     <div id="reaction-time-tracking">
-      <h4>5.4.2.1. Reaction Time and Human Tracking</h4>
+    <h4>5.4.2.1. Reaction Time and Human Tracking</h4>
 
-      <p>
-        Both functions use an open-source YOLO model capable of human detection and pose estimation.
-        The model provides continuous 3D keypoint data that allows the robot to track the user’s body
-        position in real time. Reaction-time detection uses calibrated pose-change thresholds to detect
-        the start of a punch and trigger a response within the 150 ms target window.
-      </p>
+    <p>
+        Both functions can use the open-source pre-trained YOLO model capable of human detection and
+        pose estimation. The model provides continuous 3D keypoint data that allows the robot to identify
+        and track the user’s body position in real time. Human tracking relies on stable frame-to-frame
+        detection for accurate motion prediction and safe operation, while reaction-time detection uses 
+        calibrated pose-change thresholds to determine when a significant movement occurs—such as the 
+        start of a punch—and trigger a corresponding response within the 150&nbsp;ms target window.
+    </p>
 
-      <image-component
+    <image-component
         width="40%"
         tag="image"
         source="assets/robot_intelligence/pose_estimation_model.jpg"
-        subtitle="Figure 20: Pose estimation model">
-      </image-component>
+        subtitle="Figure 16: Pose estimation model">
+    </image-component>
     </div>
 
     <!-- 5.4.2.2 COUNTER PUNCH -->
     <div id="counter-punch">
-      <h4>5.4.2.2. Counter Punch</h4>
+    <h4>5.4.2.2. Counter Punch</h4>
 
-      <p>
+    <p>
         While reaction time and tracking rely on pre-trained YOLO models, the counter-punch function
-        requires a custom-trained action-recognition model. This model classifies punch types from
-        pose sequences and maps them to suitable robot counteractions.
-      </p>
+        requires a custom-trained action-recognition model. This model classifies different punch types
+        from pose sequences and maps them to suitable counter responses from a predefined set of actions.
+        Training this model allows the robot to respond dynamically, making the sparring experience more
+        interactive and progressive.
+    </p>
     </div>
 
-    <!-- 5.4.2.2.1 MODEL PIPELINE -->
+    <!-- 5.4.2.3 MODEL PIPELINE -->
     <div id="model-pipeline">
-      <h5>5.4.2.2.1. Model Pipeline</h5>
+    <h4>5.4.2.3. Model Pipeline</h4>
 
-      <image-component
+    <p>
+        The training pipeline applies pose estimation to labelled training videos to extract keypoint
+        sequences corresponding to different punches. These pose sequences are then used to train a custom
+        action-recognition model that classifies punch types based on temporal patterns. Different model 
+        architectures (LSTM, TCN, or transformer-based) will be evaluated to determine the best balance of 
+        accuracy and latency for real-time use.
+    </p>
+
+    <image-component
         tag="image"
         source="assets/robot_intelligence/training_pipeline.jpg"
-        subtitle="Figure 21: Training pipeline">
-      </image-component>
+        subtitle="Figure 17: Training pipeline">
+    </image-component>
 
-      <image-component
+    <p>
+        The inference pipeline follows the same principle but operates in real time: the depth camera captures
+        incoming video, pose estimation is applied to each frame, and the resulting keypoint sequence is fed
+        into the trained model to predict the user’s punch. This predicted punch type is then mapped to a suitable 
+        counteraction, allowing the robot to respond immediately.
+    </p>
+
+    <image-component
         tag="image"
         source="assets/robot_intelligence/inference_pipeline.jpg"
-        subtitle="Figure 22: Inference pipeline">
-      </image-component>
+        subtitle="Figure 18: Inference pipeline">
+    </image-component>
     </div>
 
-    <!-- 5.4.2.2.2 TRAINED MODEL -->
+    <!-- 5.4.2.4 TRAINED MODEL -->
     <div id="trained-model">
-      <h5>5.4.2.2.2. Trained Model</h5>
+    <h4>5.4.2.4. Trained Model</h4>
 
-      <div class="video-row">
+    <p>
+        To validate the full training–inference pipeline, we trained an initial LSTM-based action-recognition model 
+        using a small set of 2D pose keypoints (x–y only). Despite the limited dataset, the model achieved high accuracy 
+        on unseen videos, confirming that the pipeline from pose extraction to temporal classification works reliably 
+        and can correctly identify punch types. A larger dataset will be collected using the robot’s depth camera to 
+        incorporate x, y, and depth information for improved accuracy.
+    </p>
+
+    <div class="video-row">
         <div class="video-box">
-          <video controls src="assets/robot_intelligence/trained_model_jab.mp4"></video>
-          <sub>Jab Model</sub>
+        <video controls src="assets/robot_intelligence/trained_model_jab.mp4"></video>
+        <sub>Jab Model</sub>
         </div>
 
         <div class="video-box">
-          <video controls src="assets/robot_intelligence/trained_model_hook.mp4"></video>
-          <sub>Hook Model</sub>
+        <video controls src="assets/robot_intelligence/trained_model_hook.mp4"></video>
+        <sub>Hook Model</sub>
         </div>
 
         <div class="video-box">
-          <video controls src="assets/robot_intelligence/trained_model_uppercut.mp4"></video>
-          <sub>Uppercut Model</sub>
+        <video controls src="assets/robot_intelligence/trained_model_uppercut.mp4"></video>
+        <sub>Uppercut Model</sub>
         </div>
-      </div>
+    </div>
     </div>
 
-    <!-- 5.4.2.2.3 CAMERA POSITION TESTING -->
+    <!-- 5.4.2.5 CAMERA POSITION TESTING -->
     <div id="camera-orientation">
-      <h5>5.4.2.2.3. Position & Orientation of Camera (Testing)</h5>
-    
-      <div class="video-row two-up">
+    <h4>5.4.2.5. Position & Orientation of Camera (Testing)</h4>
+
+    <p>
+        Testing showed that recognition accuracy drops when the camera angle differs from the viewpoint used 
+        to train the model. Because the current dataset comes from a single perspective, changes in orientation 
+        produce pose patterns the model was not trained to interpret. This confirms that the camera position on 
+        the robot must be fixed, and the model must be retrained using data captured directly from that mounted 
+        viewpoint to ensure consistent performance.
+    </p>
+
+    <!-- Top + Bottom in one row -->
+    <div class="video-row two-up">
         <div class="video-box">
-          <video controls src="assets/robot_intelligence/orientation_top.mp4"></video>
-          <sub>Top View</sub>
+        <video controls src="assets/robot_intelligence/orientation_top.mp4"></video>
+        <sub>Top View</sub>
         </div>
-    
+
         <div class="video-box">
-          <video controls src="assets/robot_intelligence/orientation_bottom.mp4"></video>
-          <sub>Bottom View</sub>
+        <video controls src="assets/robot_intelligence/orientation_bottom.mp4"></video>
+        <sub>Bottom View</sub>
         </div>
-      </div>
-    
-      <div class="video-row single">
-        <div class="video-box">
-          <video controls src="assets/robot_intelligence/orientation_front.mp4"></video>
-          <sub>Front View</sub>
-        </div>
-      </div>
     </div>
+
+    <!-- Front alone -->
+    <div class="video-row single">
+        <div class="video-box">
+        <video controls src="assets/robot_intelligence/orientation_front.mp4"></video>
+        <sub>Front View</sub>
+        </div>
+    </div>
+    </div>
+
 
     <!-- 5.5 CONTROL SYSTEM -->
     <div id="control-system">
@@ -1605,37 +1647,69 @@
       </image-component>
 
       <p>
-        Parallel processing is essential for coordinating tasks such as vision processing, sensor
-        feedback, and motor control. The system may run on ROS or FreeRTOS depending on processor
-        choice and communication needs. FreeRTOS offers precise timing for low-latency control,
-        whereas ROS provides modularity and easier integration.
+        Parallel processing is essential for coordinating multiple tasks such as vision processing, sensor 
+        feedback, and motor control in real time. The system will operate on either ROS or FreeRTOS, depending
+         on the chosen processor and required communication speed. 
+        FreeRTOS offers faster and more precise timing for low-latency control, 
+        while ROS provides greater modularity and ease of integration.
       </p>
     </div>
 
-    <!-- 5.5.1.2 PID CONTROL -->
-    <div id="pid-control">
-      <h3>5.5.1.2. PID Control</h3>
 
-      <image-component
+    <!-- 5.5.1.2 CONTROL SYSTEM -->
+    <div id="control-system-pid">
+    <h3>5.5.1.2. Control System</h3>
+
+    <p>
+        A closed-loop control system is required to ensure BoxBunny can continuously correct its
+        motion based on real-time feedback, as shown in Figure 20. This allows the robot to respond
+        smoothly and safely to rapid load changes during training.
+    </p>
+
+    <image-component
         tag="image"
-        source="assets/control_system/pid_block_diagram.png"
-        subtitle="Figure 24: PID block diagram">
-      </image-component>
+        source="assets/control_system/closed_loop.jpg"
+        subtitle="Figure 20: Closed-loop control block diagram">
+    </image-component>
 
-      <p>
-        BoxBunny’s arms will use brushless DC motors with encoders to achieve precise position and
-        speed control. Motor drivers such as ODrive, which include built-in position, velocity, and
-        current PID loops, allow real-time correction based on encoder feedback.
-      </p>
+    <p>
+        To achieve this, the motors are driven using a PID-based controller such as the ODrive, 
+        which implements a three-loop cascade:
+    </p>
 
-      <p>
-        This PID structure ensures smooth and accurate motion while protecting the motors during
-        unexpected interactions. In edge cases—such as when the user punches, grabs, or resists the arm’s motion—
-        the velocity and current loops automatically limit torque and reduce sudden loads to prevent
-        overheating or mechanical damage. Encoder-based PID control therefore maintains stability,
-        responsiveness, and safety even under high-impact conditions.
-      </p>
+    <ul>
+        <li>the <strong>position loop</strong> outputs a target velocity,</li>
+        <li>the <strong>velocity loop</strong> outputs a target current, and</li>
+        <li>the <strong>current loop</strong> directly controls the motor torque.</li>
+    </ul>
+
+    <p>
+        This layered structure provides fast, stable and precise actuation while protecting the
+        system under varying loads.
+    </p>
+
+    <image-component
+        tag="image"
+        source="assets/control_system/odrive_pid.png"
+        subtitle="Figure 21: PID block diagram of ODrive">
+    </image-component>
+
+    <p>The PID loops handle critical edge cases encountered during sparring, including:</p>
+
+    <ul>
+        <li><strong>Sudden impacts</strong> (e.g., user punching the arm) – PID damps the disturbance and restores position smoothly.</li>
+        <li><strong>User grabbing or holding the arm</strong> – torque limits prevent the motor from fighting the user.</li>
+        <li><strong>User resisting or pushing against motion</strong> – current control avoids overcurrent and overheating.</li>
+        <li><strong>Stall or near-stall conditions</strong> – prevents motor burnout by limiting torque.</li>
+        <li><strong>Unexpected load spikes</strong> – compensates gradually instead of producing aggressive corrections.</li>
+    </ul>
+
+    <p>
+        By combining encoder feedback with this PID cascade, the robot maintains accurate movement
+        and robust protection during high-impact training.
+    </p>
     </div>
+
 
 
     <!-- 6. Future Work -->
