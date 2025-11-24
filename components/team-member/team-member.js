@@ -1,6 +1,6 @@
 class TeamMember extends HTMLElement {
   static get observedAttributes() {
-    return ["avatar", "name", "department", "year"];
+    return ["avatar", "name", "department", "year", "contribution"];
   }
 
   constructor() {
@@ -14,44 +14,52 @@ class TeamMember extends HTMLElement {
 
   attributeChangedCallback(name, _, newValue) {
     this[name] = newValue;
+    this.render();
   }
 
   render() {
-    const div = document.createElement("div");
-    div.innerHTML = `
-    <img src="${this.avatar}" alt="${this.name}">
-    <p><strong>${this.name}</strong></p>
-    <p>${this.department}</p>
-    <p>${this.year}</p>
-    <style>
-      :host {
-        display: block;
-        max-width: 120px;
-        text-align: center;
-      }
+    this.shadowRoot.innerHTML = `
+      <div>
+        <img src="${this.avatar}" alt="${this.name}">
+        <p><strong>${this.name}</strong></p>
+        <p>${this.department}</p>
+        <p>${this.year}</p>
+        <p class="contribution">${this.contribution || ""}</p>
 
-      img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        display: block;
-        margin: auto;
-      }
+        <style>
+          :host {
+            display: block;
+            max-width: 120px;
+            text-align: center;
+          }
 
-      p {
-        text-align: center;
-        margin: 8px 0;
-      }
+          img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: block;
+            margin: auto;
+          }
 
-      @media (max-width: 599px) {
-        img {
-          display: none;
-        }
-      }
-    </style>
-  `;
+          p {
+            text-align: center;
+            margin: 8px 0;
+          }
 
-    this.shadowRoot.appendChild(div);
+          .contribution {
+            font-size: 12px;      
+            text-align: justify;  
+            margin: 4px 0 0 0;
+          }
+
+          @media (max-width: 599px) {
+            img {
+              display: none;
+            }
+          }
+        </style>
+      </div>
+    `;
   }
 }
 
