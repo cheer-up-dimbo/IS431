@@ -39,6 +39,8 @@ class TeamMember extends HTMLElement {
             border-radius: 50%;
             display: block;
             margin: auto;
+            object-fit: contain;      /* prevents stretching */
+            object-position: center; /* centers the image */
           }
 
           p {
