@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy
 from PySide6.QtCore import Qt
 
 # Define shared button styles at module level
@@ -44,10 +44,10 @@ BACK_BUTTON_STYLE = """
 # Adjusted SMALL_BUTTON_STYLE to a smaller size (change values here to tune)
 SMALL_BUTTON_STYLE = """
     QPushButton {
-        font-size: 22px;
-        padding: 18px;
-        min-width: 320px;
-        min-height: 44px;
+        font-size: 20px;
+        padding: 12px;
+        min-width: 240px;
+        min-height: 50px;
         background-color: #2196F3;
         color: white;
         border: none;
@@ -58,6 +58,64 @@ SMALL_BUTTON_STYLE = """
     }
     QPushButton:pressed {
         background-color: #155A8A;
+    }
+"""
+
+# Button style used specifically for the 12 round-selection buttons (smaller)
+ROUND_SELECTION_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 20px;
+        padding: 8px;
+        min-width: 80px;
+        min-height: 90px;
+        background-color: #1976D2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+    }
+    QPushButton:hover {
+        background-color: #1565C0;
+    }
+    QPushButton:pressed {
+        background-color: #0D47A1;
+    }
+"""
+
+# Button style used specifically for the 12 speed-selection buttons (smaller)
+SPEED_SELECTION_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 40px;
+        padding: 8px;
+        min-width: 80px;
+        min-height: 3000px;
+        background-color: #1976D2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+    }
+    QPushButton:hover {
+        background-color: #1565C0;
+    }
+    QPushButton:pressed {
+        background-color: #0D47A1;
+    }
+"""
+
+# Button style used specifically for the 12 time-selection buttons (smaller)
+TIME_SELECTION_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 18px;
+        padding: 8px;
+        background-color: #1976D2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+    }
+    QPushButton:hover {
+        background-color: #1565C0;
+    }
+    QPushButton:pressed {
+        background-color: #0D47A1;
     }
 """
 
@@ -269,42 +327,46 @@ class BasicParametersPage(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
 
-        round_btn = QPushButton("Round")
-        speed_btn = QPushButton("Speed")
-        time_btn = QPushButton("Time")
-        rest_btn = QPushButton("Rest")
+        # store as instance attribute so other pages can update it
+        self.round_btn = QPushButton("Round")
+        self.speed_btn = QPushButton("Speed")        # changed to instance attribute
+        self.time_btn = QPushButton("Time")
+        self.rest_btn = QPushButton("Rest")
         back_btn = QPushButton("Back")
 
-        round_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        speed_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        time_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        rest_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        self.round_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        self.speed_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        self.time_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        self.rest_btn.setStyleSheet(SMALL_BUTTON_STYLE)
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
 
-        round_btn.clicked.connect(self.on_round_clicked)
-        speed_btn.clicked.connect(self.on_speed_clicked)
-        time_btn.clicked.connect(self.on_time_clicked)
-        rest_btn.clicked.connect(self.on_rest_clicked)
+        self.round_btn.clicked.connect(self.on_round_clicked)
+        self.speed_btn.clicked.connect(self.on_speed_clicked)   # opens speed selection page
+        self.time_btn.clicked.connect(self.on_time_clicked)
+        self.rest_btn.clicked.connect(self.on_rest_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
-        layout.addWidget(round_btn)
-        layout.addWidget(speed_btn)
-        layout.addWidget(time_btn)
-        layout.addWidget(rest_btn)
+        layout.addWidget(self.round_btn)
+        layout.addWidget(self.speed_btn)
+        layout.addWidget(self.time_btn)
+        layout.addWidget(self.rest_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
         self.setLayout(layout)
 
     def on_round_clicked(self):
-        print("Round button clicked")
+        # open RoundSelectionPage (index 5)
+        self.stacked_widget.setCurrentIndex(5)
 
     def on_speed_clicked(self):
-        print("Speed button clicked")
+        # open SpeedSelectionPage (index 6)
+        self.stacked_widget.setCurrentIndex(6)
 
     def on_time_clicked(self):
-        print("Time button clicked")
+        # open TimeSelectionPage (index 7)
+        self.stacked_widget.setCurrentIndex(7)
 
     def on_rest_clicked(self):
         print("Rest button clicked")
@@ -312,6 +374,162 @@ class BasicParametersPage(QWidget):
     def on_back_clicked(self):
         # go back to PunchCombinationPage (index 3)
         self.stacked_widget.setCurrentIndex(3)
+
+class RoundSelectionPage(QWidget):
+    """Page showing 12 numbered round buttons and a back button."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Round")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+
+        # Create 12 numbered buttons (1..12)
+        for idx in range(12):
+            n = idx + 1
+            btn = QPushButton(str(n))
+            btn.setStyleSheet(ROUND_SELECTION_BUTTON_STYLE)
+            # call select_round with the selected number and return to BasicParametersPage
+            btn.clicked.connect(lambda checked, val=n: self.select_round(val))
+            row = idx // 4
+            col = idx % 4
+            grid.addWidget(btn, row, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        # go back to BasicParametersPage (index 4)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_round(self, n: int):
+        """Set the chosen round on BasicParametersPage and switch back."""
+        # widget index 4 is BasicParametersPage in MainWindow setup
+        try:
+            basic_page = self.stacked_widget.widget(4)
+            # ensure target has attribute round_btn
+            if hasattr(basic_page, "round_btn"):
+                basic_page.round_btn.setText(f"Round\n{n}")
+        except Exception:
+            pass
+        # go back to BasicParametersPage
+        self.stacked_widget.setCurrentIndex(4)
+
+class SpeedSelectionPage(QWidget):
+    """Page offering speed choices (25, 50, 75, 100)."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Speed")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+
+        speeds = ["25%", "50%", "75%", "100%"]
+        for col, val in enumerate(speeds):
+            btn = QPushButton(str(val))
+            btn.setStyleSheet(SPEED_SELECTION_BUTTON_STYLE)
+            btn.clicked.connect(lambda checked, v=val: self.select_speed(v))
+            grid.addWidget(btn, 0, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_speed(self, n: int):
+        """Update BasicParametersPage speed button text and return."""
+        try:
+            basic_page = self.stacked_widget.widget(4)
+            if hasattr(basic_page, "speed_btn"):
+                basic_page.speed_btn.setText(f"Speed\n{n}")
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(4)
+
+class TimeSelectionPage(QWidget):
+    """Page offering time choices (30sec, 1min, 1min30sec, 2min, 2min30sec, 3min)."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Time")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+
+        # make columns stretch so buttons get equal width regardless of text
+        for c in range(3):
+            grid.setColumnStretch(c, 1)
+
+        times = ["30sec", "1min", "1min30sec", "2min", "2min30sec", "3min"]
+        # arrange in 3 columns x 2 rows
+        for idx, val in enumerate(times):
+            btn = QPushButton(val)
+            btn.setStyleSheet(TIME_SELECTION_BUTTON_STYLE)
+            # ensure all buttons have the same width (columns stretch) and same height
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            btn.setFixedHeight(150)   # choose desired uniform height
+            btn.clicked.connect(lambda checked, v=val: self.select_time(v))
+            row = idx // 3
+            col = idx % 3
+            grid.addWidget(btn, row, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_time(self, n: str):
+        """Update BasicParametersPage time button text and return."""
+        try:
+            basic_page = self.stacked_widget.widget(4)
+            if hasattr(basic_page, "time_btn"):
+                basic_page.time_btn.setText(f"Time\n{n}")
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(4)
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -327,6 +545,9 @@ class MainWindow(QWidget):
         self.techniques_page = TechniquesPage(self.stacked_widget)
         self.punch_combinations_page = PunchCombinationPage(self.stacked_widget)
         self.basic_parameters_page = BasicParametersPage(self.stacked_widget)
+        self.round_selection_page = RoundSelectionPage(self.stacked_widget)
+        self.speed_selection_page = SpeedSelectionPage(self.stacked_widget)   # added
+        self.time_selection_page = TimeSelectionPage(self.stacked_widget)     # added
 
         # Add pages to stacked widget
         self.stacked_widget.addWidget(self.homepage)               # Index 0
@@ -334,6 +555,9 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.techniques_page)       # Index 2
         self.stacked_widget.addWidget(self.punch_combinations_page) # Index 3
         self.stacked_widget.addWidget(self.basic_parameters_page)        # Index 4
+        self.stacked_widget.addWidget(self.round_selection_page)         # Index 5
+        self.stacked_widget.addWidget(self.speed_selection_page)         # Index 6
+        self.stacked_widget.addWidget(self.time_selection_page)          # Index 7
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
