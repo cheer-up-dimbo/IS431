@@ -1,6 +1,6 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout
+from PySide6.QtCore import Qt, QTimer
 
 # Define shared button styles at module level
 BUTTON_STYLE = """
@@ -27,6 +27,44 @@ BACK_BUTTON_STYLE = """
         font-size: 20px;
         padding: 25px;
         min-width: 500px;
+        min-height: 40px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #da190b;
+    }
+    QPushButton:pressed {
+        background-color: #c41504;
+    }
+"""
+
+BACK_BUTTON_STYLE_2 = """
+    QPushButton {
+        font-size: 20px;
+        padding: 25px;
+        min-width: 250px;
+        min-height: 40px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #da190b;
+    }
+    QPushButton:pressed {
+        background-color: #c41504;
+    }
+"""
+
+BACK_CONTINUE_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 20px;
+        padding: 25px;
+        min-width: 200px;
         min-height: 40px;
         background-color: #f44336;
         color: white;
@@ -277,10 +315,10 @@ class PunchCombinationPage(QWidget):
         self_select_btn.setStyleSheet(SMALL_BUTTON_STYLE)
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
 
-        beginner_btn.clicked.connect(self.on_beginner_clicked)
-        intermediate_btn.clicked.connect(self.on_intermediate_clicked)
-        advanced_btn.clicked.connect(self.on_advanced_clicked)
-        self_select_btn.clicked.connect(self.on_self_select_clicked)
+        beginner_btn.clicked.connect(lambda: self.on_difficulty_clicked("Beginner"))
+        intermediate_btn.clicked.connect(lambda: self.on_difficulty_clicked("Intermediate"))
+        advanced_btn.clicked.connect(lambda: self.on_difficulty_clicked("Advanced"))
+        self_select_btn.clicked.connect(lambda: self.on_difficulty_clicked("Self-Select"))
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
@@ -293,21 +331,18 @@ class PunchCombinationPage(QWidget):
 
         self.setLayout(layout)
 
-    def on_beginner_clicked(self):
-        print("Beginner button clicked")
-        self.stacked_widget.setCurrentIndex(4)
-
-    def on_intermediate_clicked(self):
-        print("Intermediate button clicked")
-        self.stacked_widget.setCurrentIndex(4)
-
-    def on_advanced_clicked(self):
-        print("Advanced button clicked")
-        self.stacked_widget.setCurrentIndex(4)
-
-    def on_self_select_clicked(self):
-        print("Self-Select button clicked")
-        self.stacked_widget.setCurrentIndex(4)
+    def on_difficulty_clicked(self, difficulty):
+        print(f"{difficulty} button clicked")
+        # Store difficulty in BasicParametersPage
+        basic_page = self.stacked_widget.widget(4)
+        basic_page.selected_difficulty = difficulty
+        
+        if difficulty == "Self-Select":
+            # Go to Self-Select Sequence page
+            self.stacked_widget.setCurrentIndex(11)
+        else:
+            # Go directly to Basic Parameters page
+            self.stacked_widget.setCurrentIndex(4)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(2)
@@ -329,22 +364,19 @@ class BasicParametersPage(QWidget):
 
         # store as instance attribute so other pages can update it
         self.round_btn = QPushButton("Round")
-        self.speed_btn = QPushButton("Speed")        # changed to instance attribute
+        self.speed_btn = QPushButton("Speed")
         self.time_btn = QPushButton("Time")
         self.rest_btn = QPushButton("Rest")
-        back_btn = QPushButton("Back")
-
+        
         self.round_btn.setStyleSheet(SMALL_BUTTON_STYLE)
         self.speed_btn.setStyleSheet(SMALL_BUTTON_STYLE)
         self.time_btn.setStyleSheet(SMALL_BUTTON_STYLE)
         self.rest_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
 
         self.round_btn.clicked.connect(self.on_round_clicked)
-        self.speed_btn.clicked.connect(self.on_speed_clicked)   # opens speed selection page
+        self.speed_btn.clicked.connect(self.on_speed_clicked)
         self.time_btn.clicked.connect(self.on_time_clicked)
         self.rest_btn.clicked.connect(self.on_rest_clicked)
-        back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(self.round_btn)
@@ -352,28 +384,68 @@ class BasicParametersPage(QWidget):
         layout.addWidget(self.time_btn)
         layout.addWidget(self.rest_btn)
         layout.addStretch()
-        layout.addWidget(back_btn)
+
+        # Create horizontal layout for back and continue buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()  # Add space on the left
+        
+        back_btn = QPushButton("Back")
+        self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
+        
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.continue_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        
+        back_btn.clicked.connect(self.on_back_clicked)
+        self.continue_btn.clicked.connect(self.on_continue_clicked)
+        
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(self.continue_btn)
+        button_layout.addStretch()  # Add space on the right
+
+        layout.addLayout(button_layout)
 
         self.setLayout(layout)
+        
+        # Disable continue button initially
+        self.update_continue_button()
+
+    def is_parameter_selected(self, btn):
+        """Check if a parameter button has been selected (has more than just the label)."""
+        text = btn.text()
+        return "\n" in text  # Selected buttons have format "Label\nValue"
+
+    def update_continue_button(self):
+        """Enable continue button only if all parameters are selected."""
+        all_selected = (
+            self.is_parameter_selected(self.round_btn) and
+            self.is_parameter_selected(self.speed_btn) and
+            self.is_parameter_selected(self.time_btn) and
+            self.is_parameter_selected(self.rest_btn)
+        )
+        self.continue_btn.setEnabled(all_selected)
 
     def on_round_clicked(self):
-        # open RoundSelectionPage (index 5)
         self.stacked_widget.setCurrentIndex(5)
 
     def on_speed_clicked(self):
-        # open SpeedSelectionPage (index 6)
         self.stacked_widget.setCurrentIndex(6)
 
     def on_time_clicked(self):
-        # open TimeSelectionPage (index 7)
         self.stacked_widget.setCurrentIndex(7)
 
     def on_rest_clicked(self):
-        print("Rest button clicked")
+        self.stacked_widget.setCurrentIndex(8)
 
     def on_back_clicked(self):
-        # go back to PunchCombinationPage (index 3)
         self.stacked_widget.setCurrentIndex(3)
+
+    def on_continue_clicked(self):
+        print("Continue button clicked")
+        # Start countdown and move to CountdownPage
+        countdown_page = self.stacked_widget.widget(9)
+        countdown_page.start_countdown()
+        self.stacked_widget.setCurrentIndex(9)
 
 class RoundSelectionPage(QWidget):
     """Page showing 12 numbered round buttons and a back button."""
@@ -418,15 +490,13 @@ class RoundSelectionPage(QWidget):
 
     def select_round(self, n: int):
         """Set the chosen round on BasicParametersPage and switch back."""
-        # widget index 4 is BasicParametersPage in MainWindow setup
         try:
             basic_page = self.stacked_widget.widget(4)
-            # ensure target has attribute round_btn
             if hasattr(basic_page, "round_btn"):
                 basic_page.round_btn.setText(f"Round\n{n}")
+                basic_page.update_continue_button()
         except Exception:
             pass
-        # go back to BasicParametersPage
         self.stacked_widget.setCurrentIndex(4)
 
 class SpeedSelectionPage(QWidget):
@@ -471,6 +541,7 @@ class SpeedSelectionPage(QWidget):
             basic_page = self.stacked_widget.widget(4)
             if hasattr(basic_page, "speed_btn"):
                 basic_page.speed_btn.setText(f"Speed\n{n}")
+                basic_page.update_continue_button()
         except Exception:
             pass
         self.stacked_widget.setCurrentIndex(4)
@@ -527,9 +598,713 @@ class TimeSelectionPage(QWidget):
             basic_page = self.stacked_widget.widget(4)
             if hasattr(basic_page, "time_btn"):
                 basic_page.time_btn.setText(f"Time\n{n}")
+                basic_page.update_continue_button()
         except Exception:
             pass
         self.stacked_widget.setCurrentIndex(4)
+
+class RestSelectionPage(QWidget):
+    """Page offering rest choices (10sec to 60sec in 10sec increments)."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Rest Time")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+
+        # make columns stretch so buttons get equal width
+        for c in range(3):
+            grid.setColumnStretch(c, 1)
+
+        rest_times = ["10sec", "20sec", "30sec", "40sec", "50sec", "1min"]
+        # arrange in 3 columns x 2 rows
+        for idx, val in enumerate(rest_times):
+            btn = QPushButton(val)
+            btn.setStyleSheet(TIME_SELECTION_BUTTON_STYLE)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            btn.setFixedHeight(150)
+            btn.clicked.connect(lambda checked, v=val: self.select_rest(v))
+            row = idx // 3
+            col = idx % 3
+            grid.addWidget(btn, row, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_rest(self, n: str):
+        """Update BasicParametersPage rest button text and return."""
+        try:
+            basic_page = self.stacked_widget.widget(4)
+            if hasattr(basic_page, "rest_btn"):
+                basic_page.rest_btn.setText(f"Rest\n{n}")
+                basic_page.update_continue_button()
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(4)
+
+class CountdownPage(QWidget):
+    """Page with 20 second countdown and pause button."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.countdown_value = 20
+        self.is_paused = False
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_countdown)
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(30)
+        main_layout.setContentsMargins(50, 50, 50, 50)
+
+        title = QLabel("Wear Your Gloves")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 36px; font-weight: bold; margin-bottom: 20px;")
+
+        self.countdown_label = QLabel(str(self.countdown_value))
+        self.countdown_label.setAlignment(Qt.AlignCenter)
+        self.countdown_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+
+        # Create horizontal layout for pause and back buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        self.pause_btn = QPushButton("Pause")
+        back_btn = QPushButton("Back")
+
+        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+
+        self.pause_btn.setFixedWidth(250)
+        back_btn.setFixedWidth(250)
+
+        self.pause_btn.clicked.connect(self.toggle_pause)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        button_layout.addWidget(self.pause_btn)
+        button_layout.addWidget(back_btn)
+        button_layout.addStretch()
+
+        main_layout.addWidget(title)
+        main_layout.addWidget(self.countdown_label)
+        main_layout.addStretch()
+        main_layout.addLayout(button_layout)
+
+        self.setLayout(main_layout)
+
+    def start_countdown(self):
+        """Start the countdown timer."""
+        self.countdown_value = 20
+        self.is_paused = False
+        self.countdown_label.setText(str(self.countdown_value))
+        self.pause_btn.setText("Pause")
+        self.timer.start(1000)  # Update every 1000ms (1 second)
+
+    def update_countdown(self):
+        """Update countdown display."""
+        if self.countdown_value > 0:
+            self.countdown_value -= 1
+            self.countdown_label.setText(str(self.countdown_value))
+        else:
+            self.timer.stop()
+            # Countdown finished, you can add logic here
+
+    def toggle_pause(self):
+        """Pause or resume the countdown."""
+        if self.is_paused:
+            self.timer.start()
+            self.pause_btn.setText("Pause")
+            self.is_paused = False
+        else:
+            self.timer.stop()
+            self.pause_btn.setText("Resume")
+            self.is_paused = True
+
+    def on_back_clicked(self):
+        """Stop timer and go back to BasicParametersPage."""
+        self.timer.stop()
+        self.stacked_widget.setCurrentIndex(4)
+
+class TrainingSessionPage(QWidget):
+    """Page showing the actual training session with round counter and timer."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.current_round = 1
+        self.total_rounds = 1
+        self.work_time = 60  # in seconds
+        self.rest_time = 30  # in seconds
+        self.time_remaining = self.work_time
+        self.is_resting = False
+        self.is_paused = False
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_timer)
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(30)
+        main_layout.setContentsMargins(50, 50, 50, 50)
+
+        # Round counter at the top
+        self.round_label = QLabel(f"Round {self.current_round}/{self.total_rounds}")
+        self.round_label.setAlignment(Qt.AlignCenter)
+        self.round_label.setStyleSheet("font-size: 40px; font-weight: bold; margin-bottom: 20px;")
+
+        # Rest indicator (hidden during work periods)
+        self.rest_label = QLabel("Rest")
+        self.rest_label.setAlignment(Qt.AlignCenter)
+        self.rest_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #FF9800; margin-bottom: 10px;")
+        self.rest_label.hide()
+
+        # Timer in the middle
+        self.timer_label = QLabel(self.format_time(self.time_remaining))
+        self.timer_label.setAlignment(Qt.AlignCenter)
+        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+
+        # Create horizontal layout for pause and back buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        self.pause_btn = QPushButton("Pause")
+        back_btn = QPushButton("Back")
+
+        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+
+        self.pause_btn.setFixedWidth(250)
+        back_btn.setFixedWidth(250)
+
+        self.pause_btn.clicked.connect(self.toggle_pause)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        button_layout.addWidget(self.pause_btn)
+        button_layout.addWidget(back_btn)
+        button_layout.addStretch()
+
+        main_layout.addWidget(self.round_label)
+        main_layout.addWidget(self.rest_label)
+        main_layout.addWidget(self.timer_label)
+        main_layout.addStretch()
+        main_layout.addLayout(button_layout)
+
+        self.setLayout(main_layout)
+
+    def format_time(self, seconds):
+        """Format seconds as MM:SS."""
+        mins = seconds // 60
+        secs = seconds % 60
+        return f"{mins:02d}:{secs:02d}"
+
+    def parse_time_to_seconds(self, time_str):
+        """Convert time string to seconds."""
+        time_map = {
+            "30sec": 30,
+            "1min": 60,
+            "1min30sec": 90,
+            "2min": 120,
+            "2min30sec": 150,
+            "3min": 180,
+            "10sec": 10,
+            "20sec": 20,
+            "40sec": 40,
+            "50sec": 50
+        }
+        return time_map.get(time_str, 60)
+
+    def start_session(self, rounds, time_str, rest_str):
+        """Start the training session with the given parameters."""
+        self.current_round = 1
+        self.total_rounds = rounds
+        
+        # Convert time strings to seconds
+        self.work_time = self.parse_time_to_seconds(time_str)
+        self.rest_time = self.parse_time_to_seconds(rest_str)
+        
+        self.time_remaining = self.work_time
+        self.is_resting = False
+        self.is_paused = False
+        
+        self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
+        self.rest_label.hide()
+        self.timer_label.setText(self.format_time(self.time_remaining))
+        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+        self.pause_btn.setText("Pause")
+        self.timer.start(1000)  # Update every 1 second
+
+    def update_timer(self):
+        """Update the timer display."""
+        if self.time_remaining > 0:
+            self.time_remaining -= 1
+            self.timer_label.setText(self.format_time(self.time_remaining))
+        else:
+            # Timer finished
+            if self.is_resting:
+                # Rest period finished, start next round
+                self.current_round += 1
+                self.is_resting = False
+                self.time_remaining = self.work_time
+                self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
+                self.rest_label.hide()
+                self.timer_label.setText(self.format_time(self.time_remaining))
+                self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+            else:
+                # Work period finished
+                if self.current_round < self.total_rounds:
+                    # Not the final round, start rest period
+                    self.is_resting = True
+                    self.time_remaining = self.rest_time
+                    self.rest_label.show()
+                    self.timer_label.setText(self.format_time(self.time_remaining))
+                    self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #FF9800;")
+                else:
+                    # Final round completed, go back to Basic Parameters page
+                    self.timer.stop()
+                    self.stacked_widget.setCurrentIndex(4)
+
+    def toggle_pause(self):
+        """Pause or resume the timer."""
+        if self.is_paused:
+            self.timer.start()
+            self.pause_btn.setText("Pause")
+            self.is_paused = False
+        else:
+            self.timer.stop()
+            self.pause_btn.setText("Resume")
+            self.is_paused = True
+
+    def on_back_clicked(self):
+        """Stop timer and go back to BasicParametersPage."""
+        self.timer.stop()
+        self.stacked_widget.setCurrentIndex(4)
+
+class SelfSelectSequencePage(QWidget):
+    """Page for creating custom punch sequences."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.current_sequence = []  # Current sequence being built
+        self.sequence_list = []  # List of confirmed sequences (max 5)
+        self.editing_index = None  # Track which sequence is being edited
+        
+        main_layout = QHBoxLayout()
+        main_layout.setSpacing(30)
+        main_layout.setContentsMargins(50, 50, 50, 50)
+
+        # LEFT SIDE - Sequence List
+        left_layout = QVBoxLayout()
+        left_layout.setSpacing(15)
+
+        list_title = QLabel("Sequence List")
+        list_title.setAlignment(Qt.AlignCenter)
+        list_title.setStyleSheet("font-size: 28px; font-weight: bold; margin-bottom: 10px;")
+
+        # Container for sequence buttons
+        self.sequence_buttons_layout = QVBoxLayout()
+        self.sequence_buttons_layout.setSpacing(10)
+        self.sequence_buttons = []
+        
+        # Create 5 sequence slots
+        for i in range(5):
+            h_layout = QHBoxLayout()
+            h_layout.setSpacing(10)
+            
+            # Sequence button (clickable to edit)
+            seq_btn = QPushButton(f"{i+1}) ")
+            seq_btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 18px;
+                    padding: 10px;
+                    background-color: #f0f0f0;
+                    border: 2px solid #ccc;
+                    border-radius: 8px;
+                    text-align: left;
+                    color: black;
+                    min-height: 50px;
+                }
+                QPushButton:hover {
+                    background-color: #e0e0e0;
+                    border: 2px solid #2196F3;
+                }
+                QPushButton:pressed {
+                    background-color: #d0d0d0;
+                }
+            """)
+            seq_btn.clicked.connect(lambda checked, idx=i: self.edit_sequence(idx))
+            
+            # Up button
+            up_btn = QPushButton("▲")
+            up_btn.setFixedSize(40, 50)
+            up_btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+                QPushButton:disabled {
+                    background-color: #cccccc;
+                }
+            """)
+            up_btn.clicked.connect(lambda checked, idx=i: self.move_sequence_up(idx))
+            
+            # Down button
+            down_btn = QPushButton("▼")
+            down_btn.setFixedSize(40, 50)
+            down_btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+                QPushButton:disabled {
+                    background-color: #cccccc;
+                }
+            """)
+            down_btn.clicked.connect(lambda checked, idx=i: self.move_sequence_down(idx))
+            
+            # Delete button
+            del_btn = QPushButton("✖")
+            del_btn.setFixedSize(40, 50)
+            del_btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 20px;
+                    background-color: #f44336;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                }
+                QPushButton:hover {
+                    background-color: #da190b;
+                }
+                QPushButton:disabled {
+                    background-color: #cccccc;
+                }
+            """)
+            del_btn.clicked.connect(lambda checked, idx=i: self.delete_sequence(idx))
+            
+            h_layout.addWidget(seq_btn, stretch=1)
+            h_layout.addWidget(up_btn)
+            h_layout.addWidget(down_btn)
+            h_layout.addWidget(del_btn)
+            
+            self.sequence_buttons_layout.addLayout(h_layout)
+            self.sequence_buttons.append({
+                'button': seq_btn,
+                'up': up_btn,
+                'down': down_btn,
+                'delete': del_btn
+            })
+
+        # Back and Next buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(15)
+        
+        back_btn = QPushButton("Back")
+        self.next_btn = QPushButton("Next")
+        
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.next_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        
+        back_btn.setFixedWidth(150)
+        self.next_btn.setFixedWidth(150)
+        
+        back_btn.clicked.connect(self.on_back_clicked)
+        self.next_btn.clicked.connect(self.on_next_clicked)
+        
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(self.next_btn)
+
+        left_layout.addWidget(list_title)
+        left_layout.addLayout(self.sequence_buttons_layout)
+        left_layout.addStretch()
+        left_layout.addLayout(button_layout)
+
+        # RIGHT SIDE - Input Area
+        right_layout = QVBoxLayout()
+        right_layout.setSpacing(15)
+
+        # Text box showing current sequence
+        self.sequence_input = QLabel("")
+        self.sequence_input.setAlignment(Qt.AlignCenter)
+        self.sequence_input.setStyleSheet("""
+            font-size: 24px;
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            min-height: 60px;
+            color: black;
+        """)
+
+        # Numpad grid (1-6)
+        numpad_grid = QGridLayout()
+        numpad_grid.setSpacing(10)
+        
+        for i in range(6):
+            btn = QPushButton(str(i + 1))
+            btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 28px;
+                    padding: 20px;
+                    min-width: 80px;
+                    min-height: 80px;
+                    background-color: #2196F3;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                }
+                QPushButton:hover {
+                    background-color: #1976D2;
+                }
+                QPushButton:pressed {
+                    background-color: #0D47A1;
+                }
+            """)
+            btn.clicked.connect(lambda checked, val=str(i + 1): self.add_to_sequence(val))
+            row = i // 3
+            col = i % 3
+            numpad_grid.addWidget(btn, row, col)
+
+        # Defense buttons (Slip-L, Slip-R, Block-L, Block-R)
+        defense_grid = QGridLayout()
+        defense_grid.setSpacing(10)
+        
+        defense_moves = ["Slip-L", "Slip-R", "Block-L", "Block-R"]
+        for i, move in enumerate(defense_moves):
+            btn = QPushButton(move)
+            btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 20px;
+                    padding: 15px;
+                    min-width: 100px;
+                    min-height: 60px;
+                    background-color: #FF9800;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                }
+                QPushButton:hover {
+                    background-color: #F57C00;
+                }
+                QPushButton:pressed {
+                    background-color: #E65100;
+                }
+            """)
+            btn.clicked.connect(lambda checked, val=move: self.add_to_sequence(val))
+            row = i // 2
+            col = i % 2
+            defense_grid.addWidget(btn, row, col)
+
+        # Backspace and Confirm buttons
+        action_layout = QHBoxLayout()
+        action_layout.setSpacing(15)
+        
+        backspace_btn = QPushButton("Backspace")
+        self.confirm_btn = QPushButton("Confirm")
+        
+        backspace_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 20px;
+                padding: 15px;
+                background-color: #f44336;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: #da190b;
+            }
+        """)
+        
+        self.confirm_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 20px;
+                padding: 15px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:disabled {
+                background-color: #cccccc;
+            }
+        """)
+        
+        backspace_btn.clicked.connect(self.backspace_sequence)
+        self.confirm_btn.clicked.connect(self.confirm_sequence)
+        
+        action_layout.addWidget(backspace_btn)
+        action_layout.addWidget(self.confirm_btn)
+
+        right_layout.addWidget(self.sequence_input)
+        right_layout.addLayout(numpad_grid)
+        right_layout.addLayout(defense_grid)
+        right_layout.addLayout(action_layout)
+        right_layout.addStretch()
+
+        # Add left and right layouts to main layout
+        main_layout.addLayout(left_layout, 1)
+        main_layout.addLayout(right_layout, 1)
+
+        self.setLayout(main_layout)
+        
+        # Initial state
+        self.update_sequence_buttons()
+        self.update_buttons()
+
+    def update_sequence_buttons(self):
+        """Update all sequence button displays and states."""
+        for i in range(5):
+            if i < len(self.sequence_list):
+                self.sequence_buttons[i]['button'].setText(f"{i+1}) {self.sequence_list[i]}")
+                self.sequence_buttons[i]['button'].setEnabled(True)
+                self.sequence_buttons[i]['delete'].setEnabled(True)
+                # Enable up button if not first
+                self.sequence_buttons[i]['up'].setEnabled(i > 0)
+                # Enable down button if not last in list
+                self.sequence_buttons[i]['down'].setEnabled(i < len(self.sequence_list) - 1)
+            else:
+                self.sequence_buttons[i]['button'].setText(f"{i+1}) ")
+                self.sequence_buttons[i]['button'].setEnabled(False)
+                self.sequence_buttons[i]['up'].setEnabled(False)
+                self.sequence_buttons[i]['down'].setEnabled(False)
+                self.sequence_buttons[i]['delete'].setEnabled(False)
+
+    def edit_sequence(self, index):
+        """Load a sequence for editing."""
+        if index < len(self.sequence_list):
+            self.editing_index = index
+            # Load the sequence into current_sequence
+            self.current_sequence = self.sequence_list[index].split()
+            self.sequence_input.setText(" ".join(self.current_sequence))
+            self.update_buttons()
+
+    def move_sequence_up(self, index):
+        """Move sequence up in the list."""
+        if index > 0 and index < len(self.sequence_list):
+            self.sequence_list[index], self.sequence_list[index - 1] = \
+                self.sequence_list[index - 1], self.sequence_list[index]
+            self.update_sequence_buttons()
+
+    def move_sequence_down(self, index):
+        """Move sequence down in the list."""
+        if index < len(self.sequence_list) - 1:
+            self.sequence_list[index], self.sequence_list[index + 1] = \
+                self.sequence_list[index + 1], self.sequence_list[index]
+            self.update_sequence_buttons()
+
+    def delete_sequence(self, index):
+        """Delete a sequence from the list."""
+        if index < len(self.sequence_list):
+            self.sequence_list.pop(index)
+            # Clear editing if we're editing this sequence
+            if self.editing_index == index:
+                self.editing_index = None
+                self.current_sequence = []
+                self.sequence_input.setText("")
+            elif self.editing_index is not None and self.editing_index > index:
+                # Adjust editing index if needed
+                self.editing_index -= 1
+            self.update_sequence_buttons()
+            self.update_buttons()
+
+    def add_to_sequence(self, value):
+        """Add a move to the current sequence."""
+        if len(self.current_sequence) < 9:
+            self.current_sequence.append(value)
+            self.sequence_input.setText(" ".join(self.current_sequence))
+            self.update_buttons()
+
+    def backspace_sequence(self):
+        """Remove the last item from current sequence."""
+        if self.current_sequence:
+            self.current_sequence.pop()
+            self.sequence_input.setText(" ".join(self.current_sequence))
+            self.update_buttons()
+
+    def confirm_sequence(self):
+        """Add current sequence to the sequence list or update existing."""
+        if 1 <= len(self.current_sequence) <= 9:
+            sequence_str = " ".join(self.current_sequence)
+            
+            if self.editing_index is not None:
+                # Update existing sequence
+                self.sequence_list[self.editing_index] = sequence_str
+                self.editing_index = None
+            elif len(self.sequence_list) < 5:
+                # Add new sequence
+                self.sequence_list.append(sequence_str)
+            
+            self.current_sequence = []
+            self.sequence_input.setText("")
+            self.update_sequence_buttons()
+            self.update_buttons()
+
+    def update_buttons(self):
+        """Update button states based on current input."""
+        # Confirm button: enabled if 1-9 items
+        sequence_valid = 1 <= len(self.current_sequence) <= 9
+        
+        if self.editing_index is not None:
+            # Editing mode - always allow confirm
+            self.confirm_btn.setEnabled(sequence_valid)
+        else:
+            # Adding mode - check if we can add more
+            can_add_more = len(self.sequence_list) < 5
+            self.confirm_btn.setEnabled(sequence_valid and can_add_more)
+        
+        # Next button: enabled if at least one sequence exists
+        self.next_btn.setEnabled(len(self.sequence_list) >= 1)
+
+    def on_back_clicked(self):
+        """Go back to Punch Combination page."""
+        # Reset state
+        self.current_sequence = []
+        self.sequence_list = []
+        self.editing_index = None
+        self.sequence_input.setText("")
+        self.update_sequence_buttons()
+        self.update_buttons()
+        self.stacked_widget.setCurrentIndex(3)
+
+    def on_next_clicked(self):
+        """Go to Basic Parameters page."""
+        if len(self.sequence_list) >= 1:
+            # Store sequences in BasicParametersPage
+            basic_page = self.stacked_widget.widget(4)
+            basic_page.custom_sequences = self.sequence_list.copy()
+            self.stacked_widget.setCurrentIndex(4)
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -546,8 +1321,10 @@ class MainWindow(QWidget):
         self.punch_combinations_page = PunchCombinationPage(self.stacked_widget)
         self.basic_parameters_page = BasicParametersPage(self.stacked_widget)
         self.round_selection_page = RoundSelectionPage(self.stacked_widget)
-        self.speed_selection_page = SpeedSelectionPage(self.stacked_widget)   # added
-        self.time_selection_page = TimeSelectionPage(self.stacked_widget)     # added
+        self.speed_selection_page = SpeedSelectionPage(self.stacked_widget)
+        self.time_selection_page = TimeSelectionPage(self.stacked_widget)
+        self.rest_selection_page = RestSelectionPage(self.stacked_widget)
+        self.countdown_page = CountdownPage(self.stacked_widget)  # Ensure this is correctly instantiated
 
         # Add pages to stacked widget
         self.stacked_widget.addWidget(self.homepage)               # Index 0
@@ -558,11 +1335,37 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.round_selection_page)         # Index 5
         self.stacked_widget.addWidget(self.speed_selection_page)         # Index 6
         self.stacked_widget.addWidget(self.time_selection_page)          # Index 7
+        self.stacked_widget.addWidget(self.rest_selection_page)          # Index 8
+        self.stacked_widget.addWidget(self.countdown_page)               # Index 9
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stacked_widget)
         self.setLayout(layout)
+
+    def start_training_session(self):
+        """Extract parameters and start the training session."""
+        try:
+            basic_page = self.stacked_widget.widget(4)
+            
+            # Extract round number from button text (format: "Round\n5")
+            round_text = basic_page.round_btn.text()
+            rounds = int(round_text.split("\n")[1])
+            
+            # Extract time from button text (format: "Time\n2min")
+            time_text = basic_page.time_btn.text()
+            time_str = time_text.split("\n")[1]
+            
+            # Extract rest time from button text (format: "Rest\n30sec")
+            rest_text = basic_page.rest_btn.text()
+            rest_str = rest_text.split("\n")[1]
+            
+            # Start the training session
+            training_page = self.stacked_widget.widget(10)
+            training_page.start_session(rounds, time_str, rest_str)
+            self.stacked_widget.setCurrentIndex(10)
+        except Exception as e:
+            print(f"Error starting training session: {e}")
 
 def main():
     app = QApplication(sys.argv)
