@@ -87,7 +87,7 @@ SPEED_SELECTION_BUTTON_STYLE = """
         font-size: 40px;
         padding: 8px;
         min-width: 80px;
-        min-height: 3000px;
+        min-height: 300px;
         background-color: #1976D2;
         color: white;
         border: none;
