@@ -285,6 +285,7 @@ class TechniquesPage(QWidget):
 
     def on_defense_technique_clicked(self):
         print("Defense Technique button clicked")
+        self.stacked_widget.setCurrentIndex(12)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(1)
@@ -666,6 +667,7 @@ class CountdownPage(QWidget):
         self.stacked_widget = stacked_widget
         self.countdown_value = 20
         self.is_paused = False
+        self.on_finished = None  # callback to start training session
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_countdown)
 
@@ -725,12 +727,13 @@ class CountdownPage(QWidget):
             self.countdown_label.setText(str(self.countdown_value))
         else:
             self.timer.stop()
-            # Countdown finished, you can add logic here
+            if callable(self.on_finished):
+                self.on_finished()
 
     def toggle_pause(self):
         """Pause or resume the countdown."""
         if self.is_paused:
-            self.timer.start()
+            self.timer.start(1000)
             self.pause_btn.setText("Pause")
             self.is_paused = False
         else:
@@ -758,6 +761,13 @@ class TrainingSessionPage(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_timer)
 
+        # self-select state
+        self.is_self_select_mode = False
+        self.sequences = []
+        self.sequence_index = 0
+        self.sequence_cycle_seconds = 6  # each sequence shows for 6 seconds
+        self.sequence_time_remaining = 0
+
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
         main_layout.setSpacing(30)
@@ -779,30 +789,37 @@ class TrainingSessionPage(QWidget):
         self.timer_label.setAlignment(Qt.AlignCenter)
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
 
+        # Sequence display (visible only in self-select mode during work)
+        self.sequence_label = QLabel("")
+        self.sequence_label.setAlignment(Qt.AlignCenter)
+        self.sequence_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #2196F3; margin-top: 10px;")
+        self.sequence_label.hide()
+
         # Create horizontal layout for pause and back buttons
         button_layout = QHBoxLayout()
         button_layout.setSpacing(20)
         button_layout.addStretch()
 
         self.pause_btn = QPushButton("Pause")
-        back_btn = QPushButton("Back")
+        stop_btn = QPushButton("Stop")
 
         self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        stop_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
 
         self.pause_btn.setFixedWidth(250)
-        back_btn.setFixedWidth(250)
+        stop_btn.setFixedWidth(250)
 
         self.pause_btn.clicked.connect(self.toggle_pause)
-        back_btn.clicked.connect(self.on_back_clicked)
+        stop_btn.clicked.connect(self.on_stop_clicked)
 
         button_layout.addWidget(self.pause_btn)
-        button_layout.addWidget(back_btn)
+        button_layout.addWidget(stop_btn)
         button_layout.addStretch()
 
         main_layout.addWidget(self.round_label)
         main_layout.addWidget(self.rest_label)
         main_layout.addWidget(self.timer_label)
+        main_layout.addWidget(self.sequence_label)  # added under the timer
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
 
@@ -830,35 +847,63 @@ class TrainingSessionPage(QWidget):
         }
         return time_map.get(time_str, 60)
 
-    def start_session(self, rounds, time_str, rest_str):
+    def start_session(self, rounds, time_str, rest_str, difficulty=None, sequences=None):
         """Start the training session with the given parameters."""
         self.current_round = 1
         self.total_rounds = rounds
-        
+
         # Convert time strings to seconds
         self.work_time = self.parse_time_to_seconds(time_str)
         self.rest_time = self.parse_time_to_seconds(rest_str)
-        
+
+        # Self-select setup
+        self.is_self_select_mode = (difficulty == "Self-Select") and sequences and len(sequences) > 0
+        self.sequences = sequences if self.is_self_select_mode else []
+        self.sequence_index = 0
+        self.sequence_time_remaining = self.sequence_cycle_seconds if self.sequences else 0
+
         self.time_remaining = self.work_time
         self.is_resting = False
         self.is_paused = False
-        
+
         self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
         self.rest_label.hide()
         self.timer_label.setText(self.format_time(self.time_remaining))
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
         self.pause_btn.setText("Pause")
+
+        if self.is_self_select_mode:
+            self.sequence_label.show()
+            self.update_sequence_display()
+        else:
+            self.sequence_label.hide()
+
         self.timer.start(1000)  # Update every 1 second
+
+    def update_sequence_display(self):
+        """Show the current sequence text."""
+        if self.is_self_select_mode and self.sequences:
+            self.sequence_label.setText(self.sequences[self.sequence_index])
+        else:
+            self.sequence_label.setText("")
 
     def update_timer(self):
         """Update the timer display."""
         if self.time_remaining > 0:
             self.time_remaining -= 1
             self.timer_label.setText(self.format_time(self.time_remaining))
+
+            # Cycle self-select sequences every 6s during work
+            if self.is_self_select_mode and not self.is_resting and self.sequences:
+                if self.sequence_time_remaining > 0:
+                    self.sequence_time_remaining -= 1
+                if self.sequence_time_remaining <= 0 and self.time_remaining > 0:
+                    self.sequence_index = (self.sequence_index + 1) % len(self.sequences)
+                    self.sequence_time_remaining = self.sequence_cycle_seconds
+                    self.update_sequence_display()
         else:
-            # Timer finished
             if self.is_resting:
-                # Rest period finished, start next round
+                # Rest finished -> next round
                 self.current_round += 1
                 self.is_resting = False
                 self.time_remaining = self.work_time
@@ -866,24 +911,34 @@ class TrainingSessionPage(QWidget):
                 self.rest_label.hide()
                 self.timer_label.setText(self.format_time(self.time_remaining))
                 self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+                # reset sequence cycling for new round
+                if self.is_self_select_mode and self.sequences:
+                    self.sequence_index = 0
+                    self.sequence_time_remaining = self.sequence_cycle_seconds
+                    self.sequence_label.show()
+                    self.update_sequence_display()
+                else:
+                    self.sequence_label.hide()
             else:
-                # Work period finished
+                # Work finished
                 if self.current_round < self.total_rounds:
-                    # Not the final round, start rest period
+                    # start rest
                     self.is_resting = True
                     self.time_remaining = self.rest_time
                     self.rest_label.show()
                     self.timer_label.setText(self.format_time(self.time_remaining))
                     self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #FF9800;")
+                    self.sequence_label.hide()
                 else:
-                    # Final round completed, go back to Basic Parameters page
+                    # final round done
                     self.timer.stop()
+                    self.sequence_label.hide()
                     self.stacked_widget.setCurrentIndex(4)
 
     def toggle_pause(self):
         """Pause or resume the timer."""
         if self.is_paused:
-            self.timer.start()
+            self.timer.start(1000)
             self.pause_btn.setText("Pause")
             self.is_paused = False
         else:
@@ -891,7 +946,7 @@ class TrainingSessionPage(QWidget):
             self.pause_btn.setText("Resume")
             self.is_paused = True
 
-    def on_back_clicked(self):
+    def on_stop_clicked(self):
         """Stop timer and go back to BasicParametersPage."""
         self.timer.stop()
         self.stacked_widget.setCurrentIndex(4)
@@ -1306,6 +1361,37 @@ class SelfSelectSequencePage(QWidget):
             basic_page.custom_sequences = self.sequence_list.copy()
             self.stacked_widget.setCurrentIndex(4)
 
+class DefenseTechniquePage(QWidget):
+    """Page to pick a defense technique."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Defense Technique")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
+
+        for label in ["Slip-Counter", "Weave-Under", "Roll-Under", "Mix"]:
+            btn = QPushButton(label)
+            btn.setStyleSheet(SMALL_BUTTON_STYLE)
+            # connect to a simple print or future handler
+            btn.clicked.connect(lambda checked, v=label: print(f"{v} selected"))
+            layout.addWidget(btn)
+
+        layout.addStretch()
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
+        layout.addWidget(back_btn)
+
+        self.setLayout(layout)
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -1324,19 +1410,28 @@ class MainWindow(QWidget):
         self.speed_selection_page = SpeedSelectionPage(self.stacked_widget)
         self.time_selection_page = TimeSelectionPage(self.stacked_widget)
         self.rest_selection_page = RestSelectionPage(self.stacked_widget)
-        self.countdown_page = CountdownPage(self.stacked_widget)  # Ensure this is correctly instantiated
+        self.countdown_page = CountdownPage(self.stacked_widget)
+        self.training_session_page = TrainingSessionPage(self.stacked_widget)
+        self.self_select_sequence_page = SelfSelectSequencePage(self.stacked_widget)
+        self.defense_technique_page = DefenseTechniquePage(self.stacked_widget)
+
+        # Wire countdown completion to start the training session
+        self.countdown_page.on_finished = self.start_training_session
 
         # Add pages to stacked widget
-        self.stacked_widget.addWidget(self.homepage)               # Index 0
-        self.stacked_widget.addWidget(self.training_page)         # Index 1
-        self.stacked_widget.addWidget(self.techniques_page)       # Index 2
-        self.stacked_widget.addWidget(self.punch_combinations_page) # Index 3
-        self.stacked_widget.addWidget(self.basic_parameters_page)        # Index 4
-        self.stacked_widget.addWidget(self.round_selection_page)         # Index 5
-        self.stacked_widget.addWidget(self.speed_selection_page)         # Index 6
-        self.stacked_widget.addWidget(self.time_selection_page)          # Index 7
-        self.stacked_widget.addWidget(self.rest_selection_page)          # Index 8
-        self.stacked_widget.addWidget(self.countdown_page)               # Index 9
+        self.stacked_widget.addWidget(self.homepage)                # 0
+        self.stacked_widget.addWidget(self.training_page)           # 1
+        self.stacked_widget.addWidget(self.techniques_page)         # 2
+        self.stacked_widget.addWidget(self.punch_combinations_page) # 3
+        self.stacked_widget.addWidget(self.basic_parameters_page)   # 4
+        self.stacked_widget.addWidget(self.round_selection_page)    # 5
+        self.stacked_widget.addWidget(self.speed_selection_page)    # 6
+        self.stacked_widget.addWidget(self.time_selection_page)     # 7
+        self.stacked_widget.addWidget(self.rest_selection_page)     # 8
+        self.stacked_widget.addWidget(self.countdown_page)          # 9
+        self.stacked_widget.addWidget(self.training_session_page)   # 10
+        self.stacked_widget.addWidget(self.self_select_sequence_page) # 11
+        self.stacked_widget.addWidget(self.defense_technique_page)  # 12
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -1347,22 +1442,20 @@ class MainWindow(QWidget):
         """Extract parameters and start the training session."""
         try:
             basic_page = self.stacked_widget.widget(4)
-            
-            # Extract round number from button text (format: "Round\n5")
             round_text = basic_page.round_btn.text()
             rounds = int(round_text.split("\n")[1])
-            
-            # Extract time from button text (format: "Time\n2min")
+
             time_text = basic_page.time_btn.text()
             time_str = time_text.split("\n")[1]
-            
-            # Extract rest time from button text (format: "Rest\n30sec")
+
             rest_text = basic_page.rest_btn.text()
             rest_str = rest_text.split("\n")[1]
-            
-            # Start the training session
+
+            difficulty = getattr(basic_page, "selected_difficulty", None)
+            sequences = getattr(basic_page, "custom_sequences", [])
+
             training_page = self.stacked_widget.widget(10)
-            training_page.start_session(rounds, time_str, rest_str)
+            training_page.start_session(rounds, time_str, rest_str, difficulty, sequences)
             self.stacked_widget.setCurrentIndex(10)
         except Exception as e:
             print(f"Error starting training session: {e}")
