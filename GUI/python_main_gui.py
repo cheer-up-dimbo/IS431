@@ -398,7 +398,8 @@ class BasicParametersPage(QWidget):
         self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
         
         back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        self.continue_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        # Continue button should be green like Start actions
+        self.continue_btn.setStyleSheet(START_BUTTON_STYLE_2)
         
         back_btn.clicked.connect(self.on_back_clicked)
         self.continue_btn.clicked.connect(self.on_continue_clicked)
