@@ -99,6 +99,25 @@ START_BUTTON_STYLE_2 = """
     }
 """
 
+HISTORY_BUTTON_STYLE_2 = """
+    QPushButton {
+        font-size: 20px;
+        padding: 25px;
+        min-width: 250px;
+        min-height: 40px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #1976D2;
+    }
+    QPushButton:pressed {
+        background-color: #155A8A;
+    }
+"""
+
 BACK_CONTINUE_BUTTON_STYLE = """
     QPushButton {
         font-size: 20px;
@@ -485,11 +504,83 @@ class PowerPunchPage(QWidget):
 
     def on_completed(self):
         """Called when punch target is reached."""
-        # Navigate back to Performance page (could be changed to results page later)
-        self.stacked_widget.setCurrentIndex(14)
+        # Navigate to Power Result page after completion
+        try:
+            result_page = self.stacked_widget.widget(17)
+            if hasattr(result_page, "set_power_output"):
+                result_page.set_power_output("100 kN")
+            self.stacked_widget.setCurrentIndex(17)
+        except Exception:
+            # Fallback if result page not available
+            self.stacked_widget.setCurrentIndex(14)
 
     def on_quit_clicked(self):
         # Abort and return to Performance page
+        self.stacked_widget.setCurrentIndex(14)
+
+class PowerResultPage(QWidget):
+    """Result page shown after completing the Power punches."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        # Center message
+        self.result_label = QLabel("Your Power Output: 100 kN")
+        self.result_label.setAlignment(Qt.AlignCenter)
+        self.result_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        # Bottom buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        history_btn = QPushButton("History")
+        restart_btn = QPushButton("Restart")
+        quit_btn = QPushButton("Quit")
+
+        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
+        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+
+        history_btn.setFixedWidth(250)
+        restart_btn.setFixedWidth(250)
+        quit_btn.setFixedWidth(250)
+
+        history_btn.clicked.connect(self.on_history_clicked)
+        restart_btn.clicked.connect(self.on_restart_clicked)
+        quit_btn.clicked.connect(self.on_quit_clicked)
+
+        button_layout.addWidget(history_btn)
+        button_layout.addWidget(restart_btn)
+        button_layout.addWidget(quit_btn)
+        button_layout.addStretch()
+
+        layout.addStretch()
+        layout.addWidget(self.result_label)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+        layout.addStretch()
+
+        self.setLayout(layout)
+
+    def set_power_output(self, value_str: str):
+        self.result_label.setText(f"Your Power Output: {value_str}")
+
+    def on_history_clicked(self):
+        # Placeholder: no history page yet
+        print("History clicked - implement history page navigation here")
+
+    def on_restart_clicked(self):
+        # Return to the Power Instructions to restart the flow
+        self.stacked_widget.setCurrentIndex(15)
+
+    def on_quit_clicked(self):
+        # Return to Performance menu
         self.stacked_widget.setCurrentIndex(14)
 
 class TrainingPage(QWidget):
@@ -1796,6 +1887,7 @@ class MainWindow(QWidget):
         self.performance_page = PerformancePage(self.stacked_widget)
         self.power_instructions_page = PowerInstructionsPage(self.stacked_widget)
         self.power_punch_page = PowerPunchPage(self.stacked_widget)
+        self.power_result_page = PowerResultPage(self.stacked_widget)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
@@ -1818,6 +1910,7 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.performance_page)     # 14
         self.stacked_widget.addWidget(self.power_instructions_page) # 15
         self.stacked_widget.addWidget(self.power_punch_page) # 16
+        self.stacked_widget.addWidget(self.power_result_page) # 17
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
