@@ -2,6 +2,9 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
 
+import random
+import time
+
 # Define shared button styles at module level
 BUTTON_STYLE = """
     QPushButton {
@@ -9,6 +12,26 @@ BUTTON_STYLE = """
         padding: 40px;
         min-width: 500px;
         min-height: 50px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #45a049;
+    }
+    QPushButton:pressed {
+        background-color: #3d8b40;
+    }
+"""
+
+# Define shared button styles at module level
+PERFORMANCE_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 20px;
+        padding: 40px;
+        min-width: 500px;
+        min-height: 20px;
         background-color: #4CAF50;
         color: white;
         border: none;
@@ -60,6 +83,44 @@ BACK_BUTTON_STYLE_2 = """
     }
 """
 
+START_BUTTON_STYLE_2 = """
+    QPushButton {
+        font-size: 20px;
+        padding: 25px;
+        min-width: 250px;
+        min-height: 40px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #45a049;
+    }
+    QPushButton:pressed {
+        background-color: #3d8b40;
+    }
+"""
+
+HISTORY_BUTTON_STYLE_2 = """
+    QPushButton {
+        font-size: 20px;
+        padding: 25px;
+        min-width: 250px;
+        min-height: 40px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #1976D2;
+    }
+    QPushButton:pressed {
+        background-color: #155A8A;
+    }
+"""
+
 BACK_CONTINUE_BUTTON_STYLE = """
     QPushButton {
         font-size: 20px;
@@ -86,6 +147,45 @@ SMALL_BUTTON_STYLE = """
         padding: 12px;
         min-width: 240px;
         min-height: 50px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #1976D2;
+    }
+    QPushButton:pressed {
+        background-color: #155A8A;
+    }
+"""
+# Adjusted SMALL_BUTTON_STYLE to a smaller size (change values here to tune)
+BASIC_PARAMETERS_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 20px;
+        padding: 12px;
+        min-width: 240px;
+        min-height: 50px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+    QPushButton:hover {
+        background-color: #1976D2;
+    }
+    QPushButton:pressed {
+        background-color: #155A8A;
+    }
+"""
+
+# Adjusted Battle Button Style to a smaller size (change values here to tune)
+BATTLE_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 20px;
+        padding: 12px;
+        min-width: 240px;
+        min-height: 40px;
         background-color: #2196F3;
         color: white;
         border: none;
@@ -164,8 +264,8 @@ class Homepage(QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0,0,0,0)
 
         title = QLabel("Homepage")
         title.setAlignment(Qt.AlignCenter)
@@ -183,9 +283,13 @@ class Homepage(QWidget):
         performance_btn.clicked.connect(self.on_performance_clicked)
         others_btn.clicked.connect(self.on_others_clicked)
 
+        layout.addStretch()
         layout.addWidget(title)
+        layout.addStretch()
         layout.addWidget(training_btn)
+        layout.addStretch()
         layout.addWidget(performance_btn)
+        layout.addStretch()
         layout.addWidget(others_btn)
         layout.addStretch()
 
@@ -197,9 +301,632 @@ class Homepage(QWidget):
 
     def on_performance_clicked(self):
         print("Performance button clicked")
+        self.stacked_widget.setCurrentIndex(14)
 
     def on_others_clicked(self):
         print("Others button clicked")
+        self.stacked_widget.setCurrentIndex(22)
+
+
+class OthersPage(QWidget):
+    """Simple page with History and stance toggle."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Others")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
+
+        history_btn = QPushButton("History")
+        self.stance_btn = QPushButton("Orthodox")
+        back_btn = QPushButton("Back")
+
+        history_btn.setStyleSheet(BUTTON_STYLE)
+        self.stance_btn.setStyleSheet(BUTTON_STYLE)
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+
+        history_btn.clicked.connect(self.on_history_clicked)
+        self.stance_btn.clicked.connect(self.on_stance_clicked)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        layout.addStretch()
+        layout.addWidget(title)
+        layout.addStretch()
+        layout.addWidget(history_btn)
+        layout.addStretch()
+        layout.addWidget(self.stance_btn)
+        layout.addStretch()
+        layout.addWidget(back_btn)
+        layout.addStretch()
+
+        self.setLayout(layout)
+
+    def on_history_clicked(self):
+        print("History clicked - implement others history navigation")
+
+    def on_stance_clicked(self):
+        # Toggle button label between Orthodox and Southpaw
+        current = self.stance_btn.text().strip()
+        self.stance_btn.setText("Southpaw" if current == "Orthodox" else "Orthodox")
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(0)
+
+class PerformancePage(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Performance")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
+
+        power_btn = QPushButton("Power")
+        stamina_btn = QPushButton("Stamina")
+        reaction_time_btn = QPushButton("Reaction Time")
+        back_btn = QPushButton("Back")
+
+        power_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
+        stamina_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
+        reaction_time_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+
+        power_btn.clicked.connect(self.on_power_clicked)
+        stamina_btn.clicked.connect(self.on_stamina_clicked)
+        reaction_time_btn.clicked.connect(self.on_reaction_time_clicked)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        layout.addStretch()
+        layout.addWidget(title)
+        layout.addStretch()
+        layout.addWidget(power_btn)
+        layout.addStretch()
+        layout.addWidget(stamina_btn)
+        layout.addStretch()
+        layout.addWidget(reaction_time_btn)
+        layout.addStretch()
+        layout.addWidget(back_btn)
+        layout.addStretch()
+
+        self.setLayout(layout)
+
+    def on_power_clicked(self):
+        print("Power button clicked")
+        # Navigate to Power Instructions page (index 15)
+        self.stacked_widget.setCurrentIndex(15)
+
+    def on_stamina_clicked(self):
+        print("Stamina button clicked")
+        # Navigate to Stamina Instructions page (index 18)
+        self.stacked_widget.setCurrentIndex(18)
+
+    def on_reaction_time_clicked(self):
+        print("Reaction Time button clicked")
+        # Navigate to Reaction Instructions page (index 19)
+        self.stacked_widget.setCurrentIndex(19)
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(0)
+
+
+class StaminaInstructionsPage(QWidget):
+    """Instructions page for the Stamina mode."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Instructions")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        instructions = QLabel(
+            "1. Wait for timer to countdown\n"
+            "2. Throw as many punches to the head.\n"
+            "3. See results at the end"
+        )
+        instructions.setAlignment(Qt.AlignCenter)
+        instructions.setStyleSheet("font-size: 28px; font-weight: bold;")
+
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        back_btn = QPushButton("Back")
+        start_btn = QPushButton("Start")
+
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+
+        back_btn.setFixedWidth(250)
+        start_btn.setFixedWidth(250)
+
+        back_btn.clicked.connect(self.on_back_clicked)
+        start_btn.clicked.connect(self.on_start_clicked)
+
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(start_btn)
+        button_layout.addStretch()
+
+        layout.addStretch()
+        layout.addWidget(title)
+        layout.addStretch()
+        layout.addWidget(instructions)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(14)
+
+    def on_start_clicked(self):
+        try:
+            countdown_page = self.stacked_widget.widget(9)
+            countdown_page.on_finished = self.launch_stamina_punch_page
+            countdown_page.return_page_index = 18  # back should return to stamina instructions
+            countdown_page.start_countdown()
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(9)
+
+    def launch_stamina_punch_page(self):
+        try:
+            punch_page = self.stacked_widget.widget(16)
+            punch_page.reset_counter()
+            self.stacked_widget.setCurrentIndex(16)
+        except Exception:
+            self.stacked_widget.setCurrentIndex(14)
+
+
+class ReactionInstructionsPage(QWidget):
+    """Instructions page for the Reaction Time mode."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Instructions")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        instructions = QLabel(
+            "1. Wait for timer to countdown\n"
+            "2. Wait until the screen turns green.\n"
+            "3. See results at the end"
+        )
+        instructions.setAlignment(Qt.AlignCenter)
+        instructions.setStyleSheet("font-size: 28px; font-weight: bold;")
+
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        back_btn = QPushButton("Back")
+        start_btn = QPushButton("Start")
+
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+
+        back_btn.setFixedWidth(250)
+        start_btn.setFixedWidth(250)
+
+        back_btn.clicked.connect(self.on_back_clicked)
+        start_btn.clicked.connect(self.on_start_clicked)
+
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(start_btn)
+        button_layout.addStretch()
+
+        layout.addStretch()
+        layout.addWidget(title)
+        layout.addStretch()
+        layout.addWidget(instructions)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(14)
+
+    def on_start_clicked(self):
+        try:
+            countdown_page = self.stacked_widget.widget(9)
+            countdown_page.on_finished = self.launch_reaction_test_page
+            countdown_page.return_page_index = 19  # back should return to reaction instructions
+            countdown_page.start_countdown()
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(9)
+
+    def launch_reaction_test_page(self):
+        try:
+            reaction_test_page = self.stacked_widget.widget(20)
+            reaction_test_page.start_test()
+            self.stacked_widget.setCurrentIndex(20)
+        except Exception:
+            self.stacked_widget.setCurrentIndex(14)
+
+class PowerInstructionsPage(QWidget):
+    """Instructions page for the Power mode."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        instructions_1 = QLabel(
+            "Instructions"
+        )
+        instructions_1.setAlignment(Qt.AlignCenter)
+        instructions_1.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        instructions = QLabel(
+            "1. Wait for timer to countdown\n"
+            "2. Throw 10 power hooks to the body\n"
+            "3. See results at the end"
+        )
+        instructions.setAlignment(Qt.AlignCenter)
+        instructions.setStyleSheet("font-size: 28px; font-weight: bold;")
+
+        # Buttons at the bottom
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        back_btn = QPushButton("Back")
+        start_btn = QPushButton("Start")
+
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+
+        back_btn.setFixedWidth(250)
+        start_btn.setFixedWidth(250)
+
+        back_btn.clicked.connect(self.on_back_clicked)
+        start_btn.clicked.connect(self.on_start_clicked)
+
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(start_btn)
+        button_layout.addStretch()
+
+        layout.addStretch()
+        layout.addWidget(instructions_1)
+        layout.addStretch()
+        layout.addWidget(instructions)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def on_back_clicked(self):
+        # Return to Performance page
+        self.stacked_widget.setCurrentIndex(14)
+
+    def on_start_clicked(self):
+        # Start the existing countdown flow then show CountdownPage (index 9)
+        try:
+            countdown_page = self.stacked_widget.widget(9)
+            # When countdown finishes, go to Power Punch page
+            countdown_page.on_finished = self.launch_power_punch_page
+            countdown_page.return_page_index = 15  # back should return to instructions
+            countdown_page.start_countdown()
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(9)
+
+    def launch_power_punch_page(self):
+        """Switch to the punch counting page after countdown."""
+        try:
+            punch_page = self.stacked_widget.widget(16)
+            punch_page.reset_counter()
+            self.stacked_widget.setCurrentIndex(16)
+        except Exception:
+            # If page not available, fall back to Performance page
+            self.stacked_widget.setCurrentIndex(14)
+
+class PowerPunchPage(QWidget):
+    """Page to count power punches after countdown."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.target = 10
+        self.count = 0
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(30)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        self.counter_label = QLabel(self.counter_text())
+        self.counter_label.setAlignment(Qt.AlignCenter)
+        self.counter_label.setStyleSheet("font-size: 32px; font-weight: bold;")
+
+        self.instruction_label = QLabel("Throw 10 Powerful Body Hooks")
+        self.instruction_label.setAlignment(Qt.AlignCenter)
+        self.instruction_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        # Quit button at bottom
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        quit_btn = QPushButton("Quit")
+        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        quit_btn.setFixedWidth(250)
+        quit_btn.clicked.connect(self.on_quit_clicked)
+
+        button_layout.addWidget(quit_btn)
+        button_layout.addStretch()
+
+        main_layout.addStretch()
+        main_layout.addWidget(self.counter_label)
+        main_layout.addStretch()
+        main_layout.addWidget(self.instruction_label)
+        main_layout.addStretch()
+        main_layout.addLayout(button_layout)
+        main_layout.addStretch()
+
+        self.setLayout(main_layout)
+
+    def counter_text(self):
+        return f"Punch Count: {self.count}/{self.target}"
+
+    def reset_counter(self):
+        self.count = 0
+        self.counter_label.setText(self.counter_text())
+
+    def mousePressEvent(self, event):
+        """Increment punch count on screen press until target reached."""
+        if self.count < self.target:
+            self.count += 1
+            self.counter_label.setText(self.counter_text())
+            if self.count >= self.target:
+                # Proceed to next page when target reached
+                self.on_completed()
+        super().mousePressEvent(event)
+
+    def on_completed(self):
+        """Called when punch target is reached."""
+        # Navigate to Power Result page after completion
+        try:
+            result_page = self.stacked_widget.widget(17)
+            if hasattr(result_page, "set_power_output"):
+                result_page.set_power_output("100 kN")
+            self.stacked_widget.setCurrentIndex(17)
+        except Exception:
+            # Fallback if result page not available
+            self.stacked_widget.setCurrentIndex(14)
+
+    def on_quit_clicked(self):
+        # Abort and return to Performance page
+        self.stacked_widget.setCurrentIndex(14)
+
+class PowerResultPage(QWidget):
+    """Result page shown after completing the Power punches."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        # Center message
+        self.result_label = QLabel("Punches Thrown in a Minute: 100")
+        self.result_label.setAlignment(Qt.AlignCenter)
+        self.result_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        # Bottom buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        history_btn = QPushButton("History")
+        restart_btn = QPushButton("Restart")
+        quit_btn = QPushButton("Quit")
+
+        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
+        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+
+        history_btn.setFixedWidth(250)
+        restart_btn.setFixedWidth(250)
+        quit_btn.setFixedWidth(250)
+
+        history_btn.clicked.connect(self.on_history_clicked)
+        restart_btn.clicked.connect(self.on_restart_clicked)
+        quit_btn.clicked.connect(self.on_quit_clicked)
+
+        button_layout.addWidget(history_btn)
+        button_layout.addWidget(restart_btn)
+        button_layout.addWidget(quit_btn)
+        button_layout.addStretch()
+
+        layout.addStretch()
+        layout.addWidget(self.result_label)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+        layout.addStretch()
+
+        self.setLayout(layout)
+
+    def set_power_output(self, value_str: str):
+        self.result_label.setText(f"Your Power Output: {value_str}")
+
+    def on_history_clicked(self):
+        # Placeholder: no history page yet
+        print("History clicked - implement history page navigation here")
+
+    def on_restart_clicked(self):
+        # Return to the Power Instructions to restart the flow
+        self.stacked_widget.setCurrentIndex(15)
+
+    def on_quit_clicked(self):
+        # Return to Performance menu
+        self.stacked_widget.setCurrentIndex(14)
+
+
+class ReactionTestPage(QWidget):
+    """Red/green screen to measure reaction time after countdown."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.state = "red"
+        self.reaction_start_time = None
+
+        # Allow style sheets to paint the entire widget background
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAutoFillBackground(True)
+
+        self.green_timer = QTimer()
+        self.green_timer.setSingleShot(True)
+        self.green_timer.timeout.connect(self.go_green)
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0,0,0,0)
+
+        self.status_label = QLabel("Do Not Punch")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setStyleSheet("font-size: 48px; font-weight: bold; color: white; background: transparent;")
+
+        layout.addStretch()
+        layout.addWidget(self.status_label)
+        layout.addStretch()
+
+        self.setLayout(layout)
+        self.set_red_state()
+
+    def set_red_state(self):
+        self.state = "red"
+        self.reaction_start_time = None
+        self.setStyleSheet("background-color: #b71c1c;")
+        self.status_label.setText("Do Not Punch")
+
+    def schedule_green(self):
+        delay_ms = random.randint(5, 10) * 1000
+        self.green_timer.stop()
+        self.green_timer.start(delay_ms)
+
+    def start_test(self):
+        self.set_red_state()
+        self.schedule_green()
+
+    def flash_text(self):
+        self.status_label.setText("")
+        QTimer.singleShot(150, lambda: self.status_label.setText("Do Not Punch"))
+
+    def go_green(self):
+        self.state = "green"
+        self.reaction_start_time = time.perf_counter()
+        self.setStyleSheet("background-color: #2e7d32;")
+        self.status_label.setText("Punch Now")
+
+    def mousePressEvent(self, event):
+        if self.state == "red":
+            self.flash_text()
+            self.schedule_green()
+        elif self.state == "green":
+            self.green_timer.stop()
+            reaction_time = 0.0
+            if self.reaction_start_time is not None:
+                reaction_time = max(0.0, time.perf_counter() - self.reaction_start_time)
+            try:
+                result_page = self.stacked_widget.widget(21)
+                if hasattr(result_page, "set_reaction_time"):
+                    result_page.set_reaction_time(reaction_time)
+                self.stacked_widget.setCurrentIndex(21)
+            except Exception:
+                self.stacked_widget.setCurrentIndex(14)
+        super().mousePressEvent(event)
+
+
+class ReactionResultPage(QWidget):
+    """Shows measured reaction time after the test."""
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        self.result_label = QLabel("Reaction Time: -- s")
+        self.result_label.setAlignment(Qt.AlignCenter)
+        self.result_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        history_btn = QPushButton("History")
+        restart_btn = QPushButton("Restart")
+        back_btn = QPushButton("Back")
+
+        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
+        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+
+        history_btn.setFixedWidth(250)
+        restart_btn.setFixedWidth(250)
+        back_btn.setFixedWidth(250)
+
+        history_btn.clicked.connect(self.on_history_clicked)
+        restart_btn.clicked.connect(self.on_restart_clicked)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        button_layout.addWidget(history_btn)
+        button_layout.addWidget(restart_btn)
+        button_layout.addWidget(back_btn)
+        button_layout.addStretch()
+
+        layout.addStretch()
+        layout.addWidget(self.result_label)
+        layout.addStretch()
+        layout.addLayout(button_layout)
+        layout.addStretch()
+
+        self.setLayout(layout)
+
+    def set_reaction_time(self, seconds: float):
+        self.result_label.setText(f"Reaction Time: {seconds:.3f} s")
+
+    def on_history_clicked(self):
+        # Placeholder: add history navigation when available
+        print("History clicked - implement reaction history navigation")
+
+    def on_restart_clicked(self):
+        self.stacked_widget.setCurrentIndex(19)
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(14)
 
 class TrainingPage(QWidget):
     def __init__(self, stacked_widget):
@@ -241,7 +968,8 @@ class TrainingPage(QWidget):
 
     def on_spar_clicked(self):
         print("Spar button clicked")
-        self.stacked_widget.setCurrentIndex(13)
+        # SparPage is now at index 12 after removing DefenseTechniquePage
+        self.stacked_widget.setCurrentIndex(12)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(0)
@@ -261,20 +989,16 @@ class TechniquesPage(QWidget):
         title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
 
         punch_lib_btn = QPushButton("Punch Combination Library")
-        defense_btn = QPushButton("Defense Technique")
         back_btn = QPushButton("Back")
 
         punch_lib_btn.setStyleSheet(BUTTON_STYLE)
-        defense_btn.setStyleSheet(BUTTON_STYLE)
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
 
         punch_lib_btn.clicked.connect(self.on_punch_combination_library_clicked)
-        defense_btn.clicked.connect(self.on_defense_technique_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(punch_lib_btn)
-        layout.addWidget(defense_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
@@ -283,10 +1007,6 @@ class TechniquesPage(QWidget):
     def on_punch_combination_library_clicked(self):
         print("Punch Combination Library button clicked")
         self.stacked_widget.setCurrentIndex(3)
-
-    def on_defense_technique_clicked(self):
-        print("Defense Technique button clicked")
-        self.stacked_widget.setCurrentIndex(12)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(1)
@@ -383,11 +1103,12 @@ class BasicParametersPage(QWidget):
         self.rest_btn.clicked.connect(self.on_rest_clicked)
 
         layout.addWidget(title)
+        # center the buttons horizontally
         layout.addWidget(self.round_btn)
         layout.addWidget(self.speed_btn)
         layout.addWidget(self.time_btn)
         layout.addWidget(self.rest_btn)
-        layout.addStretch()
+        # layout.addStretch()
 
         # Create horizontal layout for back and continue buttons
         button_layout = QHBoxLayout()
@@ -449,6 +1170,12 @@ class BasicParametersPage(QWidget):
         print("Continue button clicked")
         # Start countdown and move to CountdownPage
         countdown_page = self.stacked_widget.widget(9)
+        # Ensure training flow uses the training session start callback
+        parent_window = self.stacked_widget.parent()
+        if parent_window and hasattr(parent_window, "start_training_session"):
+            countdown_page.on_finished = parent_window.start_training_session
+        # Back from countdown should return to Basic Parameters during training flow
+        countdown_page.return_page_index = 4
         countdown_page.start_countdown()
         self.stacked_widget.setCurrentIndex(9)
 
@@ -672,6 +1399,8 @@ class CountdownPage(QWidget):
         self.countdown_value = 20
         self.is_paused = False
         self.on_finished = None  # callback to start training session
+        # Where to return if user presses Back during countdown
+        self.return_page_index = 4
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_countdown)
 
@@ -709,10 +1438,13 @@ class CountdownPage(QWidget):
         button_layout.addWidget(back_btn)
         button_layout.addStretch()
 
+        main_layout.addStretch()
         main_layout.addWidget(title)
+        main_layout.addStretch()
         main_layout.addWidget(self.countdown_label)
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
+        main_layout.addStretch()
 
         self.setLayout(main_layout)
 
@@ -722,6 +1454,8 @@ class CountdownPage(QWidget):
         self.is_paused = False
         self.countdown_label.setText(str(self.countdown_value))
         self.pause_btn.setText("Pause")
+        # Ensure Pause button starts in red style
+        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
         self.timer.start(1000)  # Update every 1000ms (1 second)
 
     def update_countdown(self):
@@ -739,16 +1473,20 @@ class CountdownPage(QWidget):
         if self.is_paused:
             self.timer.start(1000)
             self.pause_btn.setText("Pause")
+            # Back to red when resuming (showing "Pause")
+            self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
             self.is_paused = False
         else:
             self.timer.stop()
             self.pause_btn.setText("Resume")
+            # Green while paused (showing "Resume")
+            self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
             self.is_paused = True
 
     def on_back_clicked(self):
         """Stop timer and go back to BasicParametersPage."""
         self.timer.stop()
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(self.return_page_index)
 
 class TrainingSessionPage(QWidget):
     """Page showing the actual training session with round counter and timer."""
@@ -820,12 +1558,17 @@ class TrainingSessionPage(QWidget):
         button_layout.addWidget(stop_btn)
         button_layout.addStretch()
 
+        main_layout.addStretch()
         main_layout.addWidget(self.round_label)
+        main_layout.addStretch()
         main_layout.addWidget(self.rest_label)
+        main_layout.addStretch()
         main_layout.addWidget(self.timer_label)
+        main_layout.addStretch()
         main_layout.addWidget(self.sequence_label)  # added under the timer
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
+        main_layout.addStretch()
 
         self.setLayout(main_layout)
 
@@ -875,6 +1618,8 @@ class TrainingSessionPage(QWidget):
         self.timer_label.setText(self.format_time(self.time_remaining))
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
         self.pause_btn.setText("Pause")
+        # Ensure Pause button starts in red style
+        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
 
         if self.is_self_select_mode:
             self.sequence_label.show()
@@ -944,10 +1689,14 @@ class TrainingSessionPage(QWidget):
         if self.is_paused:
             self.timer.start(1000)
             self.pause_btn.setText("Pause")
+            # Back to red when resuming (showing "Pause")
+            self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
             self.is_paused = False
         else:
             self.timer.stop()
             self.pause_btn.setText("Resume")
+            # Green while paused (showing "Resume")
+            self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
             self.is_paused = True
 
     def on_stop_clicked(self):
@@ -1365,45 +2114,6 @@ class SelfSelectSequencePage(QWidget):
             basic_page.custom_sequences = self.sequence_list.copy()
             self.stacked_widget.setCurrentIndex(4)
 
-class DefenseTechniquePage(QWidget):
-    """Page to pick a defense technique."""
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        self.previous_page = 2  # Default to Techniques page
-
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Defense Technique")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
-
-        for label in ["Slip-Counter", "Weave-Under", "Roll-Under", "Mix"]:
-            btn = QPushButton(label)
-            btn.setStyleSheet(SMALL_BUTTON_STYLE)
-            btn.clicked.connect(lambda checked, v=label: self.on_technique_clicked(v))
-            layout.addWidget(btn)
-
-        layout.addStretch()
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(self.previous_page))
-        layout.addWidget(back_btn)
-
-        self.setLayout(layout)
-
-    def on_technique_clicked(self, technique):
-        """Store technique and go to Basic Parameters page."""
-        basic_page = self.stacked_widget.widget(4)
-        basic_page.selected_technique = technique
-        basic_page.selected_difficulty = "Defense"
-        basic_page.previous_page = 12  # Set to Defense Technique page
-        self.stacked_widget.setCurrentIndex(4)
-
 class SparPage(QWidget):
     """Page with Spar options."""
     def __init__(self, stacked_widget):
@@ -1420,31 +2130,25 @@ class SparPage(QWidget):
         title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
 
         battle_btn = QPushButton("Battle")
-        drills_btn = QPushButton("Sparring Drills")
         back_btn = QPushButton("Back")
 
-        battle_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        drills_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        # Make Battle button look the same as the Spar button in TrainingPage
+        battle_btn.setStyleSheet(BUTTON_STYLE)
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
 
         battle_btn.clicked.connect(self.on_battle_clicked)
-        drills_btn.clicked.connect(self.on_drills_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(battle_btn)
-        layout.addWidget(drills_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
         self.setLayout(layout)
 
     def on_battle_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
-
-    def on_drills_clicked(self):
-        print("Sparring Drills button clicked")
-        self.stacked_widget.setCurrentIndex(15)
+        # BattlePage index moved to 13 after removing defense page
+        self.stacked_widget.setCurrentIndex(13)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(1)
@@ -1467,16 +2171,28 @@ class BattlePage(QWidget):
 
         for label in ["Pressure Fighter", "Counter Puncher", "Balanced Boxer", "Out Boxer", "Random"]:
             btn = QPushButton(label)
-            btn.setStyleSheet(SMALL_BUTTON_STYLE)
+            btn.setStyleSheet(BATTLE_BUTTON_STYLE)
+            btn.setMaximumWidth(420)                 # keep button width reasonable
+            btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
             btn.clicked.connect(lambda checked, v=label: self.on_style_clicked(v))
-            layout.addWidget(btn)
+            # Center the button without using alignment flags by wrapping in an HBox with stretches
+            row = QHBoxLayout()
+            row.addStretch()
+            row.addWidget(btn)
+            row.addStretch()
+            layout.addLayout(row)
 
         layout.addStretch()
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(13))
-        layout.addWidget(back_btn)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(12))
+        # Center the Back button using an HBox with stretches
+        back_row = QHBoxLayout()
+        back_row.addStretch()
+        back_row.addWidget(back_btn)
+        back_row.addStretch()
+        layout.addLayout(back_row)
 
         self.setLayout(layout)
 
@@ -1486,53 +2202,8 @@ class BattlePage(QWidget):
         basic_page = self.stacked_widget.widget(4)
         basic_page.selected_battle_style = style
         basic_page.selected_difficulty = "Battle"
-        basic_page.previous_page = 14  # Return here on back
-        self.stacked_widget.setCurrentIndex(4)
-
-class SparringDrillsPage(QWidget):
-    """Page with Sparring Drills options."""
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Sparring Drills")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
-        layout.addWidget(title)
-
-        for label in [
-            "Jab-Only Sparring",
-            "Counter-Only Sparring",
-            "Touch Sparring",
-            "Rhythm Change Drill",
-            "Defence-Only Round"
-        ]:
-            btn = QPushButton(label)
-            btn.setStyleSheet(SMALL_BUTTON_STYLE)
-            btn.clicked.connect(lambda checked, v=label: self.on_drill_clicked(v))
-            layout.addWidget(btn)
-
-        layout.addStretch()
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(13))
-        layout.addWidget(back_btn)
-
-        self.setLayout(layout)
-
-    def on_drill_clicked(self, drill):
-        """Store drill and go to Basic Parameters page."""
-        print(f"{drill} selected")
-        basic_page = self.stacked_widget.widget(4)
-        basic_page.selected_spar_drill = drill
-        basic_page.selected_difficulty = "Sparring Drill"
-        basic_page.previous_page = 15  # return here on back
+        # BattlePage is now index 13
+        basic_page.previous_page = 13  # Return here on back
         self.stacked_widget.setCurrentIndex(4)
 
 class MainWindow(QWidget):
@@ -1556,10 +2227,17 @@ class MainWindow(QWidget):
         self.countdown_page = CountdownPage(self.stacked_widget)
         self.training_session_page = TrainingSessionPage(self.stacked_widget)
         self.self_select_sequence_page = SelfSelectSequencePage(self.stacked_widget)
-        self.defense_technique_page = DefenseTechniquePage(self.stacked_widget)
         self.spar_page = SparPage(self.stacked_widget)
         self.battle_page = BattlePage(self.stacked_widget)
-        self.sparring_drills_page = SparringDrillsPage(self.stacked_widget)
+        self.performance_page = PerformancePage(self.stacked_widget)
+        self.power_instructions_page = PowerInstructionsPage(self.stacked_widget)
+        self.power_punch_page = PowerPunchPage(self.stacked_widget)
+        self.power_result_page = PowerResultPage(self.stacked_widget)
+        self.stamina_instructions_page = StaminaInstructionsPage(self.stacked_widget)
+        self.reaction_instructions_page = ReactionInstructionsPage(self.stacked_widget)
+        self.reaction_test_page = ReactionTestPage(self.stacked_widget)
+        self.reaction_result_page = ReactionResultPage(self.stacked_widget)
+        self.others_page = OthersPage(self.stacked_widget)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
@@ -1577,10 +2255,17 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.countdown_page)          # 9
         self.stacked_widget.addWidget(self.training_session_page)   # 10
         self.stacked_widget.addWidget(self.self_select_sequence_page) # 11
-        self.stacked_widget.addWidget(self.defense_technique_page)  # 12
-        self.stacked_widget.addWidget(self.spar_page)            # 13
-        self.stacked_widget.addWidget(self.battle_page)          # 14
-        self.stacked_widget.addWidget(self.sparring_drills_page)  # 15
+        self.stacked_widget.addWidget(self.spar_page)            # 12
+        self.stacked_widget.addWidget(self.battle_page)          # 13
+        self.stacked_widget.addWidget(self.performance_page)     # 14
+        self.stacked_widget.addWidget(self.power_instructions_page) # 15
+        self.stacked_widget.addWidget(self.power_punch_page) # 16
+        self.stacked_widget.addWidget(self.power_result_page) # 17
+        self.stacked_widget.addWidget(self.stamina_instructions_page) # 18
+        self.stacked_widget.addWidget(self.reaction_instructions_page) # 19
+        self.stacked_widget.addWidget(self.reaction_test_page) # 20
+        self.stacked_widget.addWidget(self.reaction_result_page) # 21
+        self.stacked_widget.addWidget(self.others_page) # 22
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
