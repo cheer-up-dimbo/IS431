@@ -790,7 +790,6 @@ class PowerResultPage(QWidget):
         # Return to Performance menu
         self.stacked_widget.setCurrentIndex(14)
 
-
 class ReactionTestPage(QWidget):
     """Red/green screen to measure reaction time after countdown."""
     def __init__(self, stacked_widget):
@@ -866,7 +865,6 @@ class ReactionTestPage(QWidget):
                 self.stacked_widget.setCurrentIndex(14)
         super().mousePressEvent(event)
 
-
 class ReactionResultPage(QWidget):
     """Shows measured reaction time after the test."""
     def __init__(self, stacked_widget):
@@ -929,6 +927,24 @@ class ReactionResultPage(QWidget):
         self.stacked_widget.setCurrentIndex(14)
 
 class TrainingPage(QWidget):
+    """
+    TrainingPage class for displaying training options in a GUI application.
+    This class extends QWidget and provides a user interface for selecting different
+    training activities. It displays a centered layout with buttons for accessing
+    techniques and sparring features, along with a back button for navigation.
+    Attributes:
+        stacked_widget (QStackedWidget): Reference to the parent stacked widget for
+            managing page navigation between different sections of the application.
+    Methods:
+        __init__(stacked_widget): Initializes the TrainingPage with UI components
+            including title, buttons, and layout configuration.
+        on_techniques_clicked(): Handles the techniques button click event and
+            navigates to the Techniques page (index 2).
+        on_spar_clicked(): Handles the spar button click event and navigates to
+            the SparPage (index 12).
+        on_back_clicked(): Handles the back button click event and returns to
+            the main page (index 0).
+    """
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2154,45 +2170,48 @@ class SparPage(QWidget):
         self.stacked_widget.setCurrentIndex(1)
 
 class BattlePage(QWidget):
-    """Page with Battle style options."""
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
+        layout.setSpacing(24)
+        layout.setContentsMargins(50, 50, 50, 50)
 
         title = QLabel("Battle")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
-        layout.addWidget(title)
+        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 8px;")
 
-        for label in ["Pressure Fighter", "Counter Puncher", "Balanced Boxer", "Out Boxer", "Random"]:
-            btn = QPushButton(label)
-            btn.setStyleSheet(BATTLE_BUTTON_STYLE)
-            btn.setMaximumWidth(420)                 # keep button width reasonable
-            btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-            btn.clicked.connect(lambda checked, v=label: self.on_style_clicked(v))
-            # Center the button without using alignment flags by wrapping in an HBox with stretches
-            row = QHBoxLayout()
-            row.addStretch()
-            row.addWidget(btn)
-            row.addStretch()
-            layout.addLayout(row)
-
-        layout.addStretch()
-
+        buttons = [
+            QPushButton("Pressure Fighter"),
+            QPushButton("Counter Puncher"),
+            QPushButton("Balanced Boxer"),
+            QPushButton("Out Boxer"),
+            QPushButton("Random"),
+        ]
         back_btn = QPushButton("Back")
+
+        for b in buttons:
+            b.setStyleSheet(BATTLE_BUTTON_STYLE)
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(12))
-        # Center the Back button using an HBox with stretches
-        back_row = QHBoxLayout()
-        back_row.addStretch()
-        back_row.addWidget(back_btn)
-        back_row.addStretch()
-        layout.addLayout(back_row)
+
+        # wire clicks
+        buttons[0].clicked.connect(lambda: self.on_style_clicked("Pressure Fighter"))
+        buttons[1].clicked.connect(lambda: self.on_style_clicked("Counter Puncher"))
+        buttons[2].clicked.connect(lambda: self.on_style_clicked("Balanced Boxer"))
+        buttons[3].clicked.connect(lambda: self.on_style_clicked("Out Boxer"))
+        buttons[4].clicked.connect(lambda: self.on_style_clicked("Random"))
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        layout.addStretch(1)
+        layout.addWidget(title)
+        for b in buttons:
+            layout.addStretch(1)
+            layout.addWidget(b)
+        layout.addStretch(1)
+        layout.addWidget(back_btn)
+        layout.addStretch(1)
 
         self.setLayout(layout)
 
@@ -2205,6 +2224,9 @@ class BattlePage(QWidget):
         # BattlePage is now index 13
         basic_page.previous_page = 13  # Return here on back
         self.stacked_widget.setCurrentIndex(4)
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(12)
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -2295,6 +2317,15 @@ class MainWindow(QWidget):
             print(f"Error starting training session: {e}")
 
 def main():
+    """
+    Initialize and run the PyQt application.
+
+    Creates a QApplication instance, instantiates the main window,
+    displays it, and starts the application event loop.
+
+    Returns:
+        None
+    """
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
