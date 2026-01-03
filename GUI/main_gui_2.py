@@ -1749,6 +1749,11 @@ class TrainingSessionPage(QWidget):
                     # final round done
                     self.timer.stop()
                     self.sequence_label.hide()
+                    # Send Log Training Session JSON message
+                    try:
+                        print(json.dumps({"action": "Log Training Session"}))
+                    except Exception as e:
+                        print(f"Error sending log training session message: {e}")
                     self.stacked_widget.setCurrentIndex(4)
 
     def toggle_pause(self):
@@ -1759,16 +1764,59 @@ class TrainingSessionPage(QWidget):
             # Back to red when resuming (showing "Pause")
             self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
             self.is_paused = False
+            # Send Resume JSON message
+            try:
+                print(json.dumps({"action": "Resume"}))
+            except Exception as e:
+                print(f"Error sending resume message: {e}")
+            
+            # Resend mode-specific information after resume
+            try:
+                if self.is_self_select_mode and self.sequences:
+                    # For Self-Select mode, send current sequence info
+                    current_sequence = self.sequences[self.sequence_index]
+                    payload = {
+                        "mode": "Self-Select",
+                        "sequence": current_sequence,
+                        "sequence_index": self.sequence_index,
+                    }
+                    print(json.dumps(payload))
+                elif self.difficulty == "Battle":
+                    # For Battle mode, send mode and battle_style
+                    payload = {
+                        "mode": self.difficulty,
+                        "battle_style": self.battle_style,
+                    }
+                    print(json.dumps(payload))
+                elif self.difficulty in ["Beginner", "Intermediate", "Advanced"]:
+                    # For Punch Combination modes
+                    mode_str = f"Punch-Combination {self.difficulty}"
+                    payload = {
+                        "mode": mode_str,
+                    }
+                    print(json.dumps(payload))
+            except Exception as e:
+                print(f"Error resending mode info after resume: {e}")
         else:
             self.timer.stop()
             self.pause_btn.setText("Resume")
             # Green while paused (showing "Resume")
             self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
             self.is_paused = True
+            # Send Pause JSON message
+            try:
+                print(json.dumps({"action": "Pause"}))
+            except Exception as e:
+                print(f"Error sending pause message: {e}")
 
     def on_stop_clicked(self):
         """Stop timer and go back to BasicParametersPage."""
         self.timer.stop()
+        # Send Stop JSON message
+        try:
+            print(json.dumps({"action": "Stop"}))
+        except Exception as e:
+            print(f"Error sending stop message: {e}")
         self.stacked_widget.setCurrentIndex(4)
 
 class SelfSelectSequencePage(QWidget):
