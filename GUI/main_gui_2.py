@@ -1520,6 +1520,10 @@ class TrainingSessionPage(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_timer)
 
+        # Training mode attributes
+        self.difficulty = None
+        self.battle_style = None
+
         # self-select state
         self.is_self_select_mode = False
         self.sequences = []
@@ -1611,11 +1615,39 @@ class TrainingSessionPage(QWidget):
         }
         return time_map.get(time_str, 60)
 
-    def start_session(self, rounds, time_str, rest_str, difficulty=None, sequences=None):
+    def send_round_start_message(self):
+        """Send JSON message at the start of each round for non-Self-Select modes."""
+        if self.is_self_select_mode:
+            return  # Skip for Self-Select mode
+        
+        try:
+            if self.difficulty == "Battle":
+                # For Battle mode, send both mode and battle_style
+                payload = {
+                    "mode": self.difficulty,
+                    "battle_style": self.battle_style,
+                }
+            elif self.difficulty in ["Beginner", "Intermediate", "Advanced"]:
+                # For Punch Combination modes
+                mode_str = f"Punch-Combination {self.difficulty}"
+                payload = {
+                    "mode": mode_str,
+                }
+            else:
+                # For other modes (Stamina, Reaction Time, Power, etc.)
+                payload = {
+                    "mode": self.difficulty,
+                }
+            print(json.dumps(payload))
+        except Exception as e:
+            print(f"Error sending round start message: {e}")
+
+    def start_session(self, rounds, time_str, rest_str, difficulty=None, sequences=None, battle_style=None):
         """Start the training session with the given parameters."""
         self.current_round = 1
         self.total_rounds = rounds
         self.difficulty = difficulty
+        self.battle_style = battle_style
 
         # Convert time strings to seconds
         self.work_time = self.parse_time_to_seconds(time_str)
@@ -1644,6 +1676,9 @@ class TrainingSessionPage(QWidget):
             self.update_sequence_display()
         else:
             self.sequence_label.hide()
+
+        # Send round start message for non-Self-Select modes
+        self.send_round_start_message()
 
         self.timer.start(1000)  # Update every 1 second
 
@@ -1688,6 +1723,10 @@ class TrainingSessionPage(QWidget):
                 self.rest_label.hide()
                 self.timer_label.setText(self.format_time(self.time_remaining))
                 self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+                
+                # Send round start message for new round
+                self.send_round_start_message()
+                
                 # reset sequence cycling for new round
                 if self.is_self_select_mode and self.sequences:
                     self.sequence_index = 0
@@ -2325,19 +2364,16 @@ class MainWindow(QWidget):
 
             # Emit payload when countdown ends (battle or punch-library flows)
             # Skip emission for Self-Select; it will emit per-sequence refresh instead
-            if (difficulty != "Self-Select") and (difficulty or battle_style):
-                payload = {
-                    "mode": difficulty,
-                    "battle_style": battle_style,
-                    "rounds": rounds,
-                    "work_time": time_str,
-                    "rest_time": rest_str,
-                    "sequences": sequences,
-                }
-                print(json.dumps(payload))
+            # if (difficulty != "Self-Select") and (difficulty or battle_style):
+            #     payload = {
+            #         "mode": difficulty,
+            #         "battle_style": battle_style,
+            #         "sequences": sequences,
+            #     }
+            #     print(json.dumps(payload))
 
             training_page = self.stacked_widget.widget(10)
-            training_page.start_session(rounds, time_str, rest_str, difficulty, sequences)
+            training_page.start_session(rounds, time_str, rest_str, difficulty, sequences, battle_style)
             self.stacked_widget.setCurrentIndex(10)
         except Exception as e:
             print(f"Error starting training session: {e}")
