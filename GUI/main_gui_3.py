@@ -1,5 +1,4 @@
 import sys
-import json
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
 
@@ -2310,19 +2309,6 @@ class MainWindow(QWidget):
 
             difficulty = getattr(basic_page, "selected_difficulty", None)
             sequences = getattr(basic_page, "custom_sequences", [])
-            battle_style = getattr(basic_page, "selected_battle_style", None)
-
-            # Emit payload when a battle fighter flow reaches countdown completion
-            if difficulty == "Battle" or battle_style:
-                payload = {
-                    "mode": difficulty,
-                    "battle_style": battle_style,
-                    "rounds": rounds,
-                    "work_time": time_str,
-                    "rest_time": rest_str,
-                    "sequences": sequences,
-                }
-                print(json.dumps(payload))
 
             training_page = self.stacked_widget.widget(10)
             training_page.start_session(rounds, time_str, rest_str, difficulty, sequences)
