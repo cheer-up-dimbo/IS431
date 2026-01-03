@@ -1655,10 +1655,6 @@ class TrainingSessionPage(QWidget):
             try:
                 payload = {
                     "mode": self.difficulty,
-                    "round": self.current_round,
-                    "total_rounds": self.total_rounds,
-                    "work_time": self.work_time,
-                    "rest_time": self.rest_time,
                     "sequence": current_sequence,
                     "sequence_index": self.sequence_index,
                 }
@@ -2328,7 +2324,8 @@ class MainWindow(QWidget):
             battle_style = getattr(basic_page, "selected_battle_style", None)
 
             # Emit payload when countdown ends (battle or punch-library flows)
-            if difficulty or battle_style:
+            # Skip emission for Self-Select; it will emit per-sequence refresh instead
+            if (difficulty != "Self-Select") and (difficulty or battle_style):
                 payload = {
                     "mode": difficulty,
                     "battle_style": battle_style,
