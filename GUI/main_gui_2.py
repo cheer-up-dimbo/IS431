@@ -1615,6 +1615,7 @@ class TrainingSessionPage(QWidget):
         """Start the training session with the given parameters."""
         self.current_round = 1
         self.total_rounds = rounds
+        self.difficulty = difficulty
 
         # Convert time strings to seconds
         self.work_time = self.parse_time_to_seconds(time_str)
@@ -1649,7 +1650,21 @@ class TrainingSessionPage(QWidget):
     def update_sequence_display(self):
         """Show the current sequence text."""
         if self.is_self_select_mode and self.sequences:
-            self.sequence_label.setText(self.sequences[self.sequence_index])
+            current_sequence = self.sequences[self.sequence_index]
+            self.sequence_label.setText(current_sequence)
+            try:
+                payload = {
+                    "mode": self.difficulty,
+                    "round": self.current_round,
+                    "total_rounds": self.total_rounds,
+                    "work_time": self.work_time,
+                    "rest_time": self.rest_time,
+                    "sequence": current_sequence,
+                    "sequence_index": self.sequence_index,
+                }
+                print(json.dumps(payload))
+            except Exception:
+                pass
         else:
             self.sequence_label.setText("")
 
@@ -2312,8 +2327,8 @@ class MainWindow(QWidget):
             sequences = getattr(basic_page, "custom_sequences", [])
             battle_style = getattr(basic_page, "selected_battle_style", None)
 
-            # Emit payload when a battle fighter flow reaches countdown completion
-            if difficulty == "Battle" or battle_style:
+            # Emit payload when countdown ends (battle or punch-library flows)
+            if difficulty or battle_style:
                 payload = {
                     "mode": difficulty,
                     "battle_style": battle_style,
