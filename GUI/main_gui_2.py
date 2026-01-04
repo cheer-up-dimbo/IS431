@@ -2285,7 +2285,7 @@ class BattlePage(QWidget):
         buttons = [
             QPushButton("Pressure Fighter"),
             QPushButton("Counter Puncher"),
-            QPushButton("Balanced Boxer"),
+            QPushButton("Infighter"),
             QPushButton("Out Boxer"),
             QPushButton("Random"),
         ]
