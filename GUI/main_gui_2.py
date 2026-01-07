@@ -6,6 +6,32 @@ from PySide6.QtCore import Qt, QTimer
 import random
 import time
 
+
+class PageIndex:
+    HOMEPAGE = 0
+    TRAINING = 1
+    TECHNIQUES = 2
+    PUNCH_COMBINATIONS = 3
+    BASIC_PARAMETERS = 4
+    ROUND_SELECTION = 5
+    SPEED_SELECTION = 6
+    TIME_SELECTION = 7
+    REST_SELECTION = 8
+    COUNTDOWN = 9
+    TRAINING_SESSION = 10
+    SELF_SELECT_SEQUENCE = 11
+    SPAR = 12
+    BATTLE = 13
+    PERFORMANCE = 14
+    POWER_INSTRUCTIONS = 15
+    POWER_PUNCH = 16
+    POWER_RESULT = 17
+    STAMINA_INSTRUCTIONS = 18
+    REACTION_INSTRUCTIONS = 19
+    REACTION_TEST = 20
+    REACTION_RESULT = 21
+    OTHERS = 22
+
 # Define shared button styles at module level
 BUTTON_STYLE = """
     QPushButton {
@@ -298,15 +324,15 @@ class Homepage(QWidget):
 
     def on_training_clicked(self):
         print("Training button clicked")
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
 
     def on_performance_clicked(self):
         print("Performance button clicked")
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_others_clicked(self):
         print("Others button clicked")
-        self.stacked_widget.setCurrentIndex(22)
+        self.stacked_widget.setCurrentIndex(PageIndex.OTHERS)
 
 
 class OthersPage(QWidget):
@@ -357,7 +383,7 @@ class OthersPage(QWidget):
         self.stance_btn.setText("Southpaw" if current == "Orthodox" else "Orthodox")
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
 
 class PerformancePage(QWidget):
     def __init__(self, stacked_widget):
@@ -405,20 +431,20 @@ class PerformancePage(QWidget):
     def on_power_clicked(self):
         print("Power button clicked")
         # Navigate to Power Instructions page (index 15)
-        self.stacked_widget.setCurrentIndex(15)
+        self.stacked_widget.setCurrentIndex(PageIndex.POWER_INSTRUCTIONS)
 
     def on_stamina_clicked(self):
         print("Stamina button clicked")
         # Navigate to Stamina Instructions page (index 18)
-        self.stacked_widget.setCurrentIndex(18)
+        self.stacked_widget.setCurrentIndex(PageIndex.STAMINA_INSTRUCTIONS)
 
     def on_reaction_time_clicked(self):
         print("Reaction Time button clicked")
         # Navigate to Reaction Instructions page (index 19)
-        self.stacked_widget.setCurrentIndex(19)
+        self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
 
 
 class StaminaInstructionsPage(QWidget):
@@ -474,25 +500,25 @@ class StaminaInstructionsPage(QWidget):
         self.setLayout(layout)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         try:
-            countdown_page = self.stacked_widget.widget(9)
+            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
             countdown_page.on_finished = self.launch_stamina_punch_page
-            countdown_page.return_page_index = 18  # back should return to stamina instructions
+            countdown_page.return_page_index = PageIndex.STAMINA_INSTRUCTIONS  # back should return to stamina instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_stamina_punch_page(self):
         try:
-            punch_page = self.stacked_widget.widget(16)
+            punch_page = self.stacked_widget.widget(PageIndex.POWER_PUNCH)
             punch_page.reset_counter()
-            self.stacked_widget.setCurrentIndex(16)
+            self.stacked_widget.setCurrentIndex(PageIndex.POWER_PUNCH)
         except Exception:
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 
 class ReactionInstructionsPage(QWidget):
@@ -548,25 +574,25 @@ class ReactionInstructionsPage(QWidget):
         self.setLayout(layout)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         try:
-            countdown_page = self.stacked_widget.widget(9)
+            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
             countdown_page.on_finished = self.launch_reaction_test_page
-            countdown_page.return_page_index = 19  # back should return to reaction instructions
+            countdown_page.return_page_index = PageIndex.REACTION_INSTRUCTIONS  # back should return to reaction instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_reaction_test_page(self):
         try:
-            reaction_test_page = self.stacked_widget.widget(20)
+            reaction_test_page = self.stacked_widget.widget(PageIndex.REACTION_TEST)
             reaction_test_page.start_test()
-            self.stacked_widget.setCurrentIndex(20)
+            self.stacked_widget.setCurrentIndex(PageIndex.REACTION_TEST)
         except Exception:
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class PowerInstructionsPage(QWidget):
     """Instructions page for the Power mode."""
@@ -625,29 +651,29 @@ class PowerInstructionsPage(QWidget):
 
     def on_back_clicked(self):
         # Return to Performance page
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         # Start the existing countdown flow then show CountdownPage (index 9)
         try:
-            countdown_page = self.stacked_widget.widget(9)
+            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
             # When countdown finishes, go to Power Punch page
             countdown_page.on_finished = self.launch_power_punch_page
-            countdown_page.return_page_index = 15  # back should return to instructions
+            countdown_page.return_page_index = PageIndex.POWER_INSTRUCTIONS  # back should return to instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_power_punch_page(self):
         """Switch to the punch counting page after countdown."""
         try:
-            punch_page = self.stacked_widget.widget(16)
+            punch_page = self.stacked_widget.widget(PageIndex.POWER_PUNCH)
             punch_page.reset_counter()
-            self.stacked_widget.setCurrentIndex(16)
+            self.stacked_widget.setCurrentIndex(PageIndex.POWER_PUNCH)
         except Exception:
             # If page not available, fall back to Performance page
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class PowerPunchPage(QWidget):
     """Page to count power punches after countdown."""
@@ -714,17 +740,17 @@ class PowerPunchPage(QWidget):
         """Called when punch target is reached."""
         # Navigate to Power Result page after completion
         try:
-            result_page = self.stacked_widget.widget(17)
+            result_page = self.stacked_widget.widget(PageIndex.POWER_RESULT)
             if hasattr(result_page, "set_power_output"):
                 result_page.set_power_output("100 kN")
-            self.stacked_widget.setCurrentIndex(17)
+            self.stacked_widget.setCurrentIndex(PageIndex.POWER_RESULT)
         except Exception:
             # Fallback if result page not available
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_quit_clicked(self):
         # Abort and return to Performance page
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class PowerResultPage(QWidget):
     """Result page shown after completing the Power punches."""
@@ -785,11 +811,11 @@ class PowerResultPage(QWidget):
 
     def on_restart_clicked(self):
         # Return to the Power Instructions to restart the flow
-        self.stacked_widget.setCurrentIndex(15)
+        self.stacked_widget.setCurrentIndex(PageIndex.POWER_INSTRUCTIONS)
 
     def on_quit_clicked(self):
         # Return to Performance menu
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class ReactionTestPage(QWidget):
     """Red/green screen to measure reaction time after countdown."""
@@ -858,12 +884,12 @@ class ReactionTestPage(QWidget):
             if self.reaction_start_time is not None:
                 reaction_time = max(0.0, time.perf_counter() - self.reaction_start_time)
             try:
-                result_page = self.stacked_widget.widget(21)
+                result_page = self.stacked_widget.widget(PageIndex.REACTION_RESULT)
                 if hasattr(result_page, "set_reaction_time"):
                     result_page.set_reaction_time(reaction_time)
-                self.stacked_widget.setCurrentIndex(21)
+                self.stacked_widget.setCurrentIndex(PageIndex.REACTION_RESULT)
             except Exception:
-                self.stacked_widget.setCurrentIndex(14)
+                self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
         super().mousePressEvent(event)
 
 class ReactionResultPage(QWidget):
@@ -922,10 +948,10 @@ class ReactionResultPage(QWidget):
         print("History clicked - implement reaction history navigation")
 
     def on_restart_clicked(self):
-        self.stacked_widget.setCurrentIndex(19)
+        self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class TrainingPage(QWidget):
     """
@@ -981,15 +1007,15 @@ class TrainingPage(QWidget):
 
     def on_techniques_clicked(self):
         print("Techniques button clicked")
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
 
     def on_spar_clicked(self):
         print("Spar button clicked")
         # SparPage is now at index 12 after removing DefenseTechniquePage
-        self.stacked_widget.setCurrentIndex(12)
+        self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
 
 class TechniquesPage(QWidget):
     def __init__(self, stacked_widget):
@@ -1023,10 +1049,10 @@ class TechniquesPage(QWidget):
 
     def on_punch_combination_library_clicked(self):
         print("Punch Combination Library button clicked")
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
 
 class PunchCombinationPage(QWidget):
     def __init__(self, stacked_widget):
@@ -1073,26 +1099,26 @@ class PunchCombinationPage(QWidget):
     def on_difficulty_clicked(self, difficulty):
         print(f"{difficulty} button clicked")
         # Store difficulty in BasicParametersPage
-        basic_page = self.stacked_widget.widget(4)
+        basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
         basic_page.selected_difficulty = difficulty
-        basic_page.previous_page = 3  # Set to Punch Combinations
+        basic_page.previous_page = PageIndex.PUNCH_COMBINATIONS  # Set to Punch Combinations
         
         if difficulty == "Self-Select":
-            self_select_page = self.stacked_widget.widget(11)
-            self_select_page.previous_page = 3
-            self.stacked_widget.setCurrentIndex(11)
+            self_select_page = self.stacked_widget.widget(PageIndex.SELF_SELECT_SEQUENCE)
+            self_select_page.previous_page = PageIndex.PUNCH_COMBINATIONS
+            self.stacked_widget.setCurrentIndex(PageIndex.SELF_SELECT_SEQUENCE)
         else:
-            self.stacked_widget.setCurrentIndex(4)
+            self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
 
 class BasicParametersPage(QWidget):
     """Page for basic parameters (index 4)."""
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        self.previous_page = 3  # Default to Punch Combinations
+        self.previous_page = PageIndex.PUNCH_COMBINATIONS  # Default to Punch Combinations
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -1169,16 +1195,16 @@ class BasicParametersPage(QWidget):
         self.continue_btn.setEnabled(all_selected)
 
     def on_round_clicked(self):
-        self.stacked_widget.setCurrentIndex(5)
+        self.stacked_widget.setCurrentIndex(PageIndex.ROUND_SELECTION)
 
     def on_speed_clicked(self):
-        self.stacked_widget.setCurrentIndex(6)
+        self.stacked_widget.setCurrentIndex(PageIndex.SPEED_SELECTION)
 
     def on_time_clicked(self):
-        self.stacked_widget.setCurrentIndex(7)
+        self.stacked_widget.setCurrentIndex(PageIndex.TIME_SELECTION)
 
     def on_rest_clicked(self):
-        self.stacked_widget.setCurrentIndex(8)
+        self.stacked_widget.setCurrentIndex(PageIndex.REST_SELECTION)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(self.previous_page)
@@ -1186,15 +1212,15 @@ class BasicParametersPage(QWidget):
     def on_continue_clicked(self):
         print("Continue button clicked")
         # Start countdown and move to CountdownPage
-        countdown_page = self.stacked_widget.widget(9)
+        countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
         # Ensure training flow uses the training session start callback
         parent_window = self.stacked_widget.parent()
         if parent_window and hasattr(parent_window, "start_training_session"):
             countdown_page.on_finished = parent_window.start_training_session
         # Back from countdown should return to Basic Parameters during training flow
-        countdown_page.return_page_index = 4
+        countdown_page.return_page_index = PageIndex.BASIC_PARAMETERS
         countdown_page.start_countdown()
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
 class RoundSelectionPage(QWidget):
     """Page showing 12 numbered round buttons and a back button."""
@@ -1228,7 +1254,7 @@ class RoundSelectionPage(QWidget):
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
         # go back to BasicParametersPage (index 4)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1240,13 +1266,13 @@ class RoundSelectionPage(QWidget):
     def select_round(self, n: int):
         """Set the chosen round on BasicParametersPage and switch back."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "round_btn"):
                 basic_page.round_btn.setText(f"Round\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SpeedSelectionPage(QWidget):
     """Page offering speed choices (25, 50, 75, 100)."""
@@ -1275,7 +1301,7 @@ class SpeedSelectionPage(QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1287,13 +1313,13 @@ class SpeedSelectionPage(QWidget):
     def select_speed(self, n: int):
         """Update BasicParametersPage speed button text and return."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "speed_btn"):
                 basic_page.speed_btn.setText(f"Speed\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class TimeSelectionPage(QWidget):
     """Page offering time choices (30sec, 1min, 1min30sec, 2min, 2min30sec, 3min)."""
@@ -1332,7 +1358,7 @@ class TimeSelectionPage(QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1344,13 +1370,13 @@ class TimeSelectionPage(QWidget):
     def select_time(self, n: str):
         """Update BasicParametersPage time button text and return."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "time_btn"):
                 basic_page.time_btn.setText(f"Time\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class RestSelectionPage(QWidget):
     """Page offering rest choices (10sec to 60sec in 10sec increments)."""
@@ -1388,7 +1414,7 @@ class RestSelectionPage(QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1400,13 +1426,13 @@ class RestSelectionPage(QWidget):
     def select_rest(self, n: str):
         """Update BasicParametersPage rest button text and return."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "rest_btn"):
                 basic_page.rest_btn.setText(f"Rest\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class CountdownPage(QWidget):
     """Page with 20 second countdown and pause button."""
@@ -1417,7 +1443,7 @@ class CountdownPage(QWidget):
         self.is_paused = False
         self.on_finished = None  # callback to start training session
         # Where to return if user presses Back during countdown
-        self.return_page_index = 4
+        self.return_page_index = PageIndex.BASIC_PARAMETERS
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_countdown)
 
@@ -1754,7 +1780,7 @@ class TrainingSessionPage(QWidget):
                         print(json.dumps({"action": "Log Training Session"}))
                     except Exception as e:
                         print(f"Error sending log training session message: {e}")
-                    self.stacked_widget.setCurrentIndex(4)
+                    self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def toggle_pause(self):
         """Pause or resume the timer."""
@@ -1817,7 +1843,7 @@ class TrainingSessionPage(QWidget):
             print(json.dumps({"action": "Stop"}))
         except Exception as e:
             print(f"Error sending stop message: {e}")
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SelfSelectSequencePage(QWidget):
     """Page for creating custom punch sequences."""
@@ -2219,15 +2245,15 @@ class SelfSelectSequencePage(QWidget):
         self.sequence_input.setText("")
         self.update_sequence_buttons()
         self.update_buttons()
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
 
     def on_next_clicked(self):
         """Go to Basic Parameters page."""
         if len(self.sequence_list) >= 1:
             # Store sequences in BasicParametersPage
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             basic_page.custom_sequences = self.sequence_list.copy()
-            self.stacked_widget.setCurrentIndex(4)
+            self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SparPage(QWidget):
     """Page with Spar options."""
@@ -2263,10 +2289,10 @@ class SparPage(QWidget):
 
     def on_battle_clicked(self):
         # BattlePage index moved to 13 after removing defense page
-        self.stacked_widget.setCurrentIndex(13)
+        self.stacked_widget.setCurrentIndex(PageIndex.BATTLE)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
 
 class BattlePage(QWidget):
     def __init__(self, stacked_widget):
@@ -2317,15 +2343,15 @@ class BattlePage(QWidget):
     def on_style_clicked(self, style):
         """Store style and go to Basic Parameters page."""
         print(f"{style} selected")
-        basic_page = self.stacked_widget.widget(4)
+        basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
         basic_page.selected_battle_style = style
         basic_page.selected_difficulty = "Battle"
         # BattlePage is now index 13
-        basic_page.previous_page = 13  # Return here on back
-        self.stacked_widget.setCurrentIndex(4)
+        basic_page.previous_page = PageIndex.BATTLE  # Return here on back
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(12)
+        self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -2396,7 +2422,7 @@ class MainWindow(QWidget):
     def start_training_session(self):
         """Extract parameters and start the training session."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             round_text = basic_page.round_btn.text()
             rounds = int(round_text.split("\n")[1])
 
@@ -2420,9 +2446,9 @@ class MainWindow(QWidget):
             #     }
             #     print(json.dumps(payload))
 
-            training_page = self.stacked_widget.widget(10)
+            training_page = self.stacked_widget.widget(PageIndex.TRAINING_SESSION)
             training_page.start_session(rounds, time_str, rest_str, difficulty, sequences, battle_style)
-            self.stacked_widget.setCurrentIndex(10)
+            self.stacked_widget.setCurrentIndex(PageIndex.TRAINING_SESSION)
         except Exception as e:
             print(f"Error starting training session: {e}")
 
