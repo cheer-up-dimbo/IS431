@@ -6,257 +6,116 @@ from PySide6.QtCore import Qt, QTimer
 import random
 import time
 
-# Define shared button styles at module level
-BUTTON_STYLE = """
-    QPushButton {
-        font-size: 28px;
-        padding: 40px;
-        min-width: 500px;
-        min-height: 50px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #45a049;
-    }
-    QPushButton:pressed {
-        background-color: #3d8b40;
-    }
-"""
 
-# Define shared button styles at module level
-PERFORMANCE_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 40px;
-        min-width: 500px;
-        min-height: 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #45a049;
-    }
-    QPushButton:pressed {
-        background-color: #3d8b40;
-    }
-"""
+class PageIndex:
+    HOMEPAGE = 0
+    TRAINING = 1
+    TECHNIQUES = 2
+    PUNCH_COMBINATIONS = 3
+    BASIC_PARAMETERS = 4
+    ROUND_SELECTION = 5
+    SPEED_SELECTION = 6
+    TIME_SELECTION = 7
+    REST_SELECTION = 8
+    COUNTDOWN = 9
+    TRAINING_SESSION = 10
+    SELF_SELECT_SEQUENCE = 11
+    SPAR = 12
+    BATTLE = 13
+    PERFORMANCE = 14
+    POWER_INSTRUCTIONS = 15
+    POWER_PUNCH = 16
+    POWER_RESULT = 17
+    STAMINA_INSTRUCTIONS = 18
+    REACTION_INSTRUCTIONS = 19
+    REACTION_TEST = 20
+    REACTION_RESULT = 21
+    OTHERS = 22
 
-BACK_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 500px;
-        min-height: 40px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #da190b;
-    }
-    QPushButton:pressed {
-        background-color: #c41504;
-    }
-"""
 
-BACK_BUTTON_STYLE_2 = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 250px;
-        min-height: 40px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #da190b;
-    }
-    QPushButton:pressed {
-        background-color: #c41504;
-    }
-"""
+class ButtonStyle:
+    """Centralized button style management."""
 
-START_BUTTON_STYLE_2 = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 250px;
-        min-height: 40px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #45a049;
-    }
-    QPushButton:pressed {
-        background-color: #3d8b40;
-    }
-"""
+    @staticmethod
+    def _create_style(font_size, padding, min_width, min_height, bg_color, hover_color, pressed_color, border_radius=8):
+        """Internal helper to generate button stylesheet."""
+        return f"""
+            QPushButton {{
+                font-size: {font_size}px;
+                padding: {padding}px;
+                min-width: {min_width}px;
+                min-height: {min_height}px;
+                background-color: {bg_color};
+                color: white;
+                border: none;
+                border-radius: {border_radius}px;
+            }}
+            QPushButton:hover {{
+                background-color: {hover_color};
+            }}
+            QPushButton:pressed {{
+                background-color: {pressed_color};
+            }}
+        """
 
-HISTORY_BUTTON_STYLE_2 = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 250px;
-        min-height: 40px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
+    # Green buttons (Primary actions)
+    PRIMARY_LARGE = _create_style.__func__(
+        font_size=28, padding=40, min_width=500, min_height=50,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
 
-BACK_CONTINUE_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 200px;
-        min-height: 40px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #da190b;
-    }
-    QPushButton:pressed {
-        background-color: #c41504;
-    }
-"""
+    PRIMARY_MEDIUM = _create_style.__func__(
+        font_size=20, padding=25, min_width=250, min_height=40,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
 
-# Adjusted SMALL_BUTTON_STYLE to a smaller size (change values here to tune)
-SMALL_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 12px;
-        min-width: 240px;
-        min-height: 50px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
-# Adjusted SMALL_BUTTON_STYLE to a smaller size (change values here to tune)
-BASIC_PARAMETERS_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 12px;
-        min-width: 240px;
-        min-height: 50px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
+    PRIMARY_WIDE = _create_style.__func__(
+        font_size=20, padding=40, min_width=500, min_height=20,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
 
-# Adjusted Battle Button Style to a smaller size (change values here to tune)
-BATTLE_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 12px;
-        min-width: 240px;
-        min-height: 40px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
+    # Red buttons (Back/Cancel)
+    BACK_LARGE = _create_style.__func__(
+        font_size=20, padding=25, min_width=500, min_height=40,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
+    )
 
-# Button style used specifically for the 12 round-selection buttons (smaller)
-ROUND_SELECTION_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 8px;
-        min-width: 80px;
-        min-height: 90px;
-        background-color: #1976D2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
-    QPushButton:hover {
-        background-color: #1565C0;
-    }
-    QPushButton:pressed {
-        background-color: #0D47A1;
-    }
-"""
+    BACK_MEDIUM = _create_style.__func__(
+        font_size=20, padding=25, min_width=250, min_height=40,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
+    )
 
-# Button style used specifically for the 12 speed-selection buttons (smaller)
-SPEED_SELECTION_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 40px;
-        padding: 8px;
-        min-width: 80px;
-        min-height: 300px;
-        background-color: #1976D2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
-    QPushButton:hover {
-        background-color: #1565C0;
-    }
-    QPushButton:pressed {
-        background-color: #0D47A1;
-    }
-"""
+    BACK_SMALL = _create_style.__func__(
+        font_size=20, padding=25, min_width=200, min_height=40,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
+    )
 
-# Button style used specifically for the 12 time-selection buttons (smaller)
-TIME_SELECTION_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 18px;
-        padding: 8px;
-        background-color: #1976D2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
-    QPushButton:hover {
-        background-color: #1565C0;
-    }
-    QPushButton:pressed {
-        background-color: #0D47A1;
-    }
-"""
+    # Blue buttons (Info/Secondary)
+    INFO_SMALL = _create_style.__func__(
+        font_size=20, padding=12, min_width=240, min_height=50,
+        bg_color="#2196F3", hover_color="#1976D2", pressed_color="#155A8A",
+    )
+
+    INFO_MEDIUM = _create_style.__func__(
+        font_size=20, padding=12, min_width=240, min_height=40,
+        bg_color="#2196F3", hover_color="#1976D2", pressed_color="#155A8A",
+    )
+
+    # Special sizes
+    ROUND_SELECTION = _create_style.__func__(
+        font_size=20, padding=8, min_width=80, min_height=90,
+        bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
+
+    SPEED_SELECTION = _create_style.__func__(
+        font_size=40, padding=8, min_width=80, min_height=300,
+        bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
+
+    TIME_SELECTION = _create_style.__func__(
+        font_size=18, padding=8, min_width=0, min_height=100,
+        bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
 
 class Homepage(QWidget):
     def __init__(self, stacked_widget):
@@ -276,9 +135,9 @@ class Homepage(QWidget):
         performance_btn = QPushButton("Performance")
         others_btn = QPushButton("Others")
 
-        training_btn.setStyleSheet(BUTTON_STYLE)
-        performance_btn.setStyleSheet(BUTTON_STYLE)
-        others_btn.setStyleSheet(BUTTON_STYLE)
+        training_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        performance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        others_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
 
         training_btn.clicked.connect(self.on_training_clicked)
         performance_btn.clicked.connect(self.on_performance_clicked)
@@ -298,15 +157,15 @@ class Homepage(QWidget):
 
     def on_training_clicked(self):
         print("Training button clicked")
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
 
     def on_performance_clicked(self):
         print("Performance button clicked")
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_others_clicked(self):
         print("Others button clicked")
-        self.stacked_widget.setCurrentIndex(22)
+        self.stacked_widget.setCurrentIndex(PageIndex.OTHERS)
 
 
 class OthersPage(QWidget):
@@ -328,9 +187,9 @@ class OthersPage(QWidget):
         self.stance_btn = QPushButton("Orthodox")
         back_btn = QPushButton("Back")
 
-        history_btn.setStyleSheet(BUTTON_STYLE)
-        self.stance_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        history_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        self.stance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         history_btn.clicked.connect(self.on_history_clicked)
         self.stance_btn.clicked.connect(self.on_stance_clicked)
@@ -357,7 +216,7 @@ class OthersPage(QWidget):
         self.stance_btn.setText("Southpaw" if current == "Orthodox" else "Orthodox")
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
 
 class PerformancePage(QWidget):
     def __init__(self, stacked_widget):
@@ -378,10 +237,10 @@ class PerformancePage(QWidget):
         reaction_time_btn = QPushButton("Reaction Time")
         back_btn = QPushButton("Back")
 
-        power_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
-        stamina_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
-        reaction_time_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        power_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        stamina_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        reaction_time_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         power_btn.clicked.connect(self.on_power_clicked)
         stamina_btn.clicked.connect(self.on_stamina_clicked)
@@ -405,20 +264,20 @@ class PerformancePage(QWidget):
     def on_power_clicked(self):
         print("Power button clicked")
         # Navigate to Power Instructions page (index 15)
-        self.stacked_widget.setCurrentIndex(15)
+        self.stacked_widget.setCurrentIndex(PageIndex.POWER_INSTRUCTIONS)
 
     def on_stamina_clicked(self):
         print("Stamina button clicked")
         # Navigate to Stamina Instructions page (index 18)
-        self.stacked_widget.setCurrentIndex(18)
+        self.stacked_widget.setCurrentIndex(PageIndex.STAMINA_INSTRUCTIONS)
 
     def on_reaction_time_clicked(self):
         print("Reaction Time button clicked")
         # Navigate to Reaction Instructions page (index 19)
-        self.stacked_widget.setCurrentIndex(19)
+        self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
 
 
 class StaminaInstructionsPage(QWidget):
@@ -451,8 +310,8 @@ class StaminaInstructionsPage(QWidget):
         back_btn = QPushButton("Back")
         start_btn = QPushButton("Start")
 
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
@@ -474,25 +333,25 @@ class StaminaInstructionsPage(QWidget):
         self.setLayout(layout)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         try:
-            countdown_page = self.stacked_widget.widget(9)
+            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
             countdown_page.on_finished = self.launch_stamina_punch_page
-            countdown_page.return_page_index = 18  # back should return to stamina instructions
+            countdown_page.return_page_index = PageIndex.STAMINA_INSTRUCTIONS  # back should return to stamina instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_stamina_punch_page(self):
         try:
-            punch_page = self.stacked_widget.widget(16)
+            punch_page = self.stacked_widget.widget(PageIndex.POWER_PUNCH)
             punch_page.reset_counter()
-            self.stacked_widget.setCurrentIndex(16)
+            self.stacked_widget.setCurrentIndex(PageIndex.POWER_PUNCH)
         except Exception:
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 
 class ReactionInstructionsPage(QWidget):
@@ -525,8 +384,8 @@ class ReactionInstructionsPage(QWidget):
         back_btn = QPushButton("Back")
         start_btn = QPushButton("Start")
 
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
@@ -548,25 +407,25 @@ class ReactionInstructionsPage(QWidget):
         self.setLayout(layout)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         try:
-            countdown_page = self.stacked_widget.widget(9)
+            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
             countdown_page.on_finished = self.launch_reaction_test_page
-            countdown_page.return_page_index = 19  # back should return to reaction instructions
+            countdown_page.return_page_index = PageIndex.REACTION_INSTRUCTIONS  # back should return to reaction instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_reaction_test_page(self):
         try:
-            reaction_test_page = self.stacked_widget.widget(20)
+            reaction_test_page = self.stacked_widget.widget(PageIndex.REACTION_TEST)
             reaction_test_page.start_test()
-            self.stacked_widget.setCurrentIndex(20)
+            self.stacked_widget.setCurrentIndex(PageIndex.REACTION_TEST)
         except Exception:
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class PowerInstructionsPage(QWidget):
     """Instructions page for the Power mode."""
@@ -601,8 +460,8 @@ class PowerInstructionsPage(QWidget):
         back_btn = QPushButton("Back")
         start_btn = QPushButton("Start")
 
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
@@ -625,29 +484,29 @@ class PowerInstructionsPage(QWidget):
 
     def on_back_clicked(self):
         # Return to Performance page
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         # Start the existing countdown flow then show CountdownPage (index 9)
         try:
-            countdown_page = self.stacked_widget.widget(9)
+            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
             # When countdown finishes, go to Power Punch page
             countdown_page.on_finished = self.launch_power_punch_page
-            countdown_page.return_page_index = 15  # back should return to instructions
+            countdown_page.return_page_index = PageIndex.POWER_INSTRUCTIONS  # back should return to instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_power_punch_page(self):
         """Switch to the punch counting page after countdown."""
         try:
-            punch_page = self.stacked_widget.widget(16)
+            punch_page = self.stacked_widget.widget(PageIndex.POWER_PUNCH)
             punch_page.reset_counter()
-            self.stacked_widget.setCurrentIndex(16)
+            self.stacked_widget.setCurrentIndex(PageIndex.POWER_PUNCH)
         except Exception:
             # If page not available, fall back to Performance page
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class PowerPunchPage(QWidget):
     """Page to count power punches after countdown."""
@@ -676,7 +535,7 @@ class PowerPunchPage(QWidget):
         button_layout.addStretch()
 
         quit_btn = QPushButton("Quit")
-        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        quit_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         quit_btn.setFixedWidth(250)
         quit_btn.clicked.connect(self.on_quit_clicked)
 
@@ -714,17 +573,17 @@ class PowerPunchPage(QWidget):
         """Called when punch target is reached."""
         # Navigate to Power Result page after completion
         try:
-            result_page = self.stacked_widget.widget(17)
+            result_page = self.stacked_widget.widget(PageIndex.POWER_RESULT)
             if hasattr(result_page, "set_power_output"):
                 result_page.set_power_output("100 kN")
-            self.stacked_widget.setCurrentIndex(17)
+            self.stacked_widget.setCurrentIndex(PageIndex.POWER_RESULT)
         except Exception:
             # Fallback if result page not available
-            self.stacked_widget.setCurrentIndex(14)
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_quit_clicked(self):
         # Abort and return to Performance page
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class PowerResultPage(QWidget):
     """Result page shown after completing the Power punches."""
@@ -751,9 +610,9 @@ class PowerResultPage(QWidget):
         restart_btn = QPushButton("Restart")
         quit_btn = QPushButton("Quit")
 
-        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
-        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
-        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        restart_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        quit_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         history_btn.setFixedWidth(250)
         restart_btn.setFixedWidth(250)
@@ -785,11 +644,11 @@ class PowerResultPage(QWidget):
 
     def on_restart_clicked(self):
         # Return to the Power Instructions to restart the flow
-        self.stacked_widget.setCurrentIndex(15)
+        self.stacked_widget.setCurrentIndex(PageIndex.POWER_INSTRUCTIONS)
 
     def on_quit_clicked(self):
         # Return to Performance menu
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class ReactionTestPage(QWidget):
     """Red/green screen to measure reaction time after countdown."""
@@ -858,12 +717,12 @@ class ReactionTestPage(QWidget):
             if self.reaction_start_time is not None:
                 reaction_time = max(0.0, time.perf_counter() - self.reaction_start_time)
             try:
-                result_page = self.stacked_widget.widget(21)
+                result_page = self.stacked_widget.widget(PageIndex.REACTION_RESULT)
                 if hasattr(result_page, "set_reaction_time"):
                     result_page.set_reaction_time(reaction_time)
-                self.stacked_widget.setCurrentIndex(21)
+                self.stacked_widget.setCurrentIndex(PageIndex.REACTION_RESULT)
             except Exception:
-                self.stacked_widget.setCurrentIndex(14)
+                self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
         super().mousePressEvent(event)
 
 class ReactionResultPage(QWidget):
@@ -889,9 +748,9 @@ class ReactionResultPage(QWidget):
         restart_btn = QPushButton("Restart")
         back_btn = QPushButton("Back")
 
-        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
-        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        restart_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         history_btn.setFixedWidth(250)
         restart_btn.setFixedWidth(250)
@@ -922,10 +781,10 @@ class ReactionResultPage(QWidget):
         print("History clicked - implement reaction history navigation")
 
     def on_restart_clicked(self):
-        self.stacked_widget.setCurrentIndex(19)
+        self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(14)
+        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class TrainingPage(QWidget):
     """
@@ -963,9 +822,9 @@ class TrainingPage(QWidget):
         spar_btn = QPushButton("Spar")
         back_btn = QPushButton("Back")
 
-        techniques_btn.setStyleSheet(BUTTON_STYLE)
-        spar_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        techniques_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        spar_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         techniques_btn.clicked.connect(self.on_techniques_clicked)
         spar_btn.clicked.connect(self.on_spar_clicked)
@@ -981,15 +840,15 @@ class TrainingPage(QWidget):
 
     def on_techniques_clicked(self):
         print("Techniques button clicked")
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
 
     def on_spar_clicked(self):
         print("Spar button clicked")
         # SparPage is now at index 12 after removing DefenseTechniquePage
-        self.stacked_widget.setCurrentIndex(12)
+        self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
 
 class TechniquesPage(QWidget):
     def __init__(self, stacked_widget):
@@ -1008,8 +867,8 @@ class TechniquesPage(QWidget):
         punch_lib_btn = QPushButton("Punch Combination Library")
         back_btn = QPushButton("Back")
 
-        punch_lib_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        punch_lib_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         punch_lib_btn.clicked.connect(self.on_punch_combination_library_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
@@ -1023,10 +882,10 @@ class TechniquesPage(QWidget):
 
     def on_punch_combination_library_clicked(self):
         print("Punch Combination Library button clicked")
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
 
 class PunchCombinationPage(QWidget):
     def __init__(self, stacked_widget):
@@ -1048,11 +907,11 @@ class PunchCombinationPage(QWidget):
         self_select_btn = QPushButton("Self-Select")
         back_btn = QPushButton("Back")
 
-        beginner_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        intermediate_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        advanced_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self_select_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        beginner_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        intermediate_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        advanced_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         beginner_btn.clicked.connect(lambda: self.on_difficulty_clicked("Beginner"))
         intermediate_btn.clicked.connect(lambda: self.on_difficulty_clicked("Intermediate"))
@@ -1073,26 +932,26 @@ class PunchCombinationPage(QWidget):
     def on_difficulty_clicked(self, difficulty):
         print(f"{difficulty} button clicked")
         # Store difficulty in BasicParametersPage
-        basic_page = self.stacked_widget.widget(4)
+        basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
         basic_page.selected_difficulty = difficulty
-        basic_page.previous_page = 3  # Set to Punch Combinations
+        basic_page.previous_page = PageIndex.PUNCH_COMBINATIONS  # Set to Punch Combinations
         
         if difficulty == "Self-Select":
-            self_select_page = self.stacked_widget.widget(11)
-            self_select_page.previous_page = 3
-            self.stacked_widget.setCurrentIndex(11)
+            self_select_page = self.stacked_widget.widget(PageIndex.SELF_SELECT_SEQUENCE)
+            self_select_page.previous_page = PageIndex.PUNCH_COMBINATIONS
+            self.stacked_widget.setCurrentIndex(PageIndex.SELF_SELECT_SEQUENCE)
         else:
-            self.stacked_widget.setCurrentIndex(4)
+            self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
 
 class BasicParametersPage(QWidget):
     """Page for basic parameters (index 4)."""
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        self.previous_page = 3  # Default to Punch Combinations
+        self.previous_page = PageIndex.PUNCH_COMBINATIONS  # Default to Punch Combinations
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -1109,10 +968,10 @@ class BasicParametersPage(QWidget):
         self.time_btn = QPushButton("Time")
         self.rest_btn = QPushButton("Rest")
         
-        self.round_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self.speed_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self.time_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self.rest_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        self.round_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.speed_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.time_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.rest_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
 
         self.round_btn.clicked.connect(self.on_round_clicked)
         self.speed_btn.clicked.connect(self.on_speed_clicked)
@@ -1135,9 +994,9 @@ class BasicParametersPage(QWidget):
         back_btn = QPushButton("Back")
         self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
         
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         # Continue button should be green like Start actions
-        self.continue_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        self.continue_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
         
         back_btn.clicked.connect(self.on_back_clicked)
         self.continue_btn.clicked.connect(self.on_continue_clicked)
@@ -1169,16 +1028,16 @@ class BasicParametersPage(QWidget):
         self.continue_btn.setEnabled(all_selected)
 
     def on_round_clicked(self):
-        self.stacked_widget.setCurrentIndex(5)
+        self.stacked_widget.setCurrentIndex(PageIndex.ROUND_SELECTION)
 
     def on_speed_clicked(self):
-        self.stacked_widget.setCurrentIndex(6)
+        self.stacked_widget.setCurrentIndex(PageIndex.SPEED_SELECTION)
 
     def on_time_clicked(self):
-        self.stacked_widget.setCurrentIndex(7)
+        self.stacked_widget.setCurrentIndex(PageIndex.TIME_SELECTION)
 
     def on_rest_clicked(self):
-        self.stacked_widget.setCurrentIndex(8)
+        self.stacked_widget.setCurrentIndex(PageIndex.REST_SELECTION)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(self.previous_page)
@@ -1186,15 +1045,15 @@ class BasicParametersPage(QWidget):
     def on_continue_clicked(self):
         print("Continue button clicked")
         # Start countdown and move to CountdownPage
-        countdown_page = self.stacked_widget.widget(9)
+        countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
         # Ensure training flow uses the training session start callback
         parent_window = self.stacked_widget.parent()
         if parent_window and hasattr(parent_window, "start_training_session"):
             countdown_page.on_finished = parent_window.start_training_session
         # Back from countdown should return to Basic Parameters during training flow
-        countdown_page.return_page_index = 4
+        countdown_page.return_page_index = PageIndex.BASIC_PARAMETERS
         countdown_page.start_countdown()
-        self.stacked_widget.setCurrentIndex(9)
+        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
 class RoundSelectionPage(QWidget):
     """Page showing 12 numbered round buttons and a back button."""
@@ -1218,7 +1077,7 @@ class RoundSelectionPage(QWidget):
         for idx in range(12):
             n = idx + 1
             btn = QPushButton(str(n))
-            btn.setStyleSheet(ROUND_SELECTION_BUTTON_STYLE)
+            btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
             # call select_round with the selected number and return to BasicParametersPage
             btn.clicked.connect(lambda checked, val=n: self.select_round(val))
             row = idx // 4
@@ -1226,9 +1085,9 @@ class RoundSelectionPage(QWidget):
             grid.addWidget(btn, row, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         # go back to BasicParametersPage (index 4)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1240,13 +1099,13 @@ class RoundSelectionPage(QWidget):
     def select_round(self, n: int):
         """Set the chosen round on BasicParametersPage and switch back."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "round_btn"):
                 basic_page.round_btn.setText(f"Round\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SpeedSelectionPage(QWidget):
     """Page offering speed choices (25, 50, 75, 100)."""
@@ -1269,13 +1128,13 @@ class SpeedSelectionPage(QWidget):
         speeds = ["25%", "50%", "75%", "100%"]
         for col, val in enumerate(speeds):
             btn = QPushButton(str(val))
-            btn.setStyleSheet(SPEED_SELECTION_BUTTON_STYLE)
+            btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
             btn.clicked.connect(lambda checked, v=val: self.select_speed(v))
             grid.addWidget(btn, 0, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1287,13 +1146,13 @@ class SpeedSelectionPage(QWidget):
     def select_speed(self, n: int):
         """Update BasicParametersPage speed button text and return."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "speed_btn"):
                 basic_page.speed_btn.setText(f"Speed\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class TimeSelectionPage(QWidget):
     """Page offering time choices (30sec, 1min, 1min30sec, 2min, 2min30sec, 3min)."""
@@ -1321,18 +1180,18 @@ class TimeSelectionPage(QWidget):
         # arrange in 3 columns x 2 rows
         for idx, val in enumerate(times):
             btn = QPushButton(val)
-            btn.setStyleSheet(TIME_SELECTION_BUTTON_STYLE)
+            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
             # ensure all buttons have the same width (columns stretch) and same height
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            btn.setFixedHeight(150)   # choose desired uniform height
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
             btn.clicked.connect(lambda checked, v=val: self.select_time(v))
             row = idx // 3
             col = idx % 3
             grid.addWidget(btn, row, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1344,13 +1203,13 @@ class TimeSelectionPage(QWidget):
     def select_time(self, n: str):
         """Update BasicParametersPage time button text and return."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "time_btn"):
                 basic_page.time_btn.setText(f"Time\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class RestSelectionPage(QWidget):
     """Page offering rest choices (10sec to 60sec in 10sec increments)."""
@@ -1378,17 +1237,17 @@ class RestSelectionPage(QWidget):
         # arrange in 3 columns x 2 rows
         for idx, val in enumerate(rest_times):
             btn = QPushButton(val)
-            btn.setStyleSheet(TIME_SELECTION_BUTTON_STYLE)
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            btn.setFixedHeight(150)
+            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
             btn.clicked.connect(lambda checked, v=val: self.select_rest(v))
             row = idx // 3
             col = idx % 3
             grid.addWidget(btn, row, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(4))
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1400,13 +1259,13 @@ class RestSelectionPage(QWidget):
     def select_rest(self, n: str):
         """Update BasicParametersPage rest button text and return."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             if hasattr(basic_page, "rest_btn"):
                 basic_page.rest_btn.setText(f"Rest\n{n}")
                 basic_page.update_continue_button()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class CountdownPage(QWidget):
     """Page with 20 second countdown and pause button."""
@@ -1417,7 +1276,7 @@ class CountdownPage(QWidget):
         self.is_paused = False
         self.on_finished = None  # callback to start training session
         # Where to return if user presses Back during countdown
-        self.return_page_index = 4
+        self.return_page_index = PageIndex.BASIC_PARAMETERS
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_countdown)
 
@@ -1442,8 +1301,8 @@ class CountdownPage(QWidget):
         self.pause_btn = QPushButton("Pause")
         back_btn = QPushButton("Back")
 
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         self.pause_btn.setFixedWidth(250)
         back_btn.setFixedWidth(250)
@@ -1472,7 +1331,7 @@ class CountdownPage(QWidget):
         self.countdown_label.setText(str(self.countdown_value))
         self.pause_btn.setText("Pause")
         # Ensure Pause button starts in red style
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         self.timer.start(1000)  # Update every 1000ms (1 second)
 
     def update_countdown(self):
@@ -1491,13 +1350,13 @@ class CountdownPage(QWidget):
             self.timer.start(1000)
             self.pause_btn.setText("Pause")
             # Back to red when resuming (showing "Pause")
-            self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
             self.is_paused = False
         else:
             self.timer.stop()
             self.pause_btn.setText("Resume")
             # Green while paused (showing "Resume")
-            self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
             self.is_paused = True
 
     def on_back_clicked(self):
@@ -1566,8 +1425,8 @@ class TrainingSessionPage(QWidget):
         self.pause_btn = QPushButton("Pause")
         stop_btn = QPushButton("Stop")
 
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        stop_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        stop_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         self.pause_btn.setFixedWidth(250)
         stop_btn.setFixedWidth(250)
@@ -1669,7 +1528,7 @@ class TrainingSessionPage(QWidget):
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
         self.pause_btn.setText("Pause")
         # Ensure Pause button starts in red style
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         if self.is_self_select_mode:
             self.sequence_label.show()
@@ -1754,7 +1613,7 @@ class TrainingSessionPage(QWidget):
                         print(json.dumps({"action": "Log Training Session"}))
                     except Exception as e:
                         print(f"Error sending log training session message: {e}")
-                    self.stacked_widget.setCurrentIndex(4)
+                    self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def toggle_pause(self):
         """Pause or resume the timer."""
@@ -1762,7 +1621,7 @@ class TrainingSessionPage(QWidget):
             self.timer.start(1000)
             self.pause_btn.setText("Pause")
             # Back to red when resuming (showing "Pause")
-            self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
             self.is_paused = False
             # Send Resume JSON message
             try:
@@ -1801,7 +1660,7 @@ class TrainingSessionPage(QWidget):
             self.timer.stop()
             self.pause_btn.setText("Resume")
             # Green while paused (showing "Resume")
-            self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
             self.is_paused = True
             # Send Pause JSON message
             try:
@@ -1817,7 +1676,7 @@ class TrainingSessionPage(QWidget):
             print(json.dumps({"action": "Stop"}))
         except Exception as e:
             print(f"Error sending stop message: {e}")
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SelfSelectSequencePage(QWidget):
     """Page for creating custom punch sequences."""
@@ -1953,8 +1812,8 @@ class SelfSelectSequencePage(QWidget):
         back_btn = QPushButton("Back")
         self.next_btn = QPushButton("Next")
         
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        self.next_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.next_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         
         back_btn.setFixedWidth(150)
         self.next_btn.setFixedWidth(150)
@@ -2219,15 +2078,15 @@ class SelfSelectSequencePage(QWidget):
         self.sequence_input.setText("")
         self.update_sequence_buttons()
         self.update_buttons()
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
 
     def on_next_clicked(self):
         """Go to Basic Parameters page."""
         if len(self.sequence_list) >= 1:
             # Store sequences in BasicParametersPage
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             basic_page.custom_sequences = self.sequence_list.copy()
-            self.stacked_widget.setCurrentIndex(4)
+            self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SparPage(QWidget):
     """Page with Spar options."""
@@ -2248,8 +2107,8 @@ class SparPage(QWidget):
         back_btn = QPushButton("Back")
 
         # Make Battle button look the same as the Spar button in TrainingPage
-        battle_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        battle_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         battle_btn.clicked.connect(self.on_battle_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
@@ -2263,10 +2122,10 @@ class SparPage(QWidget):
 
     def on_battle_clicked(self):
         # BattlePage index moved to 13 after removing defense page
-        self.stacked_widget.setCurrentIndex(13)
+        self.stacked_widget.setCurrentIndex(PageIndex.BATTLE)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
 
 class BattlePage(QWidget):
     def __init__(self, stacked_widget):
@@ -2285,15 +2144,15 @@ class BattlePage(QWidget):
         buttons = [
             QPushButton("Pressure Fighter"),
             QPushButton("Counter Puncher"),
-            QPushButton("Balanced Boxer"),
+            QPushButton("Infighter"),
             QPushButton("Out Boxer"),
             QPushButton("Random"),
         ]
         back_btn = QPushButton("Back")
 
         for b in buttons:
-            b.setStyleSheet(BATTLE_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+            b.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         # wire clicks
         buttons[0].clicked.connect(lambda: self.on_style_clicked("Pressure Fighter"))
@@ -2317,15 +2176,15 @@ class BattlePage(QWidget):
     def on_style_clicked(self, style):
         """Store style and go to Basic Parameters page."""
         print(f"{style} selected")
-        basic_page = self.stacked_widget.widget(4)
+        basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
         basic_page.selected_battle_style = style
         basic_page.selected_difficulty = "Battle"
         # BattlePage is now index 13
-        basic_page.previous_page = 13  # Return here on back
-        self.stacked_widget.setCurrentIndex(4)
+        basic_page.previous_page = PageIndex.BATTLE  # Return here on back
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(12)
+        self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -2396,7 +2255,7 @@ class MainWindow(QWidget):
     def start_training_session(self):
         """Extract parameters and start the training session."""
         try:
-            basic_page = self.stacked_widget.widget(4)
+            basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
             round_text = basic_page.round_btn.text()
             rounds = int(round_text.split("\n")[1])
 
@@ -2420,9 +2279,9 @@ class MainWindow(QWidget):
             #     }
             #     print(json.dumps(payload))
 
-            training_page = self.stacked_widget.widget(10)
+            training_page = self.stacked_widget.widget(PageIndex.TRAINING_SESSION)
             training_page.start_session(rounds, time_str, rest_str, difficulty, sequences, battle_style)
-            self.stacked_widget.setCurrentIndex(10)
+            self.stacked_widget.setCurrentIndex(PageIndex.TRAINING_SESSION)
         except Exception as e:
             print(f"Error starting training session: {e}")
 
