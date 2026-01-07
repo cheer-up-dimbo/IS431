@@ -32,257 +32,90 @@ class PageIndex:
     REACTION_RESULT = 21
     OTHERS = 22
 
-# Define shared button styles at module level
-BUTTON_STYLE = """
-    QPushButton {
-        font-size: 28px;
-        padding: 40px;
-        min-width: 500px;
-        min-height: 50px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #45a049;
-    }
-    QPushButton:pressed {
-        background-color: #3d8b40;
-    }
-"""
 
-# Define shared button styles at module level
-PERFORMANCE_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 40px;
-        min-width: 500px;
-        min-height: 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #45a049;
-    }
-    QPushButton:pressed {
-        background-color: #3d8b40;
-    }
-"""
+class ButtonStyle:
+    """Centralized button style management."""
 
-BACK_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 500px;
-        min-height: 40px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #da190b;
-    }
-    QPushButton:pressed {
-        background-color: #c41504;
-    }
-"""
+    @staticmethod
+    def _create_style(font_size, padding, min_width, min_height, bg_color, hover_color, pressed_color, border_radius=8):
+        """Internal helper to generate button stylesheet."""
+        return f"""
+            QPushButton {{
+                font-size: {font_size}px;
+                padding: {padding}px;
+                min-width: {min_width}px;
+                min-height: {min_height}px;
+                background-color: {bg_color};
+                color: white;
+                border: none;
+                border-radius: {border_radius}px;
+            }}
+            QPushButton:hover {{
+                background-color: {hover_color};
+            }}
+            QPushButton:pressed {{
+                background-color: {pressed_color};
+            }}
+        """
 
-BACK_BUTTON_STYLE_2 = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 250px;
-        min-height: 40px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #da190b;
-    }
-    QPushButton:pressed {
-        background-color: #c41504;
-    }
-"""
+    # Green buttons (Primary actions)
+    PRIMARY_LARGE = _create_style.__func__(
+        font_size=28, padding=40, min_width=500, min_height=50,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
 
-START_BUTTON_STYLE_2 = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 250px;
-        min-height: 40px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #45a049;
-    }
-    QPushButton:pressed {
-        background-color: #3d8b40;
-    }
-"""
+    PRIMARY_MEDIUM = _create_style.__func__(
+        font_size=20, padding=25, min_width=250, min_height=40,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
 
-HISTORY_BUTTON_STYLE_2 = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 250px;
-        min-height: 40px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
+    PRIMARY_WIDE = _create_style.__func__(
+        font_size=20, padding=40, min_width=500, min_height=20,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
 
-BACK_CONTINUE_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 25px;
-        min-width: 200px;
-        min-height: 40px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #da190b;
-    }
-    QPushButton:pressed {
-        background-color: #c41504;
-    }
-"""
+    # Red buttons (Back/Cancel)
+    BACK_LARGE = _create_style.__func__(
+        font_size=20, padding=25, min_width=500, min_height=40,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
+    )
 
-# Adjusted SMALL_BUTTON_STYLE to a smaller size (change values here to tune)
-SMALL_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 12px;
-        min-width: 240px;
-        min-height: 50px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
-# Adjusted SMALL_BUTTON_STYLE to a smaller size (change values here to tune)
-BASIC_PARAMETERS_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 12px;
-        min-width: 240px;
-        min-height: 50px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
+    BACK_MEDIUM = _create_style.__func__(
+        font_size=20, padding=25, min_width=250, min_height=40,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
+    )
 
-# Adjusted Battle Button Style to a smaller size (change values here to tune)
-BATTLE_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 12px;
-        min-width: 240px;
-        min-height: 40px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-    QPushButton:hover {
-        background-color: #1976D2;
-    }
-    QPushButton:pressed {
-        background-color: #155A8A;
-    }
-"""
+    BACK_SMALL = _create_style.__func__(
+        font_size=20, padding=25, min_width=200, min_height=40,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
+    )
 
-# Button style used specifically for the 12 round-selection buttons (smaller)
-ROUND_SELECTION_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 20px;
-        padding: 8px;
-        min-width: 80px;
-        min-height: 90px;
-        background-color: #1976D2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
-    QPushButton:hover {
-        background-color: #1565C0;
-    }
-    QPushButton:pressed {
-        background-color: #0D47A1;
-    }
-"""
+    # Blue buttons (Info/Secondary)
+    INFO_SMALL = _create_style.__func__(
+        font_size=20, padding=12, min_width=240, min_height=50,
+        bg_color="#2196F3", hover_color="#1976D2", pressed_color="#155A8A",
+    )
 
-# Button style used specifically for the 12 speed-selection buttons (smaller)
-SPEED_SELECTION_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 40px;
-        padding: 8px;
-        min-width: 80px;
-        min-height: 300px;
-        background-color: #1976D2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
-    QPushButton:hover {
-        background-color: #1565C0;
-    }
-    QPushButton:pressed {
-        background-color: #0D47A1;
-    }
-"""
+    INFO_MEDIUM = _create_style.__func__(
+        font_size=20, padding=12, min_width=240, min_height=40,
+        bg_color="#2196F3", hover_color="#1976D2", pressed_color="#155A8A",
+    )
 
-# Button style used specifically for the 12 time-selection buttons (smaller)
-TIME_SELECTION_BUTTON_STYLE = """
-    QPushButton {
-        font-size: 18px;
-        padding: 8px;
-        background-color: #1976D2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
-    QPushButton:hover {
-        background-color: #1565C0;
-    }
-    QPushButton:pressed {
-        background-color: #0D47A1;
-    }
-"""
+    # Special sizes
+    ROUND_SELECTION = _create_style.__func__(
+        font_size=20, padding=8, min_width=80, min_height=90,
+        bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
+
+    SPEED_SELECTION = _create_style.__func__(
+        font_size=40, padding=8, min_width=80, min_height=300,
+        bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
+
+    TIME_SELECTION = _create_style.__func__(
+        font_size=18, padding=8, min_width=0, min_height=100,
+        bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
 
 class Homepage(QWidget):
     def __init__(self, stacked_widget):
@@ -302,9 +135,9 @@ class Homepage(QWidget):
         performance_btn = QPushButton("Performance")
         others_btn = QPushButton("Others")
 
-        training_btn.setStyleSheet(BUTTON_STYLE)
-        performance_btn.setStyleSheet(BUTTON_STYLE)
-        others_btn.setStyleSheet(BUTTON_STYLE)
+        training_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        performance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        others_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
 
         training_btn.clicked.connect(self.on_training_clicked)
         performance_btn.clicked.connect(self.on_performance_clicked)
@@ -354,9 +187,9 @@ class OthersPage(QWidget):
         self.stance_btn = QPushButton("Orthodox")
         back_btn = QPushButton("Back")
 
-        history_btn.setStyleSheet(BUTTON_STYLE)
-        self.stance_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        history_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        self.stance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         history_btn.clicked.connect(self.on_history_clicked)
         self.stance_btn.clicked.connect(self.on_stance_clicked)
@@ -404,10 +237,10 @@ class PerformancePage(QWidget):
         reaction_time_btn = QPushButton("Reaction Time")
         back_btn = QPushButton("Back")
 
-        power_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
-        stamina_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
-        reaction_time_btn.setStyleSheet(PERFORMANCE_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        power_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        stamina_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        reaction_time_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         power_btn.clicked.connect(self.on_power_clicked)
         stamina_btn.clicked.connect(self.on_stamina_clicked)
@@ -477,8 +310,8 @@ class StaminaInstructionsPage(QWidget):
         back_btn = QPushButton("Back")
         start_btn = QPushButton("Start")
 
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
@@ -551,8 +384,8 @@ class ReactionInstructionsPage(QWidget):
         back_btn = QPushButton("Back")
         start_btn = QPushButton("Start")
 
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
@@ -627,8 +460,8 @@ class PowerInstructionsPage(QWidget):
         back_btn = QPushButton("Back")
         start_btn = QPushButton("Start")
 
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        start_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
@@ -702,7 +535,7 @@ class PowerPunchPage(QWidget):
         button_layout.addStretch()
 
         quit_btn = QPushButton("Quit")
-        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        quit_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         quit_btn.setFixedWidth(250)
         quit_btn.clicked.connect(self.on_quit_clicked)
 
@@ -777,9 +610,9 @@ class PowerResultPage(QWidget):
         restart_btn = QPushButton("Restart")
         quit_btn = QPushButton("Quit")
 
-        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
-        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
-        quit_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        restart_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        quit_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         history_btn.setFixedWidth(250)
         restart_btn.setFixedWidth(250)
@@ -915,9 +748,9 @@ class ReactionResultPage(QWidget):
         restart_btn = QPushButton("Restart")
         back_btn = QPushButton("Back")
 
-        history_btn.setStyleSheet(HISTORY_BUTTON_STYLE_2)
-        restart_btn.setStyleSheet(START_BUTTON_STYLE_2)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        restart_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         history_btn.setFixedWidth(250)
         restart_btn.setFixedWidth(250)
@@ -989,9 +822,9 @@ class TrainingPage(QWidget):
         spar_btn = QPushButton("Spar")
         back_btn = QPushButton("Back")
 
-        techniques_btn.setStyleSheet(BUTTON_STYLE)
-        spar_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        techniques_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        spar_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         techniques_btn.clicked.connect(self.on_techniques_clicked)
         spar_btn.clicked.connect(self.on_spar_clicked)
@@ -1034,8 +867,8 @@ class TechniquesPage(QWidget):
         punch_lib_btn = QPushButton("Punch Combination Library")
         back_btn = QPushButton("Back")
 
-        punch_lib_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        punch_lib_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         punch_lib_btn.clicked.connect(self.on_punch_combination_library_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
@@ -1074,11 +907,11 @@ class PunchCombinationPage(QWidget):
         self_select_btn = QPushButton("Self-Select")
         back_btn = QPushButton("Back")
 
-        beginner_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        intermediate_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        advanced_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self_select_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        beginner_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        intermediate_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        advanced_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         beginner_btn.clicked.connect(lambda: self.on_difficulty_clicked("Beginner"))
         intermediate_btn.clicked.connect(lambda: self.on_difficulty_clicked("Intermediate"))
@@ -1135,10 +968,10 @@ class BasicParametersPage(QWidget):
         self.time_btn = QPushButton("Time")
         self.rest_btn = QPushButton("Rest")
         
-        self.round_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self.speed_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self.time_btn.setStyleSheet(SMALL_BUTTON_STYLE)
-        self.rest_btn.setStyleSheet(SMALL_BUTTON_STYLE)
+        self.round_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.speed_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.time_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.rest_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
 
         self.round_btn.clicked.connect(self.on_round_clicked)
         self.speed_btn.clicked.connect(self.on_speed_clicked)
@@ -1161,9 +994,9 @@ class BasicParametersPage(QWidget):
         back_btn = QPushButton("Back")
         self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
         
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         # Continue button should be green like Start actions
-        self.continue_btn.setStyleSheet(START_BUTTON_STYLE_2)
+        self.continue_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
         
         back_btn.clicked.connect(self.on_back_clicked)
         self.continue_btn.clicked.connect(self.on_continue_clicked)
@@ -1244,7 +1077,7 @@ class RoundSelectionPage(QWidget):
         for idx in range(12):
             n = idx + 1
             btn = QPushButton(str(n))
-            btn.setStyleSheet(ROUND_SELECTION_BUTTON_STYLE)
+            btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
             # call select_round with the selected number and return to BasicParametersPage
             btn.clicked.connect(lambda checked, val=n: self.select_round(val))
             row = idx // 4
@@ -1252,7 +1085,7 @@ class RoundSelectionPage(QWidget):
             grid.addWidget(btn, row, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         # go back to BasicParametersPage (index 4)
         back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
@@ -1295,12 +1128,12 @@ class SpeedSelectionPage(QWidget):
         speeds = ["25%", "50%", "75%", "100%"]
         for col, val in enumerate(speeds):
             btn = QPushButton(str(val))
-            btn.setStyleSheet(SPEED_SELECTION_BUTTON_STYLE)
+            btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
             btn.clicked.connect(lambda checked, v=val: self.select_speed(v))
             grid.addWidget(btn, 0, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
@@ -1347,17 +1180,17 @@ class TimeSelectionPage(QWidget):
         # arrange in 3 columns x 2 rows
         for idx, val in enumerate(times):
             btn = QPushButton(val)
-            btn.setStyleSheet(TIME_SELECTION_BUTTON_STYLE)
+            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
             # ensure all buttons have the same width (columns stretch) and same height
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            btn.setFixedHeight(150)   # choose desired uniform height
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
             btn.clicked.connect(lambda checked, v=val: self.select_time(v))
             row = idx // 3
             col = idx % 3
             grid.addWidget(btn, row, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
@@ -1404,16 +1237,16 @@ class RestSelectionPage(QWidget):
         # arrange in 3 columns x 2 rows
         for idx, val in enumerate(rest_times):
             btn = QPushButton(val)
-            btn.setStyleSheet(TIME_SELECTION_BUTTON_STYLE)
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            btn.setFixedHeight(150)
+            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
             btn.clicked.connect(lambda checked, v=val: self.select_rest(v))
             row = idx // 3
             col = idx % 3
             grid.addWidget(btn, row, col)
 
         back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
@@ -1468,8 +1301,8 @@ class CountdownPage(QWidget):
         self.pause_btn = QPushButton("Pause")
         back_btn = QPushButton("Back")
 
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         self.pause_btn.setFixedWidth(250)
         back_btn.setFixedWidth(250)
@@ -1498,7 +1331,7 @@ class CountdownPage(QWidget):
         self.countdown_label.setText(str(self.countdown_value))
         self.pause_btn.setText("Pause")
         # Ensure Pause button starts in red style
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         self.timer.start(1000)  # Update every 1000ms (1 second)
 
     def update_countdown(self):
@@ -1517,13 +1350,13 @@ class CountdownPage(QWidget):
             self.timer.start(1000)
             self.pause_btn.setText("Pause")
             # Back to red when resuming (showing "Pause")
-            self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
             self.is_paused = False
         else:
             self.timer.stop()
             self.pause_btn.setText("Resume")
             # Green while paused (showing "Resume")
-            self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
             self.is_paused = True
 
     def on_back_clicked(self):
@@ -1592,8 +1425,8 @@ class TrainingSessionPage(QWidget):
         self.pause_btn = QPushButton("Pause")
         stop_btn = QPushButton("Stop")
 
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        stop_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        stop_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         self.pause_btn.setFixedWidth(250)
         stop_btn.setFixedWidth(250)
@@ -1695,7 +1528,7 @@ class TrainingSessionPage(QWidget):
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
         self.pause_btn.setText("Pause")
         # Ensure Pause button starts in red style
-        self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         if self.is_self_select_mode:
             self.sequence_label.show()
@@ -1788,7 +1621,7 @@ class TrainingSessionPage(QWidget):
             self.timer.start(1000)
             self.pause_btn.setText("Pause")
             # Back to red when resuming (showing "Pause")
-            self.pause_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
             self.is_paused = False
             # Send Resume JSON message
             try:
@@ -1827,7 +1660,7 @@ class TrainingSessionPage(QWidget):
             self.timer.stop()
             self.pause_btn.setText("Resume")
             # Green while paused (showing "Resume")
-            self.pause_btn.setStyleSheet(START_BUTTON_STYLE_2)
+            self.pause_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
             self.is_paused = True
             # Send Pause JSON message
             try:
@@ -1979,8 +1812,8 @@ class SelfSelectSequencePage(QWidget):
         back_btn = QPushButton("Back")
         self.next_btn = QPushButton("Next")
         
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
-        self.next_btn.setStyleSheet(BACK_BUTTON_STYLE_2)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.next_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         
         back_btn.setFixedWidth(150)
         self.next_btn.setFixedWidth(150)
@@ -2274,8 +2107,8 @@ class SparPage(QWidget):
         back_btn = QPushButton("Back")
 
         # Make Battle button look the same as the Spar button in TrainingPage
-        battle_btn.setStyleSheet(BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+        battle_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         battle_btn.clicked.connect(self.on_battle_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
@@ -2318,8 +2151,8 @@ class BattlePage(QWidget):
         back_btn = QPushButton("Back")
 
         for b in buttons:
-            b.setStyleSheet(BATTLE_BUTTON_STYLE)
-        back_btn.setStyleSheet(BACK_BUTTON_STYLE)
+            b.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         # wire clicks
         buttons[0].clicked.connect(lambda: self.on_style_clicked("Pressure Fighter"))
