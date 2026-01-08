@@ -4,10 +4,12 @@ from functools import partial
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject
 
 import random
 import time
+from power import power_runner
+from reaction_time import reaction_time_runner
 
 
 @dataclass
@@ -877,6 +879,8 @@ class PowerPunchPage(QWidget):
         self.stacked_widget = stacked_widget
         self.target = 10
         self.count = 0
+        self._worker_thread: Optional[QThread] = None
+        self._measuring = False
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
@@ -918,34 +922,69 @@ class PowerPunchPage(QWidget):
         return f"Punch Count: {self.count}/{self.target}"
 
     def reset_counter(self):
+        # Reset UI and begin measurement run
         self.count = 0
         self.counter_label.setText(self.counter_text())
+        if not self._measuring:
+            self.start_measurement()
 
     def mousePressEvent(self, event):
         """Increment punch count on screen press until target reached."""
+        # Manual taps no longer drive the flow; measurement is from sensor
+        # Keep tap to give user feedback count if desired
         if self.count < self.target:
             self.count += 1
             self.counter_label.setText(self.counter_text())
-            if self.count >= self.target:
-                # Proceed to next page when target reached
-                self.on_completed()
         super().mousePressEvent(event)
 
-    def on_completed(self):
-        """Called when punch target is reached."""
-        # Navigate to Power Result page after completion
+    def on_completed(self, peak_value: float):
+        """Called when measurement completes; shows the result page."""
         try:
             result_page = self.stacked_widget.widget(PageIndex.POWER_RESULT)
             if hasattr(result_page, "set_power_output"):
-                result_page.set_power_output("100 kN")
+                result_page.set_power_output(f"Peak: {peak_value:.2f} m/s²")
             self.stacked_widget.setCurrentIndex(PageIndex.POWER_RESULT)
         except Exception:
-            # Fallback if result page not available
             self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_quit_clicked(self):
         # Abort and return to Performance page
         self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+
+    def start_measurement(self):
+        """Start background measurement using serial to detect 10 punches."""
+        class _Worker(QObject):
+            finished = Signal(float)
+
+            def __init__(self, parent=None):
+                super().__init__(parent)
+
+            def run(self):
+                try:
+                    peak = power_runner.measure_peak()
+                except Exception as ex:
+                    print(f"Error during measurement: {ex}")
+                    peak = 0.0
+                self.finished.emit(peak)
+
+        # Set UI state
+        self._measuring = True
+        self.instruction_label.setText("Measuring... Throw 10 Powerful Body Hooks")
+
+        # Spin worker thread
+        self._worker_thread = QThread(self)
+        self._worker = _Worker()
+        self._worker.moveToThread(self._worker_thread)
+        self._worker_thread.started.connect(self._worker.run)
+        self._worker.finished.connect(self._on_worker_finished)
+        self._worker.finished.connect(self._worker_thread.quit)
+        self._worker.finished.connect(self._worker.deleteLater)
+        self._worker_thread.finished.connect(self._worker_thread.deleteLater)
+        self._worker_thread.start()
+
+    def _on_worker_finished(self, peak: float):
+        self._measuring = False
+        self.on_completed(peak)
 
 class PowerResultPage(QWidget):
     """Result page shown after completing the Power punches."""
@@ -1013,12 +1052,13 @@ class PowerResultPage(QWidget):
         self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class ReactionTestPage(QWidget):
-    """Red/green screen to measure reaction time after countdown."""
+    """Red/green screen to measure reaction time using camera after countdown."""
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.state = "red"
-        self.reaction_start_time = None
+        self._worker_thread: Optional[QThread] = None
+        self._measuring = False
 
         # Allow style sheets to paint the entire widget background
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -1046,7 +1086,6 @@ class ReactionTestPage(QWidget):
 
     def set_red_state(self):
         self.state = "red"
-        self.reaction_start_time = None
         self.setStyleSheet("background-color: #b71c1c;")
         self.status_label.setText("Do Not Punch")
 
@@ -1065,27 +1104,65 @@ class ReactionTestPage(QWidget):
 
     def go_green(self):
         self.state = "green"
-        self.reaction_start_time = time.perf_counter()
         self.setStyleSheet("background-color: #2e7d32;")
         self.status_label.setText("Punch Now")
+        # Start background measurement when green appears
+        if not self._measuring:
+            self.start_measurement()
 
     def mousePressEvent(self, event):
         if self.state == "red":
             self.flash_text()
             self.schedule_green()
-        elif self.state == "green":
-            self.green_timer.stop()
-            reaction_time = 0.0
-            if self.reaction_start_time is not None:
-                reaction_time = max(0.0, time.perf_counter() - self.reaction_start_time)
-            try:
-                result_page = self.stacked_widget.widget(PageIndex.REACTION_RESULT)
-                if hasattr(result_page, "set_reaction_time"):
-                    result_page.set_reaction_time(reaction_time)
-                self.stacked_widget.setCurrentIndex(PageIndex.REACTION_RESULT)
-            except Exception:
-                self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
         super().mousePressEvent(event)
+
+    def start_measurement(self):
+        """Start background measurement using camera to detect punch."""
+        class _Worker(QObject):
+            finished = Signal(float)
+
+            def __init__(self, parent=None):
+                super().__init__(parent)
+
+            def run(self):
+                try:
+                    reaction_ms = reaction_time_runner.measure_reaction_time(
+                        sensitivity=3,
+                        max_duration_s=5.0
+                    )
+                except Exception as ex:
+                    print(f"Error during measurement: {ex}")
+                    reaction_ms = 0.0
+                self.finished.emit(reaction_ms)
+
+        # Set UI state
+        self._measuring = True
+        self.status_label.setText("Measuring... Punch Now")
+
+        # Spin worker thread
+        self._worker_thread = QThread(self)
+        self._worker = _Worker()
+        self._worker.moveToThread(self._worker_thread)
+        self._worker_thread.started.connect(self._worker.run)
+        self._worker.finished.connect(self._on_worker_finished)
+        self._worker.finished.connect(self._worker_thread.quit)
+        self._worker.finished.connect(self._worker.deleteLater)
+        self._worker_thread.finished.connect(self._worker_thread.deleteLater)
+        self._worker_thread.start()
+
+    def _on_worker_finished(self, reaction_ms: float):
+        """Called when camera measurement completes."""
+        self._measuring = False
+        self.green_timer.stop()
+        # Convert milliseconds to seconds for display
+        reaction_seconds = reaction_ms / 1000.0
+        try:
+            result_page = self.stacked_widget.widget(PageIndex.REACTION_RESULT)
+            if hasattr(result_page, "set_reaction_time"):
+                result_page.set_reaction_time(reaction_seconds)
+            self.stacked_widget.setCurrentIndex(PageIndex.REACTION_RESULT)
+        except Exception:
+            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
 class ReactionResultPage(QWidget):
     """Shows measured reaction time after the test."""
