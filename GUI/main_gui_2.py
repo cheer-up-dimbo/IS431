@@ -1,5 +1,6 @@
 import sys
 import json
+from functools import partial
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
 
@@ -213,7 +214,13 @@ class OthersPage(QWidget):
     def on_stance_clicked(self):
         # Toggle button label between Orthodox and Southpaw
         current = self.stance_btn.text().strip()
-        self.stance_btn.setText("Southpaw" if current == "Orthodox" else "Orthodox")
+        new_stance = "Southpaw" if current == "Orthodox" else "Orthodox"
+        self.stance_btn.setText(new_stance)
+        # Send stance JSON message
+        try:
+            print(json.dumps({"stance": new_stance}))
+        except Exception as e:
+            print(f"Error sending stance message: {e}")
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
@@ -1079,7 +1086,7 @@ class RoundSelectionPage(QWidget):
             btn = QPushButton(str(n))
             btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
             # call select_round with the selected number and return to BasicParametersPage
-            btn.clicked.connect(lambda checked, val=n: self.select_round(val))
+            btn.clicked.connect(partial(self.select_round, n))
             row = idx // 4
             col = idx % 4
             grid.addWidget(btn, row, col)
@@ -1129,7 +1136,7 @@ class SpeedSelectionPage(QWidget):
         for col, val in enumerate(speeds):
             btn = QPushButton(str(val))
             btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
-            btn.clicked.connect(lambda checked, v=val: self.select_speed(v))
+            btn.clicked.connect(partial(self.select_speed, val))
             grid.addWidget(btn, 0, col)
 
         back_btn = QPushButton("Back")
@@ -1184,7 +1191,7 @@ class TimeSelectionPage(QWidget):
             # ensure all buttons have the same width (columns stretch) and same height
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
-            btn.clicked.connect(lambda checked, v=val: self.select_time(v))
+            btn.clicked.connect(partial(self.select_time, val))
             row = idx // 3
             col = idx % 3
             grid.addWidget(btn, row, col)
@@ -1240,7 +1247,7 @@ class RestSelectionPage(QWidget):
             btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
             btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
-            btn.clicked.connect(lambda checked, v=val: self.select_rest(v))
+            btn.clicked.connect(partial(self.select_rest, val))
             row = idx // 3
             col = idx % 3
             grid.addWidget(btn, row, col)
@@ -1604,6 +1611,11 @@ class TrainingSessionPage(QWidget):
                     self.timer_label.setText(self.format_time(self.time_remaining))
                     self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #FF9800;")
                     self.sequence_label.hide()
+                    # Send Rest JSON message
+                    try:
+                        print(json.dumps({"action": "Rest"}))
+                    except Exception as e:
+                        print(f"Error sending rest message: {e}")
                 else:
                     # final round done
                     self.timer.stop()
