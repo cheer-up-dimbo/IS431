@@ -5,18 +5,16 @@ BoxBunny Reaction Trainer v2
 Controls: SPACE start | R replay | S stats | Q quit
 """
 
+import cv2
 import numpy as np
 import time
 import random
 import threading
+from ultralytics import YOLO
 import os
 import json
 from collections import deque
 import math
-
-# Lazy imports for optional dependencies
-cv2 = None
-YOLO = None
 
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1" 
@@ -139,15 +137,8 @@ model = None
 cap = None
 btn_start = btn_replay = btn_settings = btn_quit = None
 btn_sens_up = btn_sens_down = None
-FONT = None  # Will be set when cv2 is imported
-FONT_BOLD = None  # Will be set when cv2 is imported
-
-def _init_cv2_constants():
-    """Initialize cv2 constants when cv2 is available."""
-    global FONT, FONT_BOLD
-    if cv2 is not None:
-        FONT = cv2.FONT_HERSHEY_SIMPLEX
-        FONT_BOLD = cv2.FONT_HERSHEY_DUPLEX
+FONT = cv2.FONT_HERSHEY_SIMPLEX
+FONT_BOLD = cv2.FONT_HERSHEY_DUPLEX
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # KALMAN FILTER - Smooth out pose jitter
@@ -286,17 +277,7 @@ def rating(ms):
 # INIT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def init():
-    global model, cap, cv2, YOLO
-    
-    # Lazy load dependencies if not already loaded
-    if cv2 is None:
-        import cv2 as _cv2
-        cv2 = _cv2
-        _init_cv2_constants()
-    if YOLO is None:
-        from ultralytics import YOLO as _YOLO
-        YOLO = _YOLO
-    
+    global model, cap
     print("  ⏳ Loading pose estimation model...")
     try:
         model = YOLO(MODEL_PATH)
@@ -1041,13 +1022,6 @@ def mouse(ev, x, y, fl, p):
 # MAIN
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def main():
-    global cv2, YOLO
-    import cv2 as _cv2
-    from ultralytics import YOLO as _YOLO
-    cv2 = _cv2
-    YOLO = _YOLO
-    _init_cv2_constants()
-    
     if not init():
         return
     
@@ -1150,114 +1124,6 @@ def main():
             print(f"  Best: {min(t):.0f}ms | Avg: {sum(t)/len(t):.0f}ms")
         print("  Goodbye!")
         print("─" * 38 + "\n")
-
-def measure_reaction_time(
-    sensitivity: int = 3,
-    max_duration_s: float = 5.0,
-    model_path: str = "models/yolo11s-pose.pt",
-) -> float:
-    """
-    Measure reaction time from camera without displaying video.
-    
-    Detects a punch after the measurement starts, returns elapsed time in milliseconds.
-    Call this function after the green "Punch Now" screen appears.
-    
-    Args:
-        sensitivity: 1-5 (1=very sensitive, 3=medium, 5=least sensitive)
-        max_duration_s: Maximum time to wait for punch before giving up (seconds)
-        model_path: Path to YOLO pose model
-        
-    Returns:
-        Reaction time in milliseconds. Returns 0.0 if no punch detected or error.
-        
-    Example:
-        >>> reaction_ms = measure_reaction_time(sensitivity=3, max_duration_s=5.0)
-        >>> print(f"Reaction: {reaction_ms:.0f}ms")
-    """
-    import cv2
-    from ultralytics import YOLO
-    
-    try:
-        # Load camera
-        cap = cv2.VideoCapture(0)
-        if not cap.isOpened():
-            print("Error: Cannot open camera")
-            return 0.0
-        
-        # Load YOLO model
-        try:
-            model = YOLO(model_path)
-        except Exception as e:
-            print(f"Error loading YOLO model: {e}")
-            cap.release()
-            return 0.0
-        
-        # Get sensitivity settings
-        if sensitivity not in SENSITIVITY_PRESETS:
-            sensitivity = 3
-        punch_distance, punch_velocity, frames_required = SENSITIVITY_PRESETS[sensitivity]
-        
-        # Reset state
-        s.phase = "measuring"
-        s.cue_on = True
-        s.cue_time = time.time()
-        s.baseline_left = None
-        s.baseline_right = None
-        s.calibrated = False
-        s.move_frames = 0
-        
-        left_filter.reset()
-        right_filter.reset()
-        
-        start_time = time.time()
-        
-        # Measurement loop - no display
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            
-            # Check timeout
-            if (time.time() - start_time) > max_duration_s:
-                break
-            
-            frame = cv2.flip(frame, 1)
-            
-            # Run pose detection
-            try:
-                results = model(frame, verbose=False)
-                left_raw, right_raw, left_scale, right_scale = get_wrists(results)
-                update_kalman(left_raw, right_raw, left_scale, right_scale)
-                
-                # Calibrate during first 0.3 seconds
-                if not s.calibrated and (time.time() - start_time) < 0.3:
-                    if left_raw and right_raw:
-                        s.baseline_left = left_raw
-                        s.baseline_right = right_raw
-                        s.baseline_scale_left = left_scale
-                        s.baseline_scale_right = right_scale
-                        s.calibrated = True
-                
-                # Detect punch
-                if s.calibrated and detect_punch():
-                    reaction_ms = (time.time() - s.cue_time) * 1000
-                    cap.release()
-                    return reaction_ms
-                    
-            except Exception as e:
-                print(f"Detection error: {e}")
-                continue
-            
-            # Small sleep to avoid busy loop
-            time.sleep(0.01)
-        
-        cap.release()
-        return 0.0  # Timeout - no punch detected
-        
-    except Exception as e:
-        print(f"Error in measure_reaction_time: {e}")
-        return 0.0
-
 
 if __name__ == "__main__":
     main()
