@@ -15,6 +15,7 @@ import os
 import json
 from collections import deque
 import math
+from pathlib import Path
 
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1" 
@@ -23,12 +24,16 @@ os.environ["MKL_NUM_THREADS"] = "1"
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CONFIG
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MODEL_PATH = "models/yolo11s-pose.pt"
+# Resolve project root (two levels up from this file: GUI/reaction_time/...)
+ROOT_DIR = Path(__file__).resolve().parents[2]
+
+# Use absolute, cross-platform paths
+MODEL_PATH = ROOT_DIR / "models" / "yolo11s-pose.pt"
 COUNTDOWN_SECS = 3
 CUE_DELAY = (1.5, 4)
 MAX_REACTION = 5.0
 CAM_W, CAM_H = 1280, 720
-STATS_FILE = "boxbunny_stats.json"
+STATS_FILE = ROOT_DIR / "boxbunny_stats.json"
 
 # Punch detection - default thresholds (adjustable via GUI)
 # These are base values that get modified by sensitivity setting
@@ -254,15 +259,15 @@ scale_tracker_right = ScaleTracker()
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def load_stats():
     try:
-        if os.path.exists(STATS_FILE):
-            with open(STATS_FILE) as f:
+        if STATS_FILE.exists():
+            with open(STATS_FILE, encoding="utf-8") as f:
                 s.stats.update(json.load(f))
     except: pass
 
 def save_stats():
     try:
-        with open(STATS_FILE, 'w') as f:
-            json.dump(s.stats, f)
+        with open(STATS_FILE, 'w', encoding="utf-8") as f:
+            json.dump(s.stats, f, ensure_ascii=False)
     except: pass
 
 def rating(ms):
@@ -280,7 +285,7 @@ def init():
     global model, cap
     print("  ⏳ Loading pose estimation model...")
     try:
-        model = YOLO(MODEL_PATH)
+        model = YOLO(str(MODEL_PATH))
         print("  ✅ Model loaded successfully")
     except Exception as e:
         print(f"  ❌ Model error: {e}")
@@ -288,7 +293,11 @@ def init():
     
     print("  ⏳ Initializing camera...")
     try:
-        cap = cv2.VideoCapture(0)
+        # Prefer DirectShow backend on Windows for better compatibility
+        if os.name == "nt":
+            cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        else:
+            cap = cv2.VideoCapture(0)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_W)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_H)
         cap.set(cv2.CAP_PROP_FPS, 30)
@@ -351,6 +360,51 @@ def get_wrists(results):
         )
     except:
         return None, None, None, None
+
+def draw_pose_skeleton(img, results, point_color=None, line_color=None, thickness=3):
+    """Draw pose keypoints and skeleton on the given image for all detected persons.
+    Uses COCO-17 keypoint format from Ultralytics YOLO pose models.
+    """
+    try:
+        if not results or len(results) == 0:
+            return img
+        kps = results[0].keypoints
+        if kps is None or kps.data is None:
+            return img
+        arr = kps.data.cpu().numpy()  # (N, 17, 3) or (N, 17, 2)
+        if arr.shape[0] == 0:
+            return img
+
+        # Default colors
+        pcol = point_color or C.AMBER
+        lcol = line_color or C.ORANGE
+
+        # COCO skeleton connections (pairs of keypoint indices)
+        connections = [
+            (5, 6),   # shoulders
+            (5, 7), (7, 9),   # left arm
+            (6, 8), (8, 10),  # right arm
+            (11, 12),         # hips
+            (5, 11), (6, 12), # torso
+            (11, 13), (13, 15), # left leg
+            (12, 14), (14, 16)  # right leg
+        ]
+
+        for person in arr:
+            pts = person[:, :2]
+            # Draw lines
+            for i, j in connections:
+                x1, y1 = pts[i]
+                x2, y2 = pts[j]
+                if (x1 > 0 or y1 > 0) and (x2 > 0 or y2 > 0):
+                    cv2.line(img, (int(x1), int(y1)), (int(x2), int(y2)), lcol, thickness)
+            # Draw keypoints
+            for x, y in pts:
+                if x > 0 or y > 0:
+                    cv2.circle(img, (int(x), int(y)), 4, pcol, -1, lineType=cv2.LINE_AA)
+    except:
+        pass
+    return img
 
 def update_kalman(left_raw, right_raw, left_scale=None, right_scale=None):
     """Update Kalman filters with raw wrist positions and scale, return smoothed."""
@@ -1054,7 +1108,8 @@ def main():
             # Run pose detection
             try:
                 results = model(frame, verbose=False)
-                frame = results[0].plot()
+                # Draw pose skeleton overlay
+                draw_pose_skeleton(frame, results)
                 
                 left_raw, right_raw, left_scale, right_scale = get_wrists(results)
                 update_kalman(left_raw, right_raw, left_scale, right_scale)
