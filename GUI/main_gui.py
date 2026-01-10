@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject
 import random
 import time
 from power import power_runner
-from reaction_time import reaction_time_runner
+from reaction_time import reaction_time_runner as rt_runner
 
 
 @dataclass
@@ -723,6 +723,7 @@ class ReactionInstructionsPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.skip_countdown = False  # Flag to skip countdown on restart
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -771,17 +772,24 @@ class ReactionInstructionsPage(QWidget):
         self.setLayout(layout)
 
     def on_back_clicked(self):
+        self.skip_countdown = False
         self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
-        try:
-            countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
-            countdown_page.on_finished = self.launch_reaction_test_page
-            countdown_page.return_page_index = PageIndex.REACTION_INSTRUCTIONS  # back should return to reaction instructions
-            countdown_page.start_countdown()
-        except Exception:
-            pass
-        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
+        if self.skip_countdown:
+            # Skip countdown and go directly to reaction test
+            self.skip_countdown = False
+            self.launch_reaction_test_page()
+        else:
+            # Show countdown normally
+            try:
+                countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
+                countdown_page.on_finished = self.launch_reaction_test_page
+                countdown_page.return_page_index = PageIndex.REACTION_INSTRUCTIONS  # back should return to reaction instructions
+                countdown_page.start_countdown()
+            except Exception:
+                pass
+            self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
 
     def launch_reaction_test_page(self):
         try:
@@ -1057,7 +1065,9 @@ class ReactionTestPage(QWidget):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.state = "red"
-        self._worker_thread: Optional[QThread] = None
+        self._init_thread: Optional[QThread] = None
+        self._measurement_thread: Optional[QThread] = None
+        self._init_in_progress = False
         self._measuring = False
 
         # Allow style sheets to paint the entire widget background
@@ -1090,76 +1100,132 @@ class ReactionTestPage(QWidget):
         self.status_label.setText("Do Not Punch")
 
     def schedule_green(self):
-        delay_ms = random.randint(5, 10) * 1000
+        delay_ms = random.randint(5, 8) * 1000
         self.green_timer.stop()
         self.green_timer.start(delay_ms)
 
     def start_test(self):
+        """Start test: show setup screen and initialize camera/model."""
         self.set_red_state()
-        self.schedule_green()
+        self.status_label.setText("Setting up camera...")
+        self._init_in_progress = True
+        
+        # Start initialization in background thread
+        self._start_initialization()
 
-    def flash_text(self):
-        self.status_label.setText("")
-        QTimer.singleShot(150, lambda: self.status_label.setText("Do Not Punch"))
-
-    def go_green(self):
-        self.state = "green"
-        self.setStyleSheet("background-color: #2e7d32;")
-        self.status_label.setText("Punch Now")
-        # Start background measurement when green appears
-        if not self._measuring:
-            self.start_measurement()
-
-    def mousePressEvent(self, event):
-        if self.state == "red":
-            self.flash_text()
-            self.schedule_green()
-        super().mousePressEvent(event)
-
-    def start_measurement(self):
-        """Start background measurement using camera to detect punch."""
-        class _Worker(QObject):
-            finished = Signal(float)
+    def _start_initialization(self):
+        """Initialize camera and model in a worker thread."""
+        class _InitWorker(QObject):
+            finished = Signal(bool, str)  # success, error_message
 
             def __init__(self, parent=None):
                 super().__init__(parent)
 
             def run(self):
                 try:
-                    reaction_ms = reaction_time_runner.measure_reaction_time(
-                        sensitivity=3,
-                        max_duration_s=5.0
-                    )
+                    success, error_msg = rt_runner.initialize_camera_and_model()
+                    self.finished.emit(success, error_msg or "")
                 except Exception as ex:
-                    print(f"Error during measurement: {ex}")
-                    reaction_ms = 0.0
-                self.finished.emit(reaction_ms)
+                    self.finished.emit(False, f"Initialization error: {str(ex)}")
+
+        # Spin worker thread
+        self._init_thread = QThread(self)
+        self._init_worker = _InitWorker()
+        self._init_worker.moveToThread(self._init_thread)
+        self._init_thread.started.connect(self._init_worker.run)
+        self._init_worker.finished.connect(self._on_init_finished)
+        self._init_worker.finished.connect(self._init_thread.quit)
+        self._init_worker.finished.connect(self._init_worker.deleteLater)
+        self._init_thread.finished.connect(self._init_thread.deleteLater)
+        self._init_thread.start()
+
+    def _on_init_finished(self, success: bool, error_message: str):
+        """Called when initialization completes."""
+        self._init_in_progress = False
+        
+        if success:
+            # Schedule green light
+            self.schedule_green()
+        else:
+            # Show error
+            self.status_label.setText(f"Error: {error_message}")
+            QTimer.singleShot(2000, lambda: self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE))
+
+    def flash_text(self):
+        self.status_label.setText("")
+        QTimer.singleShot(150, lambda: self.status_label.setText("Do Not Punch"))
+
+    def go_green(self):
+        """Signal to punch and start reaction measurement."""
+        self.state = "green"
+        self.setStyleSheet("background-color: #2e7d32;")
+        self.status_label.setText("Punch Now!")
+        
+        # Start background measurement when green appears
+        if not self._measuring:
+            self.start_measurement()
+
+    def mousePressEvent(self, event):
+        if self.state == "red" and not self._init_in_progress:
+            self.flash_text()
+            self.schedule_green()
+        super().mousePressEvent(event)
+
+    def start_measurement(self):
+        """Start background measurement using camera to detect punch."""
+        class _MeasurementWorker(QObject):
+            finished = Signal(object)  # ReactionResult
+
+            def __init__(self, parent=None):
+                super().__init__(parent)
+
+            def run(self):
+                try:
+                    result = rt_runner.measure_reaction_time()
+                    self.finished.emit(result)
+                except Exception as ex:
+                    from reaction_time.reaction_time_runner import ReactionResult
+                    result = ReactionResult(success=False, status="error", 
+                                          error_message=f"Measurement error: {str(ex)}")
+                    self.finished.emit(result)
 
         # Set UI state
         self._measuring = True
-        self.status_label.setText("Measuring... Punch Now")
+        self.status_label.setText("Measuring... Punch Now!")
 
         # Spin worker thread
-        self._worker_thread = QThread(self)
-        self._worker = _Worker()
-        self._worker.moveToThread(self._worker_thread)
-        self._worker_thread.started.connect(self._worker.run)
-        self._worker.finished.connect(self._on_worker_finished)
-        self._worker.finished.connect(self._worker_thread.quit)
-        self._worker.finished.connect(self._worker.deleteLater)
-        self._worker_thread.finished.connect(self._worker_thread.deleteLater)
-        self._worker_thread.start()
+        self._measurement_thread = QThread(self)
+        self._measurement_worker = _MeasurementWorker()
+        self._measurement_worker.moveToThread(self._measurement_thread)
+        self._measurement_thread.started.connect(self._measurement_worker.run)
+        self._measurement_worker.finished.connect(self._on_measurement_finished)
+        self._measurement_worker.finished.connect(self._measurement_thread.quit)
+        self._measurement_worker.finished.connect(self._measurement_worker.deleteLater)
+        self._measurement_thread.finished.connect(self._measurement_thread.deleteLater)
+        self._measurement_thread.start()
 
-    def _on_worker_finished(self, reaction_ms: float):
+    def _on_measurement_finished(self, result):
         """Called when camera measurement completes."""
         self._measuring = False
         self.green_timer.stop()
-        # Convert milliseconds to seconds for display
-        reaction_seconds = reaction_ms / 1000.0
+        
         try:
             result_page = self.stacked_widget.widget(PageIndex.REACTION_RESULT)
-            if hasattr(result_page, "set_reaction_time"):
-                result_page.set_reaction_time(reaction_seconds)
+            if result.success and result.reaction_ms is not None:
+                # Convert milliseconds to seconds for display
+                reaction_seconds = result.reaction_ms / 1000.0
+                if hasattr(result_page, "set_reaction_time"):
+                    result_page.set_reaction_time(reaction_seconds)
+            else:
+                # Show error/status
+                status_text = result.status or "unknown"
+                if result.status == "too_soon":
+                    status_text = "Too Soon!"
+                elif result.status == "timeout":
+                    status_text = "No Punch Detected"
+                if hasattr(result_page, "set_error_message"):
+                    result_page.set_error_message(status_text)
+            
             self.stacked_widget.setCurrentIndex(PageIndex.REACTION_RESULT)
         except Exception:
             self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
@@ -1215,11 +1281,21 @@ class ReactionResultPage(QWidget):
     def set_reaction_time(self, seconds: float):
         self.result_label.setText(f"Reaction Time: {seconds:.3f} s")
 
+    def set_error_message(self, message: str):
+        """Display error or status message instead of reaction time."""
+        self.result_label.setText(message)
+
     def on_history_clicked(self):
         # Placeholder: add history navigation when available
         print("History clicked - implement reaction history navigation")
 
     def on_restart_clicked(self):
+        # Set flag to skip countdown and go directly to test
+        try:
+            reaction_instructions_page = self.stacked_widget.widget(PageIndex.REACTION_INSTRUCTIONS)
+            reaction_instructions_page.skip_countdown = True
+        except Exception:
+            pass
         self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
@@ -1821,7 +1897,7 @@ class CountdownPage(QWidget):
 
     def start_countdown(self):
         """Start the countdown timer."""
-        self.countdown_value = 20
+        self.countdown_value = 3
         self.is_paused = False
         self.countdown_label.setText(str(self.countdown_value))
         self.pause_btn.setText("Pause")
