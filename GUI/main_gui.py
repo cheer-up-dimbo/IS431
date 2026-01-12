@@ -158,9 +158,16 @@ class TrainingConfig:
         self.rest_minutes = 1
         self.rest_seconds = 0
         self.speed = "100%"
-        self.difficulty = None
-        self.battle_style = None
-        self.custom_sequences = []
+
+
+@dataclass
+class TechCorrConfig:
+    """Persistent configuration for Technique Correction mode."""
+    difficulty: str
+    rounds: int
+    round_seconds: int
+    rest_seconds: int
+    speed: str
 
 
 class AppState:
@@ -224,6 +231,12 @@ class AppState:
         self.previous_page = initial_page
         self.time_label: Optional[str] = "3min"
         self.rest_label: Optional[str] = "1min"
+        # Technique Correction specific persistent config
+        self.tech_corr_config: Optional[TechCorrConfig] = None
+
+    def set_tech_corr_config(self, cfg: "TechCorrConfig") -> None:
+        """Persist Technique Correction configuration."""
+        self.tech_corr_config = cfg
     
     def update_rounds(self, rounds: int) -> None:
         """Update the number of rounds.
@@ -389,6 +402,13 @@ class PageIndex:
     REACTION_TEST = 20
     REACTION_RESULT = 21
     OTHERS = 22
+    TECH_CORR_PARAMETERS = 23
+    TECH_CORR_SESSION = 24
+    TECH_CORR_DIFFICULTY = 25
+    TECH_CORR_ROUNDS = 26
+    TECH_CORR_SPEED = 27
+    TECH_CORR_TIME = 28
+    TECH_CORR_REST = 29
 
 
 class ButtonStyle:
@@ -1380,16 +1400,20 @@ class TechniquesPage(QWidget):
         title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
 
         punch_lib_btn = QPushButton("Punch Combination Library")
+        technique_correction_btn = QPushButton("Technique Correction")
         back_btn = QPushButton("Back")
 
         punch_lib_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        technique_correction_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         punch_lib_btn.clicked.connect(self.on_punch_combination_library_clicked)
+        technique_correction_btn.clicked.connect(self.on_technique_correction_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(punch_lib_btn)
+        layout.addWidget(technique_correction_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
@@ -1398,6 +1422,10 @@ class TechniquesPage(QWidget):
     def on_punch_combination_library_clicked(self):
         print("Punch Combination Library button clicked")
         self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
+
+    def on_technique_correction_clicked(self):
+        print("Technique Correction button clicked")
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
@@ -1468,6 +1496,664 @@ class PunchCombinationPage(QWidget):
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
+
+class TechCorrParametersPage(QWidget):
+    """Setup page for Technique Correction mode, mirroring BasicParametersPage pattern."""
+    def __init__(self, stacked_widget, app_state=None):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.app_state = app_state
+
+        # Stored selections (require explicit user selection for all six)
+        self.selected_difficulty = None
+        self.selected_rounds = None
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Technique Correction Setup")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
+
+        # Parameter buttons (label + placeholder until selected)
+        self.difficulty_btn = QPushButton("Difficulty\n--")
+        self.rounds_btn = QPushButton("Rounds\n--")
+        self.speed_btn = QPushButton("Speed\n--")
+        self.time_btn = QPushButton("Time\n--")
+        self.rest_btn = QPushButton("Rest\n--")
+
+        for btn in [self.difficulty_btn, self.rounds_btn, self.speed_btn, self.time_btn, self.rest_btn]:
+            btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+
+        self.difficulty_btn.clicked.connect(self.on_difficulty_clicked)
+        self.rounds_btn.clicked.connect(self.on_rounds_clicked)
+        self.speed_btn.clicked.connect(self.on_speed_clicked)
+        self.time_btn.clicked.connect(self.on_time_clicked)
+        self.rest_btn.clicked.connect(self.on_rest_clicked)
+
+        layout.addWidget(title)
+        grid = QGridLayout()
+        grid.setSpacing(12)
+        grid.addWidget(self.difficulty_btn, 0, 0)
+        grid.addWidget(self.rounds_btn,     0, 1)
+        grid.addWidget(self.speed_btn,      1, 0)
+        grid.addWidget(self.time_btn,       1, 1)
+        # Center the rest button in row 2
+        rest_layout = QHBoxLayout()
+        rest_layout.addStretch()
+        rest_layout.addWidget(self.rest_btn)
+        rest_layout.addStretch()
+        layout.addLayout(grid)
+        layout.addLayout(rest_layout)
+
+        # Bottom buttons (Back + Start) like BasicParametersPage
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        back_btn = QPushButton("Back")
+        self.start_btn = QPushButton("Start")
+
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+
+        back_btn.clicked.connect(self.on_back_clicked)
+        self.start_btn.clicked.connect(self.on_start_clicked)
+
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(self.start_btn)
+        button_layout.addStretch()
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+        # Initial enable state similar to BasicParametersPage
+        self.update_start_button()
+
+    def on_difficulty_clicked(self):
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_DIFFICULTY)
+
+    def on_rounds_clicked(self):
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_ROUNDS)
+
+    def on_speed_clicked(self):
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_SPEED)
+
+    def on_time_clicked(self):
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_TIME)
+
+    def on_rest_clicked(self):
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_REST)
+
+    def update_start_button(self):
+        # Enable only when all five have a concrete value (not '--')
+        def value_of(btn: QPushButton) -> str:
+            txt = btn.text()
+            return txt.split("\n")[-1].strip() if "\n" in txt else txt.strip()
+        values = [
+            value_of(self.difficulty_btn),
+            value_of(self.rounds_btn),
+            value_of(self.speed_btn),
+            value_of(self.time_btn),
+            value_of(self.rest_btn),
+        ]
+        all_selected = all(v not in ("--", "") for v in values)
+        self.start_btn.setEnabled(all_selected)
+
+    def on_back_clicked(self):
+        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
+
+    def on_start_clicked(self):
+        # Parse time value to seconds
+        time_text = self.time_btn.text().split("\n")[-1]
+        def parse_time_to_seconds(t: str) -> int:
+            t = t.strip()
+            mins = 0
+            secs = 0
+            if "min" in t and "sec" in t:
+                try:
+                    parts = t.replace("sec", "").split("min")
+                    mins = int(parts[0]) if parts[0] else 0
+                    secs = int(parts[1]) if parts[1] else 0
+                except Exception:
+                    mins, secs = 0, 0
+            elif "min" in t:
+                try:
+                    mins = int(t.replace("min", ""))
+                except Exception:
+                    mins = 0
+            elif "sec" in t:
+                try:
+                    secs = int(t.replace("sec", ""))
+                except Exception:
+                    secs = 0
+            return mins * 60 + secs
+
+        round_seconds = parse_time_to_seconds(time_text)
+        
+        # Parse rest time
+        rest_text = self.rest_btn.text().split("\n")[-1]
+        rest_seconds = parse_time_to_seconds(rest_text)
+        
+        # Get speed
+        speed_text = self.speed_btn.text().split("\n")[-1]
+
+        if self.app_state is not None:
+            cfg = TechCorrConfig(
+                difficulty=self.selected_difficulty,
+                rounds=self.selected_rounds,
+                round_seconds=round_seconds,
+                rest_seconds=rest_seconds,
+                speed=speed_text,
+            )
+            self.app_state.set_tech_corr_config(cfg)
+
+        # Navigate to session and let it load from AppState
+        session_page = self.stacked_widget.widget(PageIndex.TECH_CORR_SESSION)
+        if hasattr(session_page, "load_from_state") and (self.app_state is not None):
+            session_page.load_from_state(self.app_state)
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_SESSION)
+
+    # Methods to update from selection pages
+    def set_difficulty(self, val: str):
+        self.selected_difficulty = val
+        self.difficulty_btn.setText(f"Difficulty\n{val}")
+        self.update_start_button()
+
+    def set_rounds(self, n: int):
+        self.selected_rounds = n
+        self.rounds_btn.setText(f"Rounds\n{n}")
+        self.update_start_button()
+
+    def set_speed(self, val: str):
+        self.speed_btn.setText(f"Speed\n{val}")
+        self.update_start_button()
+
+    def set_time(self, val: str):
+        self.time_btn.setText(f"Time\n{val}")
+        self.update_start_button()
+
+    def set_rest(self, val: str):
+        self.rest_btn.setText(f"Rest\n{val}")
+        self.update_start_button()
+
+class TechCorrSessionPage(QWidget):
+    """Session page for Technique Correction mode, mirroring TrainingSessionPage layout."""
+
+    INTERVAL_SECONDS = 25
+    ANALYTICS_SECONDS = 5
+
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.is_paused = False
+        
+        # Timing and session state
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_timer)
+        self.current_round = 1
+        self.total_rounds = 1
+        self.round_seconds = 30
+        self.interval_plan = [self.INTERVAL_SECONDS]
+        self.current_interval_index = 0
+        self.time_remaining = self.INTERVAL_SECONDS
+        self.showing_analytics = False
+        self.analytics_time_remaining = 0
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(30)
+        main_layout.setContentsMargins(50, 50, 50, 50)
+
+        # Round counter at the top
+        self.round_label = QLabel("Round 1 / 3")
+        self.round_label.setAlignment(Qt.AlignCenter)
+        self.round_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        # Interval counter
+        self.interval_label = QLabel("Interval 1 / 5")
+        self.interval_label.setAlignment(Qt.AlignCenter)
+        self.interval_label.setStyleSheet("font-size: 32px; font-weight: bold; color: #666;")
+
+        # Countdown timer for interval
+        self.timer_label = QLabel("00:30")
+        self.timer_label.setAlignment(Qt.AlignCenter)
+        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+
+        # Target combo (large, centered)
+        self.target_combo_label = QLabel("Jab - Cross - Hook")
+        self.target_combo_label.setAlignment(Qt.AlignCenter)
+        self.target_combo_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #2196F3; margin-top: 20px;")
+
+        # Feedback label (large)
+        self.feedback_label = QLabel("Good")
+        self.feedback_label.setAlignment(Qt.AlignCenter)
+        self.feedback_label.setStyleSheet("font-size: 56px; font-weight: bold; color: #4CAF50; margin-top: 15px;")
+
+        # Post-interval analytics panel (hidden by default)
+        self.analytics_panel = QWidget()
+        analytics_layout = QVBoxLayout()
+        analytics_layout.setAlignment(Qt.AlignCenter)
+        analytics_layout.setSpacing(10)
+        analytics_layout.setContentsMargins(20, 20, 20, 20)
+
+        self.analytics_title = QLabel("Interval Summary")
+        self.analytics_title.setAlignment(Qt.AlignCenter)
+        self.analytics_title.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 10px;")
+
+        self.guard_discipline_label = QLabel("Guard discipline: —")
+        self.guard_discipline_label.setAlignment(Qt.AlignCenter)
+        self.guard_discipline_label.setStyleSheet("font-size: 18px; color: #333;")
+
+        self.distance_selection_label = QLabel("Distance selection: —")
+        self.distance_selection_label.setAlignment(Qt.AlignCenter)
+        self.distance_selection_label.setStyleSheet("font-size: 18px; color: #333;")
+
+        self.combo_accuracy_label = QLabel("Combo accuracy: —")
+        self.combo_accuracy_label.setAlignment(Qt.AlignCenter)
+        self.combo_accuracy_label.setStyleSheet("font-size: 18px; color: #333;")
+
+        analytics_layout.addWidget(self.analytics_title)
+        analytics_layout.addWidget(self.guard_discipline_label)
+        analytics_layout.addWidget(self.distance_selection_label)
+        analytics_layout.addWidget(self.combo_accuracy_label)
+        self.analytics_panel.setLayout(analytics_layout)
+        self.analytics_panel.hide()
+
+        # Buttons (Pause/Resume and Stop)
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()
+
+        self.pause_btn = QPushButton("Pause")
+        stop_btn = QPushButton("Stop")
+
+        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        stop_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+
+        self.pause_btn.setFixedWidth(250)
+        stop_btn.setFixedWidth(250)
+
+        self.pause_btn.clicked.connect(self.toggle_pause)
+        stop_btn.clicked.connect(self.on_stop_clicked)
+
+        button_layout.addWidget(self.pause_btn)
+        button_layout.addWidget(stop_btn)
+        button_layout.addStretch()
+
+        # Assemble main layout
+        main_layout.addStretch()
+        main_layout.addWidget(self.round_label)
+        main_layout.addWidget(self.interval_label)
+        main_layout.addStretch()
+        main_layout.addWidget(self.timer_label)
+        main_layout.addWidget(self.target_combo_label)
+        main_layout.addWidget(self.feedback_label)
+        main_layout.addStretch()
+        main_layout.addWidget(self.analytics_panel)
+        main_layout.addStretch()
+        main_layout.addLayout(button_layout)
+        main_layout.addStretch()
+
+        self.setLayout(main_layout)
+
+    def format_time(self, seconds):
+        """Format seconds as MM:SS."""
+        mins = seconds // 60
+        secs = seconds % 60
+        return f"{mins:02d}:{secs:02d}"
+
+    def toggle_pause(self):
+        """Toggle between pause and resume."""
+        self.is_paused = not self.is_paused
+        if self.is_paused:
+            self.pause_btn.setText("Resume")
+            self.timer.stop()
+        else:
+            self.pause_btn.setText("Pause")
+            self.timer.start(1000)
+
+    def on_stop_clicked(self):
+        """Stop session and return to parameters page."""
+        self.timer.stop()
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
+
+    def load_from_state(self, app_state: AppState):
+        """Load and start Technique Correction session from config."""
+        cfg = getattr(app_state, "tech_corr_config", None)
+        if cfg:
+            self.total_rounds = cfg.rounds
+            self.round_seconds = cfg.round_seconds
+
+            # Build interval plan (25s slices, last interval may be shorter)
+            self.interval_plan = self.build_interval_plan(self.round_seconds)
+            self.current_round = 1
+            self.current_interval_index = 0
+            self.time_remaining = self.interval_plan[0]
+            self.showing_analytics = False
+            self.analytics_time_remaining = 0
+            self.is_paused = False
+
+            self.round_label.setText(f"Round {self.current_round} / {self.total_rounds}")
+            self.interval_label.setText(f"Interval {self.current_interval_index + 1} / {len(self.interval_plan)}")
+            self.timer_label.setText(self.format_time(self.time_remaining))
+            self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+            self.target_combo_label.show()
+            self.feedback_label.setText("Good")
+            self.feedback_label.show()
+            self.analytics_panel.hide()
+            self.pause_btn.setText("Pause")
+
+            print(f"[TechCorr] Start Round {self.current_round}/{self.total_rounds}, Intervals: {len(self.interval_plan)}")
+            print(f"[TechCorr] Start Interval 1/{len(self.interval_plan)} (Round {self.current_round})")
+
+            self.timer.start(1000)
+
+    def update_timer(self):
+        """Update the countdown timer and handle state transitions."""
+        if self.showing_analytics:
+            if self.analytics_time_remaining > 0:
+                # Show countdown during analytics phase
+                self.timer_label.setText(self.format_time(self.analytics_time_remaining))
+                self.analytics_time_remaining -= 1
+                return
+
+            # Analytics finished; decide next step
+            self.analytics_panel.hide()
+            self.showing_analytics = False
+            self.timer_label.show()
+            self.target_combo_label.show()
+            self.feedback_label.show()
+
+            last_interval_of_round = (self.current_interval_index == len(self.interval_plan) - 1)
+            if last_interval_of_round:
+                if self.current_round < self.total_rounds:
+                    # Next round
+                    self.current_round += 1
+                    self.interval_plan = self.build_interval_plan(self.round_seconds)
+                    self.current_interval_index = 0
+                    self.time_remaining = self.interval_plan[0]
+                    self.round_label.setText(f"Round {self.current_round} / {self.total_rounds}")
+                    self.interval_label.setText(f"Interval {self.current_interval_index + 1} / {len(self.interval_plan)}")
+                    self.timer_label.setText(self.format_time(self.time_remaining))
+                    self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+                    print(f"[TechCorr] Start Round {self.current_round}/{self.total_rounds}, Intervals: {len(self.interval_plan)}")
+                else:
+                    # Session complete
+                    print("[TechCorr] Session complete")
+                    self.timer.stop()
+                    self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
+                return
+
+            # Move to next interval in same round
+            self.current_interval_index += 1
+            self.time_remaining = self.interval_plan[self.current_interval_index]
+            self.interval_label.setText(f"Interval {self.current_interval_index + 1} / {len(self.interval_plan)}")
+            self.timer_label.setText(self.format_time(self.time_remaining))
+            self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+            print(f"[TechCorr] Start Interval {self.current_interval_index + 1}/{len(self.interval_plan)} (Round {self.current_round})")
+            return
+
+        # Interval countdown
+        if self.time_remaining > 0:
+            self.time_remaining -= 1
+            self.timer_label.setText(self.format_time(self.time_remaining))
+            return
+
+        # Interval complete -> show analytics
+        self.showing_analytics = True
+        self.analytics_time_remaining = self.ANALYTICS_SECONDS
+        self.target_combo_label.hide()
+        self.feedback_label.hide()
+        self.timer_label.show()
+        last_interval = (self.current_interval_index == len(self.interval_plan) - 1)
+        summary_text = "End of Round Summary" if last_interval else f"Interval {self.current_interval_index + 1} Summary"
+        self.analytics_title.setText(summary_text)
+        self.interval_label.setText(summary_text)
+        self.timer_label.setText(self.format_time(self.analytics_time_remaining))
+        self.analytics_panel.show()
+        print(f"[TechCorr] Interval {self.current_interval_index + 1} complete -> Analytics")
+
+    def build_interval_plan(self, round_seconds: int):
+        """Compute interval durations for a round based on 25s slices and remainder."""
+        if round_seconds <= 0:
+            return [self.INTERVAL_SECONDS]
+        count = (round_seconds + self.INTERVAL_SECONDS - 1) // self.INTERVAL_SECONDS
+        base = [self.INTERVAL_SECONDS] * count
+        remainder = round_seconds - self.INTERVAL_SECONDS * (count - 1)
+        base[-1] = remainder if remainder > 0 else self.INTERVAL_SECONDS
+        return base
+
+class TechCorrDifficultySelectionPage(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(12)
+        layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Difficulty")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        btns = []
+        for label in ["Beginner", "Intermediate", "Advanced"]:
+            b = QPushButton(label)
+            b.setStyleSheet(ButtonStyle.INFO_SMALL)
+            b.clicked.connect(partial(self.select_difficulty, label))
+            btns.append(b)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
+
+        layout.addWidget(title)
+        for b in btns:
+            layout.addWidget(b)
+        layout.addStretch()
+        layout.addWidget(back_btn)
+
+        self.setLayout(layout)
+
+    def select_difficulty(self, val: str):
+        try:
+            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
+            if hasattr(params, "set_difficulty"):
+                params.set_difficulty(val)
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
+
+class TechCorrRoundsSelectionPage(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Rounds")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+        for idx in range(12):
+            n = idx + 1
+            btn = QPushButton(str(n))
+            btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
+            btn.clicked.connect(partial(self.select_rounds, n))
+            row = idx // 6
+            col = idx % 6
+            grid.addWidget(btn, row, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_rounds(self, n: int):
+        try:
+            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
+            if hasattr(params, "set_rounds"):
+                params.set_rounds(n)
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
+
+class TechCorrSpeedSelectionPage(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Speed")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+
+        speeds = ["25%", "50%", "75%", "100%"]
+        for col, val in enumerate(speeds):
+            btn = QPushButton(str(val))
+            btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
+            btn.clicked.connect(partial(self.select_speed, val))
+            grid.addWidget(btn, 0, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_speed(self, val: str):
+        try:
+            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
+            if hasattr(params, "set_speed"):
+                params.set_speed(val)
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
+
+class TechCorrTimeSelectionPage(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Time")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+        for c in range(3):
+            grid.setColumnStretch(c, 1)
+
+        times = ["30sec", "1min", "1min30sec", "2min", "2min30sec", "3min"]
+        for idx, val in enumerate(times):
+            btn = QPushButton(val)
+            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            btn.clicked.connect(partial(self.select_time, val))
+            row = idx // 3
+            col = idx % 3
+            grid.addWidget(btn, row, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_time(self, val: str):
+        try:
+            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
+            if hasattr(params, "set_time"):
+                params.set_time(val)
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
+
+class TechCorrRestSelectionPage(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(50,50,50,50)
+
+        title = QLabel("Select Rest Time")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+
+        grid = QGridLayout()
+        grid.setSpacing(8)
+        for c in range(3):
+            grid.setColumnStretch(c, 1)
+
+        rest_times = ["10sec", "20sec", "30sec", "40sec", "50sec", "1min"]
+        for idx, val in enumerate(rest_times):
+            btn = QPushButton(val)
+            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            btn.clicked.connect(partial(self.select_rest, val))
+            row = idx // 3
+            col = idx % 3
+            grid.addWidget(btn, row, col)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+        main_layout.addWidget(back_btn)
+
+        self.setLayout(main_layout)
+
+    def select_rest(self, val: str):
+        try:
+            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
+            if hasattr(params, "set_rest"):
+                params.set_rest(val)
+        except Exception:
+            pass
+        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
 
 class BasicParametersPage(QWidget):
     """Page for basic parameters (index 4)."""
@@ -2817,6 +3503,13 @@ class MainWindow(QWidget):
         self.reaction_test_page = ReactionTestPage(self.stacked_widget)
         self.reaction_result_page = ReactionResultPage(self.stacked_widget)
         self.others_page = OthersPage(self.stacked_widget)
+        self.tech_corr_parameters_page = TechCorrParametersPage(self.stacked_widget, self.app_state)
+        self.tech_corr_session_page = TechCorrSessionPage(self.stacked_widget)
+        self.tech_corr_difficulty_page = TechCorrDifficultySelectionPage(self.stacked_widget)
+        self.tech_corr_rounds_page = TechCorrRoundsSelectionPage(self.stacked_widget)
+        self.tech_corr_speed_page = TechCorrSpeedSelectionPage(self.stacked_widget)
+        self.tech_corr_time_page = TechCorrTimeSelectionPage(self.stacked_widget)
+        self.tech_corr_rest_page = TechCorrRestSelectionPage(self.stacked_widget)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
@@ -2845,6 +3538,13 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.reaction_test_page) # 20
         self.stacked_widget.addWidget(self.reaction_result_page) # 21
         self.stacked_widget.addWidget(self.others_page) # 22
+        self.stacked_widget.addWidget(self.tech_corr_parameters_page) # 23
+        self.stacked_widget.addWidget(self.tech_corr_session_page) # 24
+        self.stacked_widget.addWidget(self.tech_corr_difficulty_page) # 25
+        self.stacked_widget.addWidget(self.tech_corr_rounds_page) # 26
+        self.stacked_widget.addWidget(self.tech_corr_speed_page) # 27
+        self.stacked_widget.addWidget(self.tech_corr_time_page) # 28
+        self.stacked_widget.addWidget(self.tech_corr_rest_page) # 29
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
