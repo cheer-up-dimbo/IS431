@@ -8,7 +8,7 @@ except Exception as e:
 
 
 def measure_peak(
-    port: str = "COM12",
+    port: str = "COM10",
     baud: int = 115200,
     threshold: float = 35.0,
     max_punches: int = 10,
