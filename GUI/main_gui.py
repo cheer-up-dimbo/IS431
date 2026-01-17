@@ -965,12 +965,14 @@ class PowerPunchPage(QWidget):
             self.counter_label.setText(self.counter_text())
         super().mousePressEvent(event)
 
-    def on_completed(self, peak_value: float):
+    def on_completed(self, punches_data: List[tuple]):
         """Called when measurement completes; shows the result page."""
         try:
+            # Calculate peak g-force from punches
+            peak_g_force = max([g for _, g in punches_data], default=0.0) if punches_data else 0.0
             result_page = self.stacked_widget.widget(PageIndex.POWER_RESULT)
             if hasattr(result_page, "set_power_output"):
-                result_page.set_power_output(f"Peak: {peak_value:.2f} m/s²")
+                result_page.set_power_output(f"Peak: {peak_g_force:.2f} g")
             self.stacked_widget.setCurrentIndex(PageIndex.POWER_RESULT)
         except Exception:
             self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
@@ -982,18 +984,29 @@ class PowerPunchPage(QWidget):
     def start_measurement(self):
         """Start background measurement using serial to detect 10 punches."""
         class _Worker(QObject):
-            finished = Signal(float)
+            finished = Signal(list)  # Emit list of (punch_number, g_force) tuples
+            punch_detected = Signal(int)  # Emit punch count
 
             def __init__(self, parent=None):
                 super().__init__(parent)
 
             def run(self):
                 try:
-                    peak = power_runner.measure_peak()
+                    punches = power_runner.measure_punches(
+                        port="COM10",
+                        baud=115200,
+                        punch_threshold_ms2=100.0,
+                        max_punches=10,
+                        debounce_ms=300,
+                        max_duration_s=120.0
+                    )
+                    # Emit punch count update for each punch detected
+                    for punch_num, _ in punches:
+                        self.punch_detected.emit(punch_num)
                 except Exception as ex:
                     print(f"Error during measurement: {ex}")
-                    peak = 0.0
-                self.finished.emit(peak)
+                    punches = []
+                self.finished.emit(punches)
 
         # Set UI state
         self._measuring = True
@@ -1004,15 +1017,21 @@ class PowerPunchPage(QWidget):
         self._worker = _Worker()
         self._worker.moveToThread(self._worker_thread)
         self._worker_thread.started.connect(self._worker.run)
+        self._worker.punch_detected.connect(self._on_punch_detected)
         self._worker.finished.connect(self._on_worker_finished)
         self._worker.finished.connect(self._worker_thread.quit)
         self._worker.finished.connect(self._worker.deleteLater)
         self._worker_thread.finished.connect(self._worker_thread.deleteLater)
         self._worker_thread.start()
 
-    def _on_worker_finished(self, peak: float):
+    def _on_punch_detected(self, punch_count: int):
+        """Update UI when a punch is detected."""
+        self.count = punch_count
+        self.counter_label.setText(self.counter_text())
+
+    def _on_worker_finished(self, punches_data: list):
         self._measuring = False
-        self.on_completed(peak)
+        self.on_completed(punches_data)
 
 class PowerResultPage(QWidget):
     """Result page shown after completing the Power punches."""
@@ -1065,7 +1084,7 @@ class PowerResultPage(QWidget):
         self.setLayout(layout)
 
     def set_power_output(self, value_str: str):
-        self.result_label.setText(f"Your Power Output: {value_str}")
+        self.result_label.setText(f"G-Force Output: {value_str}")
 
     def on_history_clicked(self):
         # Placeholder: no history page yet
