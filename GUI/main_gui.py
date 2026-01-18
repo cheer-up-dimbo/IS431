@@ -964,7 +964,7 @@ class PowerPunchPage(QWidget):
             self.count += 1
             self.counter_label.setText(self.counter_text())
         super().mousePressEvent(event)
-
+    
     def on_completed(self, punches_data: List[tuple]):
         """Called when measurement completes; shows the result page."""
         try:
@@ -985,28 +985,31 @@ class PowerPunchPage(QWidget):
         """Start background measurement using serial to detect 10 punches."""
         class _Worker(QObject):
             finished = Signal(list)  # Emit list of (punch_number, g_force) tuples
-            punch_detected = Signal(int)  # Emit punch count
+            punch_detected = Signal(int, float)  # Emit (punch_count, g_force) in real-time
 
             def __init__(self, parent=None):
                 super().__init__(parent)
 
             def run(self):
                 try:
-                    punches = power_runner.measure_punches(
-                        port="COM10",
+                    # Use the callback version for real-time updates
+                    punches = power_runner.measure_punches_with_callback(
+                        port="COM10",  # Changed from COM10 to match your other script
                         baud=115200,
                         punch_threshold_ms2=100.0,
                         max_punches=10,
                         debounce_ms=300,
-                        max_duration_s=120.0
+                        max_duration_s=120.0,
+                        callback=self._on_punch_callback  # Real-time callback
                     )
-                    # Emit punch count update for each punch detected
-                    for punch_num, _ in punches:
-                        self.punch_detected.emit(punch_num)
                 except Exception as ex:
                     print(f"Error during measurement: {ex}")
                     punches = []
                 self.finished.emit(punches)
+            
+            def _on_punch_callback(self, punch_num: int, g_force: float):
+                """Called immediately when a punch is detected by the serial reader."""
+                self.punch_detected.emit(punch_num, g_force)
 
         # Set UI state
         self._measuring = True
@@ -1024,10 +1027,14 @@ class PowerPunchPage(QWidget):
         self._worker_thread.finished.connect(self._worker_thread.deleteLater)
         self._worker_thread.start()
 
-    def _on_punch_detected(self, punch_count: int):
-        """Update UI when a punch is detected."""
+    def _on_punch_detected(self, punch_count: int, g_force: float):
+        """Update UI when a punch is detected - called in real-time via signal."""
         self.count = punch_count
         self.counter_label.setText(self.counter_text())
+        # Optional: Show visual feedback
+        self.instruction_label.setText(f"💥 {g_force:.1f}g! Keep going...")
+        # Reset instruction text after a moment
+        QTimer.singleShot(500, lambda: self.instruction_label.setText("Throw 10 Powerful Body Hooks"))
 
     def _on_worker_finished(self, punches_data: list):
         self._measuring = False
