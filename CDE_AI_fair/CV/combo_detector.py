@@ -422,3 +422,34 @@ def cleanup():
     if _detector is not None:
         _detector.cleanup()
         _detector = None
+
+
+# ============================================================================
+# PLACEHOLDER COMBO DETECTION (for testing)
+# ============================================================================
+
+def detect_combo_continuous(callback, interval_seconds: float = 3.0) -> None:
+    """Placeholder: Continuously detect combos and call callback on success.
+    
+    This is a placeholder function that simulates successful combo detection
+    every `interval_seconds` by printing JSON and calling the callback.
+    
+    Args:
+        callback: Function to call when combo is detected (receives 'successful' string)
+        interval_seconds: Time between simulated detections (default 3.0)
+    
+    Note: This runs in the caller's thread - should be called from a worker thread.
+    """
+    import json
+    start_time = time.time()
+    combo_count = 0
+    max_combos = 3  # We need 3 successful combos
+    
+    while combo_count < max_combos:
+        time.sleep(interval_seconds)
+        combo_count += 1
+        # Print JSON output for successful combo detection
+        print(json.dumps({"status": "successful", "combo": "1-1-2", "count": combo_count}))
+        callback("successful")
+    
+    return

@@ -2,7 +2,8 @@
 Simplified Boxing Training GUI with Combo and Blocking modes - INTEGRATED VERSION
 
 Features:
-- Combo Mode: Countdown → Display combo → Show results → Play video → Return home
+- Combo Mode: Countdown → Display combo with 3 checkboxes → Play video → Return home
+  (Checkboxes tick when 1-1-2 combo is detected, goes to video after 3 successful combos)
 - Blocking Mode: Countdown → Numpad interface with recording → Return home
 - Backend integration with combo_detector and blocking_detector modules
 """
@@ -274,52 +275,88 @@ class ComboCountdownPage(QWidget):
 
 
 class ComboDisplayPage(QWidget):
-    """Display '1-1-2' combo for 15 seconds with detection."""
+    """Display '1-1-2' combo with 3 checkboxes that tick on successful detection."""
+    
+    # Signal to update checkbox from worker thread
+    combo_detected = Signal(str)  # Receives 'successful' from detector
     
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        self.display_time = 15
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_timer)
         self._detection_thread: Optional[QThread] = None
+        self.successful_count = 0
+        self.video_path = None
+        
+        # Connect signal to slot for thread-safe UI updates
+        self.combo_detected.connect(self._on_combo_detected)
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(30)
         layout.setContentsMargins(50, 50, 50, 50)
 
-        self.combo_label = QLabel("1-1-2")
+        # Title
+        title = QLabel("Perform: 1-1-2")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 36px; font-weight: bold;")
+
+        # Combo label
+        self.combo_label = QLabel("Jab - Jab - Cross")
         self.combo_label.setAlignment(Qt.AlignCenter)
         self.combo_label.setStyleSheet(
-            "font-size: 80px; font-weight: bold; color: #2196F3;"
+            "font-size: 48px; font-weight: bold; color: #2196F3;"
         )
 
-        self.timer_label = QLabel("15")
-        self.timer_label.setAlignment(Qt.AlignCenter)
-        self.timer_label.setStyleSheet("font-size: 48px; color: #666;")
+        # Checkbox container
+        checkbox_layout = QGridLayout()
+        checkbox_layout.setSpacing(40)
+        checkbox_layout.setAlignment(Qt.AlignCenter)
+        
+        # Create 3 checkbox labels (we'll use labels styled as checkboxes)
+        self.checkboxes = []
+        for i in range(3):
+            checkbox = QLabel("☐")  # Empty checkbox unicode
+            checkbox.setAlignment(Qt.AlignCenter)
+            checkbox.setStyleSheet(
+                "font-size: 80px; color: #666; min-width: 100px;"
+            )
+            checkbox_layout.addWidget(checkbox, 0, i)
+            self.checkboxes.append(checkbox)
+        
+        # Status label
+        self.status_label = QLabel("Complete 3 combos (1-1-2)")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setStyleSheet("font-size: 24px; color: #666;")
 
         layout.addStretch()
+        layout.addWidget(title)
         layout.addWidget(self.combo_label)
         layout.addStretch()
-        layout.addWidget(self.timer_label)
+        layout.addLayout(checkbox_layout)
+        layout.addWidget(self.status_label)
         layout.addStretch()
 
         self.setLayout(layout)
 
     def start_display(self):
-        """Start displaying the combo and recording."""
-        self.display_time = 15
-        self.timer_label.setText(str(self.display_time))
+        """Start displaying the combo and begin detection."""
+        # Reset checkboxes
+        self.successful_count = 0
+        for checkbox in self.checkboxes:
+            checkbox.setText("☐")
+            checkbox.setStyleSheet("font-size: 80px; color: #666; min-width: 100px;")
+        
+        self.status_label.setText("Complete 3 combos (1-1-2)")
         
         # Start recording and detection in background
         self._start_detection()
         
-        self.timer.start(1000)
-        print(json.dumps({"action": "combo_display", "combo": "1-1-2", "duration": 15}))
+        print(json.dumps({"action": "combo_display", "combo": "1-1-2", "checkboxes": 3}))
 
     def _start_detection(self):
         """Start combo detection in worker thread."""
+        page_ref = self  # Reference to page for callback
+        
         class _DetectionWorker(QObject):
             finished = Signal(object)  # ComboResult
 
@@ -335,9 +372,29 @@ class ComboDisplayPage(QWidget):
                         self.finished.emit(result)
                         return
                     
-                    # Detect combo for 15 seconds
-                    result = combo_detector.detect_combo(duration_seconds=15.0, expected_punches=5)
+                    # Use placeholder continuous detection
+                    # This calls our callback every 3 seconds with 'successful'
+                    def on_combo_success(status):
+                        # Emit signal to update UI (thread-safe)
+                        page_ref.combo_detected.emit(status)
+                    
+                    combo_detector.detect_combo_continuous(
+                        callback=on_combo_success,
+                        interval_seconds=3.0
+                    )
+                    
+                    # Detection complete - create result
+                    video_dir = Path.home() / "Videos" / "BoxingTraining"
+                    video_path = str(video_dir / "combo_recording.mp4")
+                    
+                    result = combo_detector.ComboResult(
+                        success=True,
+                        successful_punches=3,
+                        total_expected=3,
+                        video_path=video_path
+                    )
                     self.finished.emit(result)
+                    
                 except Exception as ex:
                     result = combo_detector.ComboResult(
                         success=False, status="error",
@@ -355,25 +412,46 @@ class ComboDisplayPage(QWidget):
         self._detection_thread.finished.connect(self._detection_thread.deleteLater)
         self._detection_thread.start()
 
-    def _on_detection_finished(self, result):
-        """Handle detection completion."""
-        # Store result for results page
-        results_page = self.stacked_widget.widget(PageIndex.COMBO_RESULTS)
-        if result.success:
-            results_page.set_results(result.successful_punches, result.video_path)
-        else:
-            results_page.set_error(result.error_message)
+    def _on_combo_detected(self, status: str):
+        """Handle combo detection signal (called on main thread)."""
+        if status == "successful" and self.successful_count < 3:
+            # Tick the next checkbox
+            self.checkboxes[self.successful_count].setText("✓")
+            self.checkboxes[self.successful_count].setStyleSheet(
+                "font-size: 80px; color: #4CAF50; min-width: 100px; font-weight: bold;"
+            )
+            self.successful_count += 1
+            
+            print(json.dumps({
+                "action": "checkbox_ticked",
+                "count": self.successful_count,
+                "total": 3
+            }))
+            
+            # Update status
+            remaining = 3 - self.successful_count
+            if remaining > 0:
+                self.status_label.setText(f"{remaining} more combo(s) to go!")
+            else:
+                self.status_label.setText("All combos complete! 🎉")
 
-    def update_timer(self):
-        """Update timer display."""
-        if self.display_time > 1:
-            self.display_time -= 1
-            self.timer_label.setText(str(self.display_time))
+    def _on_detection_finished(self, result):
+        """Handle detection completion - go to video page."""
+        if self.successful_count >= 3:
+            print(json.dumps({"action": "combo_complete", "all_checkboxes": True}))
+            
+            # Store video path and go to video page
+            self.video_path = result.video_path
+            video_page = self.stacked_widget.widget(PageIndex.COMBO_VIDEO)
+            video_page.load_video(self.video_path)
+            self.stacked_widget.setCurrentIndex(PageIndex.COMBO_VIDEO)
         else:
-            self.timer.stop()
-            print(json.dumps({"action": "combo_complete"}))
-            # Move to results page
-            self.stacked_widget.setCurrentIndex(PageIndex.COMBO_RESULTS)
+            # Detection finished but not all checkboxes ticked (error case)
+            print(json.dumps({
+                "action": "combo_incomplete",
+                "successful": self.successful_count,
+                "error": result.error_message
+            }))
 
 
 class ComboResultsPage(QWidget):
