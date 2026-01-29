@@ -3011,7 +3011,7 @@ class SelfSelectSequencePage(QWidget):
                     border-radius: 8px;
                     text-align: left;
                     color: black;
-                    min-height: 50px;
+                    min-height: 40px;
                 }
                 QPushButton:hover {
                     background-color: #e0e0e0;
@@ -3103,8 +3103,8 @@ class SelfSelectSequencePage(QWidget):
         back_btn = QPushButton("Back")
         self.next_btn = QPushButton("Next")
         
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        self.next_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_SMALL)
+        self.next_btn.setStyleSheet(ButtonStyle.BACK_SMALL)
         
         back_btn.setFixedWidth(150)
         self.next_btn.setFixedWidth(150)
@@ -3148,7 +3148,7 @@ class SelfSelectSequencePage(QWidget):
                     font-size: 28px;
                     padding: 20px;
                     min-width: 80px;
-                    min-height: 80px;
+                    min-height: 35px;
                     background-color: #2196F3;
                     color: white;
                     border: none;
@@ -3178,7 +3178,7 @@ class SelfSelectSequencePage(QWidget):
                     font-size: 20px;
                     padding: 15px;
                     min-width: 100px;
-                    min-height: 60px;
+                    min-height: 40px;
                     background-color: #FF9800;
                     color: white;
                     border: none;
