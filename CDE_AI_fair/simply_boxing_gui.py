@@ -18,9 +18,10 @@ from PySide6.QtWidgets import (
     QLabel, QStackedWidget, QGridLayout
 )
 from PySide6.QtCore import Qt, QTimer, Signal, QThread, QObject
-from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtMultimedia import QMediaPlayer, QSoundEffect
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtCore import QUrl
+import winsound
 
 # Backend detection modules
 sys.path.insert(0, str(Path(__file__).parent))
@@ -415,6 +416,10 @@ class ComboDisplayPage(QWidget):
     def _on_combo_detected(self, status: str):
         """Handle combo detection signal (called on main thread)."""
         if status == "successful" and self.successful_count < 3:
+            # Play boxing bell "ding ding ding" sound
+            for _ in range(3):
+                winsound.Beep(2500, 100)  # High-pitched ding
+            
             # Tick the next checkbox
             self.checkboxes[self.successful_count].setText("✓")
             self.checkboxes[self.successful_count].setStyleSheet(
