@@ -519,7 +519,7 @@ def hash_password(password: str) -> str:
 
 
 def load_users() -> dict:
-    """Load users from CSV file. Returns dict of {username: password_hash}."""
+    """Load users from CSV file. Returns dict of {username: {"password_hash": ..., "level": ...}}."""
     users = {}
     csv_path = get_users_csv_path()
     if os.path.exists(csv_path):
@@ -527,7 +527,10 @@ def load_users() -> dict:
             with open(csv_path, 'r', newline='', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    users[row['username']] = row['password_hash']
+                    users[row['username']] = {
+                        'password_hash': row['password_hash'],
+                        'level': row.get('level', 'Beginner')
+                    }
         except Exception as e:
             print(f"Error loading users: {e}")
     return users
@@ -538,14 +541,49 @@ def save_users(users: dict) -> bool:
     csv_path = get_users_csv_path()
     try:
         with open(csv_path, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=['username', 'password_hash'])
+            writer = csv.DictWriter(f, fieldnames=['username', 'password_hash', 'level'])
             writer.writeheader()
-            for username, password_hash in users.items():
-                writer.writerow({'username': username, 'password_hash': password_hash})
+            for username, user_data in users.items():
+                if isinstance(user_data, dict):
+                    writer.writerow({
+                        'username': username,
+                        'password_hash': user_data['password_hash'],
+                        'level': user_data.get('level', 'Beginner')
+                    })
+                else:
+                    # Backward compatibility for old format
+                    writer.writerow({
+                        'username': username,
+                        'password_hash': user_data,
+                        'level': 'Beginner'
+                    })
         return True
     except Exception as e:
         print(f"Error saving users: {e}")
         return False
+
+
+def get_user_level(username: str) -> str:
+    """Get the current level of a user. Returns 'Beginner', 'Intermediate', or 'Advanced'."""
+    users = load_users()
+    if username in users:
+        user_data = users[username]
+        if isinstance(user_data, dict):
+            return user_data.get('level', 'Beginner')
+        return 'Beginner'
+    return 'Beginner'
+
+
+def set_user_level(username: str, level: str) -> bool:
+    """Set the level of a user. Returns True on success."""
+    if level not in ['Beginner', 'Intermediate', 'Advanced']:
+        print(f"Invalid level: {level}")
+        return False
+    users = load_users()
+    if username in users:
+        users[username]['level'] = level
+        return save_users(users)
+    return False
 
 
 def get_training_csv_path(username: str):
@@ -686,7 +724,7 @@ class LoginPage(QWidget):
         users = load_users()
         password_hash = hash_password(password)
         
-        if username in users and users[username] == password_hash:
+        if username in users and isinstance(users[username], dict) and users[username]['password_hash'] == password_hash:
             self.current_user = username
             self.status_label.setText(f"Welcome back, {username}!")
             self.status_label.setStyleSheet("font-size: 14px; color: #4CAF50;")
@@ -726,8 +764,11 @@ class LoginPage(QWidget):
             self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
             return
         
-        # Add new user
-        users[username] = hash_password(password)
+        # Add new user with Beginner level
+        users[username] = {
+            'password_hash': hash_password(password),
+            'level': 'Beginner'
+        }
         if save_users(users):
             self.current_user = username
             self.status_label.setText(f"Account created! Welcome, {username}!")
@@ -768,11 +809,12 @@ class UserManagementPage(QWidget):
         
         # User table
         self.user_table = QTableWidget()
-        self.user_table.setColumnCount(3)
-        self.user_table.setHorizontalHeaderLabels(["Username", "Training Sessions", "Actions"])
+        self.user_table.setColumnCount(4)
+        self.user_table.setHorizontalHeaderLabels(["Username", "Level", "Training Sessions", "Actions"])
         self.user_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.user_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.user_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.user_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.user_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.user_table.setStyleSheet("""
@@ -834,13 +876,19 @@ class UserManagementPage(QWidget):
         """Load and display all users."""
         users = load_users()
         self.user_table.setRowCount(len(users))
-        
         for row, username in enumerate(users.keys()):
             # Username
             username_item = QTableWidgetItem(username)
             username_item.setTextAlignment(Qt.AlignCenter)
             self.user_table.setItem(row, 0, username_item)
-            
+
+            # Level
+            user_data = users[username]
+            level = user_data.get('level', 'Beginner') if isinstance(user_data, dict) else 'Beginner'
+            level_item = QTableWidgetItem(level)
+            level_item.setTextAlignment(Qt.AlignCenter)
+            self.user_table.setItem(row, 1, level_item)
+
             # Training sessions count
             training_csv = get_training_csv_path(username)
             session_count = 0
@@ -852,10 +900,9 @@ class UserManagementPage(QWidget):
                         session_count = sum(1 for _ in reader)
                 except:
                     pass
-            
             sessions_item = QTableWidgetItem(str(session_count))
             sessions_item.setTextAlignment(Qt.AlignCenter)
-            self.user_table.setItem(row, 1, sessions_item)
+            self.user_table.setItem(row, 2, sessions_item)
             
             # Delete button
             delete_btn = QPushButton("Delete")
@@ -929,14 +976,17 @@ class Homepage(QWidget):
         training_btn = QPushButton("Training")
         performance_btn = QPushButton("Performance")
         others_btn = QPushButton("Others")
+        back_btn = QPushButton("Back to Login")
 
         training_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         performance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         others_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         training_btn.clicked.connect(self.on_training_clicked)
         performance_btn.clicked.connect(self.on_performance_clicked)
         others_btn.clicked.connect(self.on_others_clicked)
+        back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addStretch()
         layout.addWidget(title)
@@ -946,6 +996,8 @@ class Homepage(QWidget):
         layout.addWidget(performance_btn)
         layout.addStretch()
         layout.addWidget(others_btn)
+        layout.addStretch()
+        layout.addWidget(back_btn)
         layout.addStretch()
 
         self.setLayout(layout)
@@ -961,6 +1013,10 @@ class Homepage(QWidget):
     def on_others_clicked(self):
         print("Others button clicked")
         self.stacked_widget.setCurrentIndex(PageIndex.OTHERS)
+
+    def on_back_clicked(self):
+        """Navigate back to login page."""
+        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
 
 
 class OthersPage(QWidget):
@@ -1773,19 +1829,21 @@ class TrainingPage(QWidget):
     Attributes:
         stacked_widget (QStackedWidget): Reference to the parent stacked widget for
             managing page navigation between different sections of the application.
+        main_window: Reference to the MainWindow to get current user and check level.
     Methods:
-        __init__(stacked_widget): Initializes the TrainingPage with UI components
+        __init__(stacked_widget, main_window): Initializes the TrainingPage with UI components
             including title, buttons, and layout configuration.
         on_techniques_clicked(): Handles the techniques button click event and
             navigates to the Techniques page (index 2).
         on_spar_clicked(): Handles the spar button click event and navigates to
-            the SparPage (index 12).
+            the SparPage (index 12) if user is Intermediate or Advanced.
         on_back_clicked(): Handles the back button click event and returns to
             the main page (index 0).
     """
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, main_window=None):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.main_window = main_window
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -1797,20 +1855,20 @@ class TrainingPage(QWidget):
         title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
 
         techniques_btn = QPushButton("Techniques")
-        spar_btn = QPushButton("Spar")
+        self.spar_btn = QPushButton("Spar")
         back_btn = QPushButton("Back")
 
         techniques_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        spar_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        self.spar_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         techniques_btn.clicked.connect(self.on_techniques_clicked)
-        spar_btn.clicked.connect(self.on_spar_clicked)
+        self.spar_btn.clicked.connect(self.on_spar_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(techniques_btn)
-        layout.addWidget(spar_btn)
+        layout.addWidget(self.spar_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
@@ -1888,33 +1946,48 @@ class PunchCombinationPage(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
 
-        beginner_btn = QPushButton("Beginner")
-        intermediate_btn = QPushButton("Intermediate")
-        advanced_btn = QPushButton("Advanced")
-        self_select_btn = QPushButton("Self-Select")
+        self.beginner_btn = QPushButton("Beginner")
+        self.intermediate_btn = QPushButton("Intermediate")
+        self.advanced_btn = QPushButton("Advanced")
+        self.self_select_btn = QPushButton("Self-Select")
         back_btn = QPushButton("Back")
 
-        beginner_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        intermediate_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        advanced_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.beginner_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.intermediate_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.advanced_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
-        beginner_btn.clicked.connect(lambda: self.on_difficulty_clicked("Beginner"))
-        intermediate_btn.clicked.connect(lambda: self.on_difficulty_clicked("Intermediate"))
-        advanced_btn.clicked.connect(lambda: self.on_difficulty_clicked("Advanced"))
-        self_select_btn.clicked.connect(lambda: self.on_difficulty_clicked("Self-Select"))
+        self.beginner_btn.clicked.connect(lambda: self.on_difficulty_clicked("Beginner"))
+        self.intermediate_btn.clicked.connect(lambda: self.on_difficulty_clicked("Intermediate"))
+        self.advanced_btn.clicked.connect(lambda: self.on_difficulty_clicked("Advanced"))
+        self.self_select_btn.clicked.connect(lambda: self.on_difficulty_clicked("Self-Select"))
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
-        layout.addWidget(beginner_btn)
-        layout.addWidget(intermediate_btn)
-        layout.addWidget(advanced_btn)
-        layout.addWidget(self_select_btn)
+        layout.addWidget(self.beginner_btn)
+        layout.addWidget(self.intermediate_btn)
+        layout.addWidget(self.advanced_btn)
+        layout.addWidget(self.self_select_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
         self.setLayout(layout)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        username = None
+        main_window = self.parent()
+        if hasattr(main_window, 'get_current_user'):
+            username = main_window.get_current_user()
+        elif self.app_state and hasattr(self.app_state, 'current_user'):
+            username = self.app_state.current_user
+        level = get_user_level(username) if username else 'Beginner'
+        # Only enable the button matching user level
+        self.beginner_btn.setEnabled(level == 'Beginner')
+        self.intermediate_btn.setEnabled(level == 'Intermediate')
+        self.advanced_btn.setEnabled(level == 'Advanced')
+        self.self_select_btn.setEnabled(level == 'Beginner')
 
     def on_difficulty_clicked(self, difficulty):
         print(f"{difficulty} button clicked")

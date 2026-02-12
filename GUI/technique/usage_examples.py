@@ -5,7 +5,7 @@ This script demonstrates how to integrate the curriculum engine with
 the boxing training GUI.
 """
 
-from combo_curriculum import ComboCurriculum, create_mock_analytics
+from GUI.punch_combination.combo_curriculum import ComboCurriculum, create_mock_analytics
 
 
 def example_basic_usage():
