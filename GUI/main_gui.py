@@ -519,7 +519,7 @@ def hash_password(password: str) -> str:
 
 
 def load_users() -> dict:
-    """Load users from CSV file. Returns dict of {username: {"password_hash": ..., "level": ...}}."""
+    """Load users from CSV file. Returns dict of {username: {"password_hash": ..., "level": ..., "progress": ...}}."""
     users = {}
     csv_path = get_users_csv_path()
     if os.path.exists(csv_path):
@@ -529,7 +529,8 @@ def load_users() -> dict:
                 for row in reader:
                     users[row['username']] = {
                         'password_hash': row['password_hash'],
-                        'level': row.get('level', 'Beginner')
+                        'level': row.get('level', 'Beginner'),
+                        'progress': float(row.get('progress', '0.0'))
                     }
         except Exception as e:
             print(f"Error loading users: {e}")
@@ -541,21 +542,23 @@ def save_users(users: dict) -> bool:
     csv_path = get_users_csv_path()
     try:
         with open(csv_path, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=['username', 'password_hash', 'level'])
+            writer = csv.DictWriter(f, fieldnames=['username', 'password_hash', 'level', 'progress'])
             writer.writeheader()
             for username, user_data in users.items():
                 if isinstance(user_data, dict):
                     writer.writerow({
                         'username': username,
                         'password_hash': user_data['password_hash'],
-                        'level': user_data.get('level', 'Beginner')
+                        'level': user_data.get('level', 'Beginner'),
+                        'progress': user_data.get('progress', 0.0)
                     })
                 else:
                     # Backward compatibility for old format
                     writer.writerow({
                         'username': username,
                         'password_hash': user_data,
-                        'level': 'Beginner'
+                        'level': 'Beginner',
+                        'progress': 0.0
                     })
         return True
     except Exception as e:
@@ -584,6 +587,102 @@ def set_user_level(username: str, level: str) -> bool:
         users[username]['level'] = level
         return save_users(users)
     return False
+
+
+def get_user_progress(username: str) -> float:
+    """Get the current progress percentage of a user (0.0-100.0)."""
+    users = load_users()
+    if username in users:
+        user_data = users[username]
+        if isinstance(user_data, dict):
+            return user_data.get('progress', 0.0)
+        return 0.0
+    return 0.0
+
+
+def update_user_progress(username: str, progress: float) -> bool:
+    """
+    Update user's progress percentage and auto-level up if thresholds met.
+    
+    Progress thresholds:
+    - Beginner -> Intermediate: 80% progress at Beginner level
+    - Intermediate -> Advanced: 80% progress at Intermediate level
+    
+    Args:
+        username: Username to update
+        progress: Progress percentage (0.0-100.0)
+    
+    Returns:
+        bool: True on success
+    """
+    users = load_users()
+    if username not in users:
+        return False
+    
+    # Clamp progress to 0-100
+    progress = max(0.0, min(100.0, progress))
+    
+    current_level = users[username].get('level', 'Beginner')
+    users[username]['progress'] = progress
+    
+    # Auto level-up logic
+    if current_level == 'Beginner' and progress >= 80.0:
+        users[username]['level'] = 'Intermediate'
+        users[username]['progress'] = 0.0  # Reset progress for new level
+        print(f"User {username} leveled up to Intermediate!")
+    elif current_level == 'Intermediate' and progress >= 80.0:
+        users[username]['level'] = 'Advanced'
+        users[username]['progress'] = 0.0  # Reset progress for new level
+        print(f"User {username} leveled up to Advanced!")
+    
+    return save_users(users)
+
+
+def calculate_user_progress_from_combos(username: str, db_path: str) -> float:
+    """
+    Calculate user's progress based on combo mastery from database.
+    
+    Progress = (Average mastery score of all combos at current level) * 100
+    
+    Args:
+        username: Username to calculate progress for
+        db_path: Path to combos.db database
+    
+    Returns:
+        float: Progress percentage (0.0-100.0)
+    """
+    try:
+        import sys
+        import os
+        # Add combo_curriculum to path if not already there
+        curriculum_path = os.path.join(os.path.dirname(__file__), 'combo_curriculum')
+        if curriculum_path not in sys.path:
+            sys.path.insert(0, curriculum_path)
+        
+        from combo_curriculum import ComboCurriculum
+        
+        # Get user's current level
+        level = get_user_level(username)
+        
+        # Query combos at that level
+        with ComboCurriculum(db_path) as curriculum:
+            combos = curriculum.get_combos_by_difficulty(level)
+            
+            if not combos:
+                return 0.0
+            
+            # Calculate average mastery score
+            total_mastery = sum(combo.get('mastery_score', 0.0) for combo in combos)
+            avg_mastery = total_mastery / len(combos)
+            
+            # Convert to percentage (mastery_score is 0.0-1.0)
+            progress = avg_mastery * 100.0
+            
+            return progress
+    
+    except Exception as e:
+        print(f"Error calculating progress from combos: {e}")
+        return 0.0
 
 
 def get_training_csv_path(username: str):
@@ -764,10 +863,11 @@ class LoginPage(QWidget):
             self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
             return
         
-        # Add new user with Beginner level
+        # Add new user with Beginner level and 0% progress
         users[username] = {
             'password_hash': hash_password(password),
-            'level': 'Beginner'
+            'level': 'Beginner',
+            'progress': 0.0
         }
         if save_users(users):
             self.current_user = username
@@ -809,12 +909,13 @@ class UserManagementPage(QWidget):
         
         # User table
         self.user_table = QTableWidget()
-        self.user_table.setColumnCount(4)
-        self.user_table.setHorizontalHeaderLabels(["Username", "Level", "Training Sessions", "Actions"])
+        self.user_table.setColumnCount(5)
+        self.user_table.setHorizontalHeaderLabels(["Username", "Level", "Progress", "Training Sessions", "Actions"])
         self.user_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.user_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.user_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self.user_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.user_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.user_table.setStyleSheet("""
@@ -889,6 +990,12 @@ class UserManagementPage(QWidget):
             level_item.setTextAlignment(Qt.AlignCenter)
             self.user_table.setItem(row, 1, level_item)
 
+            # Progress
+            progress = user_data.get('progress', 0.0) if isinstance(user_data, dict) else 0.0
+            progress_item = QTableWidgetItem(f"{progress:.1f}%")
+            progress_item.setTextAlignment(Qt.AlignCenter)
+            self.user_table.setItem(row, 2, progress_item)
+
             # Training sessions count
             training_csv = get_training_csv_path(username)
             session_count = 0
@@ -902,7 +1009,7 @@ class UserManagementPage(QWidget):
                     pass
             sessions_item = QTableWidgetItem(str(session_count))
             sessions_item.setTextAlignment(Qt.AlignCenter)
-            self.user_table.setItem(row, 2, sessions_item)
+            self.user_table.setItem(row, 3, sessions_item)
             
             # Delete button
             delete_btn = QPushButton("Delete")
@@ -923,7 +1030,7 @@ class UserManagementPage(QWidget):
                 }
             """)
             delete_btn.clicked.connect(partial(self.delete_user, username))
-            self.user_table.setCellWidget(row, 2, delete_btn)
+            self.user_table.setCellWidget(row, 4, delete_btn)
         
         self.user_table.resizeRowsToContents()
     
