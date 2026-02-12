@@ -422,8 +422,14 @@ progress = (4 / 15) × 100 = 26.7%
 6. Training Session Begins
    ├─ Display: Round X of Y
    ├─ Timer: Work time countdown
-   ├─ [Placeholder] User performs combo
+   ├─ **Combo Display:**
+   │  ├─ Beginner/Intermediate/Advanced: Fetches next combo from database
+   │  │  └─ Shows combo sequence (e.g., "Jab-Cross-Hook-Uppercut")
+   │  └─ Self-Select: Cycles through custom sequences (every 6s)
+   ├─ User performs combo
    ├─ [Future] Action recognition scores performance
+   │  └─ Updates database with score
+   │  └─ Tracks mastery progress
    └─ Rest period after each round
 
 7. Session Ends

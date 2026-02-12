@@ -3263,6 +3263,10 @@ class TrainingSessionPage(QWidget):
         self.difficulty = None
         self.battle_style = None
 
+        # Combo curriculum state
+        self.current_combo = None  # Stores combo dict from database
+        self.combo_display_text = ""  # Text to display on screen
+
         # self-select state
         self.is_self_select_mode = False
         self.sequences = []
@@ -3286,16 +3290,16 @@ class TrainingSessionPage(QWidget):
         self.rest_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #FF9800; margin-bottom: 10px;")
         self.rest_label.hide()
 
+        # Sequence display (visible for combo/self-select modes during work)
+        self.sequence_label = QLabel("")
+        self.sequence_label.setAlignment(Qt.AlignCenter)
+        self.sequence_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #2196F3; margin-bottom: 20px;")
+        self.sequence_label.hide()
+
         # Timer in the middle
         self.timer_label = QLabel(self.format_time(self.time_remaining))
         self.timer_label.setAlignment(Qt.AlignCenter)
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
-
-        # Sequence display (visible only in self-select mode during work)
-        self.sequence_label = QLabel("")
-        self.sequence_label.setAlignment(Qt.AlignCenter)
-        self.sequence_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #2196F3; margin-top: 10px;")
-        self.sequence_label.hide()
 
         # Create horizontal layout for pause and back buttons
         button_layout = QHBoxLayout()
@@ -3323,9 +3327,8 @@ class TrainingSessionPage(QWidget):
         main_layout.addStretch()
         main_layout.addWidget(self.rest_label)
         main_layout.addStretch()
+        main_layout.addWidget(self.sequence_label)  # combo display above timer
         main_layout.addWidget(self.timer_label)
-        main_layout.addStretch()
-        main_layout.addWidget(self.sequence_label)  # added under the timer
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
         main_layout.addStretch()
@@ -3372,6 +3375,11 @@ class TrainingSessionPage(QWidget):
                 payload = {
                     "mode": mode_str,
                 }
+                # Add combo info if available
+                if self.current_combo:
+                    payload["combo_id"] = self.current_combo.get("id", "")
+                    payload["combo_name"] = self.current_combo.get("name", "")
+                    payload["combo_sequence"] = self.current_combo.get("sequence", "")
             else:
                 # For other modes (Stamina, Reaction Time, Power, etc.)
                 payload = {
@@ -3398,6 +3406,32 @@ class TrainingSessionPage(QWidget):
         self.sequence_index = 0
         self.sequence_time_remaining = self.sequence_cycle_seconds if self.sequences else 0
 
+        # Fetch combo from database for Beginner/Intermediate/Advanced modes
+        self.current_combo = None
+        self.combo_display_text = ""
+        if difficulty in ["Beginner", "Intermediate", "Advanced"]:
+            try:
+                import sys
+                import os
+                # Add combo_curriculum to path if not already there
+                curriculum_path = os.path.join(os.path.dirname(__file__), 'combo_curriculum')
+                if curriculum_path not in sys.path:
+                    sys.path.insert(0, curriculum_path)
+                
+                from combo_curriculum import ComboCurriculum
+                
+                db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+                
+                with ComboCurriculum(db_path) as curriculum:
+                    self.current_combo = curriculum.get_next_combo(difficulty)
+                    if self.current_combo:
+                        self.combo_display_text = self.current_combo.get('sequence', '')
+                        print(f"Training combo: {self.current_combo.get('name', 'Unknown')} - {self.combo_display_text}")
+            except Exception as e:
+                print(f"Error fetching combo from database: {e}")
+                # Fallback to showing difficulty level
+                self.combo_display_text = f"{difficulty} Combo"
+
         self.time_remaining = self.work_time
         self.is_resting = False
         self.is_paused = False
@@ -3410,9 +3444,13 @@ class TrainingSessionPage(QWidget):
         # Ensure Pause button starts in red style
         self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
+        # Show sequence/combo for Self-Select and Punch Combination modes
         if self.is_self_select_mode:
             self.sequence_label.show()
             self.update_sequence_display()
+        elif self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.combo_display_text:
+            self.sequence_label.show()
+            self.sequence_label.setText(self.combo_display_text)
         else:
             self.sequence_label.hide()
 
@@ -3472,6 +3510,10 @@ class TrainingSessionPage(QWidget):
                     self.sequence_time_remaining = self.sequence_cycle_seconds
                     self.sequence_label.show()
                     self.update_sequence_display()
+                elif self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.combo_display_text:
+                    # Show combo for Punch Combination modes
+                    self.sequence_label.show()
+                    self.sequence_label.setText(self.combo_display_text)
                 else:
                     self.sequence_label.hide()
             else:
@@ -4099,6 +4141,9 @@ class MainWindow(QWidget):
         self.setWindowTitle("Boxing Training App")
         self.setFixedSize(1024, 600)
 
+        # Auto-setup database on first run
+        self._ensure_database_setup()
+
         self.stacked_widget = QStackedWidget()
         self.app_state = AppState(initial_page=PageIndex.HOMEPAGE)
 
@@ -4182,6 +4227,56 @@ class MainWindow(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stacked_widget)
         self.setLayout(layout)
+    
+    def _ensure_database_setup(self):
+        """Ensure the combo database exists and has tables. If not, set it up automatically."""
+        db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+        
+        try:
+            # Check if database exists and has tables
+            needs_setup = False
+            
+            if not os.path.exists(db_path):
+                needs_setup = True
+                print("Database file not found, running setup...")
+            else:
+                # Check if tables exist
+                try:
+                    import sqlite3
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='combos'")
+                    if cursor.fetchone() is None:
+                        needs_setup = True
+                        print("Database tables not found, running setup...")
+                    conn.close()
+                except Exception as e:
+                    print(f"Error checking database: {e}")
+                    needs_setup = True
+            
+            # Run setup if needed
+            if needs_setup:
+                setup_script = os.path.join(os.path.dirname(__file__), 'setup', 'setup_combo_database.py')
+                if os.path.exists(setup_script):
+                    print(f"Running database setup from: {setup_script}")
+                    import subprocess
+                    result = subprocess.run(
+                        [sys.executable, setup_script],
+                        cwd=os.path.dirname(__file__),
+                        capture_output=True,
+                        text=True
+                    )
+                    if result.returncode == 0:
+                        print("✓ Database setup completed successfully!")
+                    else:
+                        print(f"✗ Database setup failed: {result.stderr}")
+                else:
+                    print(f"Setup script not found at: {setup_script}")
+        
+        except Exception as e:
+            print(f"Error in database setup: {e}")
+            import traceback
+            traceback.print_exc()
     
     def get_current_user(self):
         """Get the currently logged in user."""

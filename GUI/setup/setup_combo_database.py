@@ -222,7 +222,7 @@ def main():
     
     # Check if database already exists
     if db_file.exists() and not args.force:
-        print(f"⚠️  Database already exists at: {db_file.absolute()}")
+        print(f"[WARNING] Database already exists at: {db_file.absolute()}")
         print()
         response = input("Reset and recreate database? (yes/no): ").strip().lower()
         
@@ -233,7 +233,7 @@ def main():
         # Backup existing database
         backup_path = db_file.parent / f"{db_file.stem}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
         db_file.rename(backup_path)
-        print(f"✓ Backed up existing database to: {backup_path.name}")
+        print(f"[OK] Backed up existing database to: {backup_path.name}")
         print()
     
     # Create parent directory if needed
@@ -243,14 +243,14 @@ def main():
         # Step 1: Create schema
         print("Step 1: Creating database schema...")
         create_schema(args.db_path)
-        print("  ✓ Tables created: combos, performance_history")
-        print("  ✓ Indexes created: 6 indexes for query optimization")
+        print("  [OK] Tables created: combos, performance_history")
+        print("  [OK] Indexes created: 6 indexes for query optimization")
         print()
         
         # Step 2: Populate combos
         print("Step 2: Populating combo library...")
         inserted = populate_combos(args.db_path)
-        print(f"  ✓ Inserted {inserted} combos")
+        print(f"  [OK] Inserted {inserted} combos")
         print()
         
         # Step 3: Verify
@@ -258,10 +258,10 @@ def main():
         success, result = verify_database(args.db_path)
         
         if not success:
-            print(f"  ✗ Verification failed: {result}")
+            print(f"  [FAILED] Verification failed: {result}")
             return 1
         
-        print("  ✓ All combos initialized correctly")
+        print("  [OK] All combos initialized correctly")
         print()
         print("  Combo counts by difficulty:")
         for difficulty in ['Beginner', 'Intermediate', 'Advanced']:
@@ -272,7 +272,7 @@ def main():
         
         # Success summary
         print("=" * 70)
-        print("✓ SETUP COMPLETE")
+        print("[SUCCESS] SETUP COMPLETE")
         print("=" * 70)
         print()
         print(f"Database location: {db_file.absolute()}")
@@ -287,7 +287,7 @@ def main():
         return 0
         
     except Exception as e:
-        print(f"\n✗ Setup failed: {e}")
+        print(f"\n[ERROR] Setup failed: {e}")
         import traceback
         traceback.print_exc()
         return 1
