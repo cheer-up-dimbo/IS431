@@ -1,9 +1,15 @@
 import sys
 import json
+import csv
+import os
+import hashlib
 from functools import partial
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout
+from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, 
+                               QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout,
+                               QLineEdit, QMessageBox, QScrollArea, QTableWidget, 
+                               QTableWidgetItem, QHeaderView, QAbstractItemView)
 from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject
 
 import random
@@ -409,6 +415,8 @@ class PageIndex:
     TECH_CORR_SPEED = 27
     TECH_CORR_TIME = 28
     TECH_CORR_REST = 29
+    LOGIN = 30
+    USER_MANAGEMENT = 31
 
 
 class ButtonStyle:
@@ -494,6 +502,415 @@ class ButtonStyle:
         font_size=18, padding=8, min_width=0, min_height=100,
         bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
     )
+
+
+# ============================================================================
+# User Management Functions
+# ============================================================================
+
+def get_users_csv_path():
+    """Get the path to the users CSV file."""
+    return os.path.join(os.path.dirname(__file__), "users.csv")
+
+
+def hash_password(password: str) -> str:
+    """Hash a password using SHA-256."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+def load_users() -> dict:
+    """Load users from CSV file. Returns dict of {username: password_hash}."""
+    users = {}
+    csv_path = get_users_csv_path()
+    if os.path.exists(csv_path):
+        try:
+            with open(csv_path, 'r', newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    users[row['username']] = row['password_hash']
+        except Exception as e:
+            print(f"Error loading users: {e}")
+    return users
+
+
+def save_users(users: dict) -> bool:
+    """Save users dict to CSV file. Returns True on success."""
+    csv_path = get_users_csv_path()
+    try:
+        with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=['username', 'password_hash'])
+            writer.writeheader()
+            for username, password_hash in users.items():
+                writer.writerow({'username': username, 'password_hash': password_hash})
+        return True
+    except Exception as e:
+        print(f"Error saving users: {e}")
+        return False
+
+
+def get_training_csv_path(username: str):
+    """Get the path to a user's training history CSV file."""
+    return os.path.join(os.path.dirname(__file__), f"training_{username}.csv")
+
+
+class LoginPage(QWidget):
+    """Login/Signup page shown on application startup."""
+    
+    def __init__(self, stacked_widget, app_state):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.app_state = app_state
+        self.current_user = None
+        
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(10)
+        layout.setContentsMargins(100, 30, 100, 30)
+        
+        # Title
+        title = QLabel("Boxing Training App")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 32px; font-weight: bold; color: white;")
+        title.setFixedHeight(50)
+
+        
+        # Username field
+        username_label = QLabel("Username:")
+        username_label.setStyleSheet("font-size: 16px; font-weight: bold; color: white;")
+        username_label.setFixedHeight(25)
+        self.username_input = QLineEdit()
+        self.username_input.setPlaceholderText("Enter username")
+        self.username_input.setFixedHeight(45)
+        self.username_input.setStyleSheet("""
+            QLineEdit {
+                font-size: 16px;
+                padding: 10px;
+                border: 2px solid #ccc;
+                border-radius: 8px;
+                min-width: 350px;
+                background-color: white;
+                color: black;
+            }
+            QLineEdit:focus {
+                border-color: #4CAF50;
+            }
+        """)
+        
+        # Password field
+        password_label = QLabel("Password:")
+        password_label.setStyleSheet("font-size: 16px; font-weight: bold; color: white;")
+        password_label.setFixedHeight(25)
+        self.password_input = QLineEdit()
+        self.password_input.setPlaceholderText("Enter password")
+        self.password_input.setEchoMode(QLineEdit.Password)
+        self.password_input.setFixedHeight(45)
+        self.password_input.setStyleSheet("""
+            QLineEdit {
+                font-size: 16px;
+                padding: 10px;
+                border: 2px solid #ccc;
+                border-radius: 8px;
+                min-width: 350px;
+                background-color: white;
+                color: black;
+            }
+            QLineEdit:focus {
+                border-color: #4CAF50;
+            }
+        """)
+        
+        # Status label for error messages
+        self.status_label = QLabel("")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+        self.status_label.setFixedHeight(20)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        
+        login_btn = QPushButton("Login")
+        signup_btn = QPushButton("Sign Up")
+        manage_users_btn = QPushButton("Manage Users")
+        
+        login_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        signup_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        manage_users_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        
+        login_btn.setFixedSize(180, 45)
+        signup_btn.setFixedSize(180, 45)
+        manage_users_btn.setFixedSize(180, 45)
+        
+        login_btn.clicked.connect(self.on_login)
+        signup_btn.clicked.connect(self.on_signup)
+        manage_users_btn.clicked.connect(self.on_manage_users)
+        
+        # Enable login on Enter key press
+        self.password_input.returnPressed.connect(self.on_login)
+        self.username_input.returnPressed.connect(lambda: self.password_input.setFocus())
+        
+        button_layout.addStretch()
+        button_layout.addWidget(login_btn)
+        button_layout.addWidget(signup_btn)
+        button_layout.addStretch()
+        
+        # Layout assembly - compact spacing
+        layout.addStretch(1)
+        layout.addWidget(title)
+        layout.addSpacing(30)
+        layout.addWidget(username_label)
+        layout.addWidget(self.username_input)
+        layout.addSpacing(15)
+        layout.addWidget(password_label)
+        layout.addWidget(self.password_input)
+        layout.addSpacing(5)
+        layout.addWidget(self.status_label)
+        layout.addSpacing(15)
+        layout.addLayout(button_layout)
+        layout.addSpacing(10)
+        layout.addWidget(manage_users_btn, alignment=Qt.AlignCenter)
+        layout.addStretch(1)
+        
+        self.setLayout(layout)
+    
+    def on_login(self):
+        """Handle login button click."""
+        username = self.username_input.text().strip()
+        password = self.password_input.text()
+        
+        if not username or not password:
+            self.status_label.setText("Please enter both username and password")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            return
+        
+        users = load_users()
+        password_hash = hash_password(password)
+        
+        if username in users and users[username] == password_hash:
+            self.current_user = username
+            self.status_label.setText(f"Welcome back, {username}!")
+            self.status_label.setStyleSheet("font-size: 14px; color: #4CAF50;")
+            # Clear inputs
+            self.username_input.clear()
+            self.password_input.clear()
+            # Navigate to homepage
+            QTimer.singleShot(500, lambda: self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE))
+        else:
+            self.status_label.setText("Invalid username or password")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+    
+    def on_signup(self):
+        """Handle signup button click."""
+        username = self.username_input.text().strip()
+        password = self.password_input.text()
+        
+        if not username or not password:
+            self.status_label.setText("Please enter both username and password")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            return
+        
+        if len(username) < 3:
+            self.status_label.setText("Username must be at least 3 characters")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            return
+        
+        if len(password) < 4:
+            self.status_label.setText("Password must be at least 4 characters")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            return
+        
+        users = load_users()
+        
+        if username in users:
+            self.status_label.setText("Username already exists")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            return
+        
+        # Add new user
+        users[username] = hash_password(password)
+        if save_users(users):
+            self.current_user = username
+            self.status_label.setText(f"Account created! Welcome, {username}!")
+            self.status_label.setStyleSheet("font-size: 14px; color: #4CAF50;")
+            # Clear inputs
+            self.username_input.clear()
+            self.password_input.clear()
+            # Navigate to homepage
+            QTimer.singleShot(500, lambda: self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE))
+        else:
+            self.status_label.setText("Error creating account. Please try again.")
+            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+    
+    def on_manage_users(self):
+        """Navigate to user management page."""
+        self.stacked_widget.setCurrentIndex(PageIndex.USER_MANAGEMENT)
+    
+    def get_current_user(self):
+        """Return the currently logged in user."""
+        return self.current_user
+
+
+class UserManagementPage(QWidget):
+    """Page to view and delete users."""
+    
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        
+        layout = QVBoxLayout()
+        layout.setSpacing(20)
+        layout.setContentsMargins(50, 30, 50, 30)
+        
+        # Title
+        title = QLabel("User Management")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 20px; color: white;")
+        
+        # User table
+        self.user_table = QTableWidget()
+        self.user_table.setColumnCount(3)
+        self.user_table.setHorizontalHeaderLabels(["Username", "Training Sessions", "Actions"])
+        self.user_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.user_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.user_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.user_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.user_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.user_table.setStyleSheet("""
+            QTableWidget {
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background-color: white;
+                color: black;
+            }
+            QTableWidget::item {
+                padding: 10px;
+                color: black;
+            }
+            QHeaderView::section {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+            }
+        """)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        
+        refresh_btn = QPushButton("Refresh")
+        back_btn = QPushButton("Back to Login")
+        
+        refresh_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        
+        refresh_btn.setFixedSize(200, 50)
+        back_btn.setFixedSize(200, 50)
+        
+        refresh_btn.clicked.connect(self.refresh_users)
+        back_btn.clicked.connect(self.on_back)
+        
+        button_layout.addStretch()
+        button_layout.addWidget(refresh_btn)
+        button_layout.addWidget(back_btn)
+        button_layout.addStretch()
+        
+        # Layout assembly
+        layout.addWidget(title)
+        layout.addWidget(self.user_table)
+        layout.addLayout(button_layout)
+        
+        self.setLayout(layout)
+    
+    def showEvent(self, event):
+        """Refresh user list when page is shown."""
+        super().showEvent(event)
+        self.refresh_users()
+    
+    def refresh_users(self):
+        """Load and display all users."""
+        users = load_users()
+        self.user_table.setRowCount(len(users))
+        
+        for row, username in enumerate(users.keys()):
+            # Username
+            username_item = QTableWidgetItem(username)
+            username_item.setTextAlignment(Qt.AlignCenter)
+            self.user_table.setItem(row, 0, username_item)
+            
+            # Training sessions count
+            training_csv = get_training_csv_path(username)
+            session_count = 0
+            if os.path.exists(training_csv):
+                try:
+                    with open(training_csv, 'r', newline='', encoding='utf-8') as f:
+                        reader = csv.reader(f)
+                        next(reader, None)  # Skip header
+                        session_count = sum(1 for _ in reader)
+                except:
+                    pass
+            
+            sessions_item = QTableWidgetItem(str(session_count))
+            sessions_item.setTextAlignment(Qt.AlignCenter)
+            self.user_table.setItem(row, 1, sessions_item)
+            
+            # Delete button
+            delete_btn = QPushButton("Delete")
+            delete_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #f44336;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 8px 16px;
+                    font-size: 14px;
+                }
+                QPushButton:hover {
+                    background-color: #da190b;
+                }
+                QPushButton:pressed {
+                    background-color: #c41504;
+                }
+            """)
+            delete_btn.clicked.connect(partial(self.delete_user, username))
+            self.user_table.setCellWidget(row, 2, delete_btn)
+        
+        self.user_table.resizeRowsToContents()
+    
+    def delete_user(self, username: str):
+        """Delete a user after confirmation."""
+        reply = QMessageBox.question(
+            self,
+            "Confirm Delete",
+            f"Are you sure you want to delete user '{username}'?\nThis will also delete their training history.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            users = load_users()
+            if username in users:
+                del users[username]
+                if save_users(users):
+                    # Delete user's training file if exists
+                    training_csv = get_training_csv_path(username)
+                    if os.path.exists(training_csv):
+                        try:
+                            os.remove(training_csv)
+                        except:
+                            pass
+                    QMessageBox.information(self, "Success", f"User '{username}' deleted successfully.")
+                    self.refresh_users()
+                else:
+                    QMessageBox.warning(self, "Error", "Failed to delete user.")
+    
+    def on_back(self):
+        """Return to login page."""
+        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
+
 
 class Homepage(QWidget):
     def __init__(self, stacked_widget):
@@ -3536,6 +3953,10 @@ class MainWindow(QWidget):
         self.tech_corr_speed_page = TechCorrSpeedSelectionPage(self.stacked_widget)
         self.tech_corr_time_page = TechCorrTimeSelectionPage(self.stacked_widget)
         self.tech_corr_rest_page = TechCorrRestSelectionPage(self.stacked_widget)
+        
+        # Login and User Management pages
+        self.login_page = LoginPage(self.stacked_widget, self.app_state)
+        self.user_management_page = UserManagementPage(self.stacked_widget)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
@@ -3571,11 +3992,20 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.tech_corr_speed_page) # 27
         self.stacked_widget.addWidget(self.tech_corr_time_page) # 28
         self.stacked_widget.addWidget(self.tech_corr_rest_page) # 29
+        self.stacked_widget.addWidget(self.login_page) # 30
+        self.stacked_widget.addWidget(self.user_management_page) # 31
+
+        # Start on the login page
+        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stacked_widget)
         self.setLayout(layout)
+    
+    def get_current_user(self):
+        """Get the currently logged in user."""
+        return self.login_page.get_current_user()
 
     def start_training_session(self):
         """Extract parameters and start the training session."""
