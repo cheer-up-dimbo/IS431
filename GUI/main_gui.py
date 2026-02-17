@@ -9,8 +9,9 @@ from typing import Optional, List
 from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, 
                                QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout,
                                QLineEdit, QMessageBox, QScrollArea, QTableWidget, 
-                               QTableWidgetItem, QHeaderView, QAbstractItemView)
+                               QTableWidgetItem, QHeaderView, QAbstractItemView, QTextEdit)
 from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject
+from PySide6.QtGui import QTextCursor
 
 import random
 import time
@@ -677,7 +678,17 @@ class Homepage(QWidget):
     def on_combo_progress_clicked(self):
         """Navigate to combo progress page for current user."""
         print("Combo Progress button clicked")
-        # The page will be set with current user when shown
+        # Set current user immediately so page always refreshes with latest data
+        try:
+            main_window = self.window()
+            if main_window and hasattr(main_window, 'get_current_user'):
+                current_user = main_window.get_current_user()
+                if current_user:
+                    page = self.stacked_widget.widget(PageIndex.USER_COMBO_PROGRESS)
+                    if page and hasattr(page, 'set_user'):
+                        page.set_user(current_user, return_to_page=PageIndex.HOMEPAGE)
+        except Exception as e:
+            print(f"Error preparing combo progress page: {e}")
         self.stacked_widget.setCurrentIndex(PageIndex.USER_COMBO_PROGRESS)
 
     def on_others_clicked(self):
@@ -691,9 +702,10 @@ class Homepage(QWidget):
 
 class OthersPage(QWidget):
     """Simple page with History and stance toggle."""
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.app_state = app_state
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -706,15 +718,22 @@ class OthersPage(QWidget):
 
         history_btn = QPushButton("History")
         self.stance_btn = QPushButton("Orthodox")
+        self.ai_chat_btn = QPushButton("AI Chat: On")
         back_btn = QPushButton("Back")
 
         history_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         self.stance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        self.ai_chat_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         history_btn.clicked.connect(self.on_history_clicked)
         self.stance_btn.clicked.connect(self.on_stance_clicked)
+        self.ai_chat_btn.clicked.connect(self.on_ai_chat_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
+        
+        # Initialize AI Chat button state
+        if self.app_state:
+            self.ai_chat_btn.setText("AI Chat: On" if self.app_state.ai_chat_enabled else "AI Chat: Off")
 
         layout.addStretch()
         layout.addWidget(title)
@@ -722,6 +741,8 @@ class OthersPage(QWidget):
         layout.addWidget(history_btn)
         layout.addStretch()
         layout.addWidget(self.stance_btn)
+        layout.addStretch()
+        layout.addWidget(self.ai_chat_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
         layout.addStretch()
@@ -741,6 +762,13 @@ class OthersPage(QWidget):
             print(json.dumps({"stance": new_stance}))
         except Exception as e:
             print(f"Error sending stance message: {e}")
+    
+    def on_ai_chat_clicked(self):
+        # Toggle AI Chat setting
+        self.app_state.ai_chat_enabled = not self.app_state.ai_chat_enabled
+        new_label = "AI Chat: On" if self.app_state.ai_chat_enabled else "AI Chat: Off"
+        self.ai_chat_btn.setText(new_label)
+        print(f"AI Chat {'enabled' if self.app_state.ai_chat_enabled else 'disabled'}")
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
@@ -2809,9 +2837,10 @@ class CountdownPage(QWidget):
 
 class TrainingSessionPage(QWidget):
     """Page showing the actual training session with round counter and timer."""
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.app_state = app_state
         self.current_round = 1
         self.total_rounds = 1
         self.work_time = 60  # in seconds
@@ -2829,6 +2858,8 @@ class TrainingSessionPage(QWidget):
         # Combo curriculum state
         self.current_combo = None  # Stores combo dict from database
         self.combo_display_text = ""  # Text to display on screen
+        self.combo_score = 0  # Score for the current combo (0-5, whole numbers)
+        self.current_username = None  # Track current user for database updates
 
         # self-select state
         self.is_self_select_mode = False
@@ -2952,12 +2983,13 @@ class TrainingSessionPage(QWidget):
         except Exception as e:
             print(f"Error sending round start message: {e}")
 
-    def start_session(self, rounds, time_str, rest_str, difficulty=None, sequences=None, battle_style=None):
+    def start_session(self, rounds, time_str, rest_str, difficulty=None, sequences=None, battle_style=None, username=None):
         """Start the training session with the given parameters."""
         self.current_round = 1
         self.total_rounds = rounds
         self.difficulty = difficulty
         self.battle_style = battle_style
+        self.current_username = username
 
         # Convert time strings to seconds
         self.work_time = self.parse_time_to_seconds(time_str)
@@ -2989,7 +3021,11 @@ class TrainingSessionPage(QWidget):
                     self.current_combo = curriculum.get_next_combo(difficulty)
                     if self.current_combo:
                         self.combo_display_text = self.current_combo.get('combo_sequence', '')
+                        # Generate random score for this combo (placeholder for actual action recognition)
+                        import random
+                        self.combo_score = random.randint(0, 5)
                         print(f"Training combo: {self.current_combo.get('combo_name', 'Unknown')} - {self.combo_display_text}")
+                        print(f"[Placeholder] Generated score: {self.combo_score}/5")
             except Exception as e:
                 print(f"Error fetching combo from database: {e}")
                 # Fallback to showing difficulty level
@@ -3103,7 +3139,16 @@ class TrainingSessionPage(QWidget):
                         print(json.dumps({"action": "Log Training Session"}))
                     except Exception as e:
                         print(f"Error sending log training session message: {e}")
-                    self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+
+                    # Persist session history for User Management session counts
+                    self.log_user_training_session()
+                    
+                    # If combo mode, update database and show results
+                    if self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo:
+                        self.update_combo_database()
+                        self.show_combo_results()
+                    else:
+                        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
     def toggle_pause(self):
         """Pause or resume the timer."""
@@ -3168,6 +3213,107 @@ class TrainingSessionPage(QWidget):
             print(json.dumps({"action": "Stop"}))
         except Exception as e:
             print(f"Error sending stop message: {e}")
+        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+
+    def log_user_training_session(self):
+        """Append one completed session to the current user's training history CSV."""
+        if not self.current_username:
+            return
+
+        try:
+            training_csv = get_training_csv_path(self.current_username)
+            file_exists = os.path.exists(training_csv)
+
+            with open(training_csv, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow([
+                        'timestamp', 'mode', 'difficulty', 'rounds', 'score', 'combo_id', 'combo_name'
+                    ])
+
+                combo_id = self.current_combo.get('combo_id', '') if self.current_combo else ''
+                combo_name = self.current_combo.get('combo_name', '') if self.current_combo else ''
+                score = self.combo_score if self.difficulty in ["Beginner", "Intermediate", "Advanced"] else ''
+
+                writer.writerow([
+                    time.strftime('%Y-%m-%d %H:%M:%S'),
+                    self.difficulty or '',
+                    self.difficulty or '',
+                    self.total_rounds,
+                    score,
+                    combo_id,
+                    combo_name,
+                ])
+        except Exception as e:
+            print(f"Error logging user training session: {e}")
+    
+    def update_combo_database(self):
+        """Update the combo database with the score."""
+        if not self.current_combo:
+            print("[DEBUG] No current combo to update")
+            return
+        
+        try:
+            from combo_curriculum import ComboCurriculum
+            db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+            
+            with ComboCurriculum(db_path) as curriculum:
+                combo_id = self.current_combo.get('combo_id')
+                # Update score in database
+                result = curriculum.update_score(combo_id, self.combo_score)
+                print(f"[DEBUG] Updated combo {combo_id} with score {self.combo_score}/5 - Success: {result}")
+
+                # Sync user progress into users.csv so User Management table stays updated
+                if result and self.current_username:
+                    try:
+                        progress = calculate_user_progress_from_combos(self.current_username, db_path)
+                        update_user_progress(self.current_username, progress)
+                    except Exception as progress_error:
+                        print(f"Error syncing user progress: {progress_error}")
+        except Exception as e:
+            print(f"[ERROR] Error updating combo database: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    def show_combo_results(self):
+        """Navigate to results page with combo performance (via AI chat if enabled)."""
+        try:
+            combo_name = self.current_combo.get('combo_name', 'Unknown')
+            combo_sequence = self.current_combo.get('combo_sequence', '')
+            score = self.combo_score
+            difficulty = self.difficulty
+            rounds = self.total_rounds
+            
+            print(f"[DEBUG] show_combo_results called: {combo_name}, score={score}")
+            print(f"[DEBUG] app_state exists: {self.app_state is not None}")
+            if self.app_state:
+                print(f"[DEBUG] AI chat enabled: {self.app_state.ai_chat_enabled}")
+            
+            # Check if AI chat is enabled
+            if self.app_state and self.app_state.ai_chat_enabled:
+                print(f"[DEBUG] Routing to AI chat page (index {PageIndex.COMBO_LLM_CHAT})")
+                # Go to LLM chat page first
+                chat_page = self.stacked_widget.widget(PageIndex.COMBO_LLM_CHAT)
+                print(f"[DEBUG] Chat page found: {chat_page is not None}")
+                if chat_page:
+                    chat_page.set_combo_data(combo_name, combo_sequence, score, difficulty, rounds)
+                    self.stacked_widget.setCurrentIndex(PageIndex.COMBO_LLM_CHAT)
+                    print(f"[DEBUG] Switched to AI chat page")
+                    return
+            
+            # AI chat disabled or not found - go directly to results page
+            print(f"[DEBUG] Routing to results page (index {PageIndex.COMBO_RESULTS})")
+            results_page = self.stacked_widget.widget(PageIndex.COMBO_RESULTS)
+            if results_page:
+                results_page.set_results(combo_name, combo_sequence, score, difficulty, rounds)
+                self.stacked_widget.setCurrentIndex(PageIndex.COMBO_RESULTS)
+                return
+        except Exception as e:
+            print(f"[ERROR] Error showing results: {e}")
+            import traceback
+            traceback.print_exc()
+        # Fallback to basic parameters if pages not found
+        print(f"[DEBUG] Fallback to basic parameters")
         self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SelfSelectSequencePage(QWidget):
@@ -3699,6 +3845,306 @@ class BattlePage(QWidget):
         self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
 
 
+class ComboLLMChatPage(QWidget):
+    """Simplified LLM chat page for post-training combo feedback."""
+    
+    def __init__(self, stacked_widget, app_state):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.app_state = app_state
+        self._worker = None
+        self._current_reply_cursor = None
+        self.combo_data = {}
+        
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(30, 30, 30, 30)
+        
+        # Title
+        title = QLabel("AI Coach Feedback")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 28px; font-weight: bold; color: #4CAF50;")
+        
+        # Score and combo info (compact)
+        info_layout = QHBoxLayout()
+        self.combo_info_label = QLabel("Combo: - | Score: -/5")
+        self.combo_info_label.setAlignment(Qt.AlignCenter)
+        self.combo_info_label.setStyleSheet("font-size: 16px; color: white; font-weight: bold;")
+        info_layout.addWidget(self.combo_info_label)
+        
+        # Chat display area
+        self.chat_view = QTextEdit()
+        self.chat_view.setReadOnly(True)
+        self.chat_view.setStyleSheet("""
+            QTextEdit {
+                background-color: #1a1a1a;
+                color: #e6e6e6;
+                font-size: 14px;
+                border: 1px solid #333;
+                border-radius: 8px;
+                padding: 10px;
+            }
+        """)
+        self.chat_view.setLineWrapMode(QTextEdit.WidgetWidth)
+        
+        # Input row
+        input_row = QHBoxLayout()
+        self.user_input = QLineEdit()
+        self.user_input.setPlaceholderText("Ask the AI coach about the combo...")
+        self.user_input.setStyleSheet("""
+            QLineEdit {
+                background-color: #2a2a2a;
+                color: white;
+                font-size: 14px;
+                padding: 10px;
+                border: 1px solid #444;
+                border-radius: 6px;
+            }
+        """)
+        self.user_input.returnPressed.connect(self._send_user_message)
+        
+        self.send_btn = QPushButton("Send")
+        self.send_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        self.send_btn.clicked.connect(self._send_user_message)
+        
+        input_row.addWidget(self.user_input, stretch=4)
+        input_row.addWidget(self.send_btn, stretch=1)
+        
+        # Buttons row
+        buttons_layout = QHBoxLayout()
+        self.clear_btn = QPushButton("Clear Chat")
+        self.clear_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.clear_btn.clicked.connect(self._clear_chat)
+        
+        continue_btn = QPushButton("Continue")
+        continue_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        continue_btn.clicked.connect(self._continue_to_results)
+        
+        buttons_layout.addWidget(self.clear_btn)
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(continue_btn)
+        
+        # Assembly
+        main_layout.addWidget(title)
+        main_layout.addLayout(info_layout)
+        main_layout.addWidget(self.chat_view, stretch=1)
+        main_layout.addLayout(input_row)
+        main_layout.addSpacing(10)
+        main_layout.addLayout(buttons_layout)
+        
+        self.setLayout(main_layout)
+    
+    def set_combo_data(self, combo_name, combo_sequence, score, difficulty, rounds):
+        """Set the combo data and trigger initial AI feedback."""
+        print(f"[DEBUG] ComboLLMChatPage.set_combo_data called: {combo_name}, score={score}")
+        self.combo_data = {
+            'combo_name': combo_name,
+            'combo_sequence': combo_sequence,
+            'score': score,
+            'difficulty': difficulty,
+            'rounds': rounds
+        }
+        
+        # Update info label
+        self.combo_info_label.setText(f"Combo: {combo_name} | Score: {score}/5")
+        print(f"[DEBUG] Updated info label, clearing chat...")
+        
+        # Clear chat and send initial prompt
+        self.chat_view.clear()
+        self._send_initial_prompt()
+        print(f"[DEBUG] Initial prompt sent")
+    
+    def _send_initial_prompt(self):
+        """Send initial AI prompt about the combo performance."""
+        combo_name = self.combo_data.get('combo_name', 'Unknown')
+        combo_sequence = self.combo_data.get('combo_sequence', '')
+        score = self.combo_data.get('score', 0)
+        difficulty = self.combo_data.get('difficulty', 'Beginner')
+        
+        # Create initial prompt
+        prompt = (f"User just completed {combo_name} ({combo_sequence}) combo "
+                  f"at {difficulty} difficulty and scored {score}/5. "
+                  f"Give them brief encouraging feedback and one practical tip in 2-3 sentences.")
+        
+        self._append_chat("System", f"Analyzing your {combo_name} performance...")
+        self._generate_ai_response(prompt)
+    
+    def _send_user_message(self):
+        """Handle user sending a custom question."""
+        text = self.user_input.text().strip()
+        if not text:
+            return
+        
+        self.user_input.clear()
+        self._append_chat("You", text)
+        
+        # Build context-aware prompt
+        combo_name = self.combo_data.get('combo_name', '')
+        combo_sequence = self.combo_data.get('combo_sequence', '')
+        score = self.combo_data.get('score', 0)
+        
+        prompt = (f"Context: User trained {combo_name} ({combo_sequence}) and scored {score}/5. "
+                  f"User question: {text}. "
+                  f"Provide a concise, helpful answer as a boxing coach in 2-3 sentences.")
+        
+        self._generate_ai_response(prompt)
+    
+    def _generate_ai_response(self, prompt):
+        """Generate AI response (placeholder - prints to chat)."""
+        # Placeholder implementation: Generate a simple response without using actual LLM
+        # In a real implementation, this would call the LLM model
+        
+        combo_name = self.combo_data.get('combo_name', 'this combo')
+        score = self.combo_data.get('score', 0)
+        
+        # Generate contextual response based on score
+        if score >= 4:
+            responses = [
+                f"Excellent work on {combo_name}! Your technique is solid. Focus on increasing speed while maintaining this accuracy.",
+                f"Great score! You've mastered the basics of {combo_name}. Try mixing it with other combos to improve flow.",
+                f"Outstanding performance! Keep practicing {combo_name} at higher speeds to build muscle memory.",
+            ]
+        elif score >= 3:
+            responses = [
+                f"Good effort on {combo_name}! You're on the right track. Focus on clean transitions between punches.",
+                f"Decent score! For {combo_name}, remember to keep your guard up between punches. Practice slowly first.",
+                f"You're improving! With {combo_name}, focus on hip rotation and weight transfer for more power.",
+            ]
+        else:
+            responses = [
+                f"Keep practicing {combo_name}! Break it down into individual punches first, then combine them slowly.",
+                f"Don't worry, {combo_name} takes time. Focus on form over speed. Watch your footwork.",
+                f"Good try! For {combo_name}, practice each punch separately, then gradually increase combo speed.",
+            ]
+        
+        import random
+        response = random.choice(responses)
+        
+        # Simulate typing delay
+        QTimer.singleShot(500, lambda: self._append_chat("AI Coach", response))
+    
+    def _append_chat(self, who, text):
+        """Append a message to the chat view."""
+        cursor = self.chat_view.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        
+        if who == "System":
+            cursor.insertHtml(f"<p style='color:#888;'><i>{text}</i></p>")
+        elif who == "You":
+            cursor.insertHtml(f"<p><b style='color:#2196F3;'>You:</b> {text}</p>")
+        else:  # AI Coach
+            cursor.insertHtml(f"<p><b style='color:#4CAF50;'>AI Coach:</b> {text}</p>")
+        
+        self.chat_view.ensureCursorVisible()
+    
+    def _clear_chat(self):
+        """Clear the chat and restart with initial prompt."""
+        self.chat_view.clear()
+        self._send_initial_prompt()
+    
+    def _continue_to_results(self):
+        """Move to the combo results page."""
+        # Pass data to results page
+        results_page = self.stacked_widget.widget(PageIndex.COMBO_RESULTS)
+        if results_page:
+            results_page.set_results(
+                self.combo_data['combo_name'],
+                self.combo_data['combo_sequence'],
+                self.combo_data['score'],
+                self.combo_data['difficulty'],
+                self.combo_data['rounds']
+            )
+        self.stacked_widget.setCurrentIndex(PageIndex.COMBO_RESULTS)
+
+
+class ComboResultsPage(QWidget):
+    """Page showing combo training results with score and progress."""
+    
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(30, 20, 30, 20)
+        
+        # Title
+        title = QLabel("Training Complete!")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 36px; font-weight: bold; color: #4CAF50;")
+        
+        # Combo info
+        self.combo_name_label = QLabel("Combo: -")
+        self.combo_name_label.setAlignment(Qt.AlignCenter)
+        self.combo_name_label.setStyleSheet("font-size: 24px; font-weight: bold; color: white;")
+        
+        self.combo_sequence_label = QLabel("Sequence: -")
+        self.combo_sequence_label.setAlignment(Qt.AlignCenter)
+        self.combo_sequence_label.setStyleSheet("font-size: 20px; color: white;")
+        
+        # Score display
+        self.score_label = QLabel("Score: 0.0/5.0")
+        self.score_label.setAlignment(Qt.AlignCenter)
+        self.score_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #2196F3;")
+        
+        # Status message
+        self.status_label = QLabel("")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setStyleSheet("font-size: 18px; color: #FFC107;")
+        
+        # Details
+        self.details_label = QLabel("")
+        self.details_label.setAlignment(Qt.AlignCenter)
+        self.details_label.setStyleSheet("font-size: 16px; color: white;")
+        
+        # Continue button
+        continue_btn = QPushButton("Continue Training")
+        continue_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        continue_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
+        
+        # Assembly
+        main_layout.addStretch()
+        main_layout.addWidget(title)
+        main_layout.addSpacing(10)
+        main_layout.addWidget(self.combo_name_label)
+        main_layout.addWidget(self.combo_sequence_label)
+        main_layout.addSpacing(15)
+        main_layout.addWidget(self.score_label)
+        main_layout.addSpacing(5)
+        main_layout.addWidget(self.status_label)
+        main_layout.addSpacing(10)
+        main_layout.addWidget(self.details_label)
+        main_layout.addSpacing(15)
+        main_layout.addWidget(continue_btn)
+        main_layout.addStretch()
+        
+        self.setLayout(main_layout)
+    
+    def set_results(self, combo_name, combo_sequence, score, difficulty, rounds):
+        """Display the training results."""
+        self.combo_name_label.setText(f"Combo: {combo_name}")
+        self.combo_sequence_label.setText(f"Sequence: {combo_sequence}")
+        self.score_label.setText(f"Score: {score}/5")
+        
+        # Determine performance message
+        if difficulty == "Beginner":
+            threshold = 3
+            threshold_text = "3"
+        else:  # Intermediate or Advanced
+            threshold = 4
+            threshold_text = "4"
+        
+        if score >= threshold:
+            self.status_label.setText("✓ Great Job! Combo performance recorded!")
+            self.status_label.setStyleSheet("font-size: 18px; color: #4CAF50; font-weight: bold;")
+        else:
+            self.status_label.setText(f"Keep practicing! Target: {threshold_text}/5")
+            self.status_label.setStyleSheet("font-size: 18px; color: #FFC107; font-weight: bold;")
+        
+        self.details_label.setText(f"{difficulty} Level • {rounds} Rounds Completed")
+
+
 class UserComboProgressPage(QWidget):
     """Page showing a user's combo progress and mastery status."""
     
@@ -3728,7 +4174,7 @@ class UserComboProgressPage(QWidget):
         self.difficulty_buttons = {}
         for difficulty in ["Beginner", "Intermediate", "Advanced"]:
             btn = QPushButton(difficulty)
-            btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+            btn.setStyleSheet(ButtonStyle.TRACK_MEDIUM)
             btn.setFixedSize(150, 40)
             btn.setCheckable(True)
             btn.clicked.connect(lambda checked, d=difficulty: self.show_difficulty(d))
@@ -3741,11 +4187,13 @@ class UserComboProgressPage(QWidget):
         self.combo_table = QTableWidget()
         self.combo_table.setColumnCount(5)
         self.combo_table.setHorizontalHeaderLabels(["Combo", "Sequence", "Mastery", "Attempts", "Status"])
-        self.combo_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.combo_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        self.combo_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        self.combo_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.combo_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.combo_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.combo_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
+        self.combo_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
         self.combo_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.combo_table.setColumnWidth(2, 120)
+        self.combo_table.setColumnWidth(3, 90)
         self.combo_table.setStyleSheet("""
             QTableWidget {
                 font-size: 14px;
@@ -3869,9 +4317,10 @@ class UserComboProgressPage(QWidget):
                     seq_item.setTextAlignment(Qt.AlignCenter)
                     self.combo_table.setItem(row, 1, seq_item)
                     
-                    # Mastery score
+                    # Mastery score (convert from 0-1 scale to 0-5 scale)
                     mastery = combo['mastery_score'] if combo['mastery_score'] else 0.0
-                    mastery_item = QTableWidgetItem(f"{mastery:.1f}/5.0")
+                    mastery_display = mastery * 5.0  # Convert 0-1 to 0-5
+                    mastery_item = QTableWidgetItem(f"{mastery_display:.1f}/5.0")
                     mastery_item.setTextAlignment(Qt.AlignCenter)
                     self.combo_table.setItem(row, 2, mastery_item)
                     
@@ -4084,7 +4533,7 @@ class MainWindow(QWidget):
         self.time_selection_page = TimeSelectionPage(self.stacked_widget, self.app_state)
         self.rest_selection_page = RestSelectionPage(self.stacked_widget, self.app_state)
         self.countdown_page = CountdownPage(self.stacked_widget)
-        self.training_session_page = TrainingSessionPage(self.stacked_widget)
+        self.training_session_page = TrainingSessionPage(self.stacked_widget, self.app_state)
         self.self_select_sequence_page = SelfSelectSequencePage(self.stacked_widget, self.app_state)
         self.spar_page = SparPage(self.stacked_widget)
         self.battle_page = BattlePage(self.stacked_widget, self.app_state)
@@ -4096,7 +4545,7 @@ class MainWindow(QWidget):
         self.reaction_instructions_page = ReactionInstructionsPage(self.stacked_widget)
         self.reaction_test_page = ReactionTestPage(self.stacked_widget)
         self.reaction_result_page = ReactionResultPage(self.stacked_widget)
-        self.others_page = OthersPage(self.stacked_widget)
+        self.others_page = OthersPage(self.stacked_widget, self.app_state)
         self.tech_corr_parameters_page = TechCorrParametersPage(self.stacked_widget, self.app_state)
         self.tech_corr_session_page = TechCorrSessionPage(self.stacked_widget)
         self.tech_corr_difficulty_page = TechCorrDifficultySelectionPage(self.stacked_widget)
@@ -4110,6 +4559,8 @@ class MainWindow(QWidget):
         self.user_management_page = UserManagementPage(self.stacked_widget)
         self.user_combo_progress_page = UserComboProgressPage(self.stacked_widget)
         self.user_progress_overview_page = UserProgressOverviewPage(self.stacked_widget)
+        self.combo_results_page = ComboResultsPage(self.stacked_widget)
+        self.combo_llm_chat_page = ComboLLMChatPage(self.stacked_widget, self.app_state)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
@@ -4149,6 +4600,8 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.user_management_page) # 31
         self.stacked_widget.addWidget(self.user_combo_progress_page) # 32
         self.stacked_widget.addWidget(self.user_progress_overview_page) # 33
+        self.stacked_widget.addWidget(self.combo_results_page) # 34
+        self.stacked_widget.addWidget(self.combo_llm_chat_page) # 35
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -4255,7 +4708,8 @@ class MainWindow(QWidget):
             #     print(json.dumps(payload))
 
             training_page = self.stacked_widget.widget(PageIndex.TRAINING_SESSION)
-            training_page.start_session(rounds, time_str, rest_str, difficulty, sequences, battle_style)
+            current_user = self.get_current_user()
+            training_page.start_session(rounds, time_str, rest_str, difficulty, sequences, battle_style, current_user)
             self.stacked_widget.setCurrentIndex(PageIndex.TRAINING_SESSION)
         except Exception as e:
             print(f"Error starting training session: {e}")

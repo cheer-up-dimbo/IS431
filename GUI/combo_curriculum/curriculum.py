@@ -171,20 +171,26 @@ class ComboCurriculum:
             >>> True
         """
         if not self.connection:
+            print(f"[ERROR] Database connection not established for combo_id={combo_id}")
             raise RuntimeError("Database connection not established")
+        
+        print(f"[DEBUG] update_score called: combo_id={combo_id}, score={score}, type={type(score)}")
         
         try:
             cursor = self.connection.cursor()
             current_time = datetime.now().isoformat()
             
             # Step 1: Insert score into performance_history
+            print(f"[DEBUG] Step 1: Inserting into performance_history")
             insert_query = """
                 INSERT INTO performance_history (combo_id, timestamp, performance_score)
                 VALUES (?, ?, ?)
             """
             cursor.execute(insert_query, (combo_id, current_time, score))
+            print(f"[DEBUG] Step 1: Insert successful")
             
             # Step 2: Get last 5 scores for this combo
+            print(f"[DEBUG] Step 2: Getting last 5 scores")
             history_query = """
                 SELECT performance_score
                 FROM performance_history
@@ -194,8 +200,10 @@ class ComboCurriculum:
             """
             cursor.execute(history_query, (combo_id,))
             recent_scores = cursor.fetchall()
+            print(f"[DEBUG] Step 2: Found {len(recent_scores)} recent scores")
             
             # Step 3: Calculate average of last 5 scores
+            print(f"[DEBUG] Step 3: Calculating average")
             if recent_scores:
                 scores = [row['performance_score'] for row in recent_scores]
                 avg_score = sum(scores) / len(scores)
@@ -205,8 +213,10 @@ class ComboCurriculum:
             else:
                 mastery_score = score / 5.0
                 num_sessions = 1
+            print(f"[DEBUG] Step 3: mastery_score={mastery_score}, num_sessions={num_sessions}")
             
             # Step 4: Update combos table
+            print(f"[DEBUG] Step 4: Updating combos table")
             update_query = """
                 UPDATE combos
                 SET mastery_score = ?,
@@ -215,16 +225,27 @@ class ComboCurriculum:
                 WHERE combo_id = ?
             """
             cursor.execute(update_query, (mastery_score, current_time, combo_id))
+            print(f"[DEBUG] Step 4: Update successful, rows affected: {cursor.rowcount}")
             
             # Commit changes
+            print(f"[DEBUG] Committing changes")
             self.connection.commit()
+            print(f"[DEBUG] Commit successful")
             
             print(f"Updated {combo_id}: score={score:.2f}, mastery={mastery_score:.3f} (avg of {num_sessions} sessions)")
             return True
             
         except sqlite3.Error as e:
-            print(f"Error updating score: {e}")
-            self.connection.rollback()
+            print(f"[ERROR] SQLite error updating score for {combo_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            if self.connection:
+                self.connection.rollback()
+            return False
+        except Exception as e:
+            print(f"[ERROR] Unexpected error updating score for {combo_id}: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def get_next_combo(self, difficulty: str) -> Optional[Dict[str, Any]]:

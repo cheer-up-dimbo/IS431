@@ -39,6 +39,8 @@ class PageIndex:
     USER_MANAGEMENT = 31
     USER_COMBO_PROGRESS = 32
     USER_PROGRESS_OVERVIEW = 33
+    COMBO_RESULTS = 34
+    COMBO_LLM_CHAT = 35
 
 
 class ButtonStyle:
@@ -128,4 +130,8 @@ class ButtonStyle:
     HOME_LARGE = _create_style.__func__(
         font_size=28, padding=30, min_width=500, min_height=30,
         bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
+    )
+    TRACK_MEDIUM = _create_style.__func__(
+        font_size=15, padding=10, min_width=250, min_height=15,
+        bg_color="#f44336", hover_color="#da190b", pressed_color="#c41504",
     )

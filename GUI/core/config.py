@@ -232,6 +232,8 @@ class AppState:
         self.rest_label: Optional[str] = "1min"
         # Technique Correction specific persistent config
         self.tech_corr_config: Optional[TechCorrConfig] = None
+        # AI Chat setting
+        self.ai_chat_enabled: bool = True
 
     def set_tech_corr_config(self, cfg: "TechCorrConfig") -> None:
         """Persist Technique Correction configuration."""
