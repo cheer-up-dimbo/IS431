@@ -545,6 +545,62 @@ class ComboCurriculum:
         
         return difficulty_progression.get(current_difficulty)
     
+    def get_all_combos_with_progress(self) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Get all combos organized by difficulty with their progress data.
+        
+        Returns:
+            Dict[str, List[Dict]]: Dictionary with difficulty levels as keys,
+            each containing list of combos with: combo_id, combo_name, combo_sequence,
+            mastery_score, total_attempts, is_mastered
+        
+        Example:
+            >>> combos = curriculum.get_all_combos_with_progress()
+            >>> for difficulty, combo_list in combos.items():
+            >>>     for combo in combo_list:
+            >>>         print(f"{combo['combo_name']}: {combo['mastery_score']:.1f}")
+        """
+        if not self.connection:
+            raise RuntimeError("Database connection not established")
+        
+        result = {}
+        
+        for difficulty in ["Beginner", "Intermediate", "Advanced"]:
+            threshold = 3.0 if difficulty == "Beginner" else 4.0
+            
+            try:
+                cursor = self.connection.cursor()
+                query = """
+                    SELECT combo_id, combo_name, combo_sequence, mastery_score, total_attempts
+                    FROM combos
+                    WHERE difficulty_level = ?
+                    ORDER BY combo_id
+                """
+                cursor.execute(query, (difficulty,))
+                rows = cursor.fetchall()
+                
+                combos_list = []
+                for row in rows:
+                    total_attempts = row['total_attempts'] or 0
+                    mastery_score = row['mastery_score'] or 0.0
+                    is_mastered = total_attempts >= 5 and mastery_score >= threshold
+                    
+                    combos_list.append({
+                        'combo_id': row['combo_id'],
+                        'combo_name': row['combo_name'],
+                        'combo_sequence': row['combo_sequence'],
+                        'mastery_score': mastery_score,
+                        'total_attempts': total_attempts,
+                        'is_mastered': is_mastered
+                    })
+                
+                result[difficulty] = combos_list
+            except sqlite3.Error as e:
+                print(f"Error getting combos for {difficulty}: {e}")
+                result[difficulty] = []
+        
+        return result
+    
     def close(self):
         """Close the database connection."""
         if self.connection:

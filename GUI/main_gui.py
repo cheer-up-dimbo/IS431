@@ -432,13 +432,14 @@ class UserManagementPage(QWidget):
         
         # User table
         self.user_table = QTableWidget()
-        self.user_table.setColumnCount(5)
-        self.user_table.setHorizontalHeaderLabels(["Username", "Level", "Progress", "Training Sessions", "Actions"])
+        self.user_table.setColumnCount(6)
+        self.user_table.setHorizontalHeaderLabels(["Username", "Level", "Progress", "Training Sessions", "Combo Progress", "Delete"])
         self.user_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.user_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.user_table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
         self.user_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.user_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.user_table.setStyleSheet("""
@@ -534,6 +535,24 @@ class UserManagementPage(QWidget):
             sessions_item.setTextAlignment(Qt.AlignCenter)
             self.user_table.setItem(row, 3, sessions_item)
             
+            # View Combo Progress button
+            view_combo_btn = QPushButton("View Combos")
+            view_combo_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #2196F3;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 8px 16px;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background-color: #1976D2;
+                }
+            """)
+            view_combo_btn.clicked.connect(partial(self.view_user_combos, username))
+            self.user_table.setCellWidget(row, 4, view_combo_btn)
+            
             # Delete button
             delete_btn = QPushButton("Delete")
             delete_btn.setStyleSheet("""
@@ -543,7 +562,7 @@ class UserManagementPage(QWidget):
                     border: none;
                     border-radius: 4px;
                     padding: 8px 16px;
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 QPushButton:hover {
                     background-color: #da190b;
@@ -553,7 +572,7 @@ class UserManagementPage(QWidget):
                 }
             """)
             delete_btn.clicked.connect(partial(self.delete_user, username))
-            self.user_table.setCellWidget(row, 4, delete_btn)
+            self.user_table.setCellWidget(row, 5, delete_btn)
         
         self.user_table.resizeRowsToContents()
     
@@ -584,6 +603,16 @@ class UserManagementPage(QWidget):
                 else:
                     QMessageBox.warning(self, "Error", "Failed to delete user.")
     
+    def view_user_combos(self, username: str):
+        """Navigate to user combo progress page."""
+        # Find and update the UserComboProgressPage with the selected user
+        for i in range(self.stacked_widget.count()):
+            page = self.stacked_widget.widget(i)
+            if hasattr(page, '__class__') and page.__class__.__name__ == 'UserComboProgressPage':
+                page.set_user(username, return_to_page=PageIndex.USER_MANAGEMENT)
+                self.stacked_widget.setCurrentIndex(i)
+                break
+    
     def on_back(self):
         """Return to login page."""
         self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
@@ -605,16 +634,19 @@ class Homepage(QWidget):
 
         training_btn = QPushButton("Training")
         performance_btn = QPushButton("Performance")
+        combo_progress_btn = QPushButton("Combo Progress")
         others_btn = QPushButton("Others")
         back_btn = QPushButton("Back to Login")
 
-        training_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        performance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        others_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        training_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
+        performance_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
+        combo_progress_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
+        others_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         training_btn.clicked.connect(self.on_training_clicked)
         performance_btn.clicked.connect(self.on_performance_clicked)
+        combo_progress_btn.clicked.connect(self.on_combo_progress_clicked)
         others_btn.clicked.connect(self.on_others_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
@@ -624,6 +656,8 @@ class Homepage(QWidget):
         layout.addWidget(training_btn)
         layout.addStretch()
         layout.addWidget(performance_btn)
+        layout.addStretch()
+        layout.addWidget(combo_progress_btn)
         layout.addStretch()
         layout.addWidget(others_btn)
         layout.addStretch()
@@ -639,6 +673,12 @@ class Homepage(QWidget):
     def on_performance_clicked(self):
         print("Performance button clicked")
         self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+
+    def on_combo_progress_clicked(self):
+        """Navigate to combo progress page for current user."""
+        print("Combo Progress button clicked")
+        # The page will be set with current user when shown
+        self.stacked_widget.setCurrentIndex(PageIndex.USER_COMBO_PROGRESS)
 
     def on_others_clicked(self):
         print("Others button clicked")
@@ -2900,9 +2940,9 @@ class TrainingSessionPage(QWidget):
                 }
                 # Add combo info if available
                 if self.current_combo:
-                    payload["combo_id"] = self.current_combo.get("id", "")
-                    payload["combo_name"] = self.current_combo.get("name", "")
-                    payload["combo_sequence"] = self.current_combo.get("sequence", "")
+                    payload["combo_id"] = self.current_combo.get("combo_id", "")
+                    payload["combo_name"] = self.current_combo.get("combo_name", "")
+                    payload["combo_sequence"] = self.current_combo.get("combo_sequence", "")
             else:
                 # For other modes (Stamina, Reaction Time, Power, etc.)
                 payload = {
@@ -2948,8 +2988,8 @@ class TrainingSessionPage(QWidget):
                 with ComboCurriculum(db_path) as curriculum:
                     self.current_combo = curriculum.get_next_combo(difficulty)
                     if self.current_combo:
-                        self.combo_display_text = self.current_combo.get('sequence', '')
-                        print(f"Training combo: {self.current_combo.get('name', 'Unknown')} - {self.combo_display_text}")
+                        self.combo_display_text = self.current_combo.get('combo_sequence', '')
+                        print(f"Training combo: {self.current_combo.get('combo_name', 'Unknown')} - {self.combo_display_text}")
             except Exception as e:
                 print(f"Error fetching combo from database: {e}")
                 # Fallback to showing difficulty level
@@ -3658,6 +3698,367 @@ class BattlePage(QWidget):
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
 
+
+class UserComboProgressPage(QWidget):
+    """Page showing a user's combo progress and mastery status."""
+    
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.current_user = None
+        self.return_to_page = PageIndex.HOMEPAGE  # Track where to return to
+        self.db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+        
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(50, 30, 50, 30)
+        
+        # Title
+        title_layout = QHBoxLayout()
+        self.title_label = QLabel("Combo Progress")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setStyleSheet("font-size: 28px; font-weight: bold; color: white;")
+        title_layout.addWidget(self.title_label)
+        
+        # Difficulty tabs
+        tab_layout = QHBoxLayout()
+        tab_layout.setSpacing(10)
+        tab_layout.addStretch()
+        
+        self.difficulty_buttons = {}
+        for difficulty in ["Beginner", "Intermediate", "Advanced"]:
+            btn = QPushButton(difficulty)
+            btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+            btn.setFixedSize(150, 40)
+            btn.setCheckable(True)
+            btn.clicked.connect(lambda checked, d=difficulty: self.show_difficulty(d))
+            self.difficulty_buttons[difficulty] = btn
+            tab_layout.addWidget(btn)
+        
+        tab_layout.addStretch()
+        
+        # Combo progress table
+        self.combo_table = QTableWidget()
+        self.combo_table.setColumnCount(5)
+        self.combo_table.setHorizontalHeaderLabels(["Combo", "Sequence", "Mastery", "Attempts", "Status"])
+        self.combo_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.combo_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.combo_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.combo_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.combo_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.combo_table.setStyleSheet("""
+            QTableWidget {
+                font-size: 14px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background-color: white;
+                color: black;
+            }
+            QHeaderView::section {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px;
+                font-weight: bold;
+                border: none;
+            }
+        """)
+        
+        # Progress summary
+        summary_layout = QHBoxLayout()
+        summary_layout.setSpacing(30)
+        
+        self.total_label = QLabel("Total: 0")
+        self.mastered_label = QLabel("Mastered: 0")
+        self.in_progress_label = QLabel("In Progress: 0")
+        self.struggling_label = QLabel("Struggling: 0")
+        
+        for label in [self.total_label, self.mastered_label, self.in_progress_label, self.struggling_label]:
+            label.setStyleSheet("font-size: 14px; color: white; font-weight: bold;")
+        
+        summary_layout.addWidget(self.total_label)
+        summary_layout.addWidget(self.mastered_label)
+        summary_layout.addWidget(self.in_progress_label)
+        summary_layout.addWidget(self.struggling_label)
+        summary_layout.addStretch()
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        
+        refresh_btn = QPushButton("Refresh")
+        back_btn = QPushButton("Back to Home")
+        
+        refresh_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        
+        refresh_btn.setFixedSize(150, 45)
+        back_btn.setFixedSize(150, 45)
+        
+        refresh_btn.clicked.connect(self.refresh_progress)
+        back_btn.clicked.connect(self.on_back_clicked)
+        
+        button_layout.addStretch()
+        button_layout.addWidget(refresh_btn)
+        button_layout.addWidget(back_btn)
+        button_layout.addStretch()
+        
+        # Assembly
+        main_layout.addLayout(title_layout)
+        main_layout.addLayout(tab_layout)
+        main_layout.addWidget(self.combo_table)
+        main_layout.addLayout(summary_layout)
+        main_layout.addLayout(button_layout)
+        
+        self.setLayout(main_layout)
+        self.current_difficulty = "Beginner"
+    
+    def set_user(self, username, return_to_page=None):
+        """Set the user to display progress for."""
+        self.current_user = username
+        if return_to_page is not None:
+            self.return_to_page = return_to_page
+        self.title_label.setText(f"Combo Progress - {username}")
+        self.refresh_progress()
+    
+    def show_difficulty(self, difficulty):
+        """Show combos for selected difficulty."""
+        self.current_difficulty = difficulty
+        # Update button states
+        for d, btn in self.difficulty_buttons.items():
+            btn.setChecked(d == difficulty)
+        self.load_difficulty_data(difficulty)
+    
+    def refresh_progress(self):
+        """Refresh progress data."""
+        if self.current_user:
+            self.show_difficulty(self.current_difficulty)
+    
+    def on_back_clicked(self):
+        """Return to the page we came from."""
+        self.stacked_widget.setCurrentIndex(self.return_to_page)
+    
+    def load_difficulty_data(self, difficulty):
+        """Load and display combo data for a difficulty."""
+        try:
+            from combo_curriculum import ComboCurriculum
+            
+            with ComboCurriculum(self.db_path) as curriculum:
+                # Get all combos with progress
+                all_combos = curriculum.get_all_combos_with_progress()
+                combos = all_combos.get(difficulty, [])
+                
+                # Get progress summary
+                progress = curriculum.get_level_progress(difficulty)
+                
+                # Update summary labels
+                self.total_label.setText(f"Total: {progress['total_combos']}")
+                self.mastered_label.setText(f"Mastered: {progress['mastered_combos']}")
+                self.in_progress_label.setText(f"In Progress: {progress['in_progress_combos']}")
+                self.struggling_label.setText(f"Struggling: {progress['struggling_combos']}")
+                
+                # Populate table
+                self.combo_table.setRowCount(len(combos))
+                for row, combo in enumerate(combos):
+                    # Combo name
+                    name_item = QTableWidgetItem(combo['combo_name'])
+                    name_item.setTextAlignment(Qt.AlignCenter)
+                    self.combo_table.setItem(row, 0, name_item)
+                    
+                    # Sequence
+                    seq_item = QTableWidgetItem(str(combo['combo_sequence']))
+                    seq_item.setTextAlignment(Qt.AlignCenter)
+                    self.combo_table.setItem(row, 1, seq_item)
+                    
+                    # Mastery score
+                    mastery = combo['mastery_score'] if combo['mastery_score'] else 0.0
+                    mastery_item = QTableWidgetItem(f"{mastery:.1f}/5.0")
+                    mastery_item.setTextAlignment(Qt.AlignCenter)
+                    self.combo_table.setItem(row, 2, mastery_item)
+                    
+                    # Attempts
+                    attempts_item = QTableWidgetItem(str(combo['total_attempts'] or 0))
+                    attempts_item.setTextAlignment(Qt.AlignCenter)
+                    self.combo_table.setItem(row, 3, attempts_item)
+                    
+                    # Status
+                    if combo['is_mastered']:
+                        status = "✓ Mastered"
+                        status_item = QTableWidgetItem(status)
+                        status_item.setBackground(Qt.green)
+                    elif combo['total_attempts'] == 0:
+                        status = "Not Started"
+                        status_item = QTableWidgetItem(status)
+                    else:
+                        status = "Learning"
+                        status_item = QTableWidgetItem(status)
+                    status_item.setTextAlignment(Qt.AlignCenter)
+                    self.combo_table.setItem(row, 4, status_item)
+                    
+                self.combo_table.resizeRowsToContents()
+                
+        except Exception as e:
+            print(f"Error loading combo progress: {e}")
+            self.combo_table.setRowCount(0)
+
+
+class UserProgressOverviewPage(QWidget):
+    """Page showing all users' combo progress overview from user management."""
+    
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+        self.selected_user = None
+        
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(50, 30, 50, 30)
+        
+        # Title
+        title = QLabel("User Combo Progress Overview")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 28px; font-weight: bold; color: white;")
+        
+        # User selection table
+        self.user_table = QTableWidget()
+        self.user_table.setColumnCount(6)
+        self.user_table.setHorizontalHeaderLabels(["Username", "Beginner", "Intermediate", "Advanced", "Overall", "View Details"])
+        for i in range(6):
+            self.user_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+        self.user_table.setStyleSheet("""
+            QTableWidget {
+                font-size: 14px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background-color: white;
+                color: black;
+            }
+            QHeaderView::section {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px;
+                font-weight: bold;
+                border: none;
+            }
+        """)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        
+        refresh_btn = QPushButton("Refresh")
+        back_btn = QPushButton("Back to Users")
+        
+        refresh_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        
+        refresh_btn.setFixedSize(150, 45)
+        back_btn.setFixedSize(150, 45)
+        
+        refresh_btn.clicked.connect(self.refresh_users)
+        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.USER_MANAGEMENT))
+        
+        button_layout.addStretch()
+        button_layout.addWidget(refresh_btn)
+        button_layout.addWidget(back_btn)
+        button_layout.addStretch()
+        
+        # Assembly
+        main_layout.addWidget(title)
+        main_layout.addWidget(self.user_table)
+        main_layout.addLayout(button_layout)
+        
+        self.setLayout(main_layout)
+    
+    def showEvent(self, event):
+        """Refresh when page is shown."""
+        super().showEvent(event)
+        self.refresh_users()
+    
+    def refresh_users(self):
+        """Load and display all users with their combo progress."""
+        try:
+            from combo_curriculum import ComboCurriculum
+            
+            users = load_users()
+            self.user_table.setRowCount(len(users))
+            
+            with ComboCurriculum(self.db_path) as curriculum:
+                for row, username in enumerate(users.keys()):
+                    # Username
+                    user_item = QTableWidgetItem(username)
+                    user_item.setTextAlignment(Qt.AlignCenter)
+                    self.user_table.setItem(row, 0, user_item)
+                    
+                    # Get progress for each difficulty
+                    col = 1
+                    for difficulty in ["Beginner", "Intermediate", "Advanced"]:
+                        progress = curriculum.get_level_progress(difficulty)
+                        total = progress['total_combos']
+                        mastered = progress['mastered_combos']
+                        pct = (mastered / total * 100) if total > 0 else 0
+                        progress_text = f"{mastered}/{total} ({pct:.0f}%)"
+                        
+                        progress_item = QTableWidgetItem(progress_text)
+                        progress_item.setTextAlignment(Qt.AlignCenter)
+                        # Color code: green if mastered all, yellow if partial, red if none
+                        if mastered == total and total > 0:
+                            progress_item.setBackground(Qt.darkGreen)
+                            progress_item.setForeground(Qt.white)
+                        elif mastered > 0:
+                            progress_item.setBackground(Qt.darkYellow)
+                            progress_item.setForeground(Qt.white)
+                        self.user_table.setItem(row, col, progress_item)
+                        col += 1
+                    
+                    # Overall progress (average across all difficulties)
+                    overall_progress = 0.0
+                    total_all = 0
+                    mastered_all = 0
+                    for difficulty in ["Beginner", "Intermediate", "Advanced"]:
+                        progress = curriculum.get_level_progress(difficulty)
+                        total_all += progress['total_combos']
+                        mastered_all += progress['mastered_combos']
+                    
+                    overall_pct = (mastered_all / total_all * 100) if total_all > 0 else 0
+                    overall_item = QTableWidgetItem(f"{overall_pct:.1f}%")
+                    overall_item.setTextAlignment(Qt.AlignCenter)
+                    self.user_table.setItem(row, 4, overall_item)
+                    
+                    # View details button
+                    view_btn = QPushButton("View")
+                    view_btn.setStyleSheet("""
+                        QPushButton {
+                            background-color: #2196F3;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            padding: 8px 16px;
+                            font-size: 12px;
+                        }
+                        QPushButton:hover {
+                            background-color: #1976D2;
+                        }
+                    """)
+                    view_btn.clicked.connect(lambda checked, u=username: self.view_user_details(u))
+                    self.user_table.setCellWidget(row, 5, view_btn)
+            
+            self.user_table.resizeRowsToContents()
+        
+        except Exception as e:
+            print(f"Error refreshing users: {e}")
+    
+    def view_user_details(self, username):
+        """Navigate to detailed user combo progress."""
+        # Find the UserComboProgressPage and set user
+        for i in range(self.stacked_widget.count()):
+            page = self.stacked_widget.widget(i)
+            if hasattr(page, '__class__') and page.__class__.__name__ == 'UserComboProgressPage':
+                page.set_user(username, return_to_page=PageIndex.USER_PROGRESS_OVERVIEW)
+                self.stacked_widget.setCurrentIndex(i)
+                break
+
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -3666,6 +4067,8 @@ class MainWindow(QWidget):
 
         # Auto-setup database on first run
         self._ensure_database_setup()
+        
+        self.previous_page = PageIndex.LOGIN  # Track the previous page
 
         self.stacked_widget = QStackedWidget()
         self.app_state = AppState(initial_page=PageIndex.HOMEPAGE)
@@ -3705,6 +4108,8 @@ class MainWindow(QWidget):
         # Login and User Management pages
         self.login_page = LoginPage(self.stacked_widget, self.app_state)
         self.user_management_page = UserManagementPage(self.stacked_widget)
+        self.user_combo_progress_page = UserComboProgressPage(self.stacked_widget)
+        self.user_progress_overview_page = UserProgressOverviewPage(self.stacked_widget)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
@@ -3742,6 +4147,11 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.tech_corr_rest_page) # 29
         self.stacked_widget.addWidget(self.login_page) # 30
         self.stacked_widget.addWidget(self.user_management_page) # 31
+        self.stacked_widget.addWidget(self.user_combo_progress_page) # 32
+        self.stacked_widget.addWidget(self.user_progress_overview_page) # 33
+
+        # Connect stack widget page changes to update user references
+        self.stacked_widget.currentChanged.connect(self.on_page_changed)
 
         # Start on the login page
         self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
@@ -3809,6 +4219,17 @@ class MainWindow(QWidget):
     def get_current_user(self):
         """Get the currently logged in user."""
         return self.login_page.get_current_user()
+    
+    def on_page_changed(self, index):
+        """Handle page changes to update user-specific pages."""
+        if index == PageIndex.USER_COMBO_PROGRESS:
+            current_user = self.get_current_user()
+            # Set return_to_page based on where we came from
+            return_to = self.previous_page if self.previous_page not in [PageIndex.USER_COMBO_PROGRESS, PageIndex.USER_PROGRESS_OVERVIEW] else PageIndex.HOMEPAGE
+            if current_user:
+                self.user_combo_progress_page.set_user(current_user, return_to_page=return_to)
+        # Track previous page for next navigation
+        self.previous_page = index
 
     def start_training_session(self):
         """Extract parameters and start the training session."""

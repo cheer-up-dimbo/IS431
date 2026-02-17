@@ -37,6 +37,8 @@ class PageIndex:
     TECH_CORR_REST = 29
     LOGIN = 30
     USER_MANAGEMENT = 31
+    USER_COMBO_PROGRESS = 32
+    USER_PROGRESS_OVERVIEW = 33
 
 
 class ButtonStyle:
@@ -121,4 +123,9 @@ class ButtonStyle:
     TIME_SELECTION = _create_style.__func__(
         font_size=18, padding=8, min_width=0, min_height=100,
         bg_color="#1976D2", hover_color="#1565C0", pressed_color="#0D47A1", border_radius=6,
+    )
+
+    HOME_LARGE = _create_style.__func__(
+        font_size=28, padding=30, min_width=500, min_height=30,
+        bg_color="#4CAF50", hover_color="#45a049", pressed_color="#3d8b40",
     )
