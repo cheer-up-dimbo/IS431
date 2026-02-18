@@ -184,4 +184,18 @@ def calculate_user_progress_from_combos(username: str, db_path: str) -> float:
 
 def get_training_csv_path(username: str):
     """Get the path to a user's training history CSV file."""
-    return os.path.join(os.path.dirname(__file__), "..", f"training_{username}.csv")
+    gui_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    training_dir = os.path.join(gui_dir, "training_history")
+    os.makedirs(training_dir, exist_ok=True)
+
+    new_path = os.path.join(training_dir, f"training_{username}.csv")
+    legacy_path = os.path.join(gui_dir, f"training_{username}.csv")
+
+    # Migrate old files from GUI root to dedicated folder on first access.
+    if os.path.exists(legacy_path) and not os.path.exists(new_path):
+        try:
+            os.replace(legacy_path, new_path)
+        except Exception as e:
+            print(f"Error migrating training CSV for user {username}: {e}")
+
+    return new_path

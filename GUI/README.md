@@ -127,6 +127,7 @@ python main_gui.py
 GUI/
 ├── main_gui.py                      # Main application (4235 lines)
 ├── users.csv                        # User database (username, password_hash, level, progress)
+├── training_history/                # Per-user training logs (training_<username>.csv)
 ├── README.md                        # This file
 │
 ├── combo_curriculum/                # Combo curriculum module
@@ -267,6 +268,12 @@ pro_boxer,<sha256_hash>,Advanced,100.0
 - `password_hash`: SHA-256 hashed password
 - `level`: Current user level (Beginner/Intermediate/Advanced)
 - `progress`: Mastery percentage at current level (0-100%)
+
+### Training History Files
+
+- Location: `GUI/training_history/`
+- File pattern: `training_<username>.csv`
+- Example: `GUI/training_history/training_123.csv`
 
 ### Level Requirements
 
