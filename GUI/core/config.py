@@ -3,7 +3,6 @@ Core configuration data classes for boxing training application.
 
 Defines the main configuration objects used throughout the app:
 - TrainingConfig: All training session parameters
-- TechCorrConfig: Technique Correction mode configuration
 - AppState: Central application state manager
 """
 
@@ -158,17 +157,6 @@ class TrainingConfig:
         self.rest_seconds = 0
         self.speed = "100%"
 
-
-@dataclass
-class TechCorrConfig:
-    """Persistent configuration for Technique Correction mode."""
-    difficulty: str
-    rounds: int
-    round_seconds: int
-    rest_seconds: int
-    speed: str
-
-
 class AppState:
     """Manages application state and training configuration.
     
@@ -230,14 +218,8 @@ class AppState:
         self.previous_page = initial_page
         self.time_label: Optional[str] = "3min"
         self.rest_label: Optional[str] = "1min"
-        # Technique Correction specific persistent config
-        self.tech_corr_config: Optional[TechCorrConfig] = None
         # AI Chat setting
         self.ai_chat_enabled: bool = True
-
-    def set_tech_corr_config(self, cfg: "TechCorrConfig") -> None:
-        """Persist Technique Correction configuration."""
-        self.tech_corr_config = cfg
     
     def update_rounds(self, rounds: int) -> None:
         """Update the number of rounds.

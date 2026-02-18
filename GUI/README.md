@@ -415,7 +415,7 @@ progress = (4 / 15) × 100 = 26.7%
    │  └─ Self-Select: Always enabled
    
 3. User Selects Difficulty
-   └─ Navigate to TechCorrParametersPage
+   └─ Navigate to BasicParametersPage
 
 4. Configure Parameters
    ├─ Rounds (1-12)
@@ -927,7 +927,7 @@ class SomePage(QWidget):
 | LoginPage | User authentication | `on_login_clicked()`, `hash_password()` |
 | Homepage | Main menu | Navigation buttons to Training/Performance/Others |
 | PunchCombinationPage | Select difficulty | `showEvent()` - enables/disables based on level |
-| TechCorrSessionPage | Active training | `start_training()`, `timer callbacks` |
+| TrainingSessionPage | Active training | `start_session()`, `update_timer()` |
 | ReactionTestPage | Reaction measurement | `start_test()`, `go_green()`, threading |
 | PowerPunchPage | Power measurement | `start_punch_test()`, `on_punch_detected()` |
 

@@ -13,12 +13,11 @@ print('=' * 70)
 
 print('\n✓ CORE MODULE')
 try:
-    from core import TrainingConfig, TechCorrConfig, AppState
+    from core import TrainingConfig, AppState
     from core import PageIndex, ButtonStyle
     print('  ├─ TrainingConfig: Training session configuration')
-    print('  ├─ TechCorrConfig: Technique correction configuration')
     print('  ├─ AppState: Central application state manager')
-    print('  ├─ PageIndex: 32 page navigation constants')
+    print('  ├─ PageIndex: page navigation constants')
     print('  └─ ButtonStyle: Styled button definitions')
 except ImportError as e:
     print(f'  ✗ Error: {e}')
@@ -45,7 +44,7 @@ except ImportError as e:
 
 print('\n✓ MAIN_GUI INTEGRATION')
 try:
-    from core import TrainingConfig, TechCorrConfig, AppState, PageIndex, ButtonStyle
+    from core import TrainingConfig, AppState, PageIndex, ButtonStyle
     from utils import (
         get_users_csv_path, hash_password, load_users, save_users,
         get_user_level, set_user_level, get_user_progress, update_user_progress,

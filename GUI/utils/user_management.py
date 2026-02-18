@@ -172,8 +172,8 @@ def calculate_user_progress_from_combos(username: str, db_path: str) -> float:
             total_mastery = sum(combo.get('mastery_score', 0.0) for combo in combos)
             avg_mastery = total_mastery / len(combos)
             
-            # Convert to percentage (mastery_score is 0.0-1.0)
-            progress = avg_mastery * 100.0
+            # Convert to percentage (mastery_score is 0.0-5.0)
+            progress = (avg_mastery / 5.0) * 100.0
             
             return progress
     

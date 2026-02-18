@@ -15,6 +15,14 @@ from typing import List, Dict, Optional, Any
 from datetime import datetime
 
 
+DEBUG = False
+
+
+def _debug_log(message: str) -> None:
+    if DEBUG:
+        print(message)
+
+
 class ComboCurriculum:
     """
     Manages boxing combo curriculum database.
@@ -30,6 +38,25 @@ class ComboCurriculum:
         >>> beginner_combos = curriculum.get_combos_by_difficulty("Beginner")
         >>> combo = curriculum.get_combo_by_id("beginner_001")
     """
+
+    GROUP_BOUNDARIES = {
+        "Beginner": [
+            (1, 6, "Single Punches"),
+            (7, 12, "2-Punch Combos with Jab"),
+            (13, 15, "2-Punch Other Combos"),
+        ],
+        "Intermediate": [
+            (1, 8, "3-Punch Combos"),
+            (9, 11, "Body Shot Combos"),
+            (12, 13, "Defense Combos"),
+            (14, 20, "Advanced Patterns"),
+        ],
+        "Advanced": [
+            (1, 5, "Long Combinations"),
+            (6, 8, "Complex Defense"),
+            (9, 15, "Counter Punching"),
+        ],
+    }
     
     def __init__(self, db_path: str):
         """
@@ -50,7 +77,7 @@ class ComboCurriculum:
         try:
             self.connection = sqlite3.connect(self.db_path)
             self.connection.row_factory = sqlite3.Row  # Enable column access by name
-            print(f"Connected to database: {self.db_path}")
+            _debug_log(f"Connected to database: {self.db_path}")
         except sqlite3.Error as e:
             print(f"Error connecting to database: {e}")
             raise
@@ -171,26 +198,20 @@ class ComboCurriculum:
             >>> True
         """
         if not self.connection:
-            print(f"[ERROR] Database connection not established for combo_id={combo_id}")
             raise RuntimeError("Database connection not established")
-        
-        print(f"[DEBUG] update_score called: combo_id={combo_id}, score={score}, type={type(score)}")
         
         try:
             cursor = self.connection.cursor()
             current_time = datetime.now().isoformat()
             
             # Step 1: Insert score into performance_history
-            print(f"[DEBUG] Step 1: Inserting into performance_history")
             insert_query = """
                 INSERT INTO performance_history (combo_id, timestamp, performance_score)
                 VALUES (?, ?, ?)
             """
             cursor.execute(insert_query, (combo_id, current_time, score))
-            print(f"[DEBUG] Step 1: Insert successful")
             
             # Step 2: Get last 5 scores for this combo
-            print(f"[DEBUG] Step 2: Getting last 5 scores")
             history_query = """
                 SELECT performance_score
                 FROM performance_history
@@ -200,23 +221,19 @@ class ComboCurriculum:
             """
             cursor.execute(history_query, (combo_id,))
             recent_scores = cursor.fetchall()
-            print(f"[DEBUG] Step 2: Found {len(recent_scores)} recent scores")
             
-            # Step 3: Calculate average of last 5 scores
-            print(f"[DEBUG] Step 3: Calculating average")
+            # Step 3: Calculate average of last 5 scores (0-5 scale)
             if recent_scores:
                 scores = [row['performance_score'] for row in recent_scores]
                 avg_score = sum(scores) / len(scores)
-                # Normalize to 0-1 scale (since scores are 0-5)
-                mastery_score = avg_score / 5.0
+                # Store mastery score directly on 0-5 scale
+                mastery_score = avg_score
                 num_sessions = len(scores)
             else:
-                mastery_score = score / 5.0
+                mastery_score = score
                 num_sessions = 1
-            print(f"[DEBUG] Step 3: mastery_score={mastery_score}, num_sessions={num_sessions}")
             
             # Step 4: Update combos table
-            print(f"[DEBUG] Step 4: Updating combos table")
             update_query = """
                 UPDATE combos
                 SET mastery_score = ?,
@@ -225,12 +242,9 @@ class ComboCurriculum:
                 WHERE combo_id = ?
             """
             cursor.execute(update_query, (mastery_score, current_time, combo_id))
-            print(f"[DEBUG] Step 4: Update successful, rows affected: {cursor.rowcount}")
             
             # Commit changes
-            print(f"[DEBUG] Committing changes")
             self.connection.commit()
-            print(f"[DEBUG] Commit successful")
             
             print(f"Updated {combo_id}: score={score:.2f}, mastery={mastery_score:.3f} (avg of {num_sessions} sessions)")
             return True
@@ -248,17 +262,23 @@ class ComboCurriculum:
             traceback.print_exc()
             return False
     
-    def get_next_combo(self, difficulty: str) -> Optional[Dict[str, Any]]:
+    def get_next_combo(self, difficulty: str, last_combo_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
-        Get the next combo that needs practice for a given difficulty level.
-        
-        Returns the first combo (in sequential order) that is NOT yet mastered.
-        A combo is considered mastered if:
-        - total_attempts >= 5 AND
-        - mastery_score >= threshold (3.0/5.0=0.6 for Beginner, 4.0/5.0=0.8 for Intermediate/Advanced)
+        Get the next combo to train for a difficulty level using group-based progression.
+
+        Selection rules:
+        1. Identify the FIRST group in this difficulty that still has unmastered combos.
+        2. Within that group, prioritize combos with the lowest attempts.
+        3. Avoid selecting the provided last_combo_id when alternatives exist.
+        4. Return None when all groups at this difficulty are fully mastered.
+
+        Mastery criteria per combo:
+        - Beginner: total_attempts >= 5 AND average/mastery >= 3.0 (0-5 scale)
+        - Intermediate/Advanced: total_attempts >= 5 AND average/mastery >= 4.0 (0-5 scale)
         
         Args:
             difficulty (str): Difficulty level - "Beginner", "Intermediate", or "Advanced"
+            last_combo_id (Optional[str]): Most recently trained combo ID to avoid immediate repetition
         
         Returns:
             Optional[Dict[str, Any]]: Next combo to practice, or None if all are mastered
@@ -272,44 +292,89 @@ class ComboCurriculum:
         """
         if not self.connection:
             raise RuntimeError("Database connection not established")
-        
-        # Set mastery threshold based on difficulty
-        # 3.0/5.0 = 0.6 for Beginner, 4.0/5.0 = 0.8 for Intermediate/Advanced
-        if difficulty == "Beginner":
-            threshold = 3.0 / 5.0  # 0.6
-        else:  # Intermediate or Advanced
-            threshold = 4.0 / 5.0  # 0.8
-        
-        try:
-            cursor = self.connection.cursor()
-            query = """
-                SELECT combo_id, combo_name, combo_sequence, mastery_score, total_attempts
-                FROM combos
-                WHERE difficulty_level = ?
-                ORDER BY combo_id
-            """
-            cursor.execute(query, (difficulty,))
-            rows = cursor.fetchall()
-            
-            # Find first combo that is NOT mastered
-            for row in rows:
-                total_attempts = row['total_attempts'] or 0
-                mastery_score = row['mastery_score'] or 0.0
-                
-                # Not mastered if: attempts < 5 OR score < threshold
-                if total_attempts < 5 or mastery_score < threshold:
-                    return {
-                        'combo_id': row['combo_id'],
-                        'combo_name': row['combo_name'],
-                        'combo_sequence': row['combo_sequence'],
-                        'mastery_score': row['mastery_score'],
-                        'total_attempts': row['total_attempts']
-                    }
-            
-            # All combos are mastered
+
+        if difficulty not in self.GROUP_BOUNDARIES:
             return None
-            
-        except sqlite3.Error as e:
+
+        threshold = 3.0 if difficulty == "Beginner" else 4.0
+
+        def combo_index(combo_id: str) -> int:
+            try:
+                return int(combo_id.split("_")[-1])
+            except (ValueError, IndexError):
+                return 0
+
+        def is_mastered(combo: Dict[str, Any]) -> bool:
+            total_attempts = combo.get('total_attempts') or 0
+            mastery_score = combo.get('mastery_score') or 0.0
+            return total_attempts >= 5 and mastery_score >= threshold
+
+        try:
+            all_combos = self.get_combos_by_difficulty(difficulty)
+            if not all_combos:
+                return None
+
+            # Group combos by configured ID boundaries and find first unfinished group
+            active_group = None
+            for start_idx, end_idx, _group_name in self.GROUP_BOUNDARIES[difficulty]:
+                group_combos = [
+                    combo for combo in all_combos
+                    if start_idx <= combo_index(combo['combo_id']) <= end_idx
+                ]
+
+                if not group_combos:
+                    continue
+
+                if any(not is_mastered(combo) for combo in group_combos):
+                    active_group = group_combos
+                    break
+
+            # All groups are mastered
+            if not active_group:
+                return None
+
+            # Train only unmastered combos in the current active group
+            candidates = [combo for combo in active_group if not is_mastered(combo)]
+            if not candidates:
+                return None
+
+            # Prefer caller-provided last combo; fallback to most recent in active group
+            recent_combo = last_combo_id
+            if not recent_combo:
+                recent_timestamp = ""
+                for combo in active_group:
+                    ts = combo.get('last_trained_timestamp') or ""
+                    if ts > recent_timestamp:
+                        recent_timestamp = ts
+                        recent_combo = combo.get('combo_id')
+
+            # Prioritize lowest attempts first, then stable combo_id order
+            min_attempts = min((combo.get('total_attempts') or 0) for combo in candidates)
+            lowest_attempt_candidates = [
+                combo for combo in candidates
+                if (combo.get('total_attempts') or 0) == min_attempts
+            ]
+            lowest_attempt_candidates.sort(key=lambda combo: combo.get('combo_id', ''))
+
+            # Avoid immediately repeating the most recently trained combo when possible
+            non_recent_candidates = [
+                combo for combo in lowest_attempt_candidates
+                if combo.get('combo_id') != recent_combo
+            ]
+            selected = non_recent_candidates[0] if non_recent_candidates else lowest_attempt_candidates[0]
+
+            return {
+                'combo_id': selected['combo_id'],
+                'combo_name': selected['combo_name'],
+                'combo_sequence': selected['combo_sequence'],
+                'difficulty_level': selected['difficulty_level'],
+                'mastery_score': selected['mastery_score'],
+                'total_attempts': selected['total_attempts'],
+                'last_trained_timestamp': selected['last_trained_timestamp'],
+                'created_date': selected['created_date'],
+            }
+
+        except Exception as e:
             print(f"Error getting next combo: {e}")
             return None
     
@@ -403,37 +468,48 @@ class ComboCurriculum:
     
     def get_level_progress(self, difficulty: str) -> Dict[str, Any]:
         """
-        Get progress statistics for an entire difficulty level.
-        
-        Categorizes all combos at a difficulty level into:
-        - Mastered: >= 5 attempts AND >= threshold
-        - In Progress: < 5 attempts
-        - Struggling: >= 5 attempts but < threshold
+        Get progress statistics for an entire difficulty level with group context.
         
         Args:
             difficulty (str): Difficulty level - "Beginner", "Intermediate", or "Advanced"
         
         Returns:
-            Dict[str, Any]: Progress statistics
-            
-            Dictionary contains:
-            - difficulty: The difficulty level
-            - total_combos: Total number of combos at this level
-            - mastered_combos: Count of mastered combos
-            - in_progress_combos: Count with < 5 attempts
-            - struggling_combos: Count with >= 5 attempts but below threshold
+            Dict[str, Any]: Progress statistics including current group details.
         
         Example:
             >>> progress = curriculum.get_level_progress("Beginner")
-            >>> print(f"Mastered: {progress['mastered_combos']}/{progress['total_combos']}")
-            >>> print(f"In Progress: {progress['in_progress_combos']}")
-            >>> print(f"Struggling: {progress['struggling_combos']}")
+            >>> print(f"Current group: {progress['current_group_name']}")
+            >>> print(f"Group progress: {progress['current_group_progress']}")
         """
         if not self.connection:
             raise RuntimeError("Database connection not established")
         
-        # Set threshold based on difficulty
-        threshold = 3.0 / 5.0 if difficulty == "Beginner" else 4.0 / 5.0
+        # Set threshold based on difficulty (0-5 scale)
+        threshold = 3.0 if difficulty == "Beginner" else 4.0
+
+        if difficulty not in self.GROUP_BOUNDARIES:
+            return {
+                'difficulty': difficulty,
+                'total_combos': 0,
+                'mastered_combos': 0,
+                'current_group_number': 0,
+                'current_group_name': 'Unknown difficulty',
+                'current_group_progress': '0/0 combos mastered',
+                'groups_completed': 0,
+                'total_groups': 0,
+                'can_level_up': False,
+                'in_progress_combos': 0,
+                'struggling_combos': 0
+            }
+
+        def combo_index(combo_id: str) -> int:
+            try:
+                return int(combo_id.split("_")[-1])
+            except (ValueError, IndexError):
+                return 0
+
+        def is_mastered(total_attempts: int, mastery_score: float) -> bool:
+            return total_attempts >= 5 and mastery_score >= threshold
         
         try:
             cursor = self.connection.cursor()
@@ -452,25 +528,72 @@ class ComboCurriculum:
             mastered_combos = 0
             in_progress_combos = 0
             struggling_combos = 0
+
+            combo_by_id = {}
             
             for row in rows:
+                combo_id = row['combo_id']
                 total_attempts = row['total_attempts'] or 0
                 mastery_score = row['mastery_score'] or 0.0
+
+                combo_by_id[combo_id] = {
+                    'total_attempts': total_attempts,
+                    'mastery_score': mastery_score,
+                }
                 
                 if total_attempts < 5:
                     # Not enough attempts yet
                     in_progress_combos += 1
-                elif mastery_score >= threshold:
+                elif is_mastered(total_attempts, mastery_score):
                     # Mastered: >= 5 attempts AND >= threshold
                     mastered_combos += 1
                 else:
                     # Struggling: >= 5 attempts but below threshold
                     struggling_combos += 1
+
+            groups = self.GROUP_BOUNDARIES[difficulty]
+            total_groups = len(groups)
+            groups_completed = 0
+            current_group_number = 0
+            current_group_name = "All groups mastered"
+            current_group_progress = "0/0 combos mastered"
+
+            for index, (start_idx, end_idx, group_name) in enumerate(groups, start=1):
+                group_combo_ids = [
+                    combo_id for combo_id in combo_by_id.keys()
+                    if start_idx <= combo_index(combo_id) <= end_idx
+                ]
+                group_total = len(group_combo_ids)
+
+                group_mastered = 0
+                for combo_id in group_combo_ids:
+                    combo_data = combo_by_id[combo_id]
+                    if is_mastered(combo_data['total_attempts'], combo_data['mastery_score']):
+                        group_mastered += 1
+
+                group_is_complete = group_total > 0 and group_mastered == group_total
+
+                if group_is_complete:
+                    groups_completed += 1
+                elif current_group_number == 0:
+                    current_group_number = index
+                    current_group_name = group_name
+                    current_group_progress = f"{group_mastered}/{group_total} combos mastered"
+
+            can_level_up = groups_completed == total_groups and total_groups > 0
+            if can_level_up:
+                current_group_progress = "All groups completed"
             
             return {
                 'difficulty': difficulty,
                 'total_combos': total_combos,
                 'mastered_combos': mastered_combos,
+                'current_group_number': current_group_number,
+                'current_group_name': current_group_name,
+                'current_group_progress': current_group_progress,
+                'groups_completed': groups_completed,
+                'total_groups': total_groups,
+                'can_level_up': can_level_up,
                 'in_progress_combos': in_progress_combos,
                 'struggling_combos': struggling_combos
             }
@@ -481,6 +604,12 @@ class ComboCurriculum:
                 'difficulty': difficulty,
                 'total_combos': 0,
                 'mastered_combos': 0,
+                'current_group_number': 0,
+                'current_group_name': 'Unavailable',
+                'current_group_progress': '0/0 combos mastered',
+                'groups_completed': 0,
+                'total_groups': len(self.GROUP_BOUNDARIES.get(difficulty, [])),
+                'can_level_up': False,
                 'in_progress_combos': 0,
                 'struggling_combos': 0
             }
@@ -490,8 +619,8 @@ class ComboCurriculum:
         Check if user is eligible to progress to the next difficulty level.
         
         Progression requirements:
-        - Beginner → Intermediate: ALL 15 beginner combos have total_attempts >= 5 AND mastery_score >= 0.6 (3.0/5.0)
-        - Intermediate → Advanced: ALL 20 intermediate combos have total_attempts >= 5 AND mastery_score >= 0.8 (4.0/5.0)
+        - Beginner → Intermediate: ALL 15 beginner combos have total_attempts >= 5 AND mastery_score >= 3.0
+        - Intermediate → Advanced: ALL 20 intermediate combos have total_attempts >= 5 AND mastery_score >= 4.0
         - Advanced: No next level (all combos mastered at highest level)
         
         Args:
@@ -511,9 +640,8 @@ class ComboCurriculum:
         if current_difficulty == "Advanced":
             return False
         
-        # Set mastery threshold based on difficulty
-        # Beginner: 3.0/5.0 = 0.6, Intermediate: 4.0/5.0 = 0.8
-        threshold = 3.0 / 5.0 if current_difficulty == "Beginner" else 4.0 / 5.0
+        # Set mastery threshold based on difficulty (0-5 scale)
+        threshold = 3.0 if current_difficulty == "Beginner" else 4.0
         
         try:
             cursor = self.connection.cursor()
@@ -626,7 +754,7 @@ class ComboCurriculum:
         """Close the database connection."""
         if self.connection:
             self.connection.close()
-            print("Database connection closed")
+            _debug_log("Database connection closed")
     
     def __enter__(self):
         """Context manager entry."""

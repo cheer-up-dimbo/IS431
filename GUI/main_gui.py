@@ -17,14 +17,19 @@ import random
 import time
 from power import power_runner
 from reaction_time import reaction_time_runner as rt_runner
+from combo_curriculum import ComboCurriculum
+from placeholders import format_feedback_data, get_performance_score
 
 # Import from new compartmentalized modules
-from core import TrainingConfig, TechCorrConfig, AppState, PageIndex, ButtonStyle
+from core import TrainingConfig, AppState, PageIndex, ButtonStyle
 from utils import (
     get_users_csv_path, hash_password, load_users, save_users,
     get_user_level, set_user_level, get_user_progress, update_user_progress,
     calculate_user_progress_from_combos, get_training_csv_path
 )
+
+GUI_DIR = os.path.dirname(__file__)
+DB_PATH = os.path.join(GUI_DIR, 'data', 'combos.db')
 
 
 
@@ -1613,20 +1618,16 @@ class TechniquesPage(QWidget):
         title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
 
         punch_lib_btn = QPushButton("Punch Combination Library")
-        technique_correction_btn = QPushButton("Technique Correction")
         back_btn = QPushButton("Back")
 
         punch_lib_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        technique_correction_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         punch_lib_btn.clicked.connect(self.on_punch_combination_library_clicked)
-        technique_correction_btn.clicked.connect(self.on_technique_correction_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(punch_lib_btn)
-        layout.addWidget(technique_correction_btn)
         layout.addStretch()
         layout.addWidget(back_btn)
 
@@ -1635,10 +1636,6 @@ class TechniquesPage(QWidget):
     def on_punch_combination_library_clicked(self):
         print("Punch Combination Library button clicked")
         self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
-
-    def on_technique_correction_clicked(self):
-        print("Technique Correction button clicked")
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
@@ -1724,664 +1721,6 @@ class PunchCombinationPage(QWidget):
 
     def on_back_clicked(self):
         self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
-
-class TechCorrParametersPage(QWidget):
-    """Setup page for Technique Correction mode, mirroring BasicParametersPage pattern."""
-    def __init__(self, stacked_widget, app_state=None):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        self.app_state = app_state
-
-        # Stored selections (require explicit user selection for all six)
-        self.selected_difficulty = None
-        self.selected_rounds = None
-
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Technique Correction Setup")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
-
-        # Parameter buttons (label + placeholder until selected)
-        self.difficulty_btn = QPushButton("Difficulty\n--")
-        self.rounds_btn = QPushButton("Rounds\n--")
-        self.speed_btn = QPushButton("Speed\n--")
-        self.time_btn = QPushButton("Time\n--")
-        self.rest_btn = QPushButton("Rest\n--")
-
-        for btn in [self.difficulty_btn, self.rounds_btn, self.speed_btn, self.time_btn, self.rest_btn]:
-            btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-
-        self.difficulty_btn.clicked.connect(self.on_difficulty_clicked)
-        self.rounds_btn.clicked.connect(self.on_rounds_clicked)
-        self.speed_btn.clicked.connect(self.on_speed_clicked)
-        self.time_btn.clicked.connect(self.on_time_clicked)
-        self.rest_btn.clicked.connect(self.on_rest_clicked)
-
-        layout.addWidget(title)
-        grid = QGridLayout()
-        grid.setSpacing(12)
-        grid.addWidget(self.difficulty_btn, 0, 0)
-        grid.addWidget(self.rounds_btn,     0, 1)
-        grid.addWidget(self.speed_btn,      1, 0)
-        grid.addWidget(self.time_btn,       1, 1)
-        # Center the rest button in row 2
-        rest_layout = QHBoxLayout()
-        rest_layout.addStretch()
-        rest_layout.addWidget(self.rest_btn)
-        rest_layout.addStretch()
-        layout.addLayout(grid)
-        layout.addLayout(rest_layout)
-
-        # Bottom buttons (Back + Start) like BasicParametersPage
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        button_layout.addStretch()
-
-        back_btn = QPushButton("Back")
-        self.start_btn = QPushButton("Start")
-
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        self.start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-
-        back_btn.clicked.connect(self.on_back_clicked)
-        self.start_btn.clicked.connect(self.on_start_clicked)
-
-        button_layout.addWidget(back_btn)
-        button_layout.addWidget(self.start_btn)
-        button_layout.addStretch()
-        layout.addLayout(button_layout)
-
-        self.setLayout(layout)
-
-        # Initial enable state similar to BasicParametersPage
-        self.update_start_button()
-
-    def on_difficulty_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_DIFFICULTY)
-
-    def on_rounds_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_ROUNDS)
-
-    def on_speed_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_SPEED)
-
-    def on_time_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_TIME)
-
-    def on_rest_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_REST)
-
-    def update_start_button(self):
-        # Enable only when all five have a concrete value (not '--')
-        def value_of(btn: QPushButton) -> str:
-            txt = btn.text()
-            return txt.split("\n")[-1].strip() if "\n" in txt else txt.strip()
-        values = [
-            value_of(self.difficulty_btn),
-            value_of(self.rounds_btn),
-            value_of(self.speed_btn),
-            value_of(self.time_btn),
-            value_of(self.rest_btn),
-        ]
-        all_selected = all(v not in ("--", "") for v in values)
-        self.start_btn.setEnabled(all_selected)
-
-    def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
-
-    def on_start_clicked(self):
-        # Parse time value to seconds
-        time_text = self.time_btn.text().split("\n")[-1]
-        def parse_time_to_seconds(t: str) -> int:
-            t = t.strip()
-            mins = 0
-            secs = 0
-            if "min" in t and "sec" in t:
-                try:
-                    parts = t.replace("sec", "").split("min")
-                    mins = int(parts[0]) if parts[0] else 0
-                    secs = int(parts[1]) if parts[1] else 0
-                except Exception:
-                    mins, secs = 0, 0
-            elif "min" in t:
-                try:
-                    mins = int(t.replace("min", ""))
-                except Exception:
-                    mins = 0
-            elif "sec" in t:
-                try:
-                    secs = int(t.replace("sec", ""))
-                except Exception:
-                    secs = 0
-            return mins * 60 + secs
-
-        round_seconds = parse_time_to_seconds(time_text)
-        
-        # Parse rest time
-        rest_text = self.rest_btn.text().split("\n")[-1]
-        rest_seconds = parse_time_to_seconds(rest_text)
-        
-        # Get speed
-        speed_text = self.speed_btn.text().split("\n")[-1]
-
-        if self.app_state is not None:
-            cfg = TechCorrConfig(
-                difficulty=self.selected_difficulty,
-                rounds=self.selected_rounds,
-                round_seconds=round_seconds,
-                rest_seconds=rest_seconds,
-                speed=speed_text,
-            )
-            self.app_state.set_tech_corr_config(cfg)
-
-        # Navigate to session and let it load from AppState
-        session_page = self.stacked_widget.widget(PageIndex.TECH_CORR_SESSION)
-        if hasattr(session_page, "load_from_state") and (self.app_state is not None):
-            session_page.load_from_state(self.app_state)
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_SESSION)
-
-    # Methods to update from selection pages
-    def set_difficulty(self, val: str):
-        self.selected_difficulty = val
-        self.difficulty_btn.setText(f"Difficulty\n{val}")
-        self.update_start_button()
-
-    def set_rounds(self, n: int):
-        self.selected_rounds = n
-        self.rounds_btn.setText(f"Rounds\n{n}")
-        self.update_start_button()
-
-    def set_speed(self, val: str):
-        self.speed_btn.setText(f"Speed\n{val}")
-        self.update_start_button()
-
-    def set_time(self, val: str):
-        self.time_btn.setText(f"Time\n{val}")
-        self.update_start_button()
-
-    def set_rest(self, val: str):
-        self.rest_btn.setText(f"Rest\n{val}")
-        self.update_start_button()
-
-class TechCorrSessionPage(QWidget):
-    """Session page for Technique Correction mode, mirroring TrainingSessionPage layout."""
-
-    INTERVAL_SECONDS = 25
-    ANALYTICS_SECONDS = 5
-
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        self.is_paused = False
-        
-        # Timing and session state
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_timer)
-        self.current_round = 1
-        self.total_rounds = 1
-        self.round_seconds = 30
-        self.interval_plan = [self.INTERVAL_SECONDS]
-        self.current_interval_index = 0
-        self.time_remaining = self.INTERVAL_SECONDS
-        self.showing_analytics = False
-        self.analytics_time_remaining = 0
-
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(30)
-        main_layout.setContentsMargins(50, 50, 50, 50)
-
-        # Round counter at the top
-        self.round_label = QLabel("Round 1 / 3")
-        self.round_label.setAlignment(Qt.AlignCenter)
-        self.round_label.setStyleSheet("font-size: 40px; font-weight: bold;")
-
-        # Interval counter
-        self.interval_label = QLabel("Interval 1 / 5")
-        self.interval_label.setAlignment(Qt.AlignCenter)
-        self.interval_label.setStyleSheet("font-size: 32px; font-weight: bold; color: #666;")
-
-        # Countdown timer for interval
-        self.timer_label = QLabel("00:30")
-        self.timer_label.setAlignment(Qt.AlignCenter)
-        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
-
-        # Target combo (large, centered)
-        self.target_combo_label = QLabel("Jab - Cross - Hook")
-        self.target_combo_label.setAlignment(Qt.AlignCenter)
-        self.target_combo_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #2196F3; margin-top: 20px;")
-
-        # Feedback label (large)
-        self.feedback_label = QLabel("Good")
-        self.feedback_label.setAlignment(Qt.AlignCenter)
-        self.feedback_label.setStyleSheet("font-size: 56px; font-weight: bold; color: #4CAF50; margin-top: 15px;")
-
-        # Post-interval analytics panel (hidden by default)
-        self.analytics_panel = QWidget()
-        analytics_layout = QVBoxLayout()
-        analytics_layout.setAlignment(Qt.AlignCenter)
-        analytics_layout.setSpacing(10)
-        analytics_layout.setContentsMargins(20, 20, 20, 20)
-
-        self.analytics_title = QLabel("Interval Summary")
-        self.analytics_title.setAlignment(Qt.AlignCenter)
-        self.analytics_title.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 10px;")
-
-        self.guard_discipline_label = QLabel("Guard discipline: —")
-        self.guard_discipline_label.setAlignment(Qt.AlignCenter)
-        self.guard_discipline_label.setStyleSheet("font-size: 18px; color: #333;")
-
-        self.distance_selection_label = QLabel("Distance selection: —")
-        self.distance_selection_label.setAlignment(Qt.AlignCenter)
-        self.distance_selection_label.setStyleSheet("font-size: 18px; color: #333;")
-
-        self.combo_accuracy_label = QLabel("Combo accuracy: —")
-        self.combo_accuracy_label.setAlignment(Qt.AlignCenter)
-        self.combo_accuracy_label.setStyleSheet("font-size: 18px; color: #333;")
-
-        analytics_layout.addWidget(self.analytics_title)
-        analytics_layout.addWidget(self.guard_discipline_label)
-        analytics_layout.addWidget(self.distance_selection_label)
-        analytics_layout.addWidget(self.combo_accuracy_label)
-        self.analytics_panel.setLayout(analytics_layout)
-        self.analytics_panel.hide()
-
-        # Buttons (Pause/Resume and Stop)
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        button_layout.addStretch()
-
-        self.pause_btn = QPushButton("Pause")
-        stop_btn = QPushButton("Stop")
-
-        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        stop_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-
-        self.pause_btn.setFixedWidth(250)
-        stop_btn.setFixedWidth(250)
-
-        self.pause_btn.clicked.connect(self.toggle_pause)
-        stop_btn.clicked.connect(self.on_stop_clicked)
-
-        button_layout.addWidget(self.pause_btn)
-        button_layout.addWidget(stop_btn)
-        button_layout.addStretch()
-
-        # Assemble main layout
-        main_layout.addStretch()
-        main_layout.addWidget(self.round_label)
-        main_layout.addWidget(self.interval_label)
-        main_layout.addStretch()
-        main_layout.addWidget(self.timer_label)
-        main_layout.addWidget(self.target_combo_label)
-        main_layout.addWidget(self.feedback_label)
-        main_layout.addStretch()
-        main_layout.addWidget(self.analytics_panel)
-        main_layout.addStretch()
-        main_layout.addLayout(button_layout)
-        main_layout.addStretch()
-
-        self.setLayout(main_layout)
-
-    def format_time(self, seconds):
-        """Format seconds as MM:SS."""
-        mins = seconds // 60
-        secs = seconds % 60
-        return f"{mins:02d}:{secs:02d}"
-
-    def toggle_pause(self):
-        """Toggle between pause and resume."""
-        self.is_paused = not self.is_paused
-        if self.is_paused:
-            self.pause_btn.setText("Resume")
-            self.timer.stop()
-        else:
-            self.pause_btn.setText("Pause")
-            self.timer.start(1000)
-
-    def on_stop_clicked(self):
-        """Stop session and return to parameters page."""
-        self.timer.stop()
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
-
-    def load_from_state(self, app_state: AppState):
-        """Load and start Technique Correction session from config."""
-        cfg = getattr(app_state, "tech_corr_config", None)
-        if cfg:
-            self.total_rounds = cfg.rounds
-            self.round_seconds = cfg.round_seconds
-
-            # Build interval plan (25s slices, last interval may be shorter)
-            self.interval_plan = self.build_interval_plan(self.round_seconds)
-            self.current_round = 1
-            self.current_interval_index = 0
-            self.time_remaining = self.interval_plan[0]
-            self.showing_analytics = False
-            self.analytics_time_remaining = 0
-            self.is_paused = False
-
-            self.round_label.setText(f"Round {self.current_round} / {self.total_rounds}")
-            self.interval_label.setText(f"Interval {self.current_interval_index + 1} / {len(self.interval_plan)}")
-            self.timer_label.setText(self.format_time(self.time_remaining))
-            self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
-            self.target_combo_label.show()
-            self.feedback_label.setText("Good")
-            self.feedback_label.show()
-            self.analytics_panel.hide()
-            self.pause_btn.setText("Pause")
-
-            print(f"[TechCorr] Start Round {self.current_round}/{self.total_rounds}, Intervals: {len(self.interval_plan)}")
-            print(f"[TechCorr] Start Interval 1/{len(self.interval_plan)} (Round {self.current_round})")
-
-            self.timer.start(1000)
-
-    def update_timer(self):
-        """Update the countdown timer and handle state transitions."""
-        if self.showing_analytics:
-            if self.analytics_time_remaining > 0:
-                # Show countdown during analytics phase
-                self.timer_label.setText(self.format_time(self.analytics_time_remaining))
-                self.analytics_time_remaining -= 1
-                return
-
-            # Analytics finished; decide next step
-            self.analytics_panel.hide()
-            self.showing_analytics = False
-            self.timer_label.show()
-            self.target_combo_label.show()
-            self.feedback_label.show()
-
-            last_interval_of_round = (self.current_interval_index == len(self.interval_plan) - 1)
-            if last_interval_of_round:
-                if self.current_round < self.total_rounds:
-                    # Next round
-                    self.current_round += 1
-                    self.interval_plan = self.build_interval_plan(self.round_seconds)
-                    self.current_interval_index = 0
-                    self.time_remaining = self.interval_plan[0]
-                    self.round_label.setText(f"Round {self.current_round} / {self.total_rounds}")
-                    self.interval_label.setText(f"Interval {self.current_interval_index + 1} / {len(self.interval_plan)}")
-                    self.timer_label.setText(self.format_time(self.time_remaining))
-                    self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
-                    print(f"[TechCorr] Start Round {self.current_round}/{self.total_rounds}, Intervals: {len(self.interval_plan)}")
-                else:
-                    # Session complete
-                    print("[TechCorr] Session complete")
-                    self.timer.stop()
-                    self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
-                return
-
-            # Move to next interval in same round
-            self.current_interval_index += 1
-            self.time_remaining = self.interval_plan[self.current_interval_index]
-            self.interval_label.setText(f"Interval {self.current_interval_index + 1} / {len(self.interval_plan)}")
-            self.timer_label.setText(self.format_time(self.time_remaining))
-            self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
-            print(f"[TechCorr] Start Interval {self.current_interval_index + 1}/{len(self.interval_plan)} (Round {self.current_round})")
-            return
-
-        # Interval countdown
-        if self.time_remaining > 0:
-            self.time_remaining -= 1
-            self.timer_label.setText(self.format_time(self.time_remaining))
-            return
-
-        # Interval complete -> show analytics
-        self.showing_analytics = True
-        self.analytics_time_remaining = self.ANALYTICS_SECONDS
-        self.target_combo_label.hide()
-        self.feedback_label.hide()
-        self.timer_label.show()
-        last_interval = (self.current_interval_index == len(self.interval_plan) - 1)
-        summary_text = "End of Round Summary" if last_interval else f"Interval {self.current_interval_index + 1} Summary"
-        self.analytics_title.setText(summary_text)
-        self.interval_label.setText(summary_text)
-        self.timer_label.setText(self.format_time(self.analytics_time_remaining))
-        self.analytics_panel.show()
-        print(f"[TechCorr] Interval {self.current_interval_index + 1} complete -> Analytics")
-
-    def build_interval_plan(self, round_seconds: int):
-        """Compute interval durations for a round based on 25s slices and remainder."""
-        if round_seconds <= 0:
-            return [self.INTERVAL_SECONDS]
-        count = (round_seconds + self.INTERVAL_SECONDS - 1) // self.INTERVAL_SECONDS
-        base = [self.INTERVAL_SECONDS] * count
-        remainder = round_seconds - self.INTERVAL_SECONDS * (count - 1)
-        base[-1] = remainder if remainder > 0 else self.INTERVAL_SECONDS
-        return base
-
-class TechCorrDifficultySelectionPage(QWidget):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(12)
-        layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Select Difficulty")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
-
-        btns = []
-        for label in ["Beginner", "Intermediate", "Advanced"]:
-            b = QPushButton(label)
-            b.setStyleSheet(ButtonStyle.INFO_SMALL)
-            b.clicked.connect(partial(self.select_difficulty, label))
-            btns.append(b)
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
-
-        layout.addWidget(title)
-        for b in btns:
-            layout.addWidget(b)
-        layout.addStretch()
-        layout.addWidget(back_btn)
-
-        self.setLayout(layout)
-
-    def select_difficulty(self, val: str):
-        try:
-            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
-            if hasattr(params, "set_difficulty"):
-                params.set_difficulty(val)
-        except Exception:
-            pass
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
-
-class TechCorrRoundsSelectionPage(QWidget):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Select Rounds")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
-
-        grid = QGridLayout()
-        grid.setSpacing(8)
-        for idx in range(12):
-            n = idx + 1
-            btn = QPushButton(str(n))
-            btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
-            btn.clicked.connect(partial(self.select_rounds, n))
-            row = idx // 6
-            col = idx % 6
-            grid.addWidget(btn, row, col)
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
-
-        main_layout.addWidget(title)
-        main_layout.addLayout(grid)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
-
-        self.setLayout(main_layout)
-
-    def select_rounds(self, n: int):
-        try:
-            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
-            if hasattr(params, "set_rounds"):
-                params.set_rounds(n)
-        except Exception:
-            pass
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
-
-class TechCorrSpeedSelectionPage(QWidget):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Select Speed")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
-
-        grid = QGridLayout()
-        grid.setSpacing(8)
-
-        speeds = ["25%", "50%", "75%", "100%"]
-        for col, val in enumerate(speeds):
-            btn = QPushButton(str(val))
-            btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
-            btn.clicked.connect(partial(self.select_speed, val))
-            grid.addWidget(btn, 0, col)
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
-
-        main_layout.addWidget(title)
-        main_layout.addLayout(grid)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
-
-        self.setLayout(main_layout)
-
-    def select_speed(self, val: str):
-        try:
-            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
-            if hasattr(params, "set_speed"):
-                params.set_speed(val)
-        except Exception:
-            pass
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
-
-class TechCorrTimeSelectionPage(QWidget):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Select Time")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
-
-        grid = QGridLayout()
-        grid.setSpacing(8)
-        for c in range(3):
-            grid.setColumnStretch(c, 1)
-
-        times = ["30sec", "1min", "1min30sec", "2min", "2min30sec", "3min"]
-        for idx, val in enumerate(times):
-            btn = QPushButton(val)
-            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            btn.clicked.connect(partial(self.select_time, val))
-            row = idx // 3
-            col = idx % 3
-            grid.addWidget(btn, row, col)
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
-
-        main_layout.addWidget(title)
-        main_layout.addLayout(grid)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
-
-        self.setLayout(main_layout)
-
-    def select_time(self, val: str):
-        try:
-            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
-            if hasattr(params, "set_time"):
-                params.set_time(val)
-        except Exception:
-            pass
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
-
-class TechCorrRestSelectionPage(QWidget):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Select Rest Time")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
-
-        grid = QGridLayout()
-        grid.setSpacing(8)
-        for c in range(3):
-            grid.setColumnStretch(c, 1)
-
-        rest_times = ["10sec", "20sec", "30sec", "40sec", "50sec", "1min"]
-        for idx, val in enumerate(rest_times):
-            btn = QPushButton(val)
-            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            btn.clicked.connect(partial(self.select_rest, val))
-            row = idx // 3
-            col = idx % 3
-            grid.addWidget(btn, row, col)
-
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS))
-
-        main_layout.addWidget(title)
-        main_layout.addLayout(grid)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
-
-        self.setLayout(main_layout)
-
-    def select_rest(self, val: str):
-        try:
-            params = self.stacked_widget.widget(PageIndex.TECH_CORR_PARAMETERS)
-            if hasattr(params, "set_rest"):
-                params.set_rest(val)
-        except Exception:
-            pass
-        self.stacked_widget.setCurrentIndex(PageIndex.TECH_CORR_PARAMETERS)
 
 class BasicParametersPage(QWidget):
     """Page for basic parameters (index 4)."""
@@ -2870,6 +2209,12 @@ class TrainingSessionPage(QWidget):
         self.battle_style = None
 
         # Combo curriculum state
+        self.curriculum = None
+        self.current_difficulty = None
+        self.current_combo_id = None
+        self.current_combo_name = ""
+        self.current_combo_sequence = ""
+        self.last_combo_id = None
         self.current_combo = None  # Stores combo dict from database
         self.combo_display_text = ""  # Text to display on screen
         self.combo_score = 0  # Score for the current combo (0-5, whole numbers)
@@ -2965,6 +2310,136 @@ class TrainingSessionPage(QWidget):
         }
         return time_map.get(time_str, 60)
 
+    def _get_curriculum_db_path(self):
+        """Get unified curriculum database path."""
+        return DB_PATH
+
+    def _init_curriculum(self):
+        """Initialize curriculum manager for Punch Combination mode."""
+        if self.difficulty not in ["Beginner", "Intermediate", "Advanced"]:
+            self.curriculum = None
+            return
+
+        try:
+            db_path = self._get_curriculum_db_path()
+            self.curriculum = ComboCurriculum(db_path)
+        except Exception as e:
+            print(f"Error initializing curriculum: {e}")
+            self.curriculum = None
+
+    def _select_curriculum_combo(self, previous_combo_id=None):
+        """Select next combo based on curriculum progression."""
+        if not self.curriculum or self.current_difficulty not in ["Beginner", "Intermediate", "Advanced"]:
+            return False
+
+        try:
+            combo = self.curriculum.get_next_combo(self.current_difficulty, previous_combo_id)
+            if not combo:
+                next_level = self.curriculum.get_next_difficulty(self.current_difficulty)
+                if next_level:
+                    reply = QMessageBox.question(
+                        self,
+                        "Level Complete",
+                        f"Congratulations! You've mastered all {self.current_difficulty} combos!\n"
+                        f"Switch to {next_level} now?",
+                        QMessageBox.Yes | QMessageBox.No,
+                        QMessageBox.Yes,
+                    )
+                    if reply == QMessageBox.Yes:
+                        self.current_difficulty = next_level
+                        combo = self.curriculum.get_next_combo(self.current_difficulty, None)
+                        if combo:
+                            self.difficulty = self.current_difficulty
+                        else:
+                            QMessageBox.information(
+                                self,
+                                "No Combo Available",
+                                f"No available combos found for {self.current_difficulty}.",
+                            )
+                            return False
+                    else:
+                        return False
+                else:
+                    QMessageBox.information(
+                        self,
+                        "All Combos Mastered",
+                        f"Congratulations! You've mastered all {self.current_difficulty} combos!",
+                    )
+                    return False
+
+            self.current_combo = combo
+            self.current_combo_id = combo.get('combo_id')
+            self.current_combo_name = combo.get('combo_name', '')
+            self.current_combo_sequence = combo.get('combo_sequence', '')
+            self.combo_display_text = self.current_combo_sequence
+            return True
+        except Exception as e:
+            print(f"Error selecting curriculum combo: {e}")
+            return False
+
+    def _update_combo_display(self):
+        """Update the on-screen combo label for curriculum modes."""
+        if self.current_difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo_sequence:
+            self.sequence_label.show()
+            self.sequence_label.setText(self.current_combo_sequence)
+        elif self.is_self_select_mode:
+            self.sequence_label.show()
+            self.update_sequence_display()
+        else:
+            self.sequence_label.hide()
+
+    def _score_and_update_curriculum(self):
+        """Score current combo and persist curriculum progress."""
+        if not self.curriculum or not self.current_combo_id:
+            return
+
+        try:
+            score = get_performance_score(video_path=None, combo_id=self.current_combo_id)
+            self.combo_score = score
+            self.curriculum.update_score(self.current_combo_id, score)
+
+            combo_stats = self.curriculum.get_combo_stats(self.current_combo_id) or {}
+            level_progress = self.curriculum.get_level_progress(self.current_difficulty) or {}
+            feedback_data = format_feedback_data(combo_stats, level_progress, score)
+
+            if self.current_username:
+                try:
+                    progress = calculate_user_progress_from_combos(self.current_username, self._get_curriculum_db_path())
+                    update_user_progress(self.current_username, progress)
+                except Exception as progress_error:
+                    print(f"Error syncing user progress: {progress_error}")
+
+            print(f"[TrainingSession] Combo score updated: {self.current_combo_id} -> {score}/5")
+            group_name = feedback_data.get('current_group_name', 'N/A')
+            group_progress = feedback_data.get('current_group_progress', '0/0 combos mastered')
+            print(f"[TrainingSession] Progress: {group_name} ({group_progress})")
+        except Exception as e:
+            print(f"Error updating curriculum score: {e}")
+
+    def _check_level_up_eligibility(self):
+        """Check and display level-up eligibility at session end."""
+        if not self.curriculum or self.current_difficulty not in ["Beginner", "Intermediate", "Advanced"]:
+            return
+
+        try:
+            can_level_up = self.curriculum.check_progression_eligibility(self.current_difficulty)
+            if can_level_up:
+                next_level = self.curriculum.get_next_difficulty(self.current_difficulty)
+                if next_level:
+                    QMessageBox.information(
+                        self,
+                        "Level Up Ready",
+                        f"Congratulations! You are ready to level up from {self.current_difficulty} to {next_level}.",
+                    )
+                else:
+                    QMessageBox.information(
+                        self,
+                        "Mastery Complete",
+                        f"Congratulations! You've mastered all {self.current_difficulty} combos!",
+                    )
+        except Exception as e:
+            print(f"Error checking level-up eligibility: {e}")
+
     def send_round_start_message(self):
         """Send JSON message at the start of each round for non-Self-Select modes."""
         if self.is_self_select_mode:
@@ -3001,9 +2476,18 @@ class TrainingSessionPage(QWidget):
         """Start the training session with the given parameters."""
         self.current_round = 1
         self.total_rounds = rounds
-        self.difficulty = difficulty
+        config_difficulty = None
+        if self.app_state:
+            try:
+                config_difficulty = self.app_state.get_config().difficulty
+            except Exception:
+                config_difficulty = None
+
+        self.difficulty = config_difficulty or difficulty
+        self.current_difficulty = self.difficulty
         self.battle_style = battle_style
         self.current_username = username
+        self.last_combo_id = None
 
         # Convert time strings to seconds
         self.work_time = self.parse_time_to_seconds(time_str)
@@ -3018,32 +2502,18 @@ class TrainingSessionPage(QWidget):
         # Fetch combo from database for Beginner/Intermediate/Advanced modes
         self.current_combo = None
         self.combo_display_text = ""
-        if difficulty in ["Beginner", "Intermediate", "Advanced"]:
-            try:
-                import sys
-                import os
-                # Add combo_curriculum to path if not already there
-                curriculum_path = os.path.join(os.path.dirname(__file__), 'combo_curriculum')
-                if curriculum_path not in sys.path:
-                    sys.path.insert(0, curriculum_path)
-                
-                from combo_curriculum import ComboCurriculum
-                
-                db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
-                
-                with ComboCurriculum(db_path) as curriculum:
-                    self.current_combo = curriculum.get_next_combo(difficulty)
-                    if self.current_combo:
-                        self.combo_display_text = self.current_combo.get('combo_sequence', '')
-                        # Generate random score for this combo (placeholder for actual action recognition)
-                        import random
-                        self.combo_score = random.randint(0, 5)
-                        print(f"Training combo: {self.current_combo.get('combo_name', 'Unknown')} - {self.combo_display_text}")
-                        print(f"[Placeholder] Generated score: {self.combo_score}/5")
-            except Exception as e:
-                print(f"Error fetching combo from database: {e}")
-                # Fallback to showing difficulty level
-                self.combo_display_text = f"{difficulty} Combo"
+        self.current_combo_id = None
+        self.current_combo_name = ""
+        self.current_combo_sequence = ""
+        self._init_curriculum()
+
+        if self.current_difficulty in ["Beginner", "Intermediate", "Advanced"]:
+            selected = self._select_curriculum_combo(previous_combo_id=None)
+            if selected and self.current_combo:
+                self.combo_display_text = self.current_combo.get('combo_sequence', '')
+                print(f"[TrainingSession] Selected combo: {self.current_combo.get('combo_name', 'Unknown')} ({self.combo_display_text})")
+            else:
+                self.combo_display_text = ""
 
         self.time_remaining = self.work_time
         self.is_resting = False
@@ -3058,14 +2528,7 @@ class TrainingSessionPage(QWidget):
         self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         # Show sequence/combo for Self-Select and Punch Combination modes
-        if self.is_self_select_mode:
-            self.sequence_label.show()
-            self.update_sequence_display()
-        elif self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.combo_display_text:
-            self.sequence_label.show()
-            self.sequence_label.setText(self.combo_display_text)
-        else:
-            self.sequence_label.hide()
+        self._update_combo_display()
 
         # Send round start message for non-Self-Select modes
         self.send_round_start_message()
@@ -3113,24 +2576,26 @@ class TrainingSessionPage(QWidget):
                 self.rest_label.hide()
                 self.timer_label.setText(self.format_time(self.time_remaining))
                 self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
-                
-                # Send round start message for new round
-                self.send_round_start_message()
-                
+
                 # reset sequence cycling for new round
                 if self.is_self_select_mode and self.sequences:
                     self.sequence_index = 0
                     self.sequence_time_remaining = self.sequence_cycle_seconds
-                    self.sequence_label.show()
-                    self.update_sequence_display()
-                elif self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.combo_display_text:
-                    # Show combo for Punch Combination modes
-                    self.sequence_label.show()
-                    self.sequence_label.setText(self.combo_display_text)
-                else:
-                    self.sequence_label.hide()
+                elif self.current_difficulty in ["Beginner", "Intermediate", "Advanced"]:
+                    self.last_combo_id = self.current_combo_id
+                    if not self._select_curriculum_combo(previous_combo_id=self.last_combo_id):
+                        self.timer.stop()
+                        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+                        return
+                self._update_combo_display()
+
+                # Send round start message after combo has been selected/displayed
+                self.send_round_start_message()
             else:
                 # Work finished
+                if self.current_difficulty in ["Beginner", "Intermediate", "Advanced"]:
+                    self._score_and_update_curriculum()
+
                 if self.current_round < self.total_rounds:
                     # start rest
                     self.is_resting = True
@@ -3156,10 +2621,10 @@ class TrainingSessionPage(QWidget):
 
                     # Persist session history for User Management session counts
                     self.log_user_training_session()
+                    self._check_level_up_eligibility()
                     
                     # If combo mode, update database and show results
                     if self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo:
-                        self.update_combo_database()
                         self.show_combo_results()
                     else:
                         self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
@@ -3264,26 +2729,28 @@ class TrainingSessionPage(QWidget):
     def update_combo_database(self):
         """Update the combo database with the score."""
         if not self.current_combo:
-            print("[DEBUG] No current combo to update")
             return
         
         try:
-            from combo_curriculum import ComboCurriculum
-            db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
-            
-            with ComboCurriculum(db_path) as curriculum:
-                combo_id = self.current_combo.get('combo_id')
-                # Update score in database
-                result = curriculum.update_score(combo_id, self.combo_score)
-                print(f"[DEBUG] Updated combo {combo_id} with score {self.combo_score}/5 - Success: {result}")
+            curriculum = self.curriculum
+            if not curriculum:
+                curriculum = ComboCurriculum(self._get_curriculum_db_path())
 
-                # Sync user progress into users.csv so User Management table stays updated
-                if result and self.current_username:
-                    try:
-                        progress = calculate_user_progress_from_combos(self.current_username, db_path)
-                        update_user_progress(self.current_username, progress)
-                    except Exception as progress_error:
-                        print(f"Error syncing user progress: {progress_error}")
+            combo_id = self.current_combo.get('combo_id')
+            # Update score in database
+            result = curriculum.update_score(combo_id, self.combo_score)
+            print(f"[TrainingSession] Stored combo score: {combo_id} -> {self.combo_score}/5")
+
+            # Sync user progress into users.csv so User Management table stays updated
+            if result and self.current_username:
+                try:
+                    progress = calculate_user_progress_from_combos(self.current_username, self._get_curriculum_db_path())
+                    update_user_progress(self.current_username, progress)
+                except Exception as progress_error:
+                    print(f"Error syncing user progress: {progress_error}")
+
+            if curriculum is not self.curriculum:
+                curriculum.close()
         except Exception as e:
             print(f"[ERROR] Error updating combo database: {e}")
             import traceback
@@ -3298,36 +2765,29 @@ class TrainingSessionPage(QWidget):
             difficulty = self.difficulty
             rounds = self.total_rounds
             
-            print(f"[DEBUG] show_combo_results called: {combo_name}, score={score}")
-            print(f"[DEBUG] app_state exists: {self.app_state is not None}")
-            if self.app_state:
-                print(f"[DEBUG] AI chat enabled: {self.app_state.ai_chat_enabled}")
-            
             # Check if AI chat is enabled
             if self.app_state and self.app_state.ai_chat_enabled:
-                print(f"[DEBUG] Routing to AI chat page (index {PageIndex.COMBO_LLM_CHAT})")
                 # Go to LLM chat page first
                 chat_page = self.stacked_widget.widget(PageIndex.COMBO_LLM_CHAT)
-                print(f"[DEBUG] Chat page found: {chat_page is not None}")
                 if chat_page:
                     chat_page.set_combo_data(combo_name, combo_sequence, score, difficulty, rounds)
                     self.stacked_widget.setCurrentIndex(PageIndex.COMBO_LLM_CHAT)
-                    print(f"[DEBUG] Switched to AI chat page")
+                    print("[TrainingSession] Routed to combo feedback chat")
                     return
             
             # AI chat disabled or not found - go directly to results page
-            print(f"[DEBUG] Routing to results page (index {PageIndex.COMBO_RESULTS})")
             results_page = self.stacked_widget.widget(PageIndex.COMBO_RESULTS)
             if results_page:
                 results_page.set_results(combo_name, combo_sequence, score, difficulty, rounds)
                 self.stacked_widget.setCurrentIndex(PageIndex.COMBO_RESULTS)
+                print("[TrainingSession] Routed to combo results page")
                 return
         except Exception as e:
             print(f"[ERROR] Error showing results: {e}")
             import traceback
             traceback.print_exc()
         # Fallback to basic parameters if pages not found
-        print(f"[DEBUG] Fallback to basic parameters")
+        print("[TrainingSession] Results unavailable; returning to parameters")
         self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
 
 class SelfSelectSequencePage(QWidget):
@@ -4167,7 +3627,7 @@ class UserComboProgressPage(QWidget):
         self.stacked_widget = stacked_widget
         self.current_user = None
         self.return_to_page = PageIndex.HOMEPAGE  # Track where to return to
-        self.db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+        self.db_path = DB_PATH
         
         main_layout = QVBoxLayout()
         main_layout.setSpacing(15)
@@ -4331,9 +3791,9 @@ class UserComboProgressPage(QWidget):
                     seq_item.setTextAlignment(Qt.AlignCenter)
                     self.combo_table.setItem(row, 1, seq_item)
                     
-                    # Mastery score (convert from 0-1 scale to 0-5 scale)
+                    # Mastery score is already on 0-5 scale
                     mastery = combo['mastery_score'] if combo['mastery_score'] else 0.0
-                    mastery_display = mastery * 5.0  # Convert 0-1 to 0-5
+                    mastery_display = mastery
                     mastery_item = QTableWidgetItem(f"{mastery_display:.1f}/5.0")
                     mastery_item.setTextAlignment(Qt.AlignCenter)
                     self.combo_table.setItem(row, 2, mastery_item)
@@ -4370,7 +3830,7 @@ class UserProgressOverviewPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        self.db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+        self.db_path = DB_PATH
         self.selected_user = None
         
         main_layout = QVBoxLayout()
@@ -4560,13 +4020,6 @@ class MainWindow(QWidget):
         self.reaction_test_page = ReactionTestPage(self.stacked_widget)
         self.reaction_result_page = ReactionResultPage(self.stacked_widget)
         self.others_page = OthersPage(self.stacked_widget, self.app_state)
-        self.tech_corr_parameters_page = TechCorrParametersPage(self.stacked_widget, self.app_state)
-        self.tech_corr_session_page = TechCorrSessionPage(self.stacked_widget)
-        self.tech_corr_difficulty_page = TechCorrDifficultySelectionPage(self.stacked_widget)
-        self.tech_corr_rounds_page = TechCorrRoundsSelectionPage(self.stacked_widget)
-        self.tech_corr_speed_page = TechCorrSpeedSelectionPage(self.stacked_widget)
-        self.tech_corr_time_page = TechCorrTimeSelectionPage(self.stacked_widget)
-        self.tech_corr_rest_page = TechCorrRestSelectionPage(self.stacked_widget)
         
         # Login and User Management pages
         self.login_page = LoginPage(self.stacked_widget, self.app_state)
@@ -4603,19 +4056,12 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.reaction_test_page) # 20
         self.stacked_widget.addWidget(self.reaction_result_page) # 21
         self.stacked_widget.addWidget(self.others_page) # 22
-        self.stacked_widget.addWidget(self.tech_corr_parameters_page) # 23
-        self.stacked_widget.addWidget(self.tech_corr_session_page) # 24
-        self.stacked_widget.addWidget(self.tech_corr_difficulty_page) # 25
-        self.stacked_widget.addWidget(self.tech_corr_rounds_page) # 26
-        self.stacked_widget.addWidget(self.tech_corr_speed_page) # 27
-        self.stacked_widget.addWidget(self.tech_corr_time_page) # 28
-        self.stacked_widget.addWidget(self.tech_corr_rest_page) # 29
-        self.stacked_widget.addWidget(self.login_page) # 30
-        self.stacked_widget.addWidget(self.user_management_page) # 31
-        self.stacked_widget.addWidget(self.user_combo_progress_page) # 32
-        self.stacked_widget.addWidget(self.user_progress_overview_page) # 33
-        self.stacked_widget.addWidget(self.combo_results_page) # 34
-        self.stacked_widget.addWidget(self.combo_llm_chat_page) # 35
+        self.stacked_widget.addWidget(self.login_page) # 23
+        self.stacked_widget.addWidget(self.user_management_page) # 24
+        self.stacked_widget.addWidget(self.user_combo_progress_page) # 25
+        self.stacked_widget.addWidget(self.user_progress_overview_page) # 26
+        self.stacked_widget.addWidget(self.combo_results_page) # 27
+        self.stacked_widget.addWidget(self.combo_llm_chat_page) # 28
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -4630,7 +4076,7 @@ class MainWindow(QWidget):
     
     def _ensure_database_setup(self):
         """Ensure the combo database exists and has tables. If not, set it up automatically."""
-        db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+        db_path = DB_PATH
         
         try:
             # Check if database exists and has tables
@@ -4656,15 +4102,15 @@ class MainWindow(QWidget):
             
             # Run setup if needed
             if needs_setup:
-                setup_script = os.path.join(os.path.dirname(__file__), 'setup', 'setup_combo_database.py')
+                setup_script = os.path.join(GUI_DIR, 'setup', 'setup_combo_database.py')
                 if os.path.exists(setup_script):
                     print(f"Running database setup from: {setup_script}")
                     import subprocess
                     try:
-                        db_path = os.path.join(os.path.dirname(__file__), 'setup', 'combos.db')
+                        db_path = DB_PATH
                         result = subprocess.run(
                             [sys.executable, setup_script, '--db-path', db_path, '--force'],
-                            cwd=os.path.dirname(__file__),
+                            cwd=GUI_DIR,
                             capture_output=True,
                             text=True,
                             timeout=30

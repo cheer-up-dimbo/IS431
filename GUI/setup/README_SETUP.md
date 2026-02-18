@@ -288,7 +288,7 @@ After setup is complete:
 
 1. ✅ Database created with 50 combos
 2. ⏭️ Integrate curriculum engine (Python module that uses this database)
-3. ⏭️ Connect to GUI (TechCorrSessionPage)
+3. ⏭️ Connect to GUI (TrainingSessionPage)
 4. ⏭️ Test with placeholder analytics
 5. ⏭️ Integrate CV system (when ready)
 

@@ -52,7 +52,7 @@ def create_schema(db_path):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             combo_id TEXT NOT NULL,
             timestamp TEXT NOT NULL,
-            performance_score REAL CHECK(performance_score >= 0.0 AND performance_score <= 1.0),
+            performance_score REAL CHECK(performance_score >= 0.0 AND performance_score <= 5.0),
             accuracy REAL CHECK(accuracy >= 0.0 AND accuracy <= 1.0),
             timing REAL CHECK(timing >= 0.0 AND timing <= 1.0),
             form_score REAL CHECK(form_score >= 0.0 AND form_score <= 1.0),
