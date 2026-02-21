@@ -17,8 +17,10 @@ from PySide6.QtGui import QTextCursor
 
 import random
 import time
+from datetime import datetime
 from power import power_runner
 from reaction_time import reaction_time_runner as rt_runner
+from stamina.stamina_runner import StaminaRunner, USE_ARDUINO
 from combo_curriculum import ComboCurriculum
 from placeholders import format_feedback_data, get_performance_score
 
@@ -32,6 +34,23 @@ from utils import (
 
 GUI_DIR = os.path.dirname(__file__)
 SHARED_DB_PATH = os.path.join(GUI_DIR, 'data', 'combos.db')
+
+
+def _widget_navigate_to(self, page_index: int):
+    """Shared navigation helper for page widgets.
+
+    Delegates to MainWindow.navigate_to when available; otherwise falls back
+    to direct stacked widget navigation.
+    """
+    main_window = self.window()
+    if hasattr(main_window, "navigate_to"):
+        main_window.navigate_to(page_index)
+    elif hasattr(self, "stacked_widget") and self.stacked_widget is not None:
+        self.stacked_widget.setCurrentIndex(page_index)
+
+
+if not hasattr(QWidget, "navigate_to"):
+    QWidget.navigate_to = _widget_navigate_to
 
 
 def _initialize_user_combo_database(user_db_path: Path) -> bool:
@@ -432,7 +451,7 @@ class LoginPage(QWidget):
             self.username_input.clear()
             self.password_input.clear()
             # Navigate to homepage
-            QTimer.singleShot(500, lambda: self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE))
+            QTimer.singleShot(500, lambda: self.navigate_to(PageIndex.HOMEPAGE))
         else:
             self.status_label.setText("Invalid username or password")
             self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
@@ -478,14 +497,14 @@ class LoginPage(QWidget):
             self.username_input.clear()
             self.password_input.clear()
             # Navigate to homepage
-            QTimer.singleShot(500, lambda: self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE))
+            QTimer.singleShot(500, lambda: self.navigate_to(PageIndex.HOMEPAGE))
         else:
             self.status_label.setText("Error creating account. Please try again.")
             self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
     
     def on_manage_users(self):
         """Navigate to user management page."""
-        self.stacked_widget.setCurrentIndex(PageIndex.USER_MANAGEMENT)
+        self.navigate_to(PageIndex.USER_MANAGEMENT)
     
     def get_current_user(self):
         """Return the currently logged in user."""
@@ -693,7 +712,7 @@ class UserManagementPage(QWidget):
     
     def on_back(self):
         """Return to login page."""
-        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
+        self.navigate_to(PageIndex.LOGIN)
 
 
 class Homepage(QWidget):
@@ -746,11 +765,11 @@ class Homepage(QWidget):
 
     def on_training_clicked(self):
         print("Training button clicked")
-        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
+        self.navigate_to(PageIndex.TRAINING)
 
     def on_performance_clicked(self):
         print("Performance button clicked")
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_combo_progress_clicked(self):
         """Navigate to combo progress page for current user."""
@@ -766,15 +785,15 @@ class Homepage(QWidget):
                         page.set_user(current_user, return_to_page=PageIndex.HOMEPAGE)
         except Exception as e:
             print(f"Error preparing combo progress page: {e}")
-        self.stacked_widget.setCurrentIndex(PageIndex.USER_COMBO_PROGRESS)
+        self.navigate_to(PageIndex.USER_COMBO_PROGRESS)
 
     def on_others_clicked(self):
         print("Others button clicked")
-        self.stacked_widget.setCurrentIndex(PageIndex.OTHERS)
+        self.navigate_to(PageIndex.OTHERS)
 
     def on_back_clicked(self):
         """Navigate back to login page."""
-        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
+        self.navigate_to(PageIndex.LOGIN)
 
 
 class OthersPage(QWidget):
@@ -795,7 +814,7 @@ class OthersPage(QWidget):
 
         history_btn = QPushButton("History")
         self.stance_btn = QPushButton("Orthodox")
-        self.ai_chat_btn = QPushButton("AI Chat: On")
+        self.ai_chat_btn = QPushButton("AI Chat: Off")
         back_btn = QPushButton("Back")
 
         history_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
@@ -827,7 +846,15 @@ class OthersPage(QWidget):
         self.setLayout(layout)
 
     def on_history_clicked(self):
-        print("History clicked - implement others history navigation")
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(username)
+            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+        except Exception:
+            self.navigate_to(PageIndex.HOMEPAGE)
 
     def on_stance_clicked(self):
         # Toggle button label between Orthodox and Southpaw
@@ -848,7 +875,7 @@ class OthersPage(QWidget):
         print(f"AI Chat {'enabled' if self.app_state.ai_chat_enabled else 'disabled'}")
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
+        self.navigate_to(PageIndex.HOMEPAGE)
 
 class PerformancePage(QWidget):
     def __init__(self, stacked_widget):
@@ -896,20 +923,20 @@ class PerformancePage(QWidget):
     def on_power_clicked(self):
         print("Power button clicked")
         # Navigate to Power Instructions page (index 15)
-        self.stacked_widget.setCurrentIndex(PageIndex.POWER_INSTRUCTIONS)
+        self.navigate_to(PageIndex.POWER_INSTRUCTIONS)
 
     def on_stamina_clicked(self):
         print("Stamina button clicked")
         # Navigate to Stamina Instructions page (index 18)
-        self.stacked_widget.setCurrentIndex(PageIndex.STAMINA_INSTRUCTIONS)
+        self.navigate_to(PageIndex.STAMINA_INSTRUCTIONS)
 
     def on_reaction_time_clicked(self):
         print("Reaction Time button clicked")
         # Navigate to Reaction Instructions page (index 19)
-        self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
+        self.navigate_to(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
+        self.navigate_to(PageIndex.HOMEPAGE)
 
 
 class StaminaInstructionsPage(QWidget):
@@ -940,18 +967,23 @@ class StaminaInstructionsPage(QWidget):
         button_layout.addStretch()
 
         back_btn = QPushButton("Back")
+        history_btn = QPushButton("History")
         start_btn = QPushButton("Start")
 
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
+        history_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
 
         back_btn.clicked.connect(self.on_back_clicked)
+        history_btn.clicked.connect(self.show_history)
         start_btn.clicked.connect(self.on_start_clicked)
 
         button_layout.addWidget(back_btn)
+        button_layout.addWidget(history_btn)
         button_layout.addWidget(start_btn)
         button_layout.addStretch()
 
@@ -965,25 +997,478 @@ class StaminaInstructionsPage(QWidget):
         self.setLayout(layout)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         try:
             countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
-            countdown_page.on_finished = self.launch_stamina_punch_page
+            countdown_page.on_finished = self.launch_stamina_test_page
             countdown_page.return_page_index = PageIndex.STAMINA_INSTRUCTIONS  # back should return to stamina instructions
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
+        self.navigate_to(PageIndex.COUNTDOWN)
 
-    def launch_stamina_punch_page(self):
+    def launch_stamina_test_page(self):
         try:
-            punch_page = self.stacked_widget.widget(PageIndex.POWER_PUNCH)
-            punch_page.reset_counter()
-            self.stacked_widget.setCurrentIndex(PageIndex.POWER_PUNCH)
+            stamina_page = self.stacked_widget.widget(PageIndex.STAMINA_TEST)
+            if hasattr(stamina_page, "start_test"):
+                stamina_page.start_test()
+            self.navigate_to(PageIndex.STAMINA_TEST)
         except Exception:
-            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE)
+
+    def show_history(self):
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(username)
+            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+        except Exception:
+            self.navigate_to(PageIndex.PERFORMANCE)
+
+
+class StaminaTestPage(QWidget):
+    """Runs a 2-minute stamina test with simulated or hardware-backed punch detection."""
+
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.duration_seconds = 120
+        self._runner: Optional[StaminaRunner] = None
+        self._worker_thread: Optional[QThread] = None
+        self._is_running = False
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50, 50, 50, 50)
+
+        self.title_label = QLabel("Stamina Test (2 Minutes)")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setStyleSheet("font-size: 34px; font-weight: bold;")
+
+        mode_text = "Arduino" if USE_ARDUINO else "Simulation"
+        self.mode_label = QLabel(f"Mode: {mode_text}")
+        self.mode_label.setAlignment(Qt.AlignCenter)
+        self.mode_label.setStyleSheet("font-size: 18px; color: #FFC107; font-weight: bold;")
+
+        self.timer_label = QLabel("Time: 120s")
+        self.timer_label.setAlignment(Qt.AlignCenter)
+        self.timer_label.setStyleSheet("font-size: 44px; font-weight: bold;")
+
+        self.punch_label = QLabel("Punches: 0")
+        self.punch_label.setAlignment(Qt.AlignCenter)
+        self.punch_label.setStyleSheet("font-size: 36px; font-weight: bold;")
+
+        self.rate_label = QLabel("Current Rate: 0.0 punches/min")
+        self.rate_label.setAlignment(Qt.AlignCenter)
+        self.rate_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+
+        quit_btn = QPushButton("Quit")
+        quit_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        quit_btn.setFixedWidth(250)
+        quit_btn.clicked.connect(self.on_quit_clicked)
+
+        layout.addStretch()
+        layout.addWidget(self.title_label)
+        layout.addWidget(self.mode_label)
+        layout.addStretch()
+        layout.addWidget(self.timer_label)
+        layout.addWidget(self.punch_label)
+        layout.addWidget(self.rate_label)
+        layout.addStretch()
+        layout.addWidget(quit_btn, alignment=Qt.AlignCenter)
+        layout.addStretch()
+
+        self.setLayout(layout)
+
+    def start_test(self):
+        if self._is_running:
+            return
+
+        self._is_running = True
+        self.timer_label.setText(f"Time: {self.duration_seconds}s")
+        self.punch_label.setText("Punches: 0")
+        self.rate_label.setText("Current Rate: 0.0 punches/min")
+
+        class _Worker(QObject):
+            progress = Signal(int, int, float)
+            finished = Signal(dict)
+
+            def __init__(self, runner: StaminaRunner, parent=None):
+                super().__init__(parent)
+                self.runner = runner
+
+            def run(self):
+                def on_progress(elapsed: int, punches: int, rate: float):
+                    self.progress.emit(elapsed, punches, rate)
+
+                def on_result(result: dict):
+                    self.finished.emit(result)
+
+                self.runner.measure_stamina_with_callback(on_progress, on_result)
+
+        self._runner = StaminaRunner(duration_seconds=self.duration_seconds, use_arduino=USE_ARDUINO)
+        self._worker_thread = QThread(self)
+        self._worker = _Worker(self._runner)
+        self._worker.moveToThread(self._worker_thread)
+        self._worker_thread.started.connect(self._worker.run)
+        self._worker.progress.connect(self._on_progress)
+        self._worker.finished.connect(self._on_finished)
+        self._worker.finished.connect(self._worker_thread.quit)
+        self._worker.finished.connect(self._worker.deleteLater)
+        self._worker_thread.finished.connect(self._worker_thread.deleteLater)
+        self._worker_thread.start()
+
+    def _on_progress(self, elapsed: int, punches: int, rate: float):
+        remaining = max(0, self.duration_seconds - elapsed)
+        self.timer_label.setText(f"Time: {remaining}s")
+        self.punch_label.setText(f"Punches: {punches}")
+        self.rate_label.setText(f"Current Rate: {rate:.1f} punches/min")
+
+    def _on_finished(self, results: dict):
+        self._is_running = False
+        result_page = self.stacked_widget.widget(PageIndex.STAMINA_RESULT)
+        if hasattr(result_page, "set_results"):
+            result_page.set_results(results)
+        self.navigate_to(PageIndex.STAMINA_RESULT)
+
+    def on_quit_clicked(self):
+        if self._runner:
+            self._runner.stop()
+        self._is_running = False
+        self.navigate_to(PageIndex.PERFORMANCE)
+
+
+class StaminaResultPage(QWidget):
+    """Displays stamina metrics, stores test data, and generates coaching feedback."""
+
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.current_results: Optional[dict] = None
+
+        layout = QVBoxLayout()
+        layout.setSpacing(15)
+        layout.setContentsMargins(40, 30, 40, 30)
+
+        title = QLabel("Stamina Results")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 34px; font-weight: bold;")
+
+        self.score_label = QLabel("Stamina Score: --/100")
+        self.score_label.setAlignment(Qt.AlignCenter)
+        self.score_label.setStyleSheet("font-size: 30px; font-weight: bold; color: #4CAF50;")
+
+        self.metrics_label = QLabel("")
+        self.metrics_label.setAlignment(Qt.AlignCenter)
+        self.metrics_label.setStyleSheet("font-size: 20px; color: white; font-weight: bold;")
+        self.metrics_label.setWordWrap(True)
+
+        self.ai_feedback_label = QLabel("")
+        self.ai_feedback_label.setWordWrap(True)
+        self.ai_feedback_label.setStyleSheet(
+            """
+            font-size: 16px;
+            padding: 16px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            color: black;
+            """
+        )
+
+        button_row = QHBoxLayout()
+        history_btn = QPushButton("History")
+        restart_btn = QPushButton("Restart")
+        quit_btn = QPushButton("Quit")
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        restart_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        quit_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        history_btn.clicked.connect(self.on_history_clicked)
+        restart_btn.clicked.connect(self.on_restart_clicked)
+        quit_btn.clicked.connect(self.on_quit_clicked)
+        button_row.addStretch()
+        button_row.addWidget(history_btn)
+        button_row.addWidget(restart_btn)
+        button_row.addWidget(quit_btn)
+        button_row.addStretch()
+
+        layout.addWidget(title)
+        layout.addSpacing(10)
+        layout.addWidget(self.score_label)
+        layout.addWidget(self.metrics_label)
+        layout.addWidget(self.ai_feedback_label)
+        layout.addStretch()
+        layout.addLayout(button_row)
+
+        self.setLayout(layout)
+
+    def set_results(self, results: dict):
+        self.current_results = results
+        self.score_label.setText(f"Stamina Score: {results.get('stamina_score', 0)}/100")
+        self.metrics_label.setText(
+            f"Total Punches: {results.get('total_punches', 0)}\n"
+            f"Average Rate: {results.get('average_rate', 0):.1f} punches/min\n"
+            f"First 30s: {results.get('first_30_rate', 0):.1f} | Last 30s: {results.get('last_30_rate', 0):.1f}\n"
+            f"Fatigue: {results.get('fatigue_percentage', 0):.1f}%"
+        )
+
+        main_window = self.get_main_window()
+        username = main_window.get_current_user() if main_window else None
+
+        if username:
+            try:
+                from performance_database import save_stamina_result, get_latest_performance_summary
+                save_stamina_result(username, results)
+                stats = get_latest_performance_summary(username)
+            except Exception as e:
+                stats = None
+                print(f"Error saving stamina result: {e}")
+        else:
+            stats = None
+
+        self._generate_feedback(results, stats)
+
+    def _generate_feedback(self, results: dict, stats: Optional[dict]):
+        score = results.get("stamina_score", 0)
+        fatigue = results.get("fatigue_percentage", 0.0)
+        punches = results.get("total_punches", 0)
+        trend_text = ""
+        if stats and isinstance(stats, dict) and "stamina" in stats:
+            trend = stats["stamina"].get("difference", 0.0)
+            trend_text = f" Recent trend: {'+' if trend > 0 else ''}{trend:.1f} punches vs avg."
+
+        if score >= 80:
+            opening = f"Excellent endurance today: {punches} punches with strong pacing."
+        elif score >= 60:
+            opening = f"Good stamina session with {punches} punches completed."
+        else:
+            opening = f"Solid effort with {punches} punches; this is a good base to build on."
+
+        if fatigue <= 15:
+            detail = "You maintained output very consistently through the full duration."
+        elif fatigue >= 30:
+            detail = "You started fast but faded; focus on pace control in the first minute."
+        else:
+            detail = "Your pace dropped moderately; aim for steadier breathing and rhythm."
+
+        app_state = getattr(self.get_main_window(), "app_state", None)
+        ai_prefix = "🤖 Coach Feedback:" if app_state and getattr(app_state, "ai_chat_enabled", False) else "💪 Feedback:"
+        self.ai_feedback_label.setText(f"{ai_prefix}\n\n{opening} {detail}{trend_text}")
+
+    def on_history_clicked(self):
+        main_window = self.get_main_window()
+        username = main_window.get_current_user() if main_window else None
+        history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+        if username and hasattr(history_page, "load_history"):
+            history_page.load_history(username)
+        self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+
+    def on_restart_clicked(self):
+        self.navigate_to(PageIndex.STAMINA_INSTRUCTIONS)
+
+    def on_quit_clicked(self):
+        self.navigate_to(PageIndex.PERFORMANCE)
+
+    def get_main_window(self):
+        window = self.window()
+        return window if hasattr(window, "get_current_user") else None
+
+
+class PerformanceHistoryPage(QWidget):
+    """Unified performance history page for Power, Stamina, and Reaction tests."""
+
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.current_filter = 'All'
+        self.all_history: List[dict] = []
+        self.return_to_page: Optional[int] = None
+
+        layout = QVBoxLayout()
+        layout.setSpacing(12)
+        layout.setContentsMargins(24, 16, 24, 16)
+
+        self.title_label = QLabel("Performance History")
+        self.title_label.setStyleSheet("font-size: 30px; font-weight: bold;")
+        self.title_label.setAlignment(Qt.AlignCenter)
+
+        summary_group = QWidget()
+        summary_group.setStyleSheet("background-color: #1f1f1f; border-radius: 10px;")
+        summary_layout = QVBoxLayout()
+        summary_layout.setContentsMargins(15, 12, 15, 12)
+
+        summary_title = QLabel("LATEST PERFORMANCE SUMMARY")
+        summary_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #4CAF50;")
+
+        self.power_summary_label = QLabel("Power: No data yet")
+        self.stamina_summary_label = QLabel("Stamina: No data yet")
+        self.reaction_summary_label = QLabel("Reaction Time: No data yet")
+        self.trend_label = QLabel("Overall Trend: --")
+
+        for lbl in [self.power_summary_label, self.stamina_summary_label, self.reaction_summary_label]:
+            lbl.setStyleSheet("font-size: 16px; color: white;")
+        self.trend_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #4CAF50;")
+
+        summary_layout.addWidget(summary_title)
+        summary_layout.addWidget(self.power_summary_label)
+        summary_layout.addWidget(self.stamina_summary_label)
+        summary_layout.addWidget(self.reaction_summary_label)
+        summary_layout.addWidget(self.trend_label)
+        summary_group.setLayout(summary_layout)
+
+        table_group = QWidget()
+        table_layout = QVBoxLayout()
+        table_layout.setContentsMargins(0, 0, 0, 0)
+
+        filter_row = QHBoxLayout()
+        self.all_btn = QPushButton("All")
+        self.power_btn = QPushButton("Power")
+        self.stamina_btn = QPushButton("Stamina")
+        self.reaction_btn = QPushButton("Reaction")
+
+        for btn in [self.all_btn, self.power_btn, self.stamina_btn, self.reaction_btn]:
+            btn.setCheckable(True)
+            btn.setStyleSheet("""
+                QPushButton { font-size: 14px; padding: 8px 14px; }
+                QPushButton:checked { background-color: #3498db; color: white; }
+            """)
+            filter_row.addWidget(btn)
+
+        self.all_btn.setChecked(True)
+        self.all_btn.clicked.connect(lambda: self.apply_filter('All'))
+        self.power_btn.clicked.connect(lambda: self.apply_filter('Power'))
+        self.stamina_btn.clicked.connect(lambda: self.apply_filter('Stamina'))
+        self.reaction_btn.clicked.connect(lambda: self.apply_filter('Reaction'))
+
+        self.table = QTableWidget()
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["Date", "Time", "Type", "Result", "Trend"])
+        for i in range(5):
+            self.table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+        self.table.setStyleSheet("""
+            QTableWidget { font-size: 14px; background-color: white; color: black; }
+            QHeaderView::section { background-color: #4CAF50; color: white; font-weight: bold; }
+        """)
+
+        self.back_button = QPushButton("Back to Main Menu")
+        self.back_button.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.back_button.clicked.connect(self.go_back)
+
+        table_layout.addLayout(filter_row)
+        table_layout.addWidget(self.table)
+        table_group.setLayout(table_layout)
+
+        layout.addWidget(self.title_label)
+        layout.addWidget(summary_group)
+        layout.addWidget(table_group)
+        layout.addWidget(self.back_button, alignment=Qt.AlignCenter)
+        self.setLayout(layout)
+
+    def load_history(self, username: str, return_to: Optional[int] = None):
+        from performance_database import get_all_performance_history, get_latest_performance_summary
+
+        self.return_to_page = return_to
+        self.title_label.setText(f"Performance History - {username}")
+        summary = get_latest_performance_summary(username)
+        self._update_summary(summary)
+        self.all_history = get_all_performance_history(username, limit=100)
+        self.apply_filter(self.current_filter)
+
+    def _update_summary(self, summary: dict):
+        if 'power' in summary:
+            p = summary['power']
+            icon = '↑' if p['trend'] == 'up' else '↓' if p['trend'] == 'down' else '→'
+            sign = '+' if p['difference'] > 0 else ''
+            self.power_summary_label.setText(f"Power: {p['latest']:.1f}g ({icon} {sign}{p['difference']:.1f} vs avg)")
+        else:
+            self.power_summary_label.setText("Power: No data yet")
+
+        if 'stamina' in summary:
+            s = summary['stamina']
+            icon = '↑' if s['trend'] == 'up' else '↓' if s['trend'] == 'down' else '→'
+            sign = '+' if s['difference'] > 0 else ''
+            self.stamina_summary_label.setText(
+                f"Stamina: {int(s['latest'])} punches ({icon} {sign}{s['difference']:.0f} vs avg)"
+            )
+        else:
+            self.stamina_summary_label.setText("Stamina: No data yet")
+
+        if 'reaction' in summary:
+            r = summary['reaction']
+            icon = '↑' if r['trend'] == 'up' else '↓' if r['trend'] == 'down' else '→'
+            sign = '+' if r['difference'] > 0 else ''
+            self.reaction_summary_label.setText(
+                f"Reaction Time: {r['latest']:.3f}s ({icon} {sign}{r['difference']:.3f}s vs avg)"
+            )
+        else:
+            self.reaction_summary_label.setText("Reaction Time: No data yet")
+
+        if summary:
+            improving = sum(1 for key in summary if summary[key]['trend'] == 'up')
+            declining = sum(1 for key in summary if summary[key]['trend'] == 'down')
+            if improving > declining:
+                self.trend_label.setText("Overall Trend: Improving ✓")
+            elif declining > improving:
+                self.trend_label.setText("Overall Trend: Needs Work ⚠")
+            else:
+                self.trend_label.setText("Overall Trend: Stable →")
+        else:
+            self.trend_label.setText("Overall Trend: --")
+
+    def apply_filter(self, filter_type: str):
+        self.current_filter = filter_type
+        self.all_btn.setChecked(filter_type == 'All')
+        self.power_btn.setChecked(filter_type == 'Power')
+        self.stamina_btn.setChecked(filter_type == 'Stamina')
+        self.reaction_btn.setChecked(filter_type == 'Reaction')
+
+        if filter_type == 'All':
+            filtered_data = self.all_history
+        else:
+            filtered_data = [item for item in self.all_history if item.get('test_type') == filter_type]
+        self._populate_table(filtered_data)
+
+    def _populate_table(self, data: List[dict]):
+        self.table.setRowCount(len(data))
+        for row, test in enumerate(data):
+            dt = datetime.fromisoformat(test['timestamp'])
+            self.table.setItem(row, 0, QTableWidgetItem(dt.strftime('%Y-%m-%d')))
+            self.table.setItem(row, 1, QTableWidgetItem(dt.strftime('%H:%M')))
+            type_item = QTableWidgetItem(test['test_type'])
+            type_item.setTextAlignment(Qt.AlignCenter)
+            self.table.setItem(row, 2, type_item)
+            result = test['display_value']
+            if 'secondary_value' in test:
+                result = f"{result} ({test['secondary_value']})"
+            self.table.setItem(row, 3, QTableWidgetItem(result))
+            trend_item = QTableWidgetItem(self._calculate_trend(data, row, test['test_type']))
+            trend_item.setTextAlignment(Qt.AlignCenter)
+            self.table.setItem(row, 4, trend_item)
+
+    def _calculate_trend(self, data: List[dict], current_index: int, test_type: str) -> str:
+        for j in range(current_index + 1, len(data)):
+            if data[j]['test_type'] != test_type:
+                continue
+            current = float(data[current_index]['primary_value'])
+            previous = float(data[j]['primary_value'])
+            diff = (previous - current) if test_type == 'Reaction' else (current - previous)
+            if abs(diff) < 1e-6:
+                return '→ same'
+            return f"↑ +{abs(diff):.1f}" if diff > 0 else f"↓ -{abs(diff):.1f}"
+        return 'First test'
+
+    def go_back(self):
+        main_window = self.window()
+        if self.return_to_page is not None and hasattr(main_window, "navigate_to"):
+            main_window.navigate_to(self.return_to_page)
+        elif hasattr(main_window, "navigate_back"):
+            main_window.navigate_back()
+        else:
+            self.navigate_to(PageIndex.OTHERS)
 
 
 class ReactionInstructionsPage(QWidget):
@@ -1015,18 +1500,23 @@ class ReactionInstructionsPage(QWidget):
         button_layout.addStretch()
 
         back_btn = QPushButton("Back")
+        history_btn = QPushButton("History")
         start_btn = QPushButton("Start")
 
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
+        history_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
 
         back_btn.clicked.connect(self.on_back_clicked)
+        history_btn.clicked.connect(self.show_history)
         start_btn.clicked.connect(self.on_start_clicked)
 
         button_layout.addWidget(back_btn)
+        button_layout.addWidget(history_btn)
         button_layout.addWidget(start_btn)
         button_layout.addStretch()
 
@@ -1041,7 +1531,7 @@ class ReactionInstructionsPage(QWidget):
 
     def on_back_clicked(self):
         self.skip_countdown = False
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         if self.skip_countdown:
@@ -1057,15 +1547,26 @@ class ReactionInstructionsPage(QWidget):
                 countdown_page.start_countdown()
             except Exception:
                 pass
-            self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
+            self.navigate_to(PageIndex.COUNTDOWN)
 
     def launch_reaction_test_page(self):
         try:
             reaction_test_page = self.stacked_widget.widget(PageIndex.REACTION_TEST)
             reaction_test_page.start_test()
-            self.stacked_widget.setCurrentIndex(PageIndex.REACTION_TEST)
+            self.navigate_to(PageIndex.REACTION_TEST)
         except Exception:
-            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE)
+
+    def show_history(self):
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(username, return_to=PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+        except Exception:
+            self.navigate_to(PageIndex.PERFORMANCE)
 
 class PowerInstructionsPage(QWidget):
     """Instructions page for the Power mode."""
@@ -1098,18 +1599,23 @@ class PowerInstructionsPage(QWidget):
         button_layout.addStretch()
 
         back_btn = QPushButton("Back")
+        history_btn = QPushButton("History")
         start_btn = QPushButton("Start")
 
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         start_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
 
         back_btn.setFixedWidth(250)
+        history_btn.setFixedWidth(250)
         start_btn.setFixedWidth(250)
 
         back_btn.clicked.connect(self.on_back_clicked)
+        history_btn.clicked.connect(self.show_history)
         start_btn.clicked.connect(self.on_start_clicked)
 
         button_layout.addWidget(back_btn)
+        button_layout.addWidget(history_btn)
         button_layout.addWidget(start_btn)
         button_layout.addStretch()
 
@@ -1124,7 +1630,7 @@ class PowerInstructionsPage(QWidget):
 
     def on_back_clicked(self):
         # Return to Performance page
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_start_clicked(self):
         # Start the existing countdown flow then show CountdownPage (index 9)
@@ -1136,17 +1642,28 @@ class PowerInstructionsPage(QWidget):
             countdown_page.start_countdown()
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
+        self.navigate_to(PageIndex.COUNTDOWN)
 
     def launch_power_punch_page(self):
         """Switch to the punch counting page after countdown."""
         try:
             punch_page = self.stacked_widget.widget(PageIndex.POWER_PUNCH)
             punch_page.reset_counter()
-            self.stacked_widget.setCurrentIndex(PageIndex.POWER_PUNCH)
+            self.navigate_to(PageIndex.POWER_PUNCH)
         except Exception:
             # If page not available, fall back to Performance page
-            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE)
+
+    def show_history(self):
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(username, return_to=PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+        except Exception:
+            self.navigate_to(PageIndex.PERFORMANCE)
 
 class PowerPunchPage(QWidget):
     """Page to count power punches after countdown."""
@@ -1218,16 +1735,20 @@ class PowerPunchPage(QWidget):
         try:
             # Calculate peak g-force from punches
             peak_g_force = max([g for _, g in punches_data], default=0.0) if punches_data else 0.0
+            avg_g_force = (sum(g for _, g in punches_data) / len(punches_data)) if punches_data else 0.0
+            total_punches = len(punches_data)
             result_page = self.stacked_widget.widget(PageIndex.POWER_RESULT)
-            if hasattr(result_page, "set_power_output"):
+            if hasattr(result_page, "set_results"):
+                result_page.set_results(peak_g_force, avg_g_force, total_punches)
+            elif hasattr(result_page, "set_power_output"):
                 result_page.set_power_output(f"Peak: {peak_g_force:.2f} g")
-            self.stacked_widget.setCurrentIndex(PageIndex.POWER_RESULT)
+            self.navigate_to(PageIndex.POWER_RESULT)
         except Exception:
-            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_quit_clicked(self):
         # Abort and return to Performance page
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
 
     def start_measurement(self):
         """Start background measurement using serial to detect 10 punches."""
@@ -1293,6 +1814,9 @@ class PowerResultPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.current_peak_power = 0.0
+        self.current_avg_power = 0.0
+        self.current_total_punches = 0
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -1303,6 +1827,18 @@ class PowerResultPage(QWidget):
         self.result_label = QLabel("Punches Thrown in a Minute: 100")
         self.result_label.setAlignment(Qt.AlignCenter)
         self.result_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        self.ai_feedback_label = QLabel("")
+        self.ai_feedback_label.setWordWrap(True)
+        self.ai_feedback_label.setStyleSheet(
+            """
+            font-size: 16px;
+            padding: 16px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            color: black;
+            """
+        )
 
         # Bottom buttons
         button_layout = QHBoxLayout()
@@ -1332,6 +1868,7 @@ class PowerResultPage(QWidget):
 
         layout.addStretch()
         layout.addWidget(self.result_label)
+        layout.addWidget(self.ai_feedback_label)
         layout.addStretch()
         layout.addLayout(button_layout)
         layout.addStretch()
@@ -1341,17 +1878,76 @@ class PowerResultPage(QWidget):
     def set_power_output(self, value_str: str):
         self.result_label.setText(f"G-Force Output: {value_str}")
 
+    def set_results(self, peak_power: float, avg_power: float, total_punches: int):
+        self.current_peak_power = peak_power
+        self.current_avg_power = avg_power
+        self.current_total_punches = total_punches
+        self.result_label.setText(
+            f"Peak: {peak_power:.2f}g | Avg: {avg_power:.2f}g | Punches: {total_punches}"
+        )
+
+        main_window = self.window()
+        username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+        summary = None
+        if username:
+            try:
+                from performance_database import save_power_result, get_latest_performance_summary
+                save_power_result(username, peak_power, avg_power, total_punches)
+                summary = get_latest_performance_summary(username)
+            except Exception as e:
+                print(f"Error saving power result: {e}")
+
+        self._generate_feedback(peak_power, avg_power, total_punches, summary)
+
+    def _generate_feedback(self, peak_power: float, avg_power: float, total_punches: int, summary: Optional[dict]):
+        if peak_power >= 4.0:
+            opening = f"Excellent power output with a {peak_power:.2f}g peak."
+        elif peak_power >= 3.0:
+            opening = f"Good power session with a {peak_power:.2f}g peak."
+        else:
+            opening = f"Solid effort today; {peak_power:.2f}g is a good base to build from."
+
+        if avg_power >= 3.0:
+            detail = "Your average power stayed strong across punches."
+        else:
+            detail = "Focus on transferring force consistently through each punch."
+
+        count_detail = f" You completed {total_punches} recorded punches this round."
+
+        trend_text = ""
+        if summary and isinstance(summary, dict) and "power" in summary:
+            diff = summary["power"].get("difference", 0.0)
+            if diff > 0:
+                trend_text = f" Recent trend: +{diff:.2f}g vs average."
+            elif diff < 0:
+                trend_text = f" Recent trend: {diff:.2f}g vs average; keep pressing for consistency."
+
+        app_state = getattr(self.get_main_window(), "app_state", None)
+        ai_prefix = "🤖 Coach Feedback:" if app_state and getattr(app_state, "ai_chat_enabled", False) else "💪 Feedback:"
+        self.ai_feedback_label.setText(f"{ai_prefix}\n\n{opening} {detail}{count_detail}{trend_text}")
+
     def on_history_clicked(self):
-        # Placeholder: no history page yet
-        print("History clicked - implement history page navigation here")
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(username, return_to=PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+        except Exception:
+            self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_restart_clicked(self):
         # Return to the Power Instructions to restart the flow
-        self.stacked_widget.setCurrentIndex(PageIndex.POWER_INSTRUCTIONS)
+        self.navigate_to(PageIndex.POWER_INSTRUCTIONS)
 
     def on_quit_clicked(self):
         # Return to Performance menu
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
+
+    def get_main_window(self):
+        window = self.window()
+        return window if hasattr(window, "get_current_user") else None
 
 class ReactionTestPage(QWidget):
     """Red/green screen to measure reaction time using camera after countdown."""
@@ -1443,7 +2039,7 @@ class ReactionTestPage(QWidget):
         else:
             # Show error
             self.status_label.setText(f"Error: {error_message}")
-            QTimer.singleShot(2000, lambda: self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE))
+            QTimer.singleShot(2000, lambda: self.navigate_to(PageIndex.PERFORMANCE))
 
     def flash_text(self):
         self.status_label.setText("")
@@ -1520,15 +2116,19 @@ class ReactionTestPage(QWidget):
                 if hasattr(result_page, "set_error_message"):
                     result_page.set_error_message(status_text)
             
-            self.stacked_widget.setCurrentIndex(PageIndex.REACTION_RESULT)
+            self.navigate_to(PageIndex.REACTION_RESULT)
         except Exception:
-            self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE)
 
 class ReactionResultPage(QWidget):
     """Shows measured reaction time after the test."""
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.current_reaction_time = 0.0
+        self.current_accuracy = 0.0
+        self.current_total_attempts = 0
+        self.current_successful_attempts = 0
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -1538,6 +2138,18 @@ class ReactionResultPage(QWidget):
         self.result_label = QLabel("Reaction Time: -- s")
         self.result_label.setAlignment(Qt.AlignCenter)
         self.result_label.setStyleSheet("font-size: 40px; font-weight: bold;")
+
+        self.ai_feedback_label = QLabel("")
+        self.ai_feedback_label.setWordWrap(True)
+        self.ai_feedback_label.setStyleSheet(
+            """
+            font-size: 16px;
+            padding: 16px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            color: black;
+            """
+        )
 
         button_layout = QHBoxLayout()
         button_layout.setSpacing(20)
@@ -1566,6 +2178,7 @@ class ReactionResultPage(QWidget):
 
         layout.addStretch()
         layout.addWidget(self.result_label)
+        layout.addWidget(self.ai_feedback_label)
         layout.addStretch()
         layout.addLayout(button_layout)
         layout.addStretch()
@@ -1573,15 +2186,66 @@ class ReactionResultPage(QWidget):
         self.setLayout(layout)
 
     def set_reaction_time(self, seconds: float):
+        self.current_reaction_time = seconds
+        self.current_accuracy = 1.0
+        self.current_total_attempts = 1
+        self.current_successful_attempts = 1
         self.result_label.setText(f"Reaction Time: {seconds:.3f} s")
+        main_window = self.window()
+        username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+        summary = None
+        if username:
+            try:
+                from performance_database import save_reaction_result, get_latest_performance_summary
+                save_reaction_result(username, seconds, accuracy=1.0, total_attempts=1, successful_attempts=1)
+                summary = get_latest_performance_summary(username)
+            except Exception as e:
+                print(f"Error saving reaction result: {e}")
+
+        self._generate_feedback(seconds, 1.0, summary)
 
     def set_error_message(self, message: str):
         """Display error or status message instead of reaction time."""
         self.result_label.setText(message)
+        self.ai_feedback_label.setText("")
+
+    def _generate_feedback(self, reaction_time: float, accuracy: float, summary: Optional[dict]):
+        if reaction_time < 0.4:
+            opening = f"Lightning-fast reaction at {reaction_time:.3f}s."
+        elif reaction_time < 0.6:
+            opening = f"Good reflexes shown with a {reaction_time:.3f}s reaction time."
+        else:
+            opening = f"Nice effort today; {reaction_time:.3f}s is a solid baseline to improve from."
+
+        if accuracy >= 0.9:
+            detail = "Your strike timing and precision were excellent."
+        elif accuracy >= 0.7:
+            detail = "Accuracy is decent; target cleaner timing on each cue."
+        else:
+            detail = "Focus on clean target confirmation before committing each punch."
+
+        trend_text = ""
+        if summary and isinstance(summary, dict) and "reaction" in summary:
+            diff = summary["reaction"].get("difference", 0.0)
+            if diff < 0:
+                trend_text = f" Recent trend: {diff:.3f}s faster than average."
+            elif diff > 0:
+                trend_text = f" Recent trend: +{diff:.3f}s slower than average; keep practicing timing drills."
+
+        app_state = getattr(self.get_main_window(), "app_state", None)
+        ai_prefix = "🤖 Coach Feedback:" if app_state and getattr(app_state, "ai_chat_enabled", False) else "⚡ Feedback:"
+        self.ai_feedback_label.setText(f"{ai_prefix}\n\n{opening} {detail}{trend_text}")
 
     def on_history_clicked(self):
-        # Placeholder: add history navigation when available
-        print("History clicked - implement reaction history navigation")
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(username, return_to=PageIndex.PERFORMANCE)
+            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+        except Exception:
+            self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_restart_clicked(self):
         # Set flag to skip countdown and go directly to test
@@ -1590,10 +2254,14 @@ class ReactionResultPage(QWidget):
             reaction_instructions_page.skip_countdown = True
         except Exception:
             pass
-        self.stacked_widget.setCurrentIndex(PageIndex.REACTION_INSTRUCTIONS)
+        self.navigate_to(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.PERFORMANCE)
+        self.navigate_to(PageIndex.PERFORMANCE)
+
+    def get_main_window(self):
+        window = self.window()
+        return window if hasattr(window, "get_current_user") else None
 
 class TrainingPage(QWidget):
     """
@@ -1651,15 +2319,15 @@ class TrainingPage(QWidget):
 
     def on_techniques_clicked(self):
         print("Techniques button clicked")
-        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
+        self.navigate_to(PageIndex.TECHNIQUES)
 
     def on_spar_clicked(self):
         print("Spar button clicked")
         # SparPage is now at index 12 after removing DefenseTechniquePage
-        self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
+        self.navigate_to(PageIndex.SPAR)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.HOMEPAGE)
+        self.navigate_to(PageIndex.HOMEPAGE)
 
 class TechniquesPage(QWidget):
     def __init__(self, stacked_widget):
@@ -1693,10 +2361,10 @@ class TechniquesPage(QWidget):
 
     def on_punch_combination_library_clicked(self):
         print("Punch Combination Library button clicked")
-        self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
+        self.navigate_to(PageIndex.PUNCH_COMBINATIONS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
+        self.navigate_to(PageIndex.TRAINING)
 
 class PunchCombinationPage(QWidget):
     def __init__(self, stacked_widget, app_state=None):
@@ -1773,12 +2441,12 @@ class PunchCombinationPage(QWidget):
         if difficulty == "Self-Select":
             self_select_page = self.stacked_widget.widget(PageIndex.SELF_SELECT_SEQUENCE)
             self_select_page.previous_page = PageIndex.PUNCH_COMBINATIONS
-            self.stacked_widget.setCurrentIndex(PageIndex.SELF_SELECT_SEQUENCE)
+            self.navigate_to(PageIndex.SELF_SELECT_SEQUENCE)
         else:
-            self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+            self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TECHNIQUES)
+        self.navigate_to(PageIndex.TECHNIQUES)
 
 class BasicParametersPage(QWidget):
     """Page for basic parameters (index 4)."""
@@ -1877,16 +2545,16 @@ class BasicParametersPage(QWidget):
         self.continue_btn.setEnabled(all_selected)
 
     def on_round_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.ROUND_SELECTION)
+        self.navigate_to(PageIndex.ROUND_SELECTION)
 
     def on_speed_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.SPEED_SELECTION)
+        self.navigate_to(PageIndex.SPEED_SELECTION)
 
     def on_time_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TIME_SELECTION)
+        self.navigate_to(PageIndex.TIME_SELECTION)
 
     def on_rest_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.REST_SELECTION)
+        self.navigate_to(PageIndex.REST_SELECTION)
 
     def on_back_clicked(self):
         prev_page = self.app_state.previous_page if self.app_state else self.previous_page
@@ -1903,7 +2571,7 @@ class BasicParametersPage(QWidget):
         # Back from countdown should return to Basic Parameters during training flow
         countdown_page.return_page_index = PageIndex.BASIC_PARAMETERS
         countdown_page.start_countdown()
-        self.stacked_widget.setCurrentIndex(PageIndex.COUNTDOWN)
+        self.navigate_to(PageIndex.COUNTDOWN)
 
 class RoundSelectionPage(QWidget):
     """Page showing 12 numbered round buttons and a back button."""
@@ -1938,7 +2606,7 @@ class RoundSelectionPage(QWidget):
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         # go back to BasicParametersPage (index 4)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -1963,7 +2631,7 @@ class RoundSelectionPage(QWidget):
                 basic_page.update_continue_button()
             except Exception:
                 pass
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
 class SpeedSelectionPage(QWidget):
     """Page offering speed choices (25, 50, 75, 100)."""
@@ -1993,7 +2661,7 @@ class SpeedSelectionPage(QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -2018,7 +2686,7 @@ class SpeedSelectionPage(QWidget):
                 basic_page.update_continue_button()
             except Exception:
                 pass
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
 class TimeSelectionPage(QWidget):
     """Page offering time choices (30sec, 1min, 1min30sec, 2min, 2min30sec, 3min)."""
@@ -2058,7 +2726,7 @@ class TimeSelectionPage(QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -2083,7 +2751,7 @@ class TimeSelectionPage(QWidget):
                 basic_page.update_continue_button()
             except Exception:
                 pass
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
 class RestSelectionPage(QWidget):
     """Page offering rest choices (10sec to 60sec in 10sec increments)."""
@@ -2122,7 +2790,7 @@ class RestSelectionPage(QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
@@ -2147,7 +2815,7 @@ class RestSelectionPage(QWidget):
                 basic_page.update_continue_button()
             except Exception:
                 pass
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
 class CountdownPage(QWidget):
     """Page with 20 second countdown and pause button."""
@@ -2650,7 +3318,7 @@ class TrainingSessionPage(QWidget):
                     self.last_combo_id = self.current_combo_id
                     if not self._select_curriculum_combo(previous_combo_id=self.last_combo_id):
                         self.timer.stop()
-                        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+                        self.navigate_to(PageIndex.BASIC_PARAMETERS)
                         return
                 self._update_combo_display()
 
@@ -2692,7 +3360,7 @@ class TrainingSessionPage(QWidget):
                     if self.difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo:
                         self.show_combo_results()
                     else:
-                        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+                        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def toggle_pause(self):
         """Pause or resume the timer."""
@@ -2757,7 +3425,7 @@ class TrainingSessionPage(QWidget):
             print(json.dumps({"action": "Stop"}))
         except Exception as e:
             print(f"Error sending stop message: {e}")
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def log_user_training_session(self):
         """Append one completed session to the current user's training history CSV."""
@@ -2836,7 +3504,7 @@ class TrainingSessionPage(QWidget):
                 chat_page = self.stacked_widget.widget(PageIndex.COMBO_LLM_CHAT)
                 if chat_page:
                     chat_page.set_combo_data(combo_name, combo_sequence, score, difficulty, rounds)
-                    self.stacked_widget.setCurrentIndex(PageIndex.COMBO_LLM_CHAT)
+                    self.navigate_to(PageIndex.COMBO_LLM_CHAT)
                     print("[TrainingSession] Routed to combo feedback chat")
                     return
             
@@ -2844,7 +3512,7 @@ class TrainingSessionPage(QWidget):
             results_page = self.stacked_widget.widget(PageIndex.COMBO_RESULTS)
             if results_page:
                 results_page.set_results(combo_name, combo_sequence, score, difficulty, rounds)
-                self.stacked_widget.setCurrentIndex(PageIndex.COMBO_RESULTS)
+                self.navigate_to(PageIndex.COMBO_RESULTS)
                 print("[TrainingSession] Routed to combo results page")
                 return
         except Exception as e:
@@ -2853,7 +3521,7 @@ class TrainingSessionPage(QWidget):
             traceback.print_exc()
         # Fallback to basic parameters if pages not found
         print("[TrainingSession] Results unavailable; returning to parameters")
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
 class SelfSelectSequencePage(QWidget):
     """Page for creating custom punch sequences."""
@@ -3256,7 +3924,7 @@ class SelfSelectSequencePage(QWidget):
         self.sequence_input.setText("")
         self.update_sequence_buttons()
         self.update_buttons()
-        self.stacked_widget.setCurrentIndex(PageIndex.PUNCH_COMBINATIONS)
+        self.navigate_to(PageIndex.PUNCH_COMBINATIONS)
 
     def on_next_clicked(self):
         """Go to Basic Parameters page."""
@@ -3275,7 +3943,7 @@ class SelfSelectSequencePage(QWidget):
                     basic_page.custom_sequences = self.sequence_list.copy()
                 except Exception:
                     pass
-            self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+            self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
 class SparPage(QWidget):
     """Page with Spar options."""
@@ -3311,10 +3979,10 @@ class SparPage(QWidget):
 
     def on_battle_clicked(self):
         # BattlePage index moved to 13 after removing defense page
-        self.stacked_widget.setCurrentIndex(PageIndex.BATTLE)
+        self.navigate_to(PageIndex.BATTLE)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.TRAINING)
+        self.navigate_to(PageIndex.TRAINING)
 
 class BattlePage(QWidget):
     def __init__(self, stacked_widget, app_state=None):
@@ -3378,10 +4046,10 @@ class BattlePage(QWidget):
                 basic_page.previous_page = PageIndex.BATTLE
             except Exception:
                 pass
-        self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.stacked_widget.setCurrentIndex(PageIndex.SPAR)
+        self.navigate_to(PageIndex.SPAR)
 
 
 class ComboLLMChatPage(QWidget):
@@ -3593,7 +4261,7 @@ class ComboLLMChatPage(QWidget):
                 self.combo_data['difficulty'],
                 self.combo_data['rounds']
             )
-        self.stacked_widget.setCurrentIndex(PageIndex.COMBO_RESULTS)
+        self.navigate_to(PageIndex.COMBO_RESULTS)
 
 
 class ComboResultsPage(QWidget):
@@ -3640,7 +4308,7 @@ class ComboResultsPage(QWidget):
         # Continue button
         continue_btn = QPushButton("Continue Training")
         continue_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        continue_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.BASIC_PARAMETERS))
+        continue_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
         
         # Assembly
         main_layout.addStretch()
@@ -3945,7 +4613,7 @@ class UserProgressOverviewPage(QWidget):
         back_btn.setFixedSize(150, 45)
         
         refresh_btn.clicked.connect(self.refresh_users)
-        back_btn.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(PageIndex.USER_MANAGEMENT))
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.USER_MANAGEMENT))
         
         button_layout.addStretch()
         button_layout.addWidget(refresh_btn)
@@ -4056,6 +4724,8 @@ class MainWindow(QWidget):
         self._ensure_database_setup()
         
         self.previous_page = PageIndex.LOGIN  # Track the previous page
+        self.navigation_stack: List[int] = []
+        self._navigating_back = False
 
         self.stacked_widget = QStackedWidget()
         self.app_state = AppState(initial_page=PageIndex.HOMEPAGE)
@@ -4080,6 +4750,9 @@ class MainWindow(QWidget):
         self.power_punch_page = PowerPunchPage(self.stacked_widget)
         self.power_result_page = PowerResultPage(self.stacked_widget)
         self.stamina_instructions_page = StaminaInstructionsPage(self.stacked_widget)
+        self.stamina_test_page = StaminaTestPage(self.stacked_widget)
+        self.stamina_result_page = StaminaResultPage(self.stacked_widget)
+        self.performance_history_page = PerformanceHistoryPage(self.stacked_widget)
         self.reaction_instructions_page = ReactionInstructionsPage(self.stacked_widget)
         self.reaction_test_page = ReactionTestPage(self.stacked_widget)
         self.reaction_result_page = ReactionResultPage(self.stacked_widget)
@@ -4126,6 +4799,10 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.user_progress_overview_page) # 26
         self.stacked_widget.addWidget(self.combo_results_page) # 27
         self.stacked_widget.addWidget(self.combo_llm_chat_page) # 28
+        self.stacked_widget.addWidget(self.stamina_test_page) # 29
+        self.stacked_widget.addWidget(self.stamina_result_page) # 30
+        self.stacked_widget.addWidget(QWidget()) # 31 reserved (STAMINA_HISTORY)
+        self.stacked_widget.addWidget(self.performance_history_page) # 32
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -4137,6 +4814,30 @@ class MainWindow(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stacked_widget)
         self.setLayout(layout)
+
+        self.update_back_button_visibility()
+
+    def navigate_to(self, page_index: int):
+        """Navigate to a page and refresh back-button visibility."""
+        self.stacked_widget.setCurrentIndex(page_index)
+        self.update_back_button_visibility()
+
+    def navigate_back(self):
+        """Navigate back to previous page using navigation stack."""
+        if self.navigation_stack:
+            previous_page = self.navigation_stack.pop()
+            self._navigating_back = True
+            self.stacked_widget.setCurrentIndex(previous_page)
+        else:
+            self.stacked_widget.setCurrentIndex(PageIndex.MAIN_MENU)
+
+        self.update_back_button_visibility()
+
+    def update_back_button_visibility(self):
+        """Show back button only if there is navigation history."""
+        current_page = self.stacked_widget.currentWidget()
+        if current_page is not None and hasattr(current_page, "back_button"):
+            current_page.back_button.setVisible(bool(self.navigation_stack))
     
     def _ensure_database_setup(self):
         """Ensure the combo database exists and has tables. If not, set it up automatically."""
@@ -4199,6 +4900,12 @@ class MainWindow(QWidget):
     
     def on_page_changed(self, index):
         """Handle page changes to update user-specific pages."""
+        if index != self.previous_page:
+            if self._navigating_back:
+                self._navigating_back = False
+            else:
+                self.navigation_stack.append(self.previous_page)
+
         if index == PageIndex.USER_COMBO_PROGRESS:
             current_user = self.get_current_user()
             # Set return_to_page based on where we came from
@@ -4207,6 +4914,7 @@ class MainWindow(QWidget):
                 self.user_combo_progress_page.set_user(current_user, return_to_page=return_to)
         # Track previous page for next navigation
         self.previous_page = index
+        self.update_back_button_visibility()
 
     def start_training_session(self):
         """Extract parameters and start the training session."""
@@ -4234,7 +4942,7 @@ class MainWindow(QWidget):
             training_page = self.stacked_widget.widget(PageIndex.TRAINING_SESSION)
             current_user = self.get_current_user()
             training_page.start_session(rounds, time_str, rest_str, difficulty, sequences, battle_style, current_user)
-            self.stacked_widget.setCurrentIndex(PageIndex.TRAINING_SESSION)
+            self.navigate_to(PageIndex.TRAINING_SESSION)
         except Exception as e:
             print(f"Error starting training session: {e}")
 

@@ -219,7 +219,7 @@ class AppState:
         self.time_label: Optional[str] = "3min"
         self.rest_label: Optional[str] = "1min"
         # AI Chat setting
-        self.ai_chat_enabled: bool = True
+        self.ai_chat_enabled: bool = False
     
     def update_rounds(self, rounds: int) -> None:
         """Update the number of rounds.

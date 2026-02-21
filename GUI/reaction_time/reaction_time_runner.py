@@ -10,7 +10,7 @@ import time
 import random
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 try:
     import cv2
@@ -18,10 +18,7 @@ try:
 except ImportError as e:
     raise ImportError(f"Failed to import OpenCV/NumPy: {e}")
 
-try:
-    from ultralytics import YOLO
-except ImportError as e:
-    raise ImportError(f"Failed to import ultralytics (YOLO): {e}")
+YOLO = None
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -53,7 +50,7 @@ class ReactionTimeRunner:
         self.confidence_threshold = confidence_threshold
         self.motion_threshold = motion_threshold
         self.cap: Optional[cv2.VideoCapture] = None
-        self.model: Optional[YOLO] = None
+        self.model: Optional[Any] = None
     
     def initialize_camera_and_model(self) -> Tuple[bool, Optional[str]]:
         """Initialize camera and load YOLO model with warmup.
@@ -69,6 +66,15 @@ class ReactionTimeRunner:
             - (False, error_str) if failed
         """
         try:
+            global YOLO
+
+            if YOLO is None:
+                try:
+                    from ultralytics import YOLO as YOLOClass
+                    YOLO = YOLOClass
+                except Exception as e:
+                    return (False, f"Failed to import ultralytics/torch: {e}")
+
             # Check model exists
             if not MODEL_PATH.exists():
                 return (False, f"Model file not found at: {MODEL_PATH}")
