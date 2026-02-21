@@ -3,6 +3,8 @@ import json
 import csv
 import os
 import hashlib
+import sqlite3
+from pathlib import Path
 from functools import partial
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List
@@ -29,7 +31,63 @@ from utils import (
 )
 
 GUI_DIR = os.path.dirname(__file__)
-DB_PATH = os.path.join(GUI_DIR, 'data', 'combos.db')
+SHARED_DB_PATH = os.path.join(GUI_DIR, 'data', 'combos.db')
+
+
+def _initialize_user_combo_database(user_db_path: Path) -> bool:
+    """Create and populate a user's combo database if missing."""
+    try:
+        import importlib.util
+
+        setup_script_path = Path(GUI_DIR) / 'setup' / 'setup_combo_database.py'
+        if not setup_script_path.exists():
+            print(f"WARNING: Setup script not found at {setup_script_path}")
+            return False
+
+        spec = importlib.util.spec_from_file_location("setup_combo_database", str(setup_script_path))
+        if not spec or not spec.loader:
+            print("WARNING: Unable to load setup_combo_database module")
+            return False
+
+        setup_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(setup_module)
+
+        setup_module.create_schema(str(user_db_path))
+        setup_module.populate_combos(str(user_db_path))
+        success, result = setup_module.verify_database(str(user_db_path))
+        if not success:
+            print(f"WARNING: User DB verification failed: {result}")
+            return False
+
+        return True
+    except Exception as e:
+        print(f"WARNING: Failed to initialize user combo database at {user_db_path}: {e}")
+        return False
+
+
+def get_user_db_path(username: str) -> str:
+    """Get a user-specific combos DB path and initialize it on first use."""
+    if not username:
+        print("WARNING: No username provided, using shared DB")
+        return SHARED_DB_PATH
+
+    user_dir = Path(GUI_DIR) / 'users' / username
+    user_dir.mkdir(parents=True, exist_ok=True)
+    user_db_path = user_dir / 'combos.db'
+
+    if not user_db_path.exists():
+        print(f"Creating fresh combo database for user: {username}")
+        initialized = _initialize_user_combo_database(user_db_path)
+        if initialized:
+            print(f"✓ Initialized database at: {user_db_path}")
+        else:
+            print("WARNING: Falling back to shared DB due to initialization failure")
+            return SHARED_DB_PATH
+
+    return str(user_db_path)
+
+
+DB_PATH = SHARED_DB_PATH
 
 
 
@@ -540,17 +598,17 @@ class UserManagementPage(QWidget):
             progress_item.setTextAlignment(Qt.AlignCenter)
             self.user_table.setItem(row, 2, progress_item)
 
-            # Training sessions count
-            training_csv = get_training_csv_path(username)
+            # Training sessions count (aligned to per-user combo attempts)
             session_count = 0
-            if os.path.exists(training_csv):
-                try:
-                    with open(training_csv, 'r', newline='', encoding='utf-8') as f:
-                        reader = csv.reader(f)
-                        next(reader, None)  # Skip header
-                        session_count = sum(1 for _ in reader)
-                except:
-                    pass
+            try:
+                user_db_path = get_user_db_path(username)
+                with sqlite3.connect(user_db_path) as conn:
+                    result = conn.execute(
+                        "SELECT COALESCE(SUM(total_attempts), 0) FROM combos"
+                    ).fetchone()
+                    session_count = int(result[0] or 0) if result else 0
+            except Exception as e:
+                print(f"Error reading attempts for user {username}: {e}")
             sessions_item = QTableWidgetItem(str(session_count))
             sessions_item.setTextAlignment(Qt.AlignCenter)
             self.user_table.setItem(row, 3, sessions_item)
@@ -2311,8 +2369,11 @@ class TrainingSessionPage(QWidget):
         return time_map.get(time_str, 60)
 
     def _get_curriculum_db_path(self):
-        """Get unified curriculum database path."""
-        return DB_PATH
+        """Get user-specific curriculum database path."""
+        if hasattr(self, 'current_username') and self.current_username:
+            return get_user_db_path(self.current_username)
+        print("WARNING: No current_username in TrainingSessionPage")
+        return SHARED_DB_PATH
 
     def _init_curriculum(self):
         """Initialize curriculum manager for Punch Combination mode."""
@@ -2323,6 +2384,10 @@ class TrainingSessionPage(QWidget):
         try:
             db_path = self._get_curriculum_db_path()
             self.curriculum = ComboCurriculum(db_path)
+            if not hasattr(self, '_db_init_notified'):
+                if f"{os.sep}users{os.sep}" in db_path:
+                    print(f"✓ Using personal progress database for: {self.current_username}")
+                self._db_init_notified = True
         except Exception as e:
             print(f"Error initializing curriculum: {e}")
             self.curriculum = None
@@ -3627,7 +3692,7 @@ class UserComboProgressPage(QWidget):
         self.stacked_widget = stacked_widget
         self.current_user = None
         self.return_to_page = PageIndex.HOMEPAGE  # Track where to return to
-        self.db_path = DB_PATH
+        self.db_path = SHARED_DB_PATH
         
         main_layout = QVBoxLayout()
         main_layout.setSpacing(15)
@@ -3737,6 +3802,7 @@ class UserComboProgressPage(QWidget):
     def set_user(self, username, return_to_page=None):
         """Set the user to display progress for."""
         self.current_user = username
+        self.db_path = get_user_db_path(username)
         if return_to_page is not None:
             self.return_to_page = return_to_page
         self.title_label.setText(f"Combo Progress - {username}")
@@ -3830,7 +3896,7 @@ class UserProgressOverviewPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        self.db_path = DB_PATH
+        self.db_path = SHARED_DB_PATH
         self.selected_user = None
         
         main_layout = QVBoxLayout()
@@ -3905,14 +3971,15 @@ class UserProgressOverviewPage(QWidget):
             
             users = load_users()
             self.user_table.setRowCount(len(users))
-            
-            with ComboCurriculum(self.db_path) as curriculum:
-                for row, username in enumerate(users.keys()):
-                    # Username
-                    user_item = QTableWidgetItem(username)
-                    user_item.setTextAlignment(Qt.AlignCenter)
-                    self.user_table.setItem(row, 0, user_item)
-                    
+
+            for row, username in enumerate(users.keys()):
+                # Username
+                user_item = QTableWidgetItem(username)
+                user_item.setTextAlignment(Qt.AlignCenter)
+                self.user_table.setItem(row, 0, user_item)
+
+                user_db_path = get_user_db_path(username)
+                with ComboCurriculum(user_db_path) as curriculum:
                     # Get progress for each difficulty
                     col = 1
                     for difficulty in ["Beginner", "Intermediate", "Advanced"]:
@@ -3921,10 +3988,9 @@ class UserProgressOverviewPage(QWidget):
                         mastered = progress['mastered_combos']
                         pct = (mastered / total * 100) if total > 0 else 0
                         progress_text = f"{mastered}/{total} ({pct:.0f}%)"
-                        
+
                         progress_item = QTableWidgetItem(progress_text)
                         progress_item.setTextAlignment(Qt.AlignCenter)
-                        # Color code: green if mastered all, yellow if partial, red if none
                         if mastered == total and total > 0:
                             progress_item.setBackground(Qt.darkGreen)
                             progress_item.setForeground(Qt.white)
@@ -3933,38 +3999,36 @@ class UserProgressOverviewPage(QWidget):
                             progress_item.setForeground(Qt.white)
                         self.user_table.setItem(row, col, progress_item)
                         col += 1
-                    
-                    # Overall progress (average across all difficulties)
-                    overall_progress = 0.0
+
                     total_all = 0
                     mastered_all = 0
                     for difficulty in ["Beginner", "Intermediate", "Advanced"]:
                         progress = curriculum.get_level_progress(difficulty)
                         total_all += progress['total_combos']
                         mastered_all += progress['mastered_combos']
-                    
+
                     overall_pct = (mastered_all / total_all * 100) if total_all > 0 else 0
                     overall_item = QTableWidgetItem(f"{overall_pct:.1f}%")
                     overall_item.setTextAlignment(Qt.AlignCenter)
                     self.user_table.setItem(row, 4, overall_item)
-                    
-                    # View details button
-                    view_btn = QPushButton("View")
-                    view_btn.setStyleSheet("""
-                        QPushButton {
-                            background-color: #2196F3;
-                            color: white;
-                            border: none;
-                            border-radius: 4px;
-                            padding: 8px 16px;
-                            font-size: 12px;
-                        }
-                        QPushButton:hover {
-                            background-color: #1976D2;
-                        }
-                    """)
-                    view_btn.clicked.connect(lambda checked, u=username: self.view_user_details(u))
-                    self.user_table.setCellWidget(row, 5, view_btn)
+
+                # View details button
+                view_btn = QPushButton("View")
+                view_btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: #2196F3;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        padding: 8px 16px;
+                        font-size: 12px;
+                    }
+                    QPushButton:hover {
+                        background-color: #1976D2;
+                    }
+                """)
+                view_btn.clicked.connect(lambda checked, u=username: self.view_user_details(u))
+                self.user_table.setCellWidget(row, 5, view_btn)
             
             self.user_table.resizeRowsToContents()
         
