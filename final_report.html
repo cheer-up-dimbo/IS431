@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>IS-431: Intelligent boxing robot</title>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+
+  <link rel="stylesheet" href="./index.css">
+
+  <link rel="stylesheet" href="./components/team-member/team-member.css">
+  <script type="module" src="./components/team-member/team-member.js"></script>
+
+  <link rel="stylesheet" href="./components/table-of-content/table-of-content.css">
+
+  <script type="module" src="./components/image/image-component.js"></script>
+
+  <link rel="stylesheet" href="./components/scroll-to-top/scroll-to-top.css">
+  <script src="./components/scroll-to-top/scroll-to-top.js"></script>
+
+  <script src="./components/table-component/table-component.js"></script>
+
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="content">
+    <h1>IS-431: An Intelligent Boxing Robot to Assist in Boxing Training</h1>
+
+    <!-- This is the team member component use to display details about your team members -->
+    <div class="team-member-wrapper">
+      <team-member avatar="assets/team_member/zakir.png" name="Muhammad Zakir" department="Engineering Science"
+        year="Year 4" contribution="Wrote: Chapter 1 to Chapter 3, Chapter 4.2 User Journey & Chapter 5.1 User Interface (GUI)"></team-member>
+      <team-member avatar="assets/team_member/elgin.png" name="Elgin Ng Jun Hao" department="Engineering Science"
+        year="Year 4" contribution="Wrote: Chapter 5.2 Upper Mechanism & Appendix 1 - Upper Mechanism"></team-member>
+      <team-member avatar="assets/team_member/jeanette.png" name="Jeanette Sim Yu" department="Engineering Science"
+        year="Year4" contribution="Wrote: Chapter 4.1 System Overview, 5.3 Lower Mechanism & Appendix 2 - Lower Mechanism"></team-member>
+      <team-member avatar="assets/team_member/yogee.png" name="Muthukumaran Yogeeswaran" department="Engineering Science"
+        year="Year 4" contribution="Wrote: Chapter 5.4 Robotic Intelligence & 5.5 Control System"></team-member>
+    </div>
+
+    <!-- This is a divide from the shoelace library for aesthetic purpose -->
+    <sl-divider></sl-divider>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="table-of-content">
+      <h2>Table of Contents</h2>
+      <sl-tree>
+
+        <sl-tree-item expanded>
+          <a href="#introduction">1. Introduction (Zakir)</a>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#problem-clarification">2. Problem Clarification (Zakir)</a>
+          <sl-tree-item><a href="#background">2.1. Background</a></sl-tree-item>
+          <sl-tree-item><a href="#primary-research">2.2. Primary Research: User Interviews/Surveys</a></sl-tree-item>
+          <sl-tree-item><a href="#secondary-research">2.3. Secondary Research: Competitor Analysis</a></sl-tree-item>
+          <sl-tree-item expanded>
+            <a href="#value-proposition">2.4. Value Proposition Canvas</a>
+            <sl-tree-item><a href="#problem-of-interest">2.4.1. Problem of Interest</a></sl-tree-item>
+            <sl-tree-item><a href="#value-proposition-statement">2.4.2. Value Proposition Statement</a></sl-tree-item>
+          </sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#design-methodology">3. Design Methodology (Zakir)</a>
+          <sl-tree-item><a href="#clarification-of-task">3.1. Clarification of Task</a></sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#final-design">4. Final Design (Zakir and Jeanette)</a>
+          <sl-tree-item><a href="#system-overview">4.1. System Overview (Jeanette)</a></sl-tree-item>
+          <sl-tree-item expanded>
+            <a href="#user-journey">4.2. User Journey (Zakir)</a>
+            <sl-tree-item><a href="#end-to-end-user-flow">4.2.1. End-to-End User Flow</a></sl-tree-item>
+            <sl-tree-item><a href="#training-modes-overview">4.2.2. Training Modes Overview</a></sl-tree-item>
+            <sl-tree-item><a href="#movement-behavior">4.2.3. Movement Behavior</a></sl-tree-item>
+          </sl-tree-item>
+        </sl-tree-item>
+
+      </sl-tree>
+    </div>
+    <sl-divider></sl-divider>
+
+
+    <!-- MAIN SECTIONS -->
+
+    <!-- 1. Introduction -->
+    <div id="introduction">
+      <h2>1. Introduction (Zakir)</h2>
+      <p>
+        Boxing is widely recognized as a physically demanding and inherently
+        dangerous sport. The World Medical Association has raised particular
+        concern, stating that the “main medical argument against boxing is the risk
+        of chronic traumatic encephalopathy (CTE)”, a degenerative brain condition
+        linked to repeated head trauma. Beyond long-term neurological risks, acute
+        injuries are also prevalent in competitive boxing (G., Magdalena, Lindsay,
+        I., &amp; M., 2019).
+      </p>
+      <p>
+        A comparative study analysing 7,712 athlete exposures across three
+        consecutive Olympic Games emphasised the pressing need for “injury
+        prevention initiatives to reduce the burden of injury among combat sport
+        athletes.” Notably, the findings revealed that injury risk in boxing shows
+        “no difference by sex, weight category, or tournament round,” accenting that
+        the hazards of the sport affect athletes indiscriminately, regardless of
+        demographic or competitive context (Lystad, Alevras, Rudy, Soligard,  &amp;
+        Engebretsen, 2021).
+      </p>
+      <p>
+        Given these challenges, there is a growing necessity for solutions that
+        mitigate injury risk during training. This is especially crucial for elite
+        athletes, where sparring remains an indispensable component of preparation
+        but simultaneously exposes them to the highest risk of harm. Therefore,
+        alternative training methods are needed approaches that replicate the
+        intensity and realism of sparring while offering a safer environment.
+      </p>
+    </div>
+    <sl-divider></sl-divider>
+    <!-- 2. Problem Clarification -->
+    <div id="problem-clarification">
+      <h2>2. Problem Clarification (Zakir)</h2>
+    </div>
+
+    <div id="background">
+      <h3>2.1 Background</h3>
+      <p>
+        Sparring is widely regarded as the cornerstone of boxing training, as it
+        represents the “combat” element of the sport and enables athletes to put
+        their techniques into practice under realistic conditions. It is during
+        sparring training that boxers sharpen essential skills such as timing,
+        defence, and adaptability under pressure. However, research indicates that
+        “repetitive sub-concussive trauma from frequent and intense sparring
+        training appears to be a significant risk for developing neurological
+        sequelae”, highlighting the health risks associated with its practice
+        (Stiller, et al., 2014). While sparring training remains indispensable,
+        these risks point to the need for safer alternatives that can replicate its
+        training benefits without compromising athlete well-being.
+      </p>
+      <p>
+        To better understand this problem, our team engaged directly with the boxing
+        community by signing up for boxing gym memberships. We conducted user
+        interviews, alongside a secondary survey of existing solutions and
+        competitors in the boxing training landscape. From these findings, we
+        developed two value proposition canvas to capture the needs and pain points
+        of both boxers and the community.
+      </p>
+    </div>
+
+    <div id="primary-research">
+      <h3>2.2 Primary Research: User Interviews/Surveys</h3>
+        <h4>2.2.1 Methodology</h4>
+          <p>
+            Our research team conducted user interviews at six different boxing gyms in
+            Singapore to broaden the scope of perspectives.
+          </p>
+          <p>
+            Our research method was guided by the Interaction Design Foundation (IDF)
+            framework, where user interviews are carried out during the empathize phase
+            of the design thinking process (IxDF, 2016). While at the various boxing
+            gyms, we employed IDF’s method of Unstructured Interviews, enabling a
+            “qualitative exploration of users’ thoughts and experiences” (IxDF, 2016).
+            In addition, we also designed and sent out survey forms to get more
+            viewpoints from boxers that we did not meet in-person from the
+            aforementioned gyms. Through our user interview and surveys, we defined the
+            different stakeholders in the boxing community into two groups;
+          </p>
+          <p>
+            - <strong>Boxing-Gym Boxers</strong>: People who train recreationally or
+            competitively in boxing gyms are known as boxers.
+          </p>
+          <p>
+            - <strong>Training Support Stakeholders</strong>: Stakeholders in the
+            training support ecosystem include parents, trainers, and gym owners who
+            plan, coordinate, and encourage boxing involvement and progress.
+          </p>
+          <p>
+            Questions are tailored accordingly and refined them into a concise set of
+            guiding questions (Table 1).
+          </p>
+          <table-component subtitle="Table 1: User Interview Questions">
+            <div id="interview-qn"></div>
+          </table-component>
+        <h4>2.2.2 Insights</h4>
+        <p>
+          Our user interview and surveys of Boxing-Gym Boxers presented that sparring
+          training still accounts for about 22.6% + 15.1% (≈37.7%) of reported
+          difficulties highlights the fact that sparring training continues to be
+          boxers' main source of both attraction and annoyance (Figure 1). Finding
+          reliable partners who can match their ability and energy levels is a
+          challenge for many boxers, which can result in lower-quality training or a
+          higher risk of injury. However, about 20.8% of respondents say they would
+          like to learn and advance more quickly but feel constrained by the format of
+          the lessons that are offered. Because different skill levels are frequently
+          mixed in group training, more experienced boxers are forced to hold back or
+          repeat fundamental drills, which hinders their progress and saps their
+          desire. Essentially, even while sparring training is essential for
+          development, the way gyms are set up now frequently makes it difficult to
+          customize the level of intensity and learning rate, which leaves experienced
+          boxers constrained in development and those looking to improve constrained
+          by inflexible class schedules.
+        </p>
+
+        <div style="display: flex; justify-content: center;">
+          <div id="boxer-pie-container" style="width: 400px; height: 400px;">
+            <canvas id="boxer-pie"></canvas>
+          </div>
+        </div>
+
+        <p>
+          Approximately 33% of coaches within the ‘Training Support Stakeholders’
+          group prioritized pad work, and 22% thought sparring training sessions were
+          the best way to keep boxers engaged (Figure 2). These results imply that
+          sustaining motivation and skill improvement requires direct, coach-like
+          engagement, whether via guided drills, pad work, or sparring. However, with
+          current boxing gym setups, such individualised attention is not possible as
+          the coach to boxer ratio is uneven.
+        </p>
+
+        <div style="display: flex; justify-content: center;">
+          <div id="train-sp-pie-container" style="width: 400px; height: 400px;">
+            <canvas id="train-sp-pie"></canvas>
+          </div>
+        </div>
+
+        <p>
+          As the basis for the Value Proposition Canvas, we provide insight summaries
+          for Boxers at Boxing Gyms and Training Support Stakeholders, emphasizing
+          their primary tasks, challenges, and rewards.
+        </p>
+
+        <table-component subtitle="Table 2: User Interview Questions">
+          <div id="user-insights"></div>
+        </table-component>
+
+        <p>
+          These realizations served as the basis for the Value Proposition Canvas's
+          Customer Profile. Each group stands for a distinct set of jobs, pains, and
+          gains made during the interview. Focused value propositions and product
+          features are then created that support their objectives by comprehending
+          their unique motivations and frustrations, as revealed in later parts.
+      </p>
+    </div>
+
+    <div id="secondary-research">
+      <h3>2.3 Secondary Research: Competitor Analysis</h3>
+      <p>
+        Following the identification of user insights, a competitor study was
+        carried out to look at current boxing training programs and spot any
+        possible market gaps. The goal of this analysis was to determine how
+        existing goods either meet or fall short of meeting the pains, gains and
+        jobs identified by our user interview. We determined what people value most
+        and where discontent frequently arises by analysing the features,
+        functioning, and user feedback of each competition. By evaluating each
+        competitor’s features and online reviews, we can identify what users value
+        most and where discontent commonly arises.
+      </p>
+      <p>
+        Three close competitors were chosen for a thorough comparison in order to
+        guarantee relevancy; each was picked because of their high internet
+        presence, which indicated a sizeable percentage of user adoption (Table 3). 
+        Furthermore, our competitor selection intentionally focuses on ‘robotic’ 
+        training equipment as the primary problem identified in our research is the 
+        lack of adaptive training partners. These contrasts gave us a standard by 
+        which to measure our own value proposition and design approach.
+      </p>
+
+      <table-component subtitle="Table 3: Competitor Analysis">
+        <div id="competitor-table"></div>
+      </table-component>
+      
+      <p>
+        Our innovation strategy was guided by the useful design orientations and 
+        functional gaps that were discovered through the examination of features 
+        and feedback across a number of commercially available solutions (Table 4). 
+        On-screen coaching, variety of strike zones, impact sensors, and a range of 
+        training modes (e.g., cardio, sparring, mitts) are already features of existing 
+        systems, such as interactive boxing trainers and AI-powered punch trackers. 
+        These features suited to various training preferences, offered quantifiable 
+        performance statistics, and successfully increased user motivation. Nevertheless, 
+        significant drawbacks remained, such as unreliable technology, no reactive or 
+        tactile feedback, irrational attack angles, and an inability to simulate defensive 
+        situations. Furthermore, a lot of sophisticated technologies were either too 
+        expensive, lacked adaptive intelligence, or were too immobile to accommodate dynamic 
+        boxing motions like footwork.
+      </p>
+
+      <table-component subtitle="Table 4: Design Improvement Opportunities">
+        <div id="design-improvement"></div>
+      </table-component>
+      
+      <p>
+        Analysing competitors revealed that although existing solutions effectively use 
+        digital coaching and quantifiable data, they frequently fail to provide realistic 
+        engagement, adaptability, and safety for a wide range of users. Many technologies are 
+        still too expensive for general use or too inflexible for practical training. Our team 
+        used these insights to create five integrated products that each addressed a distinct 
+        market gap: Intelligent Training System, Skill Progression Studio, Adaptive Fight 
+        Intelligence, Performance Analytics, and Modular Boxing Platform. When taken as a whole, 
+        these solutions transform boxing training by fusing accessibility, realism, and data
+        -driven feedback to benefit gym-based stakeholders as well as individual athletes.
+      </p>
+    
+    <div id="value-proposition">
+      <h3>2.4 Value Proposition Canvas</h3>
+      <p>
+        Two Value Proposition Canvases were created to reflect the unique but related demands of 
+        Boxing-Gym Boxers (Figure 3) and Training Support Stakeholders (Figure 4) after-market gaps 
+        and user insights were identified. These canvases convert the recurrent themes, frustrations, 
+        and intended results from our secondary research and interviews into focused product 
+        opportunities.
+      </p>
+
+      <p>
+        For the Boxing Gym Boxers, the findings showed that boxers had a high demand for 
+        flexibility in training, quantifiable development, and realism. Many complained about the uneven 
+        quality of the sparring-drill sessions, the lack of feedback in class, and the challenge of 
+        striking a balance between safety and growth. This influenced the development of solutions that 
+        give controlled and flexible skill development, duplicate the intensity of sparring-drill sessions 
+        without the risks involved, and provide measurable feedback to maintain motivation and progress.
+      </p>
+
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/vpc/VPC Boxers in Boxing Gyms.png"
+        subtitle="Figure 3: Value Proposition Canvas - Boxing Gym Boxers">
+      </image-component>
+    
+      <p>
+        Safety, structure, and scalability were the main concerns for Training Support Stakeholders. 
+        Interviews brought to light issues such a lack of gym space, expensive operating expenses, and the 
+        difficulties of sustaining participation across a range of ability levels. In order to reassure 
+        parents and boxers about the efficacy of training, stakeholders looked for methods that enhance 
+        safety oversight, standardize the quality of instruction, and offer quantifiable performance data.
+      </p>
+    
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/vpc/VPC Training Support Stakeholders.png"
+        subtitle="Figure 4: Value Proposition Canvas - Training Support Stakeholders">
+      </image-component>
+
+      <p>
+        The Intelligent Training System, Skill Progression Studio, Adaptive Fight Intelligence, Performance 
+        Analytics, and Modular Boxing Platform are five interconnected solutions that were designed with the 
+        use of these insights.  Each addressing the challenges and successes noted in both canvases, striking 
+        a balance between the stakeholders' demands for safety, structure, and operational effectiveness and 
+        the boxers' desire for realism and advancement.
+      </p>      
+    </div>  
+      
+    <div id="problem-of-interest">
+      <h4>2.4.1 Problem of Interest</h4>
+      <p>
+        A basic problem that both boxers and training support stakeholders face is the absence of a thorough, 
+        secure, and flexible training program that combines the structure and quantifiability of contemporary 
+        coaching with the reality of sparring-drill sessions, according to the two Value Proposition Canvases.  
+        While boxers want flexible training, realistic involvement, and regular feedback, coaches and gym owners 
+        struggle to provide safety, personalized instruction, and efficiency in a constrained amount of time and 
+        space. Only specific elements of the training experience are addressed by current training technology.  
+        None offer a single platform that supports teaching, data tracking, and realistic skill development all 
+        at once, allowing for safe, intelligent training.  This restriction causes a disconnect between what 
+        coaches can provide during training sessions and what boxers want for realistic practice.
+      </p>
+
+      <p>
+        Only specific elements of the training experience are addressed by current training technology.  
+        None offer a single platform that supports teaching, data tracking, and realistic skill development all 
+        at once, allowing for safe, intelligent training.  This restriction causes a disconnect between what coaches 
+        can provide during training sessions and what boxers want for realistic practice. Therefore, our goal is to investigate 
+      </p>      
+
+      <p style="text-align: center; font-style: italic;">
+        "How might we design an intelligent boxing training system that can dynamically and safely strike with users while 
+        assisting coaches in guiding, monitoring, and sustaining boxer development both during and beyond training sessions."
+      </p>
+        This serves as the basis for our design direction, which aims to develop a human-assistive training ecosystem that 
+        redefines how boxing skills are learnt, practiced, and mastered by serving as a training partner for athletes and an 
+        educational extension for coaches.  
+      <p>
+
+      </p>
+    </div>
+
+    <div id="value-proposition-statement">
+      <h4>2.4.2 Value Proposition Statement</h4>
+      <p>
+        Based on insights from interviews, surveys, and analysis of existing solutions, 
+        the proposed robot directly addresses challenges faced by boxers, including 
+        lack of training variety, misalignment with body types, and limited ways to 
+        track progress. At the same time, it enhances motivation and inclusivity by 
+        introducing interactivity and personalized feedback. Thus, our value proposition 
+        statement is defined as:
+      </p>
+
+      <p style="text-align: center; font-style: italic;">
+        “The boxing robot delivers a safe and dynamic training experience that adapts to 
+        each individual, offering the realism of training with a training partner, and 
+        the guidance of a coach while supporting users of all levels to train effectively, 
+        build confidence, and continuously improve.”
+      </p>      
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. Design Methodology -->
+    <div id="design-methodology">
+      <h2>3. Design Methodology (Zakir)</h2>
+      <p>
+        To translate the problem of interest and value propositions into actionable design 
+        outcomes, this project adopted Pahl and Beitz (Pahl, Beitz, Feldhusen, & Grote, 2007) 
+        approach to engineering design. Their framework emphasizes a logical, iterative progression
+        from problem definition to detailed realization, ensuring that all design decisions remain 
+        traceable to user needs, competitor insights, and technical requirements.
+      </p>
+      <p>
+       According to Pahl and Beitz (Pahl, Beitz, Feldhusen, & Grote, 2007), there are four main stages of design:
+      </p>
+      
+      <ul>
+        <li>Clarification of Task: Involves understanding and defining the design problem, identifying user and technical requirements, and outlining key system functions.</li>
+        <li>Conceptual Design: Focuses on developing alternative principles and mechanisms that could satisfy these functions.</li>
+        <li>Embodiment Design: Refines selected concepts, assessing feasibility, structure, and integration across subsystems.</li>
+        <li>Detail Design: Finalizes the chosen concept for prototyping and testing.</li>
+      </ul>
+    
+      <p>
+       Each phase is supported by specific design tools developed for this project:
+      </p>
+
+      <ul>
+        <li>Clarification of Task → Product Needs Translation</li>
+        <li>Conceptual Design → Solution Principles and Concept Generation</li>
+        <li>Embodiment Design → Concept Screening</li>
+        <li>Detail Design → Prototyping and Testing</li>
+      </ul>
+
+      <p>
+        Every choice, from determining market gaps to improving technical performance, was supported 
+        by methodical reasoning through this organized design technique. It offered the engineering 
+        expertise required to turn research findings into a logical, useful, and user-focused boxing 
+        training program.
+      </p>
+
+    </div>
+
+    <div id="clarification-of-task">
+      <h3>3.1 Clarification of Task</h3>
+      <p>
+        Insights from the competition study were first translated into specific product requirements 
+        using the Product Needs Translation tool (Table 5), which identified important enhancements, 
+        performance standards, and user experience objectives. The Function Specifications, which included 
+        explicit functions, performance standards, and design justifications for the robot's subsystems 
+        (arms, head, legs, body, skeleton, and interface), were subsequently influenced by these translated 
+        needs. 
+      </p>
+
+      <table-component subtitle="Table 5: Product Needs Translation">
+        <div id="product-needs"></div>
+      </table-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. Final Design -->
+    <div id="final-design">
+      <h2>4. Final Design (Jeanette and Zakir)</h2>
+    </div>
+
+    <div id="system-overview">
+      <h3>4.1 System Overview (Jeanette)</h3>
+      <p>Building on the identified product needs, the BoxBunny robot is organised
+      into four key subsystems, each addressing a distinct set of functions
+      (Figure 5):</p>
+      <ul type="disc">
+          <li>
+              <strong>User Interface</strong> – touchscreen, visual      feedback, and
+              control logic for configuring and running training sessions.
+          </li>
+          <li>
+              <strong>Upper Mechanism</strong> – includes Punch Execution      (arms),
+              Contact Points (head/torso/arms), and Impact Sensors responsible
+              for safe, realistic striking interaction.
+          </li>
+          <li>
+              <strong>Lower Mechanism</strong> – comprises Footwork      Movement
+              (legs), Compact Footprint (base), and Height Adjustability, which
+              together position the robot correctly relative to the user.
+          </li>
+          <li>
+              <strong>Robot      Intelligence</strong> – primarily User Tracking,
+              enabling the robot to respond      to the boxer’s movement and adapt
+              drills in real time.
+          </li>
+      </ul>
+      <p>
+          Each of these subsystems is detailed in the following sections.
+      </p>
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/Lower_mechanism/0-full robot product feature - cad overview.png"
+        subtitle="Figure 5: Product Features of BoxBunny">
+      </image-component>
+
+
+    </div>
+
+    <div id="user-journey">
+      <h3>4.2 User Journey (Zakir)</h3>
+      <h4 id="end-to-end-user-flow">4.2.1 End-to-End User Flow </h4>
+      <p>
+        The flowchart in Figure 6 illustrates the complete user journey when interacting with the robot, 
+        from the start of a session to its conclusion. Each activity is color-coded according to its 
+        corresponding product feature category, as indicated in the legend on the right. The session begins 
+        with height adjustment and selecting the training parameters that match the user’s goals. Once training 
+        starts, the robot functions as an intelligent training partner. The robot enables users to strike designated 
+        zones, defend against simulated punches through arm actuation, and move or orient itself in response to the 
+        user. At the end of the session, the robot generates performance analytics displayed on the dashboard. From 
+        there, users can choose to begin a new session or exit, depending on their needs.
+      </p>
+      
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/user_journey/User_Journey_Counter_Punch.png"
+        subtitle="Figure 6: User Journey Flowchart">
+      </image-component>
+
+    </div>
+
+    <div id="training-modes-overview">
+      <h4>4.2.2 Training Modes Overview</h4>
+      <p>
+        The robot offers two primary training modes: Training and Performance.
+      </p>
+      <p> 
+        Firstly, Training Mode includes Techniques and Spar.
+      </p>
+      <ul>
+        <li> Spar features five preset boxer types that simulate common opponent styles.</li>
+        <li> Techniques provides three categories: Punch Combination Library, Offensive Drills, and Defensive Drills.</li>
+        <ul>
+          <li> The Punch Combination Library includes multiple difficulty levels and also allows users to customise their own punch sequences.</li>
+          <li> o	Offensive and Defensive Drills focus on developing the user’s specific attacking and defensive skills respectively.</li>
+        </ul>
+      </ul>
+      <p>
+        Performance Mode measures key physical attributes such as stamina, punch power, and reaction time.
+      </p>
+      <p>
+         Additionally, the Others menu on the homepage enables users to adjust system settings such as switching 
+         between orthodox and southpaw, while the Insights feature provides a summary of training metrics and performance 
+         trends. 
+      </p>
+    </div>
+    <div id="movement-behavior"> 
+      <h4>4.2.3 Movement Behavior</h4>
+      <p>
+        When the user selects the training parameters, they are interacting with the Skill Progression component of the 
+        product. This feature determines the appropriate motor actuations and software activations (such as computer vision) 
+        required for the session. As shown in Figure 7, users can choose from several training categories such as Training, 
+        Performance, and Others with each serving different purposes. For clarity, this report focuses only on the green pathway, 
+        as detailing every iteration would be unnecessarily exhaustive.
+      </p>
+      <p> 
+        The green pathway leads to the Counter Punch Mode, which is intentionally chosen because it engages the full range of the 
+        robot’s capabilities. This mode is for all skill levels, as it replicates one of the most common foundational sparring 
+        opponents: a reactive boxer who waits for the user to initiate an attack and responds with precise, well-timed counters 
+        (typically jabs and crosses). This style is characterized by low aggression, high timing sensitivity, and reactive movement.
+      </p>
+      <p>
+        Translated into robot behaviour, the system uses computer vision to detect the user’s punches. For every punch thrown by the 
+        user, the robot responds with a counter-punch by actuating its arm motors. Additionally, the robot adjusts its position by 
+        moving linearly when the user steps forward or backward, and it maintains proper orientation by rotating to face the user. 
+        This ensures a realistic and continuous sparring interaction.
+      </p>
+
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/user_journey/user_journey.png"
+        subtitle="Figure 7: Simplified User Journey to Counterpuncher Training">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- SECTION 5.1 - GUI DEVELOPMENT (NEW DETAILED CONTENT) -->
+    <div id="user-interface">
+      <h3>5.1. User Interface (GUI) (Zakir)</h3>
+      
+      <p>
+        The Graphical User Interface (GUI) serves as the primary interaction point between users and BoxBunny's capabilities. 
+        As the system integrates multiple subsystems—computer vision for punch detection, Arduino sensors for power measurement, 
+        and robotic arms for sparring—the GUI must provide an intuitive, responsive interface that coordinates these components 
+        while remaining accessible to users with varying technical backgrounds.
+      </p>
+
+      <p>
+        My role in the BoxBunny project centered on complete GUI development, encompassing all user-facing features except 
+        the computer vision components handled by Yogeeswaran. This involved designing and implementing a comprehensive 
+        training system that integrates with the team's hardware contributions: Yogeeswaran's CV system for technique 
+        analysis, Elgin's 2-DOF robotic arms for sparring functionality, and Jeanette's height adjustment and rotating 
+        base mechanism. Additionally, I contributed to minor mechanical components including the screen holder, Jetson Nano 
+        mount, and foam construction.
+      </p>
+
+      <!-- 5.1.1 Design Specifications -->
+      <div id="gui-design-specifications">
+        <h4>5.1.1. Design Specifications</h4>
+        
+        <p>
+          The primary requirement provided was straightforward yet challenging: <strong>"as long as it is easy to use."</strong> 
+          This broad directive required translation into concrete, measurable specifications through analysis of the target 
+          user base identified in Chapter 2's primary research.
+        </p>
+
+        <p><strong>User Requirements Analysis</strong></p>
+        <p>
+          Building on the insights from our gym interviews (Section 2.2), I identified that users range from beginners 
+          to intermediate boxers, aged 15-50, with varied technical proficiency. The system needed to accommodate users 
+          with minimal technical knowledge while providing depth for experienced practitioners. Key usability requirements 
+          emerged:
+        </p>
+        <ul>
+          <li>Maximum 3 clicks to reach any feature from main menu</li>
+          <li>Large touch targets (minimum 80x60px) suitable for use with boxing gloves</li>
+          <li>Clear visual hierarchy with prominent display of critical information (current combo, score, timer)</li>
+          <li>Real-time feedback with <500ms latency from sensor input to UI update</li>
+          <li>High contrast design for visibility during physical activity</li>
+        </ul>
+
+        <p><strong>Functional Requirements</strong></p>
+        <p>
+          The GUI needed to fulfill several critical functions within the BoxBunny ecosystem:
+        </p>
+
+        <table-component id="gui-functional-requirements"></table-component>
+
+        <p><strong>Technical Specifications</strong></p>
+        <p>
+          The development platform selection was constrained by the project timeline. With only four months 
+          (December 2024 - April 2025) available, there was insufficient time to learn modern web or mobile frameworks. 
+          This necessitated selecting <strong>PySide6 (Qt for Python)</strong>, which leveraged existing Python knowledge 
+          while providing professional UI capabilities.
+        </p>
+
+        <p><strong>Platform Configuration:</strong></p>
+        <ul>
+          <li><strong>Development Framework:</strong> PySide6 (Qt for Python)</li>
+          <li><strong>Target Hardware:</strong> NVIDIA Jetson Nano 4GB (ARM architecture)</li>
+          <li><strong>Display:</strong> 7-inch touchscreen (1024x600 resolution)</li>
+          <li><strong>Operating System:</strong> Ubuntu 20.04 LTS</li>
+          <li><strong>Database:</strong> SQLite (lightweight, no server required)</li>
+        </ul>
+
+        <p><strong>Integration Specifications:</strong></p>
+        <p>
+          The GUI interfaces with multiple hardware components, each requiring specific communication protocols:
+        </p>
+
+        <table-component id="gui-integration-specs"></table-component>
+
+        <p><strong>Performance Requirements</strong></p>
+        <p>
+          To ensure responsive operation on the Jetson Nano's limited resources:
+        </p>
+        <ul>
+          <li>Application startup time < 3 seconds</li>
+          <li>Page transition latency < 500ms</li>
+          <li>Sensor data processing latency < 500ms</li>
+          <li>Database query time < 200ms for history retrieval</li>
+          <li>Memory footprint < 500MB (Jetson has 4GB total)</li>
+          <li>99% uptime during 4-hour training sessions</li>
+        </ul>
+      </div>
+
+      <!-- 5.1.2 Concept Generation & Evaluation -->
+      <div id="gui-concept-generation">
+        <h4>5.1.2. Concept Generation & Evaluation</h4>
+
+        <p><strong>Technology Stack Evaluation</strong></p>
+        <p>
+          The first critical decision involved selecting an appropriate development framework. Given the compressed timeline, 
+          I evaluated several options:
+        </p>
+
+        <table-component id="gui-framework-comparison"></table-component>
+
+        <p>
+          <strong>Decision:</strong> PySide6 was selected as it offered the best balance of development speed 
+          (leveraging existing Python knowledge), professional UI capabilities, and proven compatibility with the Jetson 
+          Nano platform. The extensive Qt documentation and large community support also reduced risk in the compressed timeline.
+        </p>
+
+        <p><strong>Navigation Architecture Concepts</strong></p>
+        <p>
+          I evaluated three navigation paradigms for the application structure:
+        </p>
+
+        <p><strong>Concept A: Tab-Based Navigation</strong></p>
+        <p>
+          <u>Description:</u> Main features accessible via persistent tabs (Training, Performance, Settings)
+        </p>
+        <p><u>Advantages:</u></p>
+        <ul>
+          <li>All major sections always visible</li>
+          <li>Familiar pattern from web browsers and mobile apps</li>
+          <li>Quick switching between modes</li>
+        </ul>
+        <p><u>Limitations:</u></p>
+        <ul>
+          <li>Limited screen real estate on 7-inch display</li>
+          <li>Tabs difficult to tap accurately with boxing gloves</li>
+          <li>Not suitable for multi-step workflows (select mode → configure → train → results)</li>
+        </ul>
+        <p><strong>Verdict:</strong> Rejected due to poor ergonomics for touchscreen operation during training</p>
+
+        <p><strong>Concept B: Hierarchical Pages with Navigation Stack</strong></p>
+        <p>
+          <u>Description:</u> Tree-structured pages with back button to retrace steps
+        </p>
+        <p><u>Advantages:</u></p>
+        <ul>
+          <li>Full-screen real estate for each page</li>
+          <li>Clear task flows (select mode → configure → train → results)</li>
+          <li>Large, glove-friendly buttons possible</li>
+          <li>Intuitive back navigation matches user mental model</li>
+        </ul>
+        <p><u>Limitations:</u></p>
+        <ul>
+          <li>Requires multiple taps to switch between unrelated features</li>
+          <li>Potential for deep navigation where users feel "lost"</li>
+        </ul>
+        <p>
+          <strong>Mitigation:</strong> Implement navigation stack to automatically track page history, 
+          eliminating need for manual back button implementation on each page.
+        </p>
+        <p><strong>Verdict:</strong> Selected with navigation stack implementation</p>
+
+        <p><strong>Concept C: Dashboard with Modal Dialogs</strong></p>
+        <p>
+          <u>Description:</u> Single dashboard screen with popup dialogs for each function
+        </p>
+        <p><u>Advantages:</u></p>
+        <ul>
+          <li>No page transitions required</li>
+          <li>All options visible from dashboard</li>
+        </ul>
+        <p><u>Limitations:</u></p>
+        <ul>
+          <li>Dashboard becomes cluttered with many training modes</li>
+          <li>Modal dialogs obscure context and feel disconnected</li>
+          <li>Difficult to manage complex multi-step workflows</li>
+        </ul>
+        <p><strong>Verdict:</strong> Rejected - doesn't scale to feature complexity</p>
+
+        <p><strong>Data Architecture Evaluation</strong></p>
+        <p>
+          To support multiple users on a shared BoxBunny unit, I evaluated data isolation strategies:
+        </p>
+
+        <table-component id="gui-data-isolation"></table-component>
+
+        <p>
+          <strong>Selected Approach:</strong> Per-user database files provide complete data isolation, easy user 
+          management (add/delete users by managing files), and maintain privacy. Each user's progress is stored in:
+        </p>
+        <ul>
+          <li><code>users/[username]/combos.db</code> - Combination training progress (50 combos × mastery scores)</li>
+          <li><code>users/[username]/performance_history.db</code> - Performance test results (Power, Stamina, Reaction Time)</li>
+        </ul>
+
+        <p><strong>Feature Prioritization</strong></p>
+        <p>
+          With the limited development timeline, I used MoSCoW prioritization to ensure core functionality delivery:
+        </p>
+
+        <p><strong>Must Have (Critical Path):</strong></p>
+        <ul>
+          <li>User login/signup system with secure credential storage</li>
+          <li>Basic navigation framework with page management</li>
+          <li>Punch combination training mode with CV integration placeholders</li>
+          <li>Database schema for user profiles and training data</li>
+          <li>Arduino sensor integration for power/stamina measurement</li>
+        </ul>
+
+        <p><strong>Should Have (Important):</strong></p>
+        <ul>
+          <li>Smart combo curriculum with progressive difficulty</li>
+          <li>Performance history tracking with trend analysis</li>
+          <li>Real-time feedback display during training</li>
+          <li>Settings and preferences management</li>
+        </ul>
+
+        <p><strong>Could Have (Desirable):</strong></p>
+        <ul>
+          <li>AI coaching feedback integration</li>
+          <li>Progress visualization with charts and graphs</li>
+          <li>Customizable training programs</li>
+          <li>Data export functionality (CSV/PDF)</li>
+        </ul>
+
+        <p><strong>Won't Have (Future Work):</strong></p>
+        <ul>
+          <li>Cloud synchronization across multiple BoxBunny units</li>
+          <li>Mobile app companion for remote tracking</li>
+          <li>Social features (leaderboards, progress sharing)</li>
+          <li>Video recording and playback of training sessions</li>
+        </ul>
+      </div>
+
+      <!-- 5.1.3 Detailed Design -->
+      <div id="gui-detailed-design">
+        <h4>5.1.3. Detailed Design</h4>
+
+        <p><strong>System Architecture</strong></p>
+        <p>
+          The GUI system follows a layered architecture pattern, separating concerns for maintainability:
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+┌─────────────────────────────────────────────────────────┐
+│           Presentation Layer (PySide6 Widgets)          │
+│  • Pages and UI Components                              │
+│  • Button Handlers and Event Callbacks                  │
+├─────────────────────────────────────────────────────────┤
+│              Application Layer                          │
+│  • Navigation Management (Page Stack)                   │
+│  • State Management (User Session, Config)              │
+│  • Event Coordination                                    │
+├─────────────────────────────────────────────────────────┤
+│             Business Logic Layer                        │
+│  • Combo Curriculum Engine                              │
+│  • Performance Testing Logic                            │
+│  • User Management                                       │
+├─────────────────────────────────────────────────────────┤
+│            Integration Layer                            │
+│  • Arduino Serial Communication                         │
+│  • CV System Interface                                   │
+│  • Robot Control (ROS Topics)                           │
+├─────────────────────────────────────────────────────────┤
+│              Data Layer                                 │
+│  • SQLite Databases (Per-User Files)                    │
+│  • Configuration Management                             │
+└─────────────────────────────────────────────────────────┘
+        </pre>
+
+        <p><strong>Navigation System Design</strong></p>
+        <p>
+          The application uses a QStackedWidget for page management with centralized navigation control. 
+          A key innovation was implementing an automatic navigation stack:
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+class MainWindow(QMainWindow):
+    def __init__(self):
+        self.pages = {}              # Dictionary: PageIndex → QWidget
+        self.stacked_widget = QStackedWidget()
+        self.navigation_stack = []   # Automatic page history
+        
+    def navigate_to(self, page_index, add_to_stack=True):
+        """Central navigation with automatic history tracking"""
+        current = self.stacked_widget.currentIndex()
+        
+        if add_to_stack and current != page_index:
+            self.navigation_stack.append(current)
+        
+        self.stacked_widget.setCurrentIndex(page_index)
+        self.update_back_button_visibility()
+    
+    def navigate_back(self):
+        """Return to previous page using stack"""
+        if self.navigation_stack:
+            previous = self.navigation_stack.pop()
+            self.navigate_to(previous, add_to_stack=False)
+        else:
+            self.navigate_to(PageIndex.MAIN_MENU, add_to_stack=False)
+        </pre>
+
+        <p>
+          This design eliminates the need for manual back button implementation on each page. Any page can call 
+          <code>navigate_back()</code> and the system automatically returns to the previous page, improving consistency 
+          and reducing code duplication.
+        </p>
+
+        <p><strong>Combo Curriculum Engine</strong></p>
+        <p>
+          Rather than allowing random combo selection, I designed a structured curriculum based on pedagogical principles:
+        </p>
+
+        <ul>
+          <li><strong>Progressive Difficulty:</strong> Beginners start with single punches before complex combinations</li>
+          <li><strong>Mastery-Based Progression:</strong> Users must demonstrate competence (average score ≥ threshold over 5 sessions) before advancing</li>
+          <li><strong>Group-Based Learning:</strong> Related techniques grouped together (e.g., all 2-punch jab combinations)</li>
+          <li><strong>Rotation for Variety:</strong> Within groups, combos rotate to prevent monotony while reinforcing fundamentals</li>
+        </ul>
+
+        <p><strong>Combo Library Structure:</strong></p>
+        <p>Total: <strong>50 Combinations</strong></p>
+        <ul>
+          <li><strong>Beginner (15 combos):</strong> Single punches (1-6) → 2-punch sequences (1-1, 1-2, etc.)</li>
+          <li><strong>Intermediate (20 combos):</strong> 3-punch sequences, body shots (Xb notation), basic defense (slip, block)</li>
+          <li><strong>Advanced (15 combos):</strong> 4-6 punch combinations, complex defense integration, counter-punching patterns</li>
+        </ul>
+
+        <p><strong>Notation System:</strong></p>
+        <table-component id="gui-combo-notation"></table-component>
+
+        <p><strong>Mastery Criteria:</strong></p>
+        <ul>
+          <li><strong>Beginner:</strong> Average score ≥ 3.0 / 5.0 over last 5 sessions</li>
+          <li><strong>Intermediate:</strong> Average score ≥ 4.0 / 5.0 over last 5 sessions</li>
+          <li><strong>Advanced:</strong> Average score ≥ 4.0 / 5.0 over last 5 sessions</li>
+        </ul>
+
+        <p><strong>Group-Based Progression Algorithm:</strong></p>
+        <p>
+          Within each difficulty level, combos are organized into groups. The system finds the first group with unmastered 
+          combos and rotates through them:
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+Beginner Groups:
+  Group 1: Single Punches (combos 1-6)
+  Group 2: 2-Punch with Jab (combos 7-12)
+  Group 3: 2-Punch Other (combos 13-15)
+
+Progression Example:
+  Round 1-6:   Rotate through Group 1 (Jab, Cross, Lead Hook, etc.)
+  Round 7-12:  Second pass through Group 1
+  ... continue until all 6 combos have avg ≥ 3.0 over 5 sessions ...
+  Round N:     Unlock Group 2, begin 2-punch sequences
+        </pre>
+
+        <p><strong>Arduino Multi-Mode Protocol</strong></p>
+        <p>
+          To support both Power and Stamina testing with a single MPU6050 accelerometer, I designed a command-based 
+          protocol allowing the Arduino to operate in different modes:
+        </p>
+
+        <table-component id="gui-arduino-modes"></table-component>
+
+        <p><strong>Protocol Command Set:</strong></p>
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+Python → Arduino Commands:
+    MODE:CONTINUOUS    # Switch to streaming mode
+    MODE:STAMINA       # Switch to stamina counting  
+    MODE:POWER         # Switch to power tracking
+    START              # Begin test (STAMINA/POWER modes)
+    STOP               # End test and return results
+
+Arduino → Python Responses:
+    OK:MODE_STAMINA                # Mode switch confirmed
+    OK:STAMINA_STARTED             # Test started
+    PUNCH_DETECTED:5               # Real-time count (Stamina)
+    POWER_PUNCH:4.2                # Real-time power (Power)
+    RESULT:PUNCHES:150             # Final stamina result
+    RESULT:PEAK:4.5,AVG:3.2,COUNT:10   # Final power result
+    ERROR:UNKNOWN_COMMAND          # Error handling
+        </pre>
+
+        <p><strong>Backward Compatibility:</strong></p>
+        <p>
+          To ensure the GUI works with both updated firmware and legacy firmware, I implemented protocol detection:
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+def check_protocol_version(serial_port):
+    # Send mode command
+    serial_port.write(b"MODE:CONTINUOUS\n")
+    
+    # Wait for response with timeout
+    response = serial_port.readline(timeout=1.0)
+    
+    if response.startswith("OK:"):
+        return "command_based"  # New firmware
+    else:
+        return "streaming"      # Old firmware, use fallback
+        </pre>
+
+        <p><strong>Database Schema Design</strong></p>
+        <p>
+          Each user's training data is stored in two SQLite databases:
+        </p>
+
+        <p><strong>1. Combo Progress Database (<code>users/[username]/combos.db</code>):</strong></p>
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+CREATE TABLE combos (
+    combo_id TEXT PRIMARY KEY,           -- e.g., "beginner_001"
+    combo_name TEXT NOT NULL,            -- e.g., "Jab"
+    combo_sequence TEXT NOT NULL,        -- e.g., "1"
+    difficulty_level TEXT NOT NULL,      -- Beginner/Intermediate/Advanced
+    mastery_score REAL DEFAULT 0.0,      -- 0-5 scale, avg of last 5
+    total_attempts INTEGER DEFAULT 0,
+    last_trained_timestamp TEXT,
+    created_date TEXT,
+    last_updated TEXT
+);
+
+CREATE TABLE performance_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    combo_id TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    performance_score REAL,              -- 0-5 from CV system
+    FOREIGN KEY (combo_id) REFERENCES combos(combo_id)
+);
+        </pre>
+
+        <p><strong>2. Performance Testing Database (<code>users/[username]/performance_history.db</code>):</strong></p>
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+CREATE TABLE power_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    peak_power REAL,                     -- G-force
+    average_power REAL,
+    total_punches INTEGER
+);
+
+CREATE TABLE stamina_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    total_punches INTEGER,
+    average_rate REAL,                   -- Punches per minute
+    first_30_rate REAL,
+    last_30_rate REAL,
+    stamina_score INTEGER,               -- 0-100
+    fatigue_percentage REAL,
+    duration INTEGER
+);
+
+CREATE TABLE reaction_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    reaction_time REAL,                  -- Seconds
+    accuracy REAL,                       -- 0-1
+    total_attempts INTEGER,
+    successful_attempts INTEGER
+);
+        </pre>
+      </div>
+
+      <!-- 5.1.4 Implementation & Testing -->
+      <div id="gui-implementation">
+        <h4>5.1.4. Implementation & Testing</h4>
+
+        <p>
+          The GUI development followed an iterative approach over 15 weeks (December 2024 - April 2025), 
+          with each iteration building upon the previous and addressing discovered issues. Below are the major iterations:
+        </p>
+
+        <p><strong>Iteration 1: Foundation & Core Framework (Weeks 1-2, December)</strong></p>
+        <p><u>Objectives:</u></p>
+        <ul>
+          <li>Establish PySide6 development environment on Jetson Nano</li>
+          <li>Create basic application shell with main window and page management</li>
+          <li>Implement simple navigation between placeholder pages</li>
+          <li>Verify touchscreen functionality with target hardware</li>
+        </ul>
+
+        <p><u>Implementation:</u></p>
+        <ul>
+          <li>Installed PySide6 on Jetson: <code>pip3 install PySide6</code></li>
+          <li>Created MainWindow class with QStackedWidget for page management</li>
+          <li>Developed 3 placeholder pages: Login, Main Menu, Settings</li>
+          <li>Implemented basic button navigation using lambda connections</li>
+        </ul>
+
+        <p><u>Testing:</u></p>
+        <ul>
+          <li>Tested on Jetson with 7-inch touchscreen</li>
+          <li>Verified touch targets were large enough (80x60px minimum)</li>
+          <li>Measured page transition latency: ~200ms (within acceptable range)</li>
+        </ul>
+
+        <p><u>Issues & Solutions:</u></p>
+        <ul>
+          <li><strong>Issue:</strong> Default Qt styling too small for comfortable touch interaction</li>
+          <li><strong>Solution:</strong> Created custom ButtonStyle class with larger fonts (18px+) and increased padding (20px)</li>
+        </ul>
+
+        <p><u>Outcomes:</u></p>
+        <ul>
+          <li>Proof of concept validated - PySide6 viable on target hardware</li>
+          <li>Basic navigation framework established as foundation for feature development</li>
+        </ul>
+
+        <p><strong>Iteration 2: User Management & Database (Weeks 3-4, January)</strong></p>
+        <p><u>Objectives:</u></p>
+        <ul>
+          <li>Implement multi-user support with login/signup functionality</li>
+          <li>Design and implement database schema for user profiles</li>
+          <li>Create user management UI (view users, delete users)</li>
+          <li>Implement session state management to track current user</li>
+        </ul>
+
+        <p><u>Implementation:</u></p>
+        <ul>
+          <li>Created <code>users.csv</code> for credential storage with SHA-256 password hashing</li>
+          <li>Developed LoginPage with username/password validation and signup flow</li>
+          <li>Created UserManagementPage for viewing and deleting user accounts</li>
+          <li>Added <code>current_user</code> state tracking in MainWindow</li>
+        </ul>
+
+        <p><u>Testing:</u></p>
+        <ul>
+          <li>Created 5 test users and verified data persistence across sessions</li>
+          <li>Tested login validation with correct/incorrect password scenarios</li>
+          <li>Verified user deletion doesn't affect other users' data</li>
+        </ul>
+
+        <p><u>Issues & Solutions:</u></p>
+        <ul>
+          <li><strong>Issue:</strong> Deleted user's training data remained in database files</li>
+          <li><strong>Solution:</strong> Implemented cascade deletion - remove entire <code>users/[username]</code> folder on account deletion</li>
+        </ul>
+
+        <p><u>Outcomes:</u></p>
+        <ul>
+          <li>Multi-user support functional with proper data isolation</li>
+          <li>Zero data mixing observed across 5 test users</li>
+        </ul>
+
+        <p><strong>Iteration 3: Combo Curriculum System (Weeks 5-7, January-February)</strong></p>
+        <p><u>Objectives:</u></p>
+        <ul>
+          <li>Design 50-combo library with progressive difficulty structure</li>
+          <li>Implement mastery-based progression algorithm</li>
+          <li>Create combo training session UI with timer and scoring display</li>
+          <li>Integrate with CV system (using placeholders initially)</li>
+        </ul>
+
+        <p><u>Implementation:</u></p>
+        <ul>
+          <li>Designed combo notation system (numeric codes + body shot modifiers + defense moves)</li>
+          <li>Created SQLite database schema for combo progress tracking</li>
+          <li>Implemented <code>ComboCurriculum</code> class with group-based selection algorithm</li>
+          <li>Developed training session page with countdown timer, combo display, and scoring interface</li>
+          <li>Created placeholder CV integration returning fixed score (3.0/5.0) for testing workflow</li>
+        </ul>
+
+        <p><u>Testing:</u></p>
+        <ul>
+          <li>Simulated 30 training sessions to validate progression logic</li>
+          <li>Verified combos rotate correctly within groups before advancing</li>
+          <li>Tested mastery threshold calculation (average of last 5 scores)</li>
+          <li>Confirmed all 15 beginner combos unlock before intermediate level</li>
+        </ul>
+
+        <p><u>Issues & Solutions:</u></p>
+        <ul>
+          <li><strong>Issue:</strong> Initial design used spaced repetition (Anki-style scheduling), but user workflow is actually sequential practice</li>
+          <li><strong>Solution:</strong> Redesigned to group-based rotation with mastery thresholds instead of time-based scheduling algorithms</li>
+          <li><strong>Issue:</strong> Database initially stored scores on 0-1 scale but CV outputs 0-5 values</li>
+          <li><strong>Solution:</strong> Migrated database schema to 0-5 scale with CHECK constraints: <code>CHECK(performance_score >= 0.0 AND performance_score <= 5.0)</code></li>
+          <li><strong>Issue:</strong> Shared database caused data mixing when multiple users practiced</li>
+          <li><strong>Solution:</strong> Implemented per-user database files at <code>users/[username]/combos.db</code></li>
+        </ul>
+
+        <p><u>Outcomes:</u></p>
+        <ul>
+          <li>50-combo curriculum implemented and validated through simulation</li>
+          <li>Progression algorithm correctly advances through 3 groups × 3 difficulty levels</li>
+          <li>Per-user data isolation achieved and tested</li>
+        </ul>
+
+        <p><strong>Iteration 4: Performance Testing Suite (Weeks 8-10, February)</strong></p>
+        <p><u>Objectives:</u></p>
+        <ul>
+          <li>Implement Power test with Arduino MPU6050 sensor integration</li>
+          <li>Implement Stamina test with endurance metrics calculation</li>
+          <li>Implement Reaction Time test (CV-based)</li>
+          <li>Create result pages displaying scores and statistics</li>
+        </ul>
+
+        <p><u>Implementation:</u></p>
+        <p><strong>Power Test:</strong></p>
+        <ul>
+          <li>Created <code>power_runner.py</code> module for Arduino serial communication at 115200 baud</li>
+          <li>Implemented punch detection: threshold-based (>2.5g) with 300ms debouncing to prevent double-counting</li>
+          <li>Result page displays peak g-force, average power, total punch count</li>
+        </ul>
+
+        <p><strong>Stamina Test:</strong></p>
+        <ul>
+          <li>Created <code>stamina_runner.py</code> with 2-minute endurance test protocol</li>
+          <li>Implemented punch rate calculation (punches per minute over rolling 10-second window)</li>
+          <li>Added fatigue analysis comparing first 30 seconds vs last 30 seconds</li>
+          <li>Stamina score formula: 60% total punch volume + 40% consistency (minimal fatigue)</li>
+          <li>Included simulation mode generating realistic random data for testing without hardware</li>
+        </ul>
+
+        <p><strong>Reaction Time Test:</strong></p>
+        <ul>
+          <li>Created <code>reaction_runner.py</code> interfacing with Yogeeswaran's CV module</li>
+          <li>Test displays visual cue, CV detects punch, measures elapsed time</li>
+          <li>Tracks accuracy (successful reactions / total attempts)</li>
+        </ul>
+
+        <p><u>Testing:</u></p>
+        <ul>
+          <li><strong>Power:</strong> Tested with Arduino on breadboard, validated punch detection at 2.5g threshold</li>
+          <li><strong>Stamina:</strong> Ran 10 simulated tests, confirmed scoring produces 0-100 range with realistic distribution</li>
+          <li><strong>Reaction:</strong> Tested with mock CV data in 0.3-0.6 second range</li>
+        </ul>
+
+        <p><u>Issues & Solutions:</u></p>
+        <ul>
+          <li><strong>Issue:</strong> Both Stamina and Power needed Arduino, but unclear which mode was active</li>
+          <li><strong>Solution:</strong> See Iteration 5 (multi-mode protocol design)</li>
+        </ul>
+
+        <p><u>Outcomes:</u></p>
+        <ul>
+          <li>All three performance tests functional with proper result display</li>
+          <li>Arduino integration working in streaming mode</li>
+          <li>Simulation modes enable complete testing without hardware dependencies</li>
+        </ul>
+
+        <p><strong>Iteration 5: Arduino Multi-Mode Protocol (Weeks 11-12, March)</strong></p>
+        <p><u>Objectives:</u></p>
+        <ul>
+          <li>Resolve Arduino mode ambiguity (Power vs Stamina confusion)</li>
+          <li>Design command-based protocol for explicit mode switching</li>
+          <li>Implement protocol in both Arduino firmware and Python runners</li>
+          <li>Add backward compatibility for legacy streaming firmware</li>
+        </ul>
+
+        <p><u>Protocol Design:</u></p>
+        <ul>
+          <li><strong>CONTINUOUS mode:</strong> Stream acceleration data at 100Hz (for debugging/tuning)</li>
+          <li><strong>STAMINA mode:</strong> Count punches internally, return total on STOP command</li>
+          <li><strong>POWER mode:</strong> Track peak/average acceleration, return metrics on STOP command</li>
+        </ul>
+
+        <p><u>Implementation:</u></p>
+        <p><strong>Arduino Firmware:</strong></p>
+        <ul>
+          <li>Created state machine with 3 distinct operating modes</li>
+          <li>Command parser handling MODE:X, START, STOP commands</li>
+          <li>Response formatter for OK:X, RESULT:X, ERROR:X messages</li>
+          <li>Debouncing logic (300ms) to prevent double-counting rapid punches</li>
+        </ul>
+
+        <p><strong>Python Integration:</strong></p>
+        <ul>
+          <li>Added <code>check_protocol_version()</code> function to detect firmware capabilities</li>
+          <li>Implemented command-based measurement in <code>power_runner.py</code> and <code>stamina_runner.py</code></li>
+          <li>Maintained streaming fallback for backward compatibility with older firmware</li>
+          <li>Added protocol validation expecting "OK:" responses with 2-second timeout</li>
+        </ul>
+
+        <p><u>Testing:</u></p>
+        <ul>
+          <li>Tested mode switching sequence: CONTINUOUS → STAMINA → POWER → CONTINUOUS</li>
+          <li>Verified command protocol using Arduino serial monitor</li>
+          <li>Tested fallback: old firmware (no MODE command support) correctly uses streaming mode</li>
+          <li>Validated punch counting accuracy: 95% correct detection (5% missed due to weak punches below threshold)</li>
+        </ul>
+
+        <p><u>Issues & Solutions:</u></p>
+        <ul>
+          <li><strong>Issue:</strong> Serial buffer overflow when Arduino sends data faster than Python reads</li>
+          <li><strong>Solution:</strong> Increased Python read frequency to 100Hz, added buffer clearing before each test</li>
+          <li><strong>Issue:</strong> Occasional command misalignment (Arduino missed MODE command)</li>
+          <li><strong>Solution:</strong> Added retry logic with 2-second timeout and response validation</li>
+        </ul>
+
+        <p><u>Outcomes:</u></p>
+        <ul>
+          <li>Multi-mode protocol fully functional with clean separation between test types</li>
+          <li>Backward compatibility maintained for users with older Arduino firmware</li>
+          <li>95% punch detection accuracy, mode switching completes in <2 seconds</li>
+        </ul>
+
+        <p><strong>Iteration 6: Unified History & Navigation Stack (Weeks 13-15, March-April)</strong></p>
+        <p><u>Objectives:</u></p>
+        <ul>
+          <li>Unify performance history across Power/Stamina/Reaction test types</li>
+          <li>Implement intelligent navigation with automatic back button support</li>
+          <li>Add AI coaching feedback framework (template-based with LLM integration prepared)</li>
+          <li>Polish UI consistency across all pages and training modes</li>
+        </ul>
+
+        <p><u>Implementation:</u></p>
+        <p><strong>Unified Performance Database:</strong></p>
+        <ul>
+          <li>Created <code>performance_database.py</code> with single database containing all test types</li>
+          <li>Implemented <code>get_latest_performance_summary()</code> showing trends (↑ improved / ↓ declined / → stable)</li>
+          <li>Built PerformanceHistoryPage displaying:
+            <ul>
+              <li>Latest test summary comparing current performance vs historical average</li>
+              <li>Filterable table (All tests / Power only / Stamina only / Reaction only)</li>
+              <li>Per-test trend calculation (comparing each test to previous test of same type)</li>
+            </ul>
+          </li>
+        </ul>
+
+        <p><strong>Navigation Stack:</strong></p>
+        <ul>
+          <li>Added <code>navigation_stack</code> list to MainWindow for automatic page history tracking</li>
+          <li>Modified <code>navigate_to()</code> to automatically record current page before navigation</li>
+          <li>Implemented <code>navigate_back()</code> to pop from stack and return to previous page</li>
+          <li>Migrated 87 instances of <code>setCurrentIndex()</code> to <code>navigate_to()</code> for centralized control</li>
+          <li>Added automatic back button visibility control (hidden when stack is empty)</li>
+        </ul>
+
+        <p><strong>AI Feedback Framework:</strong></p>
+        <ul>
+          <li>Designed feedback prompt template incorporating test results + historical context</li>
+          <li>Implemented template-based fallback for when AI/LLM is disabled</li>
+          <li>Added feedback display section to all result pages (Power, Stamina, Reaction)</li>
+          <li>Feedback considers: current score, historical average, trend direction, test-specific metrics</li>
+        </ul>
+
+        <p><u>Testing:</u></p>
+        <ul>
+          <li><strong>Navigation:</strong> Tested deep navigation paths (6+ levels), verified back button always returns to actual previous page</li>
+          <li><strong>History:</strong> Created 20 mixed test results, verified filtering and trend calculations work correctly</li>
+          <li><strong>AI Feedback:</strong> Validated template generation for various score scenarios (high/medium/low performance)</li>
+        </ul>
+
+        <p><u>Issues & Solutions:</u></p>
+        <ul>
+          <li><strong>Issue:</strong> Back button from History page always navigated to Settings page regardless of entry point</li>
+          <li><strong>Solution:</strong> Implemented navigation stack - back button now correctly returns to wherever user came from (Performance result page or Settings page)</li>
+          <li><strong>Issue:</strong> Database schema mismatch (0-1 scale vs 0-5 scale) caused CHECK constraint violations</li>
+          <li><strong>Solution:</strong> Recreated database with corrected CHECK constraints allowing 0-5 range</li>
+          <li><strong>Issue:</strong> Training session count in CSV didn't match combo attempts in database (7 sessions vs 3 attempts)</li>
+          <li><strong>Solution:</strong> Reset training history CSV files when migrating to per-user databases for clean data state</li>
+        </ul>
+
+        <p><u>Outcomes:</u></p>
+        <ul>
+          <li>Unified performance tracking system operational across all test types</li>
+          <li>Intelligent navigation with automatic history - back button works 100% correctly across all flows</li>
+          <li>AI feedback framework ready (template functional, LLM integration prepared for future)</li>
+          <li>History page successfully shows combined data from Power, Stamina, and Reaction tests</li>
+        </ul>
+
+        <p><strong>Validation Testing Summary</strong></p>
+        <table-component id="gui-functional-testing"></table-component>
+
+        <p><strong>Performance Testing Results</strong></p>
+        <table-component id="gui-performance-testing"></table-component>
+
+        <p>
+          All performance targets were met or exceeded, confirming the GUI operates efficiently within the 
+          Jetson Nano's resource constraints.
+        </p>
+      </div>
+
+      <!-- 5.1.5 Evaluation & Outcomes -->
+      <div id="gui-evaluation">
+        <h4>5.1.5. Evaluation & Outcomes</h4>
+
+        <p><strong>Requirements Achievement</strong></p>
+        <p>
+          The primary requirement—<strong>"as long as it is easy to use"</strong>—was successfully met through:
+        </p>
+        <ul>
+          <li>Maximum 3-click navigation to any feature achieved across entire interface</li>
+          <li>Large touch targets (80x60px minimum) enabling gloved operation</li>
+          <li>Clear visual hierarchy with prominent display of critical information</li>
+          <li>Consistent navigation pattern with automatic back button behavior</li>
+          <li>Real-time feedback with measured latency well below 500ms target</li>
+        </ul>
+
+        <p><strong>Core Deliverables Status</strong></p>
+        <table-component id="gui-deliverables-status"></table-component>
+
+        <p><strong>Technical Achievements</strong></p>
+        <ul>
+          <li><strong>Rapid Development:</strong> Delivered feature-complete GUI in 4 months despite no prior PySide6 experience</li>
+          <li><strong>Robust Architecture:</strong> Layered design enables straightforward feature additions and maintenance</li>
+          <li><strong>Hardware Integration:</strong> Multi-mode Arduino protocol elegantly handles Power/Stamina/Continuous modes with single codebase</li>
+          <li><strong>User Experience:</strong> Navigation stack provides intuitive back button behavior eliminating need for manual implementation</li>
+          <li><strong>Data Integrity:</strong> Per-user database isolation ensures privacy and prevents data mixing across all testing scenarios</li>
+        </ul>
+
+        <p><strong>Design Strengths</strong></p>
+        <ul>
+          <li><strong>Pedagogical Approach:</strong> Combo curriculum based on mastery learning principles rather than arbitrary selection</li>
+          <li><strong>Extensibility:</strong> Adding new training modes or performance tests requires minimal code changes due to modular design</li>
+          <li><strong>Offline-First:</strong> All features function without internet connectivity, suitable for gym environments</li>
+          <li><strong>Backward Compatibility:</strong> Protocol detection ensures GUI works with both updated and legacy Arduino firmware</li>
+        </ul>
+
+        <p><strong>Limitations & Constraints</strong></p>
+        <p><strong>Development Constraints Impact:</strong></p>
+        <ul>
+          <li><strong>Limited User Testing:</strong> Due to academic timeline, unable to conduct extensive usability studies with actual boxers beyond team members</li>
+          <li><strong>Single Developer:</strong> All GUI work completed individually without peer code review or collaborative refinement</li>
+          <li><strong>Hardware Availability:</strong> Testing often performed with simulation modes due to limited access to fully integrated robot during development</li>
+        </ul>
+
+        <p><strong>Technical Limitations:</strong></p>
+        <ul>
+          <li><strong>Display Constraints:</strong> 7-inch screen limits simultaneous information display; cannot show multiple metrics side-by-side</li>
+          <li><strong>Touch Precision:</strong> Boxing gloves reduce touch accuracy; some users may struggle with smaller UI elements despite 80x60px targets</li>
+          <li><strong>Serial Reliability:</strong> Occasional Arduino communication glitches require retry logic and error handling</li>
+        </ul>
+
+        <p><strong>Known Issues</strong></p>
+        <table-component id="gui-known-issues"></table-component>
+
+        <p><strong>Lessons Learned</strong></p>
+        <p><strong>Technical Lessons:</strong></p>
+        <ul>
+          <li><strong>Framework Selection Critical:</strong> PySide6 choice enabled rapid development without sacrificing professional quality</li>
+          <li><strong>Design for Iteration:</strong> Modular architecture made refactoring straightforward (e.g., database migration, navigation stack addition)</li>
+          <li><strong>Early Hardware Testing:</strong> Simulation cannot capture all Arduino communication edge cases; real hardware testing essential</li>
+          <li><strong>Document Protocol Decisions:</strong> Clear multi-mode Arduino protocol documentation saved significant debugging time</li>
+        </ul>
+
+        <p><strong>Project Management Lessons:</strong></p>
+        <ul>
+          <li><strong>Prioritize Ruthlessly:</strong> MoSCoW method ensured core features delivered despite compressed timeline</li>
+          <li><strong>Iterative Development Works:</strong> Six iterations allowed course correction when requirements clarified (e.g., changing from spaced repetition to group rotation)</li>
+          <li><strong>Placeholder Patterns Enable Parallel Work:</strong> CV and Arduino placeholders allowed GUI development before hardware/software integration</li>
+        </ul>
+
+        <p><strong>Future Work Recommendations</strong></p>
+        <p><strong>Short-term (1-2 months):</strong></p>
+        <ol>
+          <li>Complete LLM integration for AI coaching feedback, replacing template responses</li>
+          <li>Conduct usability study with 10-15 actual boxers for real-world validation</li>
+          <li>Add progress visualization (charts/graphs) to history page</li>
+        </ol>
+
+        <p><strong>Medium-term (3-6 months):</strong></p>
+        <ol>
+          <li>Advanced analytics: trend analysis, comparative metrics, weak area identification</li>
+          <li>Customization features: user-defined programs, custom combo creation, adjustable thresholds</li>
+          <li>Data export functionality: CSV/PDF reports for coaches and personal tracking</li>
+        </ol>
+
+        <p><strong>Long-term (6+ months):</strong></p>
+        <ol>
+          <li>Cloud integration: sync user data across multiple BoxBunny units, centralized leaderboards</li>
+          <li>Mobile companion app: view history on smartphone, set goals, receive training reminders</li>
+          <li>Video integration: record sessions from CV camera, playback with technique annotations</li>
+          <li>Community features: global leaderboards, virtual sparring, coach marketplace</li>
+        </ol>
+
+        <p><strong>Conclusion</strong></p>
+        <p>
+          The GUI development for BoxBunny successfully delivered a comprehensive, user-friendly interface within the 
+          constrained 4-month timeline (December 2024 - April 2025). The system meets all core requirements: 
+          ease of use, multi-user support, intelligent training curriculum, performance testing suite, and hardware 
+          integration with team members' subsystems.
+        </p>
+
+        <p>
+          Key achievements include:
+        </p>
+        <ul>
+          <li>50-combo progressive curriculum with mastery-based advancement across three difficulty levels</li>
+          <li>Multi-mode Arduino protocol enabling flexible sensor usage for different test types</li>
+          <li>Unified performance tracking across Power, Stamina, and Reaction Time tests</li>
+          <li>Intelligent navigation system with automatic back button eliminating manual implementation</li>
+          <li>Complete per-user data isolation ensuring privacy and preventing data mixing</li>
+        </ul>
+
+        <p>
+          The iterative development approach proved essential, allowing discovery and resolution of design issues 
+          (database schema corrections, navigation flow improvements, protocol ambiguity elimination) before they 
+          became critical problems. While limitations exist due to development constraints (limited user testing, 
+          single developer, compressed timeline), the foundation is robust for future enhancement through user 
+          feedback and feature expansion.
+        </p>
+
+        <p>
+          The GUI component successfully fulfills its role within the BoxBunny system: providing an intuitive, 
+          responsive interface that integrates computer vision (Yogeeswaran), robotic arms (Elgin), and height/rotation 
+          mechanisms (Jeanette) into a cohesive training experience. Future work will focus on user testing validation, 
+          visual refinement, and advanced features including full AI integration and cloud connectivity.
+        </p>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+  <!-- Scroll to top button -->
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+
+  <!-- Table components scripts -->
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script type="module" src="./components/table-component/table-component.js"></script>
+  <script src="./components/table-component/user-insights.js"></script>
+  <script src="./components/table-component/competitor-analysis.js"></script>
+  <script src="./components/table-component/design-improvement.js"></script>
+  <script src="./components/table-component/product-needs.js"></script>
+  <script src="./components/table-component/ui-func-spec.js"></script>
+  <script src="./components/table-component/interview-qn.js"></script>
+  <script src="./components/table-component/tables.js"></script>
+  <script src="./components/table-component/gui-functional-requirements.js"></script>
+  <script src="./components/table-component/gui-integration-specs.js"></script>
+  <script src="./components/table-component/gui-framework-comparison.js"></script>
+  <script src="./components/table-component/gui-data-isolation.js"></script>
+  <script src="./components/table-component/gui-combo-notation.js"></script>
+  <script src="./components/table-component/gui-arduino-modes.js"></script>
+  <script src="./components/table-component/gui-functional-testing.js"></script>
+  <script src="./components/table-component/gui-performance-testing.js"></script>
+  <script src="./components/table-component/gui-deliverables-status.js"></script>
+  <script src="./components/table-component/gui-known-issues.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="./components/data-chart/boxer-pie.js"></script>
+  <script src="./components/data-chart/train-sp-pie.js"></script>
+</body>
+</html>
