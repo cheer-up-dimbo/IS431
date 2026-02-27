@@ -38,6 +38,7 @@ class PageIndex:
     STAMINA_RESULT = 30
     STAMINA_HISTORY = 31
     PERFORMANCE_HISTORY = 32
+    BATTLE_STYLE_DESC = 33
 
 
 class ButtonStyle:

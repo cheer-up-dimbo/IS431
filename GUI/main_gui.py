@@ -7,13 +7,21 @@ import sqlite3
 from pathlib import Path
 from functools import partial
 from dataclasses import dataclass, field, asdict
-from typing import Optional, List
+from typing import Optional, List, Dict, Set
 from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, 
                                QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout,
                                QLineEdit, QMessageBox, QScrollArea, QTableWidget, 
-                               QTableWidgetItem, QHeaderView, QAbstractItemView, QTextEdit)
-from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject
-from PySide6.QtGui import QTextCursor
+                               QTableWidgetItem, QHeaderView, QAbstractItemView, QTextEdit,
+                               QComboBox, QGraphicsDropShadowEffect)
+from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject, QEvent
+from PySide6.QtGui import QTextCursor, QKeyEvent, QCloseEvent, QColor
+
+try:
+    import serial
+    from serial.tools import list_ports
+except Exception:
+    serial = None
+    list_ports = None
 
 import random
 import time
@@ -34,6 +42,87 @@ from utils import (
 
 GUI_DIR = os.path.dirname(__file__)
 SHARED_DB_PATH = os.path.join(GUI_DIR, 'data', 'combos.db')
+GUI_ENV_PATH = os.path.join(GUI_DIR, ".env")
+
+
+def _load_env_file(path: str):
+    """Load KEY=VALUE pairs from a simple .env file into os.environ."""
+    if not os.path.exists(path):
+        return
+
+    try:
+        with open(path, "r", encoding="utf-8") as env_file:
+            for raw_line in env_file:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                if key:
+                    os.environ.setdefault(key, value)
+    except Exception as e:
+        print(f"WARNING: Failed to load env file {path}: {e}")
+
+
+def _set_env_key(path: str, key: str, value: str):
+    """Set or append KEY=VALUE in a simple .env file and runtime env."""
+    normalized_line = f"{key}={value}"
+    lines: List[str] = []
+
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as env_file:
+                lines = env_file.read().splitlines()
+        except Exception:
+            lines = []
+
+    updated = False
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith(f"{key}="):
+            lines[index] = normalized_line
+            updated = True
+            break
+
+    if not updated:
+        lines.append(normalized_line)
+
+    with open(path, "w", encoding="utf-8") as env_file:
+        env_file.write("\n".join(lines).strip() + "\n")
+
+    os.environ[key] = value
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except Exception:
+        return default
+
+
+def _env_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+_load_env_file(os.path.join(os.path.dirname(GUI_DIR), ".env"))
+_load_env_file(os.path.join(GUI_DIR, ".env"))
 
 
 def _widget_navigate_to(self, page_index: int):
@@ -109,10 +198,312 @@ def get_user_db_path(username: str) -> str:
 DB_PATH = SHARED_DB_PATH
 
 
+class ArduinoButtonListener(QThread):
+    """Background serial listener for physical navigation buttons."""
+
+    button_pressed = Signal(str)
+    status = Signal(str)
+
+    def __init__(
+        self,
+        port: Optional[str] = None,
+        baudrate: int = 115200,
+        debounce_ms: int = 120,
+        serial_timeout_s: float = 0.05,
+        startup_delay_s: float = 1.2,
+        reconnect_interval_s: float = 2.0,
+        parent: Optional[QObject] = None,
+    ):
+        super().__init__(parent)
+        self.port = port or os.getenv("ARDUINO_BUTTON_PORT", "")
+        self.baudrate = baudrate
+        self.debounce_ms = debounce_ms
+        self.serial_timeout_s = serial_timeout_s
+        self.startup_delay_s = startup_delay_s
+        self.reconnect_interval_s = reconnect_interval_s
+        self._running = True
+        self._ser = None
+        self._last_emit_ms: Dict[str, int] = {}
+        self._last_status_msg: str = ""
+        self._last_status_ts: float = 0.0
+
+    def stop(self):
+        self._running = False
+
+    def _emit_status_throttled(self, message: str, min_interval_s: float = 2.0):
+        now = time.time()
+        if message != self._last_status_msg or (now - self._last_status_ts) >= min_interval_s:
+            self.status.emit(message)
+            self._last_status_msg = message
+            self._last_status_ts = now
+
+    def _resolve_port(self) -> Optional[str]:
+        if self.port:
+            return self.port
+        if list_ports is None:
+            return None
+        for candidate in list_ports.comports():
+            desc = (candidate.description or "").lower()
+            if "arduino" in desc or "ch340" in desc or "usb serial" in desc:
+                return candidate.device
+        return None
+
+    def _connect(self) -> bool:
+        if serial is None:
+            self._emit_status_throttled("pyserial not installed - Arduino button input disabled", min_interval_s=10.0)
+            return False
+
+        port = self._resolve_port()
+        if not port:
+            self._emit_status_throttled("No Arduino serial port detected", min_interval_s=5.0)
+            return False
+
+        try:
+            self._ser = serial.Serial(port, self.baudrate, timeout=self.serial_timeout_s)
+            self._ser.reset_input_buffer()
+            self._ser.reset_output_buffer()
+            if self.startup_delay_s > 0:
+                time.sleep(self.startup_delay_s)
+                self._ser.reset_input_buffer()
+            self._emit_status_throttled(f"Arduino buttons connected on {port} @ {self.baudrate}", min_interval_s=0.0)
+            return True
+        except Exception as e:
+            self._emit_status_throttled(f"Arduino connect failed on {port}: {e}", min_interval_s=3.0)
+            self._ser = None
+            return False
+
+    def _close_serial(self):
+        try:
+            if self._ser and self._ser.is_open:
+                self._ser.close()
+        except Exception:
+            pass
+        finally:
+            self._ser = None
+
+    def run(self):
+        command_aliases = {
+            "BTN1_PRESS": "BTN1_PRESS",
+            "BTN2_PRESS": "BTN2_PRESS",
+            "BTN3_PRESS": "BTN3_PRESS",
+            "BTN1": "BTN1_PRESS",
+            "BTN2": "BTN2_PRESS",
+            "BTN3": "BTN3_PRESS",
+        }
+
+        while self._running:
+            if self._ser is None or not self._ser.is_open:
+                if not self._connect():
+                    self.msleep(int(self.reconnect_interval_s * 1000))
+                    continue
+
+            try:
+                raw_line = self._ser.readline()
+                if not raw_line:
+                    continue
+
+                cmd_raw = raw_line.decode("utf-8", errors="ignore").replace("\x00", "").strip().upper()
+                cmd = command_aliases.get(cmd_raw)
+                if not cmd:
+                    continue
+
+                now_ms = int(time.time() * 1000)
+                last_ms = self._last_emit_ms.get(cmd, 0)
+                if now_ms - last_ms < self.debounce_ms:
+                    continue
+
+                self._last_emit_ms[cmd] = now_ms
+                self.button_pressed.emit(cmd)
+            except Exception as e:
+                self._emit_status_throttled(f"Arduino read error: {e}", min_interval_s=3.0)
+                self._close_serial()
+                self.msleep(int(self.reconnect_interval_s * 1000))
+
+        self._close_serial()
+
+
 
 # ============================================================================
 # Page Classes
 # ============================================================================
+
+class ButtonNavigationMixin:
+    """Provides consistent button styling and keyboard navigation."""
+
+    BUTTON_STYLE = """
+        QPushButton {
+            font-size: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 360px;
+            max-width: 420px;
+            min-height: 65px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
+    def setup_navigation(self, buttons: List[QPushButton]):
+        nav_buttons = [button for button in buttons if isinstance(button, QPushButton)]
+        self._nav_buttons = nav_buttons
+        self._focused_button_index = 0
+        nav_style = getattr(self, "NAV_BUTTON_STYLE", self.BUTTON_STYLE)
+        nav_autosize = getattr(self, "NAV_BUTTON_AUTOSIZE", False)
+        nav_min_width = getattr(self, "NAV_BUTTON_MIN_WIDTH", 360)
+        nav_max_width = getattr(self, "NAV_BUTTON_MAX_WIDTH", 420)
+        nav_min_height = getattr(self, "NAV_BUTTON_MIN_HEIGHT", 65)
+
+        if not nav_buttons:
+            return
+
+        if hasattr(self, "setFocusPolicy"):
+            self.setFocusPolicy(Qt.StrongFocus)
+
+        for button in nav_buttons:
+            button.setFocusPolicy(Qt.StrongFocus)
+            button.setStyleSheet(nav_style)
+
+            if nav_autosize:
+                button.setMinimumWidth(nav_min_width)
+                button.setMaximumWidth(16777215)
+                button.setMinimumHeight(nav_min_height)
+                button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+            else:
+                button.setMinimumWidth(nav_min_width)
+                button.setMaximumWidth(nav_max_width)
+                button.setMinimumHeight(nav_min_height)
+                button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
+            parent_widget = button.parentWidget()
+            parent_layout = parent_widget.layout() if parent_widget is not None else None
+            if parent_layout is not None:
+                parent_layout.setAlignment(button, Qt.AlignHCenter)
+
+            button.installEventFilter(self)
+
+        QTimer.singleShot(0, lambda: self._set_focus_index(0))
+
+    def _set_focus_index(self, index: int):
+        if not getattr(self, "_nav_buttons", None):
+            return
+        self._focused_button_index = index % len(self._nav_buttons)
+        self._nav_buttons[self._focused_button_index].setFocus(Qt.TabFocusReason)
+        self._update_focus_glow()
+
+    def _move_focus(self, step: int):
+        self._set_focus_index(self._focused_button_index + step)
+
+    def _activate_focused_button(self):
+        if not getattr(self, "_nav_buttons", None):
+            return
+        self._nav_buttons[self._focused_button_index].click()
+
+    def _update_focus_glow(self):
+        if not getattr(self, "_nav_buttons", None):
+            return
+        for idx, button in enumerate(self._nav_buttons):
+            if idx == self._focused_button_index:
+                glow = QGraphicsDropShadowEffect(self)
+                glow.setBlurRadius(36)
+                glow.setColor(QColor(0, 255, 0, 230))
+                glow.setOffset(0, 0)
+                button.setGraphicsEffect(glow)
+            else:
+                button.setGraphicsEffect(None)
+
+    def eventFilter(self, obj, event):
+        nav_buttons = getattr(self, "_nav_buttons", [])
+        if obj in nav_buttons:
+            idx = nav_buttons.index(obj)
+            if event.type() == QEvent.FocusIn:
+                self._focused_button_index = idx
+                self._update_focus_glow()
+                return False
+            if event.type() == QEvent.KeyPress:
+                key = event.key()
+                if key == Qt.Key_Up:
+                    self._move_focus(-1)
+                    return True
+                if key == Qt.Key_Down:
+                    self._move_focus(1)
+                    return True
+                if key in (Qt.Key_Return, Qt.Key_Enter):
+                    self._activate_focused_button()
+                    return True
+
+        parent_event_filter = getattr(super(), "eventFilter", None)
+        if callable(parent_event_filter):
+            return parent_event_filter(obj, event)
+        return False
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == Qt.Key_Up:
+            self._move_focus(-1)
+            event.accept()
+            return
+        if key == Qt.Key_Down:
+            self._move_focus(1)
+            event.accept()
+            return
+        if key in (Qt.Key_Return, Qt.Key_Enter):
+            self._activate_focused_button()
+            event.accept()
+            return
+        super_key_press = getattr(super(), "keyPressEvent", None)
+        if callable(super_key_press):
+            super_key_press(event)
+
+    def handle_arduino_up(self) -> bool:
+        if not getattr(self, "_nav_buttons", None):
+            return False
+        self._move_focus(-1)
+        return True
+
+    def handle_arduino_down(self) -> bool:
+        if not getattr(self, "_nav_buttons", None):
+            return False
+        self._move_focus(1)
+        return True
+
+    def handle_arduino_enter(self) -> bool:
+        if not getattr(self, "_nav_buttons", None):
+            return False
+        self._activate_focused_button()
+        return True
+
+
+PARAMETER_SELECTION_BUTTON_STYLE = """
+    QPushButton {
+        font-size: 17px;
+        padding: 10px 20px;
+        background-color: #f5f5f5;
+        border: 3px solid #cccccc;
+        border-radius: 10px;
+        min-width: 280px;
+        min-height: 55px;
+        color: #111111;
+    }
+    QPushButton:focus {
+        border: 6px solid #00ff00;
+        background-color: #2d5016;
+        color: white;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #e8e8e8;
+    }
+"""
 
 def get_users_csv_path():
     """Get the path to the users CSV file."""
@@ -310,8 +701,33 @@ def get_training_csv_path(username: str):
     return new_path
 
 
-class LoginPage(QWidget):
+class LoginPage(ButtonNavigationMixin, QWidget):
     """Login/Signup page shown on application startup."""
+
+    NAV_BUTTON_AUTOSIZE = True
+    NAV_BUTTON_MIN_WIDTH = 280
+    NAV_BUTTON_MIN_HEIGHT = 70
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 20px;
+            padding: 15px 30px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 280px;
+            min-height: 70px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
     
     def __init__(self, stacked_widget, app_state):
         super().__init__()
@@ -321,8 +737,8 @@ class LoginPage(QWidget):
         
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(10)
-        layout.setContentsMargins(100, 30, 100, 30)
+        layout.setSpacing(20)
+        layout.setContentsMargins(60, 40, 60, 40)
         
         # Title
         title = QLabel("Boxing Training App")
@@ -394,9 +810,15 @@ class LoginPage(QWidget):
         signup_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         manage_users_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         
-        login_btn.setFixedSize(180, 45)
-        signup_btn.setFixedSize(180, 45)
-        manage_users_btn.setFixedSize(180, 45)
+        login_btn.setMinimumHeight(70)
+        signup_btn.setMinimumHeight(70)
+        manage_users_btn.setMinimumHeight(70)
+        login_btn.setMinimumWidth(280)
+        signup_btn.setMinimumWidth(280)
+        manage_users_btn.setMinimumWidth(280)
+        login_btn.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        signup_btn.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        manage_users_btn.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         
         login_btn.clicked.connect(self.on_login)
         signup_btn.clicked.connect(self.on_signup)
@@ -511,7 +933,7 @@ class LoginPage(QWidget):
         return self.current_user
 
 
-class UserManagementPage(QWidget):
+class UserManagementPage(ButtonNavigationMixin, QWidget):
     """Page to view and delete users."""
     
     def __init__(self, stacked_widget):
@@ -715,7 +1137,32 @@ class UserManagementPage(QWidget):
         self.navigate_to(PageIndex.LOGIN)
 
 
-class Homepage(QWidget):
+class Homepage(ButtonNavigationMixin, QWidget):
+    NAV_BUTTON_AUTOSIZE = True
+    NAV_BUTTON_MIN_WIDTH = 320
+    NAV_BUTTON_MIN_HEIGHT = 65
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 18px;
+            padding: 12px 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 320px;
+            min-height: 65px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -796,54 +1243,143 @@ class Homepage(QWidget):
         self.navigate_to(PageIndex.LOGIN)
 
 
-class OthersPage(QWidget):
-    """Simple page with History and stance toggle."""
+class OthersPage(ButtonNavigationMixin, QWidget):
+    """Others page with stable layout and explicit focus navigation."""
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
+        self.setFocusPolicy(Qt.StrongFocus)
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
-
-        title = QLabel("Others")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
-
-        history_btn = QPushButton("History")
+        self.history_btn = QPushButton("History")
         self.stance_btn = QPushButton("Orthodox")
         self.ai_chat_btn = QPushButton("AI Chat: Off")
-        back_btn = QPushButton("Back")
+        self.arduino_port_combo = QComboBox()
+        self.arduino_port_apply_btn = QPushButton("Apply Arduino Port")
+        self.back_btn = QPushButton("Back")
+        self.arduino_port_status = QLabel("")
+        self.arduino_listener_status = QLabel("Listener: initializing")
 
-        history_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        self.stance_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        self.ai_chat_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        self._nav_buttons: List[QPushButton] = [
+            self.history_btn,
+            self.stance_btn,
+            self.ai_chat_btn,
+            self.arduino_port_apply_btn,
+            self.back_btn,
+        ]
+        self._focused_button_index = 0
 
-        history_btn.clicked.connect(self.on_history_clicked)
-        self.stance_btn.clicked.connect(self.on_stance_clicked)
-        self.ai_chat_btn.clicked.connect(self.on_ai_chat_clicked)
-        back_btn.clicked.connect(self.on_back_clicked)
-        
-        # Initialize AI Chat button state
+        self._setup_widgets()
+        self._setup_layout()
+        self._setup_connections()
+        self.setup_navigation(self._nav_buttons)
+
         if self.app_state:
             self.ai_chat_btn.setText("AI Chat: On" if self.app_state.ai_chat_enabled else "AI Chat: Off")
 
-        layout.addStretch()
-        layout.addWidget(title)
-        layout.addStretch()
-        layout.addWidget(history_btn)
-        layout.addStretch()
-        layout.addWidget(self.stance_btn)
-        layout.addStretch()
-        layout.addWidget(self.ai_chat_btn)
-        layout.addStretch()
-        layout.addWidget(back_btn)
-        layout.addStretch()
+        self._refresh_arduino_ports()
+        self._refresh_listener_status()
 
-        self.setLayout(layout)
+    def _setup_widgets(self):
+        for button in self._nav_buttons:
+            button.setFocusPolicy(Qt.StrongFocus)
+
+        self.arduino_port_combo.setFixedWidth(360)
+        self.arduino_port_combo.setFocusPolicy(Qt.NoFocus)
+        self.arduino_port_apply_btn.setFixedWidth(320)
+        self.arduino_port_status.setAlignment(Qt.AlignCenter)
+        self.arduino_port_status.setStyleSheet("color: #666; font-size: 13px;")
+        self.arduino_listener_status.setAlignment(Qt.AlignCenter)
+        self.arduino_listener_status.setStyleSheet("color: #666; font-size: 13px;")
+
+    def _setup_layout(self):
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(40, 28, 40, 28)
+        main_layout.setSpacing(14)
+
+        title = QLabel("Others")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 32px; font-weight: bold;")
+
+        button_stack = QVBoxLayout()
+        button_stack.setSpacing(12)
+        button_stack.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        button_stack.addWidget(self.history_btn, alignment=Qt.AlignCenter)
+        button_stack.addWidget(self.stance_btn, alignment=Qt.AlignCenter)
+        button_stack.addWidget(self.ai_chat_btn, alignment=Qt.AlignCenter)
+
+        serial_stack = QVBoxLayout()
+        serial_stack.setSpacing(8)
+        serial_stack.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        serial_stack.addWidget(self.arduino_port_combo, alignment=Qt.AlignCenter)
+        serial_stack.addWidget(self.arduino_port_apply_btn, alignment=Qt.AlignCenter)
+        serial_stack.addWidget(self.arduino_port_status, alignment=Qt.AlignCenter)
+        serial_stack.addWidget(self.arduino_listener_status, alignment=Qt.AlignCenter)
+
+        main_layout.addWidget(title, alignment=Qt.AlignCenter)
+        main_layout.addSpacing(8)
+        main_layout.addLayout(button_stack)
+        main_layout.addSpacing(10)
+        main_layout.addLayout(serial_stack)
+        main_layout.addStretch(1)
+        main_layout.addWidget(self.back_btn, alignment=Qt.AlignCenter)
+
+        self.setLayout(main_layout)
+
+    def _setup_connections(self):
+        self.history_btn.clicked.connect(self.on_history_clicked)
+        self.stance_btn.clicked.connect(self.on_stance_clicked)
+        self.ai_chat_btn.clicked.connect(self.on_ai_chat_clicked)
+        self.arduino_port_apply_btn.clicked.connect(self.on_apply_arduino_port)
+        self.back_btn.clicked.connect(self.on_back_clicked)
+
+    def _refresh_listener_status(self):
+        main_window = self.window()
+        if main_window and hasattr(main_window, "get_arduino_button_runtime_status"):
+            self.arduino_listener_status.setText(
+                f"Listener: {main_window.get_arduino_button_runtime_status()}"
+            )
+        else:
+            self.arduino_listener_status.setText("Listener: unavailable")
+
+    def _refresh_arduino_ports(self):
+        self.arduino_port_combo.clear()
+        self.arduino_port_combo.addItem("Auto Detect", "")
+
+        ports: List[str] = []
+        arduino_like_ports: List[str] = []
+        if list_ports is not None:
+            try:
+                for port_info in list_ports.comports():
+                    ports.append(port_info.device)
+                    desc = (port_info.description or "").lower()
+                    if "arduino" in desc or "ch340" in desc or "usb serial" in desc:
+                        arduino_like_ports.append(port_info.device)
+            except Exception:
+                ports = []
+                arduino_like_ports = []
+
+        for port in sorted(set(ports)):
+            self.arduino_port_combo.addItem(port, port)
+
+        configured_port = os.getenv("ARDUINO_BUTTON_PORT", "").strip()
+        if configured_port:
+            idx = self.arduino_port_combo.findData(configured_port)
+            if idx < 0:
+                self.arduino_port_combo.addItem(f"{configured_port} (configured)", configured_port)
+                idx = self.arduino_port_combo.findData(configured_port)
+            self.arduino_port_combo.setCurrentIndex(max(idx, 0))
+            self.arduino_port_status.setText(f"Current: {configured_port}")
+        else:
+            self.arduino_port_combo.setCurrentIndex(0)
+            self.arduino_port_status.setText("Current: Auto Detect")
+
+        unique_arduino_like = sorted(set(arduino_like_ports))
+        if not configured_port and len(unique_arduino_like) == 1:
+            self._apply_arduino_port(unique_arduino_like[0], user_initiated=False)
+
+        self._refresh_listener_status()
 
     def on_history_clicked(self):
         try:
@@ -857,27 +1393,47 @@ class OthersPage(QWidget):
             self.navigate_to(PageIndex.HOMEPAGE)
 
     def on_stance_clicked(self):
-        # Toggle button label between Orthodox and Southpaw
         current = self.stance_btn.text().strip()
         new_stance = "Southpaw" if current == "Orthodox" else "Orthodox"
         self.stance_btn.setText(new_stance)
-        # Send stance JSON message
         try:
             print(json.dumps({"stance": new_stance}))
         except Exception as e:
             print(f"Error sending stance message: {e}")
-    
+
     def on_ai_chat_clicked(self):
-        # Toggle AI Chat setting
+        if self.app_state is None:
+            return
         self.app_state.ai_chat_enabled = not self.app_state.ai_chat_enabled
         new_label = "AI Chat: On" if self.app_state.ai_chat_enabled else "AI Chat: Off"
         self.ai_chat_btn.setText(new_label)
         print(f"AI Chat {'enabled' if self.app_state.ai_chat_enabled else 'disabled'}")
 
+    def _apply_arduino_port(self, selected_port: str, user_initiated: bool):
+        _set_env_key(GUI_ENV_PATH, "ARDUINO_BUTTON_PORT", selected_port)
+        main_window = self.window()
+        if hasattr(main_window, "restart_arduino_button_listener"):
+            main_window.restart_arduino_button_listener()
+
+        label = selected_port if selected_port else "Auto Detect"
+        self.arduino_port_status.setText(f"Current: {label}")
+        if user_initiated:
+            print(f"[ArduinoButtons] Port updated to: {label}")
+        else:
+            print(f"[ArduinoButtons] Auto-applied detected port: {label}")
+
+    def on_apply_arduino_port(self):
+        selected_port = (self.arduino_port_combo.currentData() or "").strip()
+        try:
+            self._apply_arduino_port(selected_port, user_initiated=True)
+            self._refresh_listener_status()
+        except Exception as e:
+            self.arduino_port_status.setText(f"Port update failed: {e}")
+
     def on_back_clicked(self):
         self.navigate_to(PageIndex.HOMEPAGE)
 
-class PerformancePage(QWidget):
+class PerformancePage(ButtonNavigationMixin, QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -939,7 +1495,7 @@ class PerformancePage(QWidget):
         self.navigate_to(PageIndex.HOMEPAGE)
 
 
-class StaminaInstructionsPage(QWidget):
+class StaminaInstructionsPage(ButtonNavigationMixin, QWidget):
     """Instructions page for the Stamina mode."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -1030,7 +1586,7 @@ class StaminaInstructionsPage(QWidget):
             self.navigate_to(PageIndex.PERFORMANCE)
 
 
-class StaminaTestPage(QWidget):
+class StaminaTestPage(ButtonNavigationMixin, QWidget):
     """Runs a 2-minute stamina test with simulated or hardware-backed punch detection."""
 
     def __init__(self, stacked_widget):
@@ -1143,7 +1699,7 @@ class StaminaTestPage(QWidget):
         self.navigate_to(PageIndex.PERFORMANCE)
 
 
-class StaminaResultPage(QWidget):
+class StaminaResultPage(ButtonNavigationMixin, QWidget):
     """Displays stamina metrics, stores test data, and generates coaching feedback."""
 
     def __init__(self, stacked_widget):
@@ -1278,7 +1834,7 @@ class StaminaResultPage(QWidget):
         return window if hasattr(window, "get_current_user") else None
 
 
-class PerformanceHistoryPage(QWidget):
+class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
     """Unified performance history page for Power, Stamina, and Reaction tests."""
 
     def __init__(self, stacked_widget):
@@ -1471,7 +2027,7 @@ class PerformanceHistoryPage(QWidget):
             self.navigate_to(PageIndex.OTHERS)
 
 
-class ReactionInstructionsPage(QWidget):
+class ReactionInstructionsPage(ButtonNavigationMixin, QWidget):
     """Instructions page for the Reaction Time mode."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -1568,7 +2124,7 @@ class ReactionInstructionsPage(QWidget):
         except Exception:
             self.navigate_to(PageIndex.PERFORMANCE)
 
-class PowerInstructionsPage(QWidget):
+class PowerInstructionsPage(ButtonNavigationMixin, QWidget):
     """Instructions page for the Power mode."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -1665,7 +2221,7 @@ class PowerInstructionsPage(QWidget):
         except Exception:
             self.navigate_to(PageIndex.PERFORMANCE)
 
-class PowerPunchPage(QWidget):
+class PowerPunchPage(ButtonNavigationMixin, QWidget):
     """Page to count power punches after countdown."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -1809,7 +2365,7 @@ class PowerPunchPage(QWidget):
         self._measuring = False
         self.on_completed(punches_data)
 
-class PowerResultPage(QWidget):
+class PowerResultPage(ButtonNavigationMixin, QWidget):
     """Result page shown after completing the Power punches."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -1949,7 +2505,7 @@ class PowerResultPage(QWidget):
         window = self.window()
         return window if hasattr(window, "get_current_user") else None
 
-class ReactionTestPage(QWidget):
+class ReactionTestPage(ButtonNavigationMixin, QWidget):
     """Red/green screen to measure reaction time using camera after countdown."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -2120,7 +2676,7 @@ class ReactionTestPage(QWidget):
         except Exception:
             self.navigate_to(PageIndex.PERFORMANCE)
 
-class ReactionResultPage(QWidget):
+class ReactionResultPage(ButtonNavigationMixin, QWidget):
     """Shows measured reaction time after the test."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -2263,7 +2819,7 @@ class ReactionResultPage(QWidget):
         window = self.window()
         return window if hasattr(window, "get_current_user") else None
 
-class TrainingPage(QWidget):
+class TrainingPage(ButtonNavigationMixin, QWidget):
     """
     TrainingPage class for displaying training options in a GUI application.
     This class extends QWidget and provides a user interface for selecting different
@@ -2329,7 +2885,7 @@ class TrainingPage(QWidget):
     def on_back_clicked(self):
         self.navigate_to(PageIndex.HOMEPAGE)
 
-class TechniquesPage(QWidget):
+class TechniquesPage(ButtonNavigationMixin, QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2366,7 +2922,34 @@ class TechniquesPage(QWidget):
     def on_back_clicked(self):
         self.navigate_to(PageIndex.TRAINING)
 
-class PunchCombinationPage(QWidget):
+class PunchCombinationPage(ButtonNavigationMixin, QWidget):
+    NAV_BUTTON_MIN_WIDTH = 300
+    NAV_BUTTON_MAX_WIDTH = 360
+    NAV_BUTTON_MIN_HEIGHT = 55
+    LAYOUT_SPACING = 18
+    LAYOUT_MARGINS = (50, 30, 50, 30)
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 18px;
+            padding: 12px 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 300px;
+            min-height: 55px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2374,8 +2957,8 @@ class PunchCombinationPage(QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
+        layout.setSpacing(self.LAYOUT_SPACING)
+        layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
         title = QLabel("Punch Combinations")
         title.setAlignment(Qt.AlignCenter)
@@ -2448,8 +3031,15 @@ class PunchCombinationPage(QWidget):
     def on_back_clicked(self):
         self.navigate_to(PageIndex.TECHNIQUES)
 
-class BasicParametersPage(QWidget):
+class BasicParametersPage(ButtonNavigationMixin, QWidget):
     """Page for basic parameters (index 4)."""
+    NAV_BUTTON_MIN_WIDTH = 280
+    NAV_BUTTON_MAX_WIDTH = 340
+    NAV_BUTTON_MIN_HEIGHT = 55
+    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
+    LAYOUT_SPACING = 15
+    LAYOUT_MARGINS = (50, 25, 50, 25)
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2458,8 +3048,8 @@ class BasicParametersPage(QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
+        layout.setSpacing(self.LAYOUT_SPACING)
+        layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
         title = QLabel("Basic Parameters")
         title.setAlignment(Qt.AlignCenter)
@@ -2573,8 +3163,36 @@ class BasicParametersPage(QWidget):
         countdown_page.start_countdown()
         self.navigate_to(PageIndex.COUNTDOWN)
 
-class RoundSelectionPage(QWidget):
+class RoundSelectionPage(ButtonNavigationMixin, QWidget):
     """Page showing 12 numbered round buttons and a back button."""
+    NAV_BUTTON_MIN_WIDTH = 90
+    NAV_BUTTON_MAX_WIDTH = 120
+    NAV_BUTTON_MIN_HEIGHT = 55
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 90px;
+            max-width: 120px;
+            min-height: 55px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+    LAYOUT_SPACING = 15
+    LAYOUT_MARGINS = (50, 25, 50, 25)
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2582,36 +3200,42 @@ class RoundSelectionPage(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
+        main_layout.setSpacing(self.LAYOUT_SPACING)
+        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
         title = QLabel("Select Round")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
 
         grid = QGridLayout()
-        grid.setSpacing(8)
+        grid.setHorizontalSpacing(15)
+        grid.setVerticalSpacing(15)
+        grid.setContentsMargins(30, 30, 30, 30)
 
-        # Create 12 numbered buttons (1..12)
+        self.round_buttons: List[QPushButton] = []
         for idx in range(12):
             n = idx + 1
             btn = QPushButton(str(n))
             btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
-            # call select_round with the selected number and return to BasicParametersPage
             btn.clicked.connect(partial(self.select_round, n))
             row = idx // 4
             col = idx % 4
             grid.addWidget(btn, row, col)
+            self.round_buttons.append(btn)
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        back_btn.setMinimumWidth(280)
+        back_btn.setMaximumWidth(360)
         # go back to BasicParametersPage (index 4)
         back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        self.back_btn = back_btn
+        self.navigation_buttons = [*self.round_buttons]
 
         main_layout.addWidget(title)
         main_layout.addLayout(grid)
         main_layout.addStretch()
-        main_layout.addWidget(back_btn)
+        main_layout.addWidget(back_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(main_layout)
 
@@ -2633,8 +3257,15 @@ class RoundSelectionPage(QWidget):
                 pass
         self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
-class SpeedSelectionPage(QWidget):
+class SpeedSelectionPage(ButtonNavigationMixin, QWidget):
     """Page offering speed choices (25, 50, 75, 100)."""
+    NAV_BUTTON_MIN_WIDTH = 280
+    NAV_BUTTON_MAX_WIDTH = 340
+    NAV_BUTTON_MIN_HEIGHT = 55
+    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
+    LAYOUT_SPACING = 15
+    LAYOUT_MARGINS = (50, 25, 50, 25)
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2642,29 +3273,30 @@ class SpeedSelectionPage(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
+        main_layout.setSpacing(self.LAYOUT_SPACING)
+        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
         title = QLabel("Select Speed")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
 
-        grid = QGridLayout()
-        grid.setSpacing(8)
+        options_layout = QVBoxLayout()
+        options_layout.setSpacing(self.LAYOUT_SPACING)
+        options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
-        speeds = ["25%", "50%", "75%", "100%"]
-        for col, val in enumerate(speeds):
-            btn = QPushButton(str(val))
+        speeds = [("Slow", "25%"), ("Medium", "50%"), ("Fast", "75%")]
+        for label, value in speeds:
+            btn = QPushButton(label)
             btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
-            btn.clicked.connect(partial(self.select_speed, val))
-            grid.addWidget(btn, 0, col)
+            btn.clicked.connect(partial(self.select_speed, value))
+            options_layout.addWidget(btn, alignment=Qt.AlignCenter)
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
-        main_layout.addLayout(grid)
+        main_layout.addLayout(options_layout)
         main_layout.addStretch()
         main_layout.addWidget(back_btn)
 
@@ -2688,8 +3320,15 @@ class SpeedSelectionPage(QWidget):
                 pass
         self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
-class TimeSelectionPage(QWidget):
+class TimeSelectionPage(ButtonNavigationMixin, QWidget):
     """Page offering time choices (30sec, 1min, 1min30sec, 2min, 2min30sec, 3min)."""
+    NAV_BUTTON_MIN_WIDTH = 280
+    NAV_BUTTON_MAX_WIDTH = 340
+    NAV_BUTTON_MIN_HEIGHT = 55
+    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
+    LAYOUT_SPACING = 15
+    LAYOUT_MARGINS = (50, 25, 50, 25)
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2697,48 +3336,46 @@ class TimeSelectionPage(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
+        main_layout.setSpacing(self.LAYOUT_SPACING)
+        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
         title = QLabel("Select Time")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
 
-        grid = QGridLayout()
-        grid.setSpacing(8)
+        options_layout = QVBoxLayout()
+        options_layout.setSpacing(self.LAYOUT_SPACING)
+        options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
-        # make columns stretch so buttons get equal width regardless of text
-        for c in range(3):
-            grid.setColumnStretch(c, 1)
-
-        times = ["30sec", "1min", "1min30sec", "2min", "2min30sec", "3min"]
-        # arrange in 3 columns x 2 rows
-        for idx, val in enumerate(times):
-            btn = QPushButton(val)
+        times = [
+            ("30s", 30),
+            ("1min", 60),
+            ("2min", 90),
+            ("3min", 120),
+        ]
+        for label, seconds in times:
+            btn = QPushButton(label)
             btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
-            # ensure all buttons have the same width (columns stretch) and same height
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
-            btn.clicked.connect(partial(self.select_time, val))
-            row = idx // 3
-            col = idx % 3
-            grid.addWidget(btn, row, col)
+            btn.clicked.connect(partial(self.select_time, seconds, label))
+            options_layout.addWidget(btn, alignment=Qt.AlignCenter)
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
-        main_layout.addLayout(grid)
+        main_layout.addLayout(options_layout)
         main_layout.addStretch()
         main_layout.addWidget(back_btn)
 
         self.setLayout(main_layout)
 
-    def select_time(self, n: str):
+    def select_time(self, seconds: int, label: str):
         """Update BasicParametersPage time button text and return."""
         if self.app_state:
-            self.app_state.update_time(n)
+            self.app_state.time_label = label
+            self.app_state.config.time_minutes = seconds // 60
+            self.app_state.config.time_seconds = seconds % 60
             try:
                 basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
                 basic_page.update_button_displays()
@@ -2747,14 +3384,21 @@ class TimeSelectionPage(QWidget):
         else:
             try:
                 basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
-                basic_page.time_btn.setText(f"Time\n{n}")
+                basic_page.time_btn.setText(f"Time\n{label}")
                 basic_page.update_continue_button()
             except Exception:
                 pass
         self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
-class RestSelectionPage(QWidget):
+class RestSelectionPage(ButtonNavigationMixin, QWidget):
     """Page offering rest choices (10sec to 60sec in 10sec increments)."""
+    NAV_BUTTON_MIN_WIDTH = 280
+    NAV_BUTTON_MAX_WIDTH = 340
+    NAV_BUTTON_MIN_HEIGHT = 55
+    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
+    LAYOUT_SPACING = 15
+    LAYOUT_MARGINS = (50, 25, 50, 25)
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -2762,47 +3406,46 @@ class RestSelectionPage(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(50,50,50,50)
+        main_layout.setSpacing(self.LAYOUT_SPACING)
+        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
         title = QLabel("Select Rest Time")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
 
-        grid = QGridLayout()
-        grid.setSpacing(8)
+        options_layout = QVBoxLayout()
+        options_layout.setSpacing(self.LAYOUT_SPACING)
+        options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
-        # make columns stretch so buttons get equal width
-        for c in range(3):
-            grid.setColumnStretch(c, 1)
-
-        rest_times = ["10sec", "20sec", "30sec", "40sec", "50sec", "1min"]
-        # arrange in 3 columns x 2 rows
-        for idx, val in enumerate(rest_times):
-            btn = QPushButton(val)
+        rest_times = [
+            ("10s", 10),
+            ("30s", 30),
+            ("1min", 60),
+            ("1min 30s", 90),
+        ]
+        for label, seconds in rest_times:
+            btn = QPushButton(label)
             btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
-            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            # Use ButtonStyle.TIME_SELECTION min-height; no fixed height override
-            btn.clicked.connect(partial(self.select_rest, val))
-            row = idx // 3
-            col = idx % 3
-            grid.addWidget(btn, row, col)
+            btn.clicked.connect(partial(self.select_rest, seconds, label))
+            options_layout.addWidget(btn, alignment=Qt.AlignCenter)
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
 
         main_layout.addWidget(title)
-        main_layout.addLayout(grid)
+        main_layout.addLayout(options_layout)
         main_layout.addStretch()
         main_layout.addWidget(back_btn)
 
         self.setLayout(main_layout)
 
-    def select_rest(self, n: str):
+    def select_rest(self, seconds: int, label: str):
         """Update BasicParametersPage rest button text and return."""
         if self.app_state:
-            self.app_state.update_rest(n)
+            self.app_state.rest_label = label
+            self.app_state.config.rest_minutes = seconds // 60
+            self.app_state.config.rest_seconds = seconds % 60
             try:
                 basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
                 basic_page.update_button_displays()
@@ -2811,13 +3454,13 @@ class RestSelectionPage(QWidget):
         else:
             try:
                 basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
-                basic_page.rest_btn.setText(f"Rest\n{n}")
+                basic_page.rest_btn.setText(f"Rest\n{label}")
                 basic_page.update_continue_button()
             except Exception:
                 pass
         self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
-class CountdownPage(QWidget):
+class CountdownPage(ButtonNavigationMixin, QWidget):
     """Page with 20 second countdown and pause button."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -2914,7 +3557,7 @@ class CountdownPage(QWidget):
         self.timer.stop()
         self.stacked_widget.setCurrentIndex(self.return_page_index)
 
-class TrainingSessionPage(QWidget):
+class TrainingSessionPage(ButtonNavigationMixin, QWidget):
     """Page showing the actual training session with round counter and timer."""
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
@@ -3523,7 +4166,7 @@ class TrainingSessionPage(QWidget):
         print("[TrainingSession] Results unavailable; returning to parameters")
         self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
-class SelfSelectSequencePage(QWidget):
+class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
     """Page for creating custom punch sequences."""
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
@@ -3534,8 +4177,8 @@ class SelfSelectSequencePage(QWidget):
         self.editing_index = None  # Track which sequence is being edited
         
         main_layout = QHBoxLayout()
-        main_layout.setSpacing(30)
-        main_layout.setContentsMargins(50, 50, 50, 50)
+        main_layout.setSpacing(25)
+        main_layout.setContentsMargins(40, 40, 40, 40)
 
         # LEFT SIDE - Sequence List
         left_layout = QVBoxLayout()
@@ -3557,10 +4200,11 @@ class SelfSelectSequencePage(QWidget):
             
             # Sequence button (clickable to edit)
             seq_btn = QPushButton(f"{i+1}) ")
+            seq_btn.setFocusPolicy(Qt.StrongFocus)
             seq_btn.setStyleSheet("""
                 QPushButton {
-                    font-size: 18px;
-                    padding: 10px;
+                    font-size: 16px;
+                    padding: 8px 12px;
                     background-color: #f0f0f0;
                     border: 2px solid #ccc;
                     border-radius: 8px;
@@ -3572,6 +4216,12 @@ class SelfSelectSequencePage(QWidget):
                     background-color: #e0e0e0;
                     border: 2px solid #2196F3;
                 }
+                QPushButton:focus {
+                    border: 6px solid #00ff00;
+                    background-color: #2d5016;
+                    color: white;
+                    font-weight: bold;
+                }
                 QPushButton:pressed {
                     background-color: #d0d0d0;
                 }
@@ -3580,17 +4230,22 @@ class SelfSelectSequencePage(QWidget):
             
             # Up button
             up_btn = QPushButton("▲")
-            up_btn.setFixedSize(40, 50)
+            up_btn.setFocusPolicy(Qt.StrongFocus)
+            up_btn.setFixedSize(38, 50)
             up_btn.setStyleSheet("""
                 QPushButton {
                     font-size: 20px;
                     background-color: #4CAF50;
                     color: white;
-                    border: none;
+                    border: 2px solid #2f7f32;
                     border-radius: 4px;
                 }
                 QPushButton:hover {
                     background-color: #45a049;
+                }
+                QPushButton:focus {
+                    border: 3px solid #00ff00;
+                    background-color: #2d5016;
                 }
                 QPushButton:disabled {
                     background-color: #cccccc;
@@ -3600,17 +4255,22 @@ class SelfSelectSequencePage(QWidget):
             
             # Down button
             down_btn = QPushButton("▼")
-            down_btn.setFixedSize(40, 50)
+            down_btn.setFocusPolicy(Qt.StrongFocus)
+            down_btn.setFixedSize(38, 50)
             down_btn.setStyleSheet("""
                 QPushButton {
                     font-size: 20px;
                     background-color: #4CAF50;
                     color: white;
-                    border: none;
+                    border: 2px solid #2f7f32;
                     border-radius: 4px;
                 }
                 QPushButton:hover {
                     background-color: #45a049;
+                }
+                QPushButton:focus {
+                    border: 3px solid #00ff00;
+                    background-color: #2d5016;
                 }
                 QPushButton:disabled {
                     background-color: #cccccc;
@@ -3620,17 +4280,22 @@ class SelfSelectSequencePage(QWidget):
             
             # Delete button
             del_btn = QPushButton("✖")
-            del_btn.setFixedSize(40, 50)
+            del_btn.setFocusPolicy(Qt.StrongFocus)
+            del_btn.setFixedSize(38, 50)
             del_btn.setStyleSheet("""
                 QPushButton {
                     font-size: 20px;
                     background-color: #f44336;
                     color: white;
-                    border: none;
+                    border: 2px solid #9e1f17;
                     border-radius: 4px;
                 }
                 QPushButton:hover {
                     background-color: #da190b;
+                }
+                QPushButton:focus {
+                    border: 3px solid #00ff00;
+                    background-color: #a52a2a;
                 }
                 QPushButton:disabled {
                     background-color: #cccccc;
@@ -3657,12 +4322,58 @@ class SelfSelectSequencePage(QWidget):
         
         back_btn = QPushButton("Back")
         self.next_btn = QPushButton("Next")
-        
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        self.next_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        
-        back_btn.setFixedWidth(150)
-        self.next_btn.setFixedWidth(150)
+
+        back_btn.setFocusPolicy(Qt.StrongFocus)
+        self.next_btn.setFocusPolicy(Qt.StrongFocus)
+
+        back_btn.setStyleSheet("""
+            QPushButton {
+                min-width: 140px;
+                min-height: 50px;
+                padding: 10px 15px;
+                font-size: 17px;
+                background-color: #f44336;
+                color: white;
+                border: 3px solid #b71c1c;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: #d32f2f;
+            }
+            QPushButton:focus {
+                border: 6px solid #00ff00;
+                background-color: #2d5016;
+                color: white;
+                font-weight: bold;
+            }
+        """)
+
+        self.next_btn.setStyleSheet("""
+            QPushButton {
+                min-width: 140px;
+                min-height: 50px;
+                padding: 10px 15px;
+                font-size: 17px;
+                background-color: #4CAF50;
+                color: white;
+                border: 3px solid #2e7d32;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: #43a047;
+            }
+            QPushButton:focus {
+                border: 6px solid #00ff00;
+                background-color: #2d5016;
+                color: white;
+                font-weight: bold;
+            }
+            QPushButton:disabled {
+                background-color: #cccccc;
+                border: 3px solid #a9a9a9;
+                color: #666666;
+            }
+        """)
         
         back_btn.clicked.connect(self.on_back_clicked)
         self.next_btn.clicked.connect(self.on_next_clicked)
@@ -3678,6 +4389,7 @@ class SelfSelectSequencePage(QWidget):
         # RIGHT SIDE - Input Area
         right_layout = QVBoxLayout()
         right_layout.setSpacing(15)
+        right_layout.setContentsMargins(25, 25, 25, 25)
 
         # Text box showing current sequence
         self.sequence_input = QLabel("")
@@ -3694,23 +4406,28 @@ class SelfSelectSequencePage(QWidget):
 
         # Numpad grid (1-6)
         numpad_grid = QGridLayout()
-        numpad_grid.setSpacing(10)
-        
+        numpad_grid.setHorizontalSpacing(20)
+        numpad_grid.setVerticalSpacing(20)
+
         for i in range(6):
             btn = QPushButton(str(i + 1))
+            btn.setFocusPolicy(Qt.StrongFocus)
+            btn.setFixedSize(140, 60)
             btn.setStyleSheet("""
                 QPushButton {
-                    font-size: 28px;
-                    padding: 20px;
-                    min-width: 80px;
-                    min-height: 80px;
+                    font-size: 26px;
+                    padding: 15px;
                     background-color: #2196F3;
                     color: white;
-                    border: none;
+                    border: 2px solid #0d47a1;
                     border-radius: 8px;
                 }
                 QPushButton:hover {
                     background-color: #1976D2;
+                }
+                QPushButton:focus {
+                    border: 4px solid #00ff00;
+                    background-color: #2d5016;
                 }
                 QPushButton:pressed {
                     background-color: #0D47A1;
@@ -3720,27 +4437,33 @@ class SelfSelectSequencePage(QWidget):
             row = i // 3
             col = i % 3
             numpad_grid.addWidget(btn, row, col)
+            print(f"Adding button {i + 1} at row={row}, col={col}")
 
         # Defense buttons (Slip-L, Slip-R, Block-L, Block-R)
         defense_grid = QGridLayout()
-        defense_grid.setSpacing(10)
-        
+        defense_grid.setHorizontalSpacing(20)
+        defense_grid.setVerticalSpacing(20)
+
         defense_moves = ["Slip-L", "Slip-R", "Block-L", "Block-R"]
         for i, move in enumerate(defense_moves):
             btn = QPushButton(move)
+            btn.setFocusPolicy(Qt.StrongFocus)
+            btn.setFixedSize(180, 58)
             btn.setStyleSheet("""
                 QPushButton {
-                    font-size: 20px;
-                    padding: 15px;
-                    min-width: 100px;
-                    min-height: 60px;
+                    font-size: 19px;
+                    padding: 12px;
                     background-color: #FF9800;
                     color: white;
-                    border: none;
+                    border: 2px solid #bf6a00;
                     border-radius: 8px;
                 }
                 QPushButton:hover {
                     background-color: #F57C00;
+                }
+                QPushButton:focus {
+                    border: 4px solid #00ff00;
+                    background-color: #2d5016;
                 }
                 QPushButton:pressed {
                     background-color: #E65100;
@@ -3750,6 +4473,7 @@ class SelfSelectSequencePage(QWidget):
             row = i // 2
             col = i % 2
             defense_grid.addWidget(btn, row, col)
+            print(f"Adding {move} at row={row}, col={col}")
 
         # Backspace and Confirm buttons
         action_layout = QHBoxLayout()
@@ -3757,35 +4481,52 @@ class SelfSelectSequencePage(QWidget):
         
         backspace_btn = QPushButton("Backspace")
         self.confirm_btn = QPushButton("Confirm")
+        backspace_btn.setFocusPolicy(Qt.StrongFocus)
+        self.confirm_btn.setFocusPolicy(Qt.StrongFocus)
         
         backspace_btn.setStyleSheet("""
             QPushButton {
-                font-size: 20px;
-                padding: 15px;
+                font-size: 18px;
+                padding: 12px 20px;
+                min-height: 50px;
                 background-color: #f44336;
                 color: white;
-                border: none;
+                border: 2px solid #b71c1c;
                 border-radius: 8px;
             }
             QPushButton:hover {
                 background-color: #da190b;
             }
+            QPushButton:focus {
+                border: 4px solid #00ff00;
+                background-color: #2d5016;
+                color: white;
+            }
         """)
         
         self.confirm_btn.setStyleSheet("""
             QPushButton {
-                font-size: 20px;
-                padding: 15px;
+                font-size: 18px;
+                padding: 12px 20px;
+                min-height: 50px;
                 background-color: #4CAF50;
                 color: white;
-                border: none;
+                border: 2px solid #2e7d32;
                 border-radius: 8px;
             }
             QPushButton:hover {
                 background-color: #45a049;
             }
+            QPushButton:focus {
+                border: 4px solid #00ff00;
+                background-color: #2d5016;
+                color: white;
+                font-weight: bold;
+            }
             QPushButton:disabled {
                 background-color: #cccccc;
+                border: 2px solid #a9a9a9;
+                color: #666666;
             }
         """)
         
@@ -3796,14 +4537,17 @@ class SelfSelectSequencePage(QWidget):
         action_layout.addWidget(self.confirm_btn)
 
         right_layout.addWidget(self.sequence_input)
+        right_layout.addSpacing(15)
         right_layout.addLayout(numpad_grid)
+        right_layout.addSpacing(15)
         right_layout.addLayout(defense_grid)
+        right_layout.addSpacing(15)
         right_layout.addLayout(action_layout)
         right_layout.addStretch()
 
         # Add left and right layouts to main layout
         main_layout.addLayout(left_layout, 1)
-        main_layout.addLayout(right_layout, 1)
+        main_layout.addLayout(right_layout, 2)
 
         self.setLayout(main_layout)
         
@@ -3945,7 +4689,7 @@ class SelfSelectSequencePage(QWidget):
                     pass
             self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
-class SparPage(QWidget):
+class SparPage(ButtonNavigationMixin, QWidget):
     """Page with Spar options."""
     def __init__(self, stacked_widget):
         super().__init__()
@@ -3963,9 +4707,50 @@ class SparPage(QWidget):
         battle_btn = QPushButton("Battle")
         back_btn = QPushButton("Back")
 
-        # Make Battle button look the same as the Spar button in TrainingPage
-        battle_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        battle_btn.setFixedSize(180, 65)
+        back_btn.setFixedSize(180, 65)
+        battle_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 20px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+            QPushButton:focus {
+                border: 4px solid #00ff00;
+                background-color: #2d5016;
+                color: white;
+                font-weight: bold;
+            }
+        """)
+        back_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 20px;
+                background-color: #f44336;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background-color: #da190b;
+            }
+            QPushButton:pressed {
+                background-color: #c41504;
+            }
+            QPushButton:focus {
+                border: 4px solid #00ff00;
+                background-color: #2d5016;
+                color: white;
+                font-weight: bold;
+            }
+        """)
 
         battle_btn.clicked.connect(self.on_battle_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
@@ -3984,75 +4769,212 @@ class SparPage(QWidget):
     def on_back_clicked(self):
         self.navigate_to(PageIndex.TRAINING)
 
-class BattlePage(QWidget):
+class BattlePage(ButtonNavigationMixin, QWidget):
+    NAV_BUTTON_MIN_WIDTH = 225
+    NAV_BUTTON_MAX_WIDTH = 420
+    NAV_BUTTON_MIN_HEIGHT = 65
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 18px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-height: 65px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(24)
-        layout.setContentsMargins(50, 50, 50, 50)
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setContentsMargins(40, 40, 40, 40)
+        main_layout.setSpacing(20)
 
         title = QLabel("Battle")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 8px;")
+        title.setStyleSheet("font-size: 30px; font-weight: bold;")
 
-        buttons = [
-            QPushButton("Pressure Fighter"),
-            QPushButton("Counter Puncher"),
-            QPushButton("Infighter"),
-            QPushButton("Out Boxer"),
-            QPushButton("Random"),
-        ]
+        pressure_btn = QPushButton("Pressure Fighter")
+        counter_btn = QPushButton("Counter Puncher")
+        infighter_btn = QPushButton("Infighter")
+        outboxer_btn = QPushButton("Out Boxer")
+        random_btn = QPushButton("Random")
         back_btn = QPushButton("Back")
 
-        for b in buttons:
-            b.setStyleSheet(ButtonStyle.INFO_MEDIUM)
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        style_buttons = [pressure_btn, counter_btn, infighter_btn, outboxer_btn, random_btn]
+        for button in style_buttons:
+            button.setStyleSheet(self.NAV_BUTTON_STYLE)
+            button.setFocusPolicy(Qt.StrongFocus)
+
+        back_btn.setStyleSheet(self.NAV_BUTTON_STYLE)
+        back_btn.setFocusPolicy(Qt.StrongFocus)
+
+        self.navigation_buttons = style_buttons + [back_btn]
+        self.setup_navigation(self.navigation_buttons)
+
+        for button in style_buttons:
+            button.setFixedSize(225, 65)
+
+        back_btn.setMinimumWidth(200)
+        back_btn.setMinimumHeight(60)
+
+        # --- Alternative approach: Use HBoxLayouts for both rows ---
+        # Row 0: Pressure Fighter, Counter Puncher, Infighter
+        row0_layout = QHBoxLayout()
+        row0_layout.setSpacing(15)
+        row0_layout.addWidget(pressure_btn)
+        row0_layout.addWidget(counter_btn)
+        row0_layout.addWidget(infighter_btn)
+
+        # Row 1: Out Boxer, Random (centered)
+        row1_layout = QHBoxLayout()
+        row1_layout.setSpacing(15)
+        row1_layout.addStretch()
+        row1_layout.addWidget(outboxer_btn)
+        row1_layout.addWidget(random_btn)
+        row1_layout.addStretch()
 
         # wire clicks
-        buttons[0].clicked.connect(lambda: self.on_style_clicked("Pressure Fighter"))
-        buttons[1].clicked.connect(lambda: self.on_style_clicked("Counter Puncher"))
-        buttons[2].clicked.connect(lambda: self.on_style_clicked("Balanced Boxer"))
-        buttons[3].clicked.connect(lambda: self.on_style_clicked("Out Boxer"))
-        buttons[4].clicked.connect(lambda: self.on_style_clicked("Random"))
+        pressure_btn.clicked.connect(lambda: self.on_style_clicked("Pressure Fighter"))
+        counter_btn.clicked.connect(lambda: self.on_style_clicked("Counter Puncher"))
+        infighter_btn.clicked.connect(lambda: self.on_style_clicked("Infighter"))
+        outboxer_btn.clicked.connect(lambda: self.on_style_clicked("Out Boxer"))
+        random_btn.clicked.connect(lambda: self.on_style_clicked("Random"))
         back_btn.clicked.connect(self.on_back_clicked)
 
-        layout.addStretch(1)
-        layout.addWidget(title)
-        for b in buttons:
-            layout.addStretch(1)
-            layout.addWidget(b)
-        layout.addStretch(1)
-        layout.addWidget(back_btn)
-        layout.addStretch(1)
+        # Layout assembly
+        main_layout.setContentsMargins(40, 40, 40, 40)
+        main_layout.setSpacing(25)
+        main_layout.addStretch(1)  # Top stretch
+        main_layout.addWidget(title)
+        main_layout.addSpacing(30)
+        main_layout.addLayout(row0_layout)
+        main_layout.addSpacing(20)
+        main_layout.addLayout(row1_layout)
+        main_layout.addSpacing(30)
+        main_layout.addWidget(back_btn, alignment=Qt.AlignCenter)
+        main_layout.addStretch(1)  # Bottom stretch
 
-        self.setLayout(layout)
+        self.setLayout(main_layout)
 
     def on_style_clicked(self, style):
-        """Store style via app state and go to Basic Parameters page."""
+        """Navigate to style description page."""
         print(f"{style} selected")
-        if self.app_state:
-            self.app_state.update_battle_style(style)
-            self.app_state.update_difficulty("Battle")
-            self.app_state.previous_page = PageIndex.BATTLE
-        else:
-            try:
-                basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
-                basic_page.selected_battle_style = style
-                basic_page.selected_difficulty = "Battle"
-                basic_page.previous_page = PageIndex.BATTLE
-            except Exception:
-                pass
-        self.navigate_to(PageIndex.BASIC_PARAMETERS)
+        desc_page = self.stacked_widget.widget(PageIndex.BATTLE_STYLE_DESC)
+        if isinstance(desc_page, BattleStyleDescriptionPage):
+            desc_page.set_style_info(style)
+        self.navigate_to(PageIndex.BATTLE_STYLE_DESC)
 
     def on_back_clicked(self):
         self.navigate_to(PageIndex.SPAR)
 
 
-class ComboLLMChatPage(QWidget):
+class BattleStyleDescriptionPage(ButtonNavigationMixin, QWidget):
+    def __init__(self, stacked_widget, app_state=None):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.app_state = app_state
+        self.selected_style = ""
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.setContentsMargins(40, 40, 40, 40)
+
+        self.style_title = QLabel("")
+        self.style_title.setAlignment(Qt.AlignCenter)
+        self.style_title.setStyleSheet("font-size: 28px; font-weight: bold; margin-bottom: 10px;")
+
+        self.description_label = QLabel("")
+        self.description_label.setAlignment(Qt.AlignCenter)
+        self.description_label.setWordWrap(True)
+        self.description_label.setStyleSheet("""
+            font-size: 18px;
+            padding: 25px;
+            background-color: #f5f5f5;
+            border: 2px solid #cccccc;
+            border-radius: 10px;
+            line-height: 1.6;
+            color: #000000;
+            text-align: center;
+            max-width: 900px;
+            min-width: 800px;
+        """)
+
+        continue_btn = QPushButton("Continue to Training")
+        back_btn = QPushButton("Back")
+
+        continue_btn.setMinimumSize(250, 60)
+        back_btn.setMinimumSize(200, 60)
+
+        continue_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+
+        continue_btn.clicked.connect(self.on_continue_clicked)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(continue_btn)
+
+        layout.addWidget(self.style_title)
+        layout.addSpacing(15)
+        layout.addWidget(self.description_label, alignment=Qt.AlignCenter)
+        layout.addSpacing(25)
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def set_style_info(self, style):
+        """Set the fighting style and show description."""
+        self.selected_style = style
+        self.style_title.setText(style)
+
+        descriptions = {
+            "Pressure Fighter": "Aggressive style that constantly moves forward, applying pressure with high-volume punches. Wears down opponents through relentless attacks and cuts off the ring.",
+            "Counter Puncher": "Defensive style that waits for opponents to attack, then counters with precise punches. Relies on timing, reflexes, and exploiting openings.",
+            "Infighter": "Close-range specialist who fights inside, using hooks and uppercuts. Excels at close-quarters combat with head movement and body shots.",
+            "Out Boxer": "Technical style using footwork and reach advantage. Maintains distance with jabs and straight punches, avoiding close exchanges.",
+            "Random": "Unpredictable mixed style that randomly combines elements from all fighting styles. Keeps you guessing!",
+        }
+
+        self.description_label.setText(descriptions.get(style, "Select your fighting style."))
+
+    def on_continue_clicked(self):
+        if self.app_state:
+            self.app_state.update_battle_style(self.selected_style)
+            self.app_state.update_difficulty("Battle")
+            self.app_state.previous_page = PageIndex.BATTLE_STYLE_DESC
+        else:
+            try:
+                basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
+                basic_page.selected_battle_style = self.selected_style
+                basic_page.selected_difficulty = "Battle"
+                basic_page.previous_page = PageIndex.BATTLE_STYLE_DESC
+            except Exception:
+                pass
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
+
+    def on_back_clicked(self):
+        self.navigate_to(PageIndex.BATTLE)
+
+
+class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
     """Simplified LLM chat page for post-training combo feedback."""
     
     def __init__(self, stacked_widget, app_state):
@@ -4264,7 +5186,7 @@ class ComboLLMChatPage(QWidget):
         self.navigate_to(PageIndex.COMBO_RESULTS)
 
 
-class ComboResultsPage(QWidget):
+class ComboResultsPage(ButtonNavigationMixin, QWidget):
     """Page showing combo training results with score and progress."""
     
     def __init__(self, stacked_widget):
@@ -4352,7 +5274,7 @@ class ComboResultsPage(QWidget):
         self.details_label.setText(f"{difficulty} Level • {rounds} Rounds Completed")
 
 
-class UserComboProgressPage(QWidget):
+class UserComboProgressPage(ButtonNavigationMixin, QWidget):
     """Page showing a user's combo progress and mastery status."""
     
     def __init__(self, stacked_widget):
@@ -4558,7 +5480,7 @@ class UserComboProgressPage(QWidget):
             self.combo_table.setRowCount(0)
 
 
-class UserProgressOverviewPage(QWidget):
+class UserProgressOverviewPage(ButtonNavigationMixin, QWidget):
     """Page showing all users' combo progress overview from user management."""
     
     def __init__(self, stacked_widget):
@@ -4719,6 +5641,22 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Boxing Training App")
         self.setFixedSize(1024, 600)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+        self.arduino_button_listener: Optional[ArduinoButtonListener] = None
+        self._arduino_buttons_suspended = False
+        self._arduino_runtime_status = "starting"
+        self._serial_exclusive_pages: Set[int] = {
+            PageIndex.POWER_INSTRUCTIONS,
+            PageIndex.POWER_PUNCH,
+            PageIndex.STAMINA_INSTRUCTIONS,
+            PageIndex.STAMINA_TEST,
+        }
+
+        self._arduino_watchdog_timer = QTimer(self)
+        watchdog_ms = _env_int("ARDUINO_BUTTON_WATCHDOG_MS", 5000)
+        self._arduino_watchdog_timer.setInterval(max(1000, watchdog_ms))
+        self._arduino_watchdog_timer.timeout.connect(self._watchdog_arduino_button_listener)
 
         # Auto-setup database on first run
         self._ensure_database_setup()
@@ -4745,6 +5683,7 @@ class MainWindow(QWidget):
         self.self_select_sequence_page = SelfSelectSequencePage(self.stacked_widget, self.app_state)
         self.spar_page = SparPage(self.stacked_widget)
         self.battle_page = BattlePage(self.stacked_widget, self.app_state)
+        self.battle_style_description_page = BattleStyleDescriptionPage(self.stacked_widget, self.app_state)
         self.performance_page = PerformancePage(self.stacked_widget)
         self.power_instructions_page = PowerInstructionsPage(self.stacked_widget)
         self.power_punch_page = PowerPunchPage(self.stacked_widget)
@@ -4803,6 +5742,7 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.stamina_result_page) # 30
         self.stacked_widget.addWidget(QWidget()) # 31 reserved (STAMINA_HISTORY)
         self.stacked_widget.addWidget(self.performance_history_page) # 32
+        self.stacked_widget.addWidget(self.battle_style_description_page) # 33
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -4815,7 +5755,185 @@ class MainWindow(QWidget):
         layout.addWidget(self.stacked_widget)
         self.setLayout(layout)
 
+        self._normalize_page_layouts()
+        self._setup_page_button_navigation()
         self.update_back_button_visibility()
+        self._start_arduino_button_listener()
+        self._arduino_watchdog_timer.start()
+
+    def _normalize_page_layouts(self):
+        """Apply consistent spacing and margins for balanced 1024x600 button layouts."""
+        for index in range(self.stacked_widget.count()):
+            page = self.stacked_widget.widget(index)
+            if page is None:
+                continue
+
+            page_layout = page.layout()
+            if page_layout is None:
+                continue
+
+            spacing = getattr(page, "LAYOUT_SPACING", 20)
+            margins = getattr(page, "LAYOUT_MARGINS", (60, 40, 60, 40))
+
+            page_layout.setSpacing(spacing)
+            if isinstance(margins, tuple) and len(margins) == 4:
+                page_layout.setContentsMargins(*margins)
+            else:
+                page_layout.setContentsMargins(60, 40, 60, 40)
+
+    def _setup_page_button_navigation(self):
+        """Apply mixin navigation setup to all pages with QPushButtons."""
+        for index in range(self.stacked_widget.count()):
+            page = self.stacked_widget.widget(index)
+            if not isinstance(page, ButtonNavigationMixin):
+                continue
+
+            if isinstance(page, OthersPage):
+                continue
+
+            if isinstance(page, SelfSelectSequencePage):
+                continue
+
+            if isinstance(page, BattlePage):
+                continue
+
+            explicit_buttons = getattr(page, "navigation_buttons", None)
+            if explicit_buttons is None:
+                explicit_buttons = getattr(page, "_nav_buttons", None)
+
+            if explicit_buttons:
+                buttons = [button for button in explicit_buttons if isinstance(button, QPushButton)]
+            else:
+                buttons = [button for button in page.findChildren(QPushButton)]
+
+            if buttons:
+                page.setup_navigation(buttons)
+
+    def _start_arduino_button_listener(self):
+        """Start background listener for Arduino button commands."""
+        if not _env_bool("ARDUINO_BUTTONS_ENABLED", True):
+            self._arduino_runtime_status = "disabled"
+            self._notify_arduino_status_change("Disabled by ARDUINO_BUTTONS_ENABLED")
+            return
+
+        self._arduino_runtime_status = "starting"
+
+        port = os.getenv("ARDUINO_BUTTON_PORT", "").strip() or None
+        baudrate = _env_int("ARDUINO_BUTTON_BAUD", 115200)
+        debounce_ms = _env_int("ARDUINO_BUTTON_DEBOUNCE_MS", 120)
+        serial_timeout_s = _env_float("ARDUINO_BUTTON_TIMEOUT_SEC", 0.05)
+        startup_delay_s = _env_float("ARDUINO_BUTTON_STARTUP_DELAY_SEC", 1.2)
+        reconnect_interval_s = _env_float("ARDUINO_BUTTON_RECONNECT_SEC", 2.0)
+
+        self.arduino_button_listener = ArduinoButtonListener(
+            port=port,
+            baudrate=baudrate,
+            debounce_ms=debounce_ms,
+            serial_timeout_s=serial_timeout_s,
+            startup_delay_s=startup_delay_s,
+            reconnect_interval_s=reconnect_interval_s,
+            parent=self,
+        )
+        self.arduino_button_listener.button_pressed.connect(self._handle_arduino_button_command)
+        self.arduino_button_listener.status.connect(self._on_arduino_button_status)
+        self.arduino_button_listener.start()
+
+    def restart_arduino_button_listener(self):
+        """Restart button listener after runtime config changes."""
+        if self.arduino_button_listener and self.arduino_button_listener.isRunning():
+            self.arduino_button_listener.stop()
+            self.arduino_button_listener.wait(1000)
+        self.arduino_button_listener = None
+        if not self._arduino_buttons_suspended:
+            self._start_arduino_button_listener()
+
+    def _suspend_arduino_button_listener(self):
+        if self._arduino_buttons_suspended:
+            return
+        self._arduino_buttons_suspended = True
+        if self.arduino_button_listener and self.arduino_button_listener.isRunning():
+            self.arduino_button_listener.stop()
+            self.arduino_button_listener.wait(1000)
+        self.arduino_button_listener = None
+        self._arduino_runtime_status = "suspended"
+        self._notify_arduino_status_change("Suspended during serial-exclusive test page")
+
+    def _resume_arduino_button_listener(self):
+        if not self._arduino_buttons_suspended:
+            return
+        self._arduino_buttons_suspended = False
+        self._start_arduino_button_listener()
+        self._notify_arduino_status_change("Resumed after leaving serial-exclusive test page")
+
+    def _watchdog_arduino_button_listener(self):
+        """Auto-recover listener if it unexpectedly stops."""
+        if self._arduino_buttons_suspended:
+            return
+        if not _env_bool("ARDUINO_BUTTONS_ENABLED", True):
+            return
+        if self.arduino_button_listener is None or not self.arduino_button_listener.isRunning():
+            self._notify_arduino_status_change("Watchdog restarting listener")
+            self.restart_arduino_button_listener()
+
+    def _on_arduino_button_status(self, message: str):
+        lower_msg = message.lower()
+        if "connected" in lower_msg:
+            self._arduino_runtime_status = "connected"
+        elif "disabled" in lower_msg:
+            self._arduino_runtime_status = "disabled"
+        elif "no arduino" in lower_msg or "failed" in lower_msg or "error" in lower_msg:
+            self._arduino_runtime_status = "reconnecting"
+        elif "suspended" in lower_msg:
+            self._arduino_runtime_status = "suspended"
+        elif "resumed" in lower_msg:
+            self._arduino_runtime_status = "starting"
+        self._notify_arduino_status_change(message)
+
+    def _notify_arduino_status_change(self, message: str):
+        print(f"[ArduinoButtons] {message}")
+        if hasattr(self, "others_page") and hasattr(self.others_page, "_refresh_listener_status"):
+            self.others_page._refresh_listener_status()
+
+    def get_arduino_button_runtime_status(self) -> str:
+        return self._arduino_runtime_status
+
+    def _simulate_key(self, key: int):
+        """Simulate a keyboard key press/release on the focused widget."""
+        target = QApplication.focusWidget()
+        if target is None:
+            target = self.stacked_widget.currentWidget()
+        if target is None:
+            target = self
+
+        press_event = QKeyEvent(QKeyEvent.KeyPress, key, Qt.NoModifier)
+        release_event = QKeyEvent(QKeyEvent.KeyRelease, key, Qt.NoModifier)
+        QApplication.postEvent(target, press_event)
+        QApplication.postEvent(target, release_event)
+
+    def _handle_arduino_button_command(self, command: str):
+        """Map Arduino commands to existing GUI keyboard navigation."""
+        current_page = self.stacked_widget.currentWidget()
+        if isinstance(current_page, ButtonNavigationMixin):
+            if command == "BTN1_PRESS" and current_page.handle_arduino_up():
+                return
+            if command == "BTN3_PRESS" and current_page.handle_arduino_down():
+                return
+            if command == "BTN2_PRESS" and current_page.handle_arduino_enter():
+                return
+
+        if command == "BTN1_PRESS":
+            self.focusPreviousChild()
+            self._simulate_key(Qt.Key_Up)
+        elif command == "BTN3_PRESS":
+            self.focusNextChild()
+            self._simulate_key(Qt.Key_Down)
+        elif command == "BTN2_PRESS":
+            focused = QApplication.focusWidget()
+            if isinstance(focused, QPushButton):
+                focused.click()
+            else:
+                self._simulate_key(Qt.Key_Return)
+                self._simulate_key(Qt.Key_Enter)
 
     def navigate_to(self, page_index: int):
         """Navigate to a page and refresh back-button visibility."""
@@ -4906,6 +6024,15 @@ class MainWindow(QWidget):
             else:
                 self.navigation_stack.append(self.previous_page)
 
+        if index == PageIndex.OTHERS and hasattr(self.others_page, "_refresh_arduino_ports"):
+            self.others_page._refresh_arduino_ports()
+
+        if _env_bool("ARDUINO_BUTTONS_SUSPEND_DURING_TESTS", True):
+            if index in self._serial_exclusive_pages:
+                self._suspend_arduino_button_listener()
+            else:
+                self._resume_arduino_button_listener()
+
         if index == PageIndex.USER_COMBO_PROGRESS:
             current_user = self.get_current_user()
             # Set return_to_page based on where we came from
@@ -4945,6 +6072,15 @@ class MainWindow(QWidget):
             self.navigate_to(PageIndex.TRAINING_SESSION)
         except Exception as e:
             print(f"Error starting training session: {e}")
+
+    def closeEvent(self, event: QCloseEvent):
+        """Ensure background serial listener is stopped when app closes."""
+        if hasattr(self, "_arduino_watchdog_timer"):
+            self._arduino_watchdog_timer.stop()
+        if self.arduino_button_listener and self.arduino_button_listener.isRunning():
+            self.arduino_button_listener.stop()
+            self.arduino_button_listener.wait(1000)
+        super().closeEvent(event)
 
 def main():
     """

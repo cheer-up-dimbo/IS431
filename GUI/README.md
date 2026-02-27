@@ -198,6 +198,28 @@ python main_gui.py
 - If available, it uses explicit mode commands and structured responses.
 - If unavailable, it falls back to legacy streaming mode.
 
+### Arduino physical-button navigation (new)
+- Upload sketch: `GUI/arduino/button_navigation/button_navigation.ino`
+- Wiring: buttons on pins `2` (UP), `4` (ENTER), `7` (DOWN) using `INPUT_PULLUP` to GND.
+- Arduino sends serial commands at `115200`: `BTN1_PRESS`, `BTN2_PRESS`, `BTN3_PRESS`.
+- Python listener in `main_gui.py` runs in background thread and maps to Up/Down/Enter navigation.
+- Optional config via `.env` (copy from `GUI/.env.example`):
+   - `ARDUINO_BUTTONS_ENABLED=true|false`
+   - `ARDUINO_BUTTON_PORT=COM3` (recommended on Windows)
+   - `ARDUINO_BUTTON_BAUD=115200`
+   - `ARDUINO_BUTTON_DEBOUNCE_MS=120`
+   - `ARDUINO_BUTTON_TIMEOUT_SEC=0.05`
+   - `ARDUINO_BUTTON_STARTUP_DELAY_SEC=1.2`
+   - `ARDUINO_BUTTON_RECONNECT_SEC=2.0`
+   - `ARDUINO_BUTTONS_SUSPEND_DURING_TESTS=true`
+   - `ARDUINO_BUTTON_WATCHDOG_MS=5000`
+- You can also set COM port directly in app: `Others` → dropdown (`Auto Detect` or COMx) → `Apply Arduino Port`.
+- The dropdown refreshes each time `Others` opens, so newly plugged USB serial devices appear without restarting the app.
+- If exactly one Arduino-like serial device is detected and no fixed port is configured, the app auto-applies that port.
+- Button listener is temporarily suspended on serial-heavy Power/Stamina test pages to avoid COM-port contention, then resumed automatically.
+- `Others` page shows live listener state (`connected`, `starting`, `reconnecting`, `suspended`, `disabled`).
+- A watchdog auto-restarts the listener thread if it stops unexpectedly.
+
 ### Reaction-time model path
 - Expected YOLO model file:
   - `models/yolo11s-pose.pt` (repo root `models/` folder)
@@ -239,6 +261,7 @@ The app includes pages for:
 
 3. **Serial/Arduino issues**
    - Verify COM port and baud settings.
+   - For physical-button nav, set `ARDUINO_BUTTON_PORT` in `GUI/.env` if auto-detect picks wrong port.
    - Check firmware compatibility (command-based mode support).
    - The app should fallback to streaming mode if needed.
 
