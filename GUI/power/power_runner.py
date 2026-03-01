@@ -7,6 +7,78 @@ except Exception as e:
     serial = None  # Will raise at runtime when used
 
 
+def _send_command(ser, command: str):
+    ser.write(f"{command}\n".encode("utf-8"))
+
+
+def _read_line_with_timeout(ser, timeout_s: float) -> str:
+    start = time.time()
+    while (time.time() - start) < timeout_s:
+        if ser.in_waiting:
+            return ser.readline().decode('utf-8', errors='ignore').strip()
+        time.sleep(0.01)
+    return ""
+
+
+def check_protocol_version(ser) -> str:
+    """Detect if Arduino supports command-based protocol."""
+    try:
+        ser.reset_input_buffer()
+    except Exception:
+        pass
+
+    _send_command(ser, "MODE:CONTINUOUS")
+    response = _read_line_with_timeout(ser, timeout_s=1.0)
+    if response.startswith("OK:"):
+        return "command_based"
+    return "streaming"
+
+
+def _expect_prefix(ser, command: str, expected_prefix: str, timeout_s: float) -> bool:
+    _send_command(ser, command)
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        response = _read_line_with_timeout(ser, timeout_s=0.2)
+        if not response:
+            continue
+        if response.startswith(expected_prefix):
+            return True
+        if response.startswith("ERROR:"):
+            print(f"[POWER PROTOCOL] {response}")
+            return False
+    return False
+
+
+def _parse_power_result(line: str) -> Tuple[Optional[float], Optional[float], Optional[int]]:
+    # Expected format: RESULT:PEAK:<peak>,AVG:<avg>,COUNT:<count>
+    if not line.startswith("RESULT:"):
+        return None, None, None
+
+    payload = line[len("RESULT:"):]
+    fields = payload.split(",")
+    parsed: dict[str, str] = {}
+    for field in fields:
+        if ":" not in field:
+            continue
+        key, value = field.split(":", 1)
+        parsed[key.strip().upper()] = value.strip()
+
+    try:
+        peak_val = float(parsed["PEAK"]) if "PEAK" in parsed else None
+    except Exception:
+        peak_val = None
+    try:
+        avg_val = float(parsed["AVG"]) if "AVG" in parsed else None
+    except Exception:
+        avg_val = None
+    try:
+        count_val = int(parsed["COUNT"]) if "COUNT" in parsed else None
+    except Exception:
+        count_val = None
+
+    return peak_val, avg_val, count_val
+
+
 def measure_punches(
     port: str = "COM10",
     baud: int = 115200,
@@ -164,58 +236,165 @@ def measure_punches_with_callback(
     
     time.sleep(2.0)  # Allow device to reset
 
-    count = 0
-    punches: List[Tuple[int, float]] = []
-    last_punch_time = 0.0
-    start_time = time.time()
-    data_received = False
-
     try:
-        while count < max_punches:
-            # Check timeout
-            elapsed = time.time() - start_time
-            if max_duration_s is not None and elapsed > max_duration_s:
-                print(f"[PUNCH DETECTION] Timeout reached after {elapsed:.1f}s. Detected {count} punches.")
-                break
-
-            # Read and process data
-            if ser.in_waiting:
-                data_received = True
-                raw = ser.readline().decode('utf-8', errors='ignore').strip()
-                if raw and "Total_Accel:" in raw:
-                    try:
-                        parts = raw.split(',')
-                        for p in parts:
-                            if "Total_Accel:" in p:
-                                accel_ms2 = float(p.split(':', 1)[1])
-                                now = time.time()
-                                time_since_last = (now - last_punch_time) * 1000.0
-                                
-                                # Only register punch if above threshold AND outside debounce window
-                                if accel_ms2 > punch_threshold_ms2 and time_since_last > debounce_ms:
-                                    count += 1
-                                    last_punch_time = now
-                                    g_force = accel_ms2 / 9.81
-                                    punches.append((count, g_force))
-                                    print(f"[PUNCH DETECTION] ✓ PUNCH #{count} detected! Accel: {accel_ms2:.2f} m/s² | G-Force: {g_force:.2f}g")
-                                    
-                                    # Call GUI callback immediately
-                                    if callback:
-                                        callback(count, g_force)
-                    except Exception as e:
-                        print(f"[PUNCH DETECTION] Parse error: {e}")
-            else:
-                time.sleep(0.01)
+        protocol = check_protocol_version(ser)
+        if protocol == "command_based":
+            punches = _measure_punches_command_with_callback(
+                ser=ser,
+                max_punches=max_punches,
+                max_duration_s=max_duration_s,
+                callback=callback,
+            )
+        else:
+            print("WARNING: Arduino firmware outdated - please update for best experience")
+            punches = _measure_punches_streaming_with_callback(
+                ser=ser,
+                punch_threshold_ms2=punch_threshold_ms2,
+                max_punches=max_punches,
+                debounce_ms=debounce_ms,
+                max_duration_s=max_duration_s,
+                callback=callback,
+            )
     
     except Exception as e:
         print(f"[PUNCH DETECTION] Exception during measurement: {e}")
+        punches = []
     finally:
         try:
             ser.close()
         except Exception:
             pass
 
-    print(f"[PUNCH DETECTION] Measurement complete. Detected {count}/{max_punches} punches in {time.time() - start_time:.1f}s")
+    print(f"[PUNCH DETECTION] Measurement complete. Detected {len(punches)}/{max_punches} punches")
+    return punches
+
+
+def _measure_punches_command_with_callback(
+    ser,
+    max_punches: int,
+    max_duration_s: Optional[float],
+    callback=None,
+) -> List[Tuple[int, float]]:
+    if not _expect_prefix(ser, "MODE:POWER", "OK:MODE_POWER", timeout_s=2.0):
+        print("[POWER PROTOCOL] MODE:POWER failed; switching to streaming fallback")
+        return _measure_punches_streaming_with_callback(
+            ser=ser,
+            punch_threshold_ms2=100.0,
+            max_punches=max_punches,
+            debounce_ms=300,
+            max_duration_s=max_duration_s,
+            callback=callback,
+        )
+
+    if not _expect_prefix(ser, "START", "OK:POWER_STARTED", timeout_s=2.0):
+        print("[POWER PROTOCOL] START failed; switching to streaming fallback")
+        return _measure_punches_streaming_with_callback(
+            ser=ser,
+            punch_threshold_ms2=100.0,
+            max_punches=max_punches,
+            debounce_ms=300,
+            max_duration_s=max_duration_s,
+            callback=callback,
+        )
+
+    punches: List[Tuple[int, float]] = []
+    start_time = time.time()
+
+    while len(punches) < max_punches:
+        elapsed = time.time() - start_time
+        if max_duration_s is not None and elapsed > max_duration_s:
+            print(f"[POWER PROTOCOL] Timeout reached after {elapsed:.1f}s. Detected {len(punches)} punches.")
+            break
+
+        line = _read_line_with_timeout(ser, timeout_s=0.1)
+        if not line:
+            continue
+
+        if line.startswith("POWER_PUNCH:"):
+            try:
+                power_value = float(line.split(":", 1)[1].strip())
+            except Exception:
+                continue
+
+            punch_num = len(punches) + 1
+            punches.append((punch_num, power_value))
+            if callback:
+                callback(punch_num, power_value)
+        elif line.startswith("ERROR:"):
+            print(f"[POWER PROTOCOL] {line}")
+        elif line.startswith("RESULT:"):
+            # Some firmware may auto-finish and return result before explicit STOP.
+            break
+
+    _send_command(ser, "STOP")
+    peak, avg, count = _wait_for_power_result(ser, timeout_s=2.0)
+    if count is not None and count > len(punches):
+        fill_value = avg if avg is not None else (peak if peak is not None else 0.0)
+        while len(punches) < count:
+            punch_num = len(punches) + 1
+            punches.append((punch_num, fill_value))
+
+    return punches
+
+
+def _wait_for_power_result(ser, timeout_s: float) -> Tuple[Optional[float], Optional[float], Optional[int]]:
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        line = _read_line_with_timeout(ser, timeout_s=0.2)
+        if not line:
+            continue
+        if line.startswith("RESULT:"):
+            return _parse_power_result(line)
+        if line.startswith("ERROR:"):
+            print(f"[POWER PROTOCOL] {line}")
+            return None, None, None
+    return None, None, None
+
+
+def _measure_punches_streaming_with_callback(
+    ser,
+    punch_threshold_ms2: float,
+    max_punches: int,
+    debounce_ms: int,
+    max_duration_s: Optional[float],
+    callback=None,
+) -> List[Tuple[int, float]]:
+    count = 0
+    punches: List[Tuple[int, float]] = []
+    last_punch_time = 0.0
+    start_time = time.time()
+
+    while count < max_punches:
+        elapsed = time.time() - start_time
+        if max_duration_s is not None and elapsed > max_duration_s:
+            print(f"[PUNCH DETECTION] Timeout reached after {elapsed:.1f}s. Detected {count} punches.")
+            break
+
+        if ser.in_waiting:
+            raw = ser.readline().decode('utf-8', errors='ignore').strip()
+            if raw and "Total_Accel:" in raw:
+                try:
+                    parts = raw.split(',')
+                    for p in parts:
+                        if "Total_Accel:" in p:
+                            accel_ms2 = float(p.split(':', 1)[1])
+                            now = time.time()
+                            time_since_last = (now - last_punch_time) * 1000.0
+
+                            if accel_ms2 > punch_threshold_ms2 and time_since_last > debounce_ms:
+                                count += 1
+                                last_punch_time = now
+                                g_force = accel_ms2 / 9.81
+                                punches.append((count, g_force))
+                                print(f"[PUNCH DETECTION] ✓ PUNCH #{count} detected! Accel: {accel_ms2:.2f} m/s² | G-Force: {g_force:.2f}g")
+
+                                if callback:
+                                    callback(count, g_force)
+                except Exception as e:
+                    print(f"[PUNCH DETECTION] Parse error: {e}")
+        else:
+            time.sleep(0.01)
+
     return punches
 
 

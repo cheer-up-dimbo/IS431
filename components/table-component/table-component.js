@@ -19,10 +19,11 @@ class TableComponent extends HTMLElement {
   }
 
   render() {
+    const subtitle = this.subtitle || "";
     const div = document.createElement("div");
     div.innerHTML = `
     <slot></slot>
-    <sub>${this.subtitle}</sub>
+    ${subtitle ? `<sub>${subtitle}</sub>` : ""}
     <style>
       :host {
         display: block;

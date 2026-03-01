@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>IS-431: Intelligent boxing robot</title>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+
+  <link rel="stylesheet" href="./index.css">
+
+  <link rel="stylesheet" href="./components/team-member/team-member.css">
+  <script type="module" src="./components/team-member/team-member.js"></script>
+
+  <link rel="stylesheet" href="./components/table-of-content/table-of-content.css">
+
+  <script type="module" src="./components/image/image-component.js"></script>
+
+  <script type="module" src="./components/video/video.js"></script>
+
+  <link rel="stylesheet" href="./components/references/references.css">
+
+  <link rel="stylesheet" href="./components/scroll-to-top/scroll-to-top.css">
+  <script src="./components/scroll-to-top/scroll-to-top.js"></script>
+
+  <script src="./components/table-component/table-component.js"></script>
+
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="content">
+    <h1>IS-431: An Intelligent Boxing Robot to Assist in Boxing Training</h1>
+
+    <!-- This is the team member component use to display details about your team members -->
+    <div class="team-member-wrapper">
+      <team-member avatar="assets/team_member/zakir.png" name="Muhammad Zakir" department="Engineering Science"
+        year="Year 4" contribution="Wrote: Chapter 1 to Chapter 3, Chapter 4.2 User Journey & Chapter 5.1 User Interface (GUI)"></team-member>
+      <team-member avatar="assets/team_member/elgin.png" name="Elgin Ng Jun Hao" department="Engineering Science"
+        year="Year 4" contribution="Wrote: Chapter 5.2 Upper Mechanism & Appendix 1 - Upper Mechanism"></team-member>
+      <team-member avatar="assets/team_member/jeanette.png" name="Jeanette Sim Yu" department="Engineering Science"
+        year="Year4" contribution="Wrote: Chapter 4.1 System Overview, 5.3 Lower Mechanism & Appendix 2 - Lower Mechanism"></team-member>
+      <team-member avatar="assets/team_member/yogee.png" name="Muthukumaran Yogeeswaran" department="Engineering Science"
+        year="Year 4" contribution="Wrote: Chapter 5.4 Robotic Intelligence & 5.5 Control System"></team-member>
+    </div>
+
+    <!-- This is a divide from the shoelace library for aesthetic purpose -->
+    <sl-divider></sl-divider>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="table-of-content">
+      <h2>Table of Contents</h2>
+      <sl-tree>
+
+        <sl-tree-item expanded>
+          <a href="#introduction">1. Introduction (Zakir)</a>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#problem-clarification">2. Problem Clarification (Zakir)</a>
+          <sl-tree-item><a href="#background">2.1. Background</a></sl-tree-item>
+          <sl-tree-item><a href="#primary-research">2.2. Primary Research: User Interviews/Surveys</a></sl-tree-item>
+          <sl-tree-item><a href="#secondary-research">2.3. Secondary Research: Competitor Analysis</a></sl-tree-item>
+          <sl-tree-item><a href="#value-proposition">2.4. Value Proposition</a></sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#design-methodology">3. Design Methodology (Zakir)</a>
+          <sl-tree-item><a href="#clarification-of-task">3.1. Clarification of Task</a></sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#final-design">4. Final Design (Zakir and Jeanette)</a>
+          <sl-tree-item><a href="#system-overview">4.1. System Overview (Jeanette)</a></sl-tree-item>
+          <sl-tree-item><a href="#user-journey">4.2. User Journey (Zakir)</a></sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#conceptual-design">5. Conceptual Design (Zakir, Elgin, Jeanette, Yogeeswaran)</a>
+          <sl-tree-item expanded>
+            <a href="#user-interface">5.1. User Interface (GUI) (Zakir)</a>
+            <sl-tree-item><a href="#gui-design-specifications">5.1.1. Design Specifications</a></sl-tree-item>
+            <sl-tree-item><a href="#gui-concept-generation">5.1.2. Concept Generation & Evaluation</a></sl-tree-item>
+            <sl-tree-item><a href="#gui-detailed-design">5.1.3. Detailed Design</a></sl-tree-item>
+            <sl-tree-item><a href="#gui-implementation">5.1.4. Implementation & Testing</a></sl-tree-item>
+            <sl-tree-item><a href="#gui-evaluation">5.1.5. Evaluation & Outcomes</a></sl-tree-item>
+          </sl-tree-item>
+          <sl-tree-item><a href="#upper-mechanism">5.2. Upper Mechanism (Elgin)</a></sl-tree-item>
+          <sl-tree-item><a href="#lower-mechanism">5.3. Lower Mechanism (Jeanette)</a></sl-tree-item>
+          <sl-tree-item><a href="#robot-intelligence">5.4. Robot Intelligence (Yogeeswaran)</a></sl-tree-item>
+          <sl-tree-item><a href="#control-system">5.5. Control System (Yogeeswaran)</a></sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#future-work">6. Future Work (Zakir, Elgin, Jeanette, Yogeeswaran)</a>
+          <sl-tree-item><a href="#test-plan">6.1. Test Plan</a></sl-tree-item>
+          <sl-tree-item><a href="#project-plan">6.2. Project Plan</a></sl-tree-item>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#references">References</a>
+        </sl-tree-item>
+
+        <sl-tree-item expanded>
+          <a href="#appendices">Appendices (Elgin and Jeanette)</a>
+          <sl-tree-item><a href="#appendix-1">Appendix 1 - Upper Mechanism Calculations (Elgin)</a></sl-tree-item>
+          <sl-tree-item><a href="#appendix-2">Appendix 2 - Lower Mechanism Calculations (Jeanette)</a></sl-tree-item>
+        </sl-tree-item>
+
+      </sl-tree>
+    </div>
+    <sl-divider></sl-divider>
+
+
+    <!-- INSERT YOUR EXISTING SECTIONS 1-4 HERE -->
+    <!-- I'm keeping the structure but you'll copy your existing content from sections 1, 2, 3, and 4 -->
+
+    <!-- SECTION 5.1 - GUI DEVELOPMENT (NEW DETAILED CONTENT) -->
+    <div id="user-interface">
+      <h3>5.1. User Interface (GUI) (Zakir)</h3>
+
+      <p>
+        The Graphical User Interface (GUI) serves as the primary interaction point between users and BoxBunny's capabilities.
+        As the system integrates multiple subsystems—computer vision for punch detection, Arduino sensors for power measurement,
+        and robotic arms for sparring—the GUI must provide an intuitive, responsive interface that coordinates these components
+        while remaining accessible to users with varying technical backgrounds.
+      </p>
+
+      <p>
+        My role in the BoxBunny project centred on complete GUI development, encompassing all user-facing features except
+        the computer vision components handled by Yogeeswaran. This involved designing and implementing a comprehensive
+        training system that integrates with the team's hardware contributions: Yogeeswaran's CV system for technique
+        analysis, Elgin's 2-DOF robotic arms for sparring functionality, and Jeanette's height adjustment and rotating
+        base mechanism. Additionally, I contributed to minor mechanical components including the screen holder, Jetson Nano
+        mount, and foam construction.
+      </p>
+
+      <!-- 5.1.1 Design Specifications -->
+      <div id="gui-design-specifications">
+        <h4>5.1.1. Design Specifications</h4>
+
+        <p>
+          The primary requirement provided was straightforward yet challenging: <strong>"as long as it is easy to use."</strong>
+          This broad directive required translation into concrete, measurable specifications through systematic analysis of the
+          target user base identified in Chapter 2's primary research.
+        </p>
+
+        <h5>User Requirements Analysis</h5>
+        <p>
+          Building on the insights gathered from our gym interviews (Section 2.2), the target user population was identified
+          as ranging from beginners to intermediate boxers, aged 15–50, with varied levels of technical proficiency. The
+          system therefore needed to accommodate users with minimal technical knowledge while still providing sufficient depth
+          for more experienced practitioners. Analysis of this user base yielded several concrete usability requirements:
+          any feature must be reachable from the main menu within a maximum of three interactions; touch targets must be at
+          least 80×60 pixels to allow reliable operation with boxing gloves; critical information such as the current
+          combination, score, and timer must be displayed with clear visual hierarchy; sensor input must be reflected in the
+          interface within 500 milliseconds; and the display must maintain high contrast to remain readable during physical
+          activity.
+        </p>
+
+        <h5>Functional Requirements</h5>
+        <p>
+          The GUI was required to fulfil several critical functions within the BoxBunny ecosystem, spanning user account
+          management, structured combination training, performance testing with hardware sensors, progress history tracking,
+          and integration with the team's computer vision and robotic subsystems. These requirements are detailed in the
+          table below.
+        </p>
+
+        <table-component id="gui-functional-requirements"></table-component>
+
+        <h5>Technical Specifications</h5>
+        <p>
+          The development platform selection was directly constrained by the project timeline. With only four months available
+          (December 2024 – April 2025), there was insufficient time to learn modern web or mobile frameworks from scratch.
+          This necessitated selecting <strong>PySide6 (Qt for Python)</strong>, which leveraged existing Python proficiency
+          while delivering professional UI capabilities suitable for a production system. The target platform was the NVIDIA
+          Jetson Nano 4GB running Ubuntu 20.04 LTS, paired with a 7-inch touchscreen operating at 1024×600 resolution.
+          SQLite was chosen as the database engine for its lightweight footprint and its ability to run without a separate
+          server process—both important considerations on the resource-constrained Jetson hardware.
+        </p>
+
+        <p>
+          The GUI interfaces with multiple hardware components, each requiring specific communication protocols, as
+          summarised in the integration specifications table below.
+        </p>
+
+        <table-component id="gui-integration-specs"></table-component>
+
+        <h5>Performance Requirements</h5>
+        <p>
+          To ensure responsive operation within the Jetson Nano's resource constraints, a set of quantitative performance
+          targets was defined prior to implementation. Application startup was required to complete within three seconds;
+          page transitions and sensor data processing were each bounded at 500 milliseconds; database queries for history
+          retrieval were required to complete within 200 milliseconds; total memory consumption was capped at 500 MB given
+          the Jetson's 4 GB total RAM; and the system was expected to maintain 99% uptime over continuous four-hour
+          training sessions.
+        </p>
+      </div>
+
+      <!-- 5.1.2 Concept Generation & Evaluation -->
+      <div id="gui-concept-generation">
+        <h4>5.1.2. Concept Generation &amp; Evaluation</h4>
+
+        <h5>Technology Stack Evaluation</h5>
+        <p>
+          The first critical design decision involved selecting an appropriate development framework. Given the compressed
+          timeline, several options were evaluated and compared against key criteria including development speed, hardware
+          compatibility, community support, and professional UI capability. The comparison is summarised in the framework
+          evaluation table below.
+        </p>
+
+        <table-component id="gui-framework-comparison"></table-component>
+
+        <p>
+          PySide6 was ultimately selected as it offered the best balance of development speed—by leveraging existing Python
+          knowledge—professional UI capabilities, and proven compatibility with the Jetson Nano platform. The extensive Qt
+          documentation and large community support also meaningfully reduced technical risk within the compressed timeline.
+        </p>
+
+        <h5>Navigation Architecture Concepts</h5>
+        <p>
+          Three navigation paradigms were evaluated for the application structure, each reflecting a different design
+          philosophy and set of trade-offs.
+        </p>
+
+        <p>
+          <strong>Concept A: Tab-Based Navigation</strong> proposed making all major sections—Training, Performance, and
+          Settings—accessible via a persistent tab bar. While this approach offers visibility and familiarity from web and
+          mobile conventions, it was found to be poorly suited to the 7-inch display, where limited screen real estate and
+          the precision demands of tab targets made interaction unreliable when wearing boxing gloves. It also did not
+          naturally accommodate multi-step workflows such as selecting a mode, configuring parameters, training, and then
+          viewing results. This concept was therefore rejected on ergonomic grounds.
+        </p>
+
+        <p>
+          <strong>Concept B: Hierarchical Pages with Navigation Stack</strong> proposed a tree-structured page layout where
+          users retrace their steps via a back button. This approach maximises usable screen space on each page, supports
+          large glove-friendly buttons, and naturally models the sequential workflows inherent to boxing training. The
+          primary concern—that deep navigation paths could leave users disoriented—was addressed by implementing an
+          automatic navigation stack that records page history without requiring manual back button logic on every screen.
+          This concept was selected for implementation.
+        </p>
+
+        <p>
+          <strong>Concept C: Dashboard with Modal Dialogs</strong> proposed a single dashboard screen from which all
+          functions were launched as popup dialogs. While this eliminates page transitions, the approach was found to scale
+          poorly given the number of training modes and their complex multi-step workflows. Modal dialogs obscure contextual
+          information and produce a fragmented user experience. This concept was rejected as unsuitable for the feature
+          complexity of BoxBunny.
+        </p>
+
+        <h5>Data Architecture Evaluation</h5>
+        <p>
+          To support multiple users sharing a single BoxBunny unit, several data isolation strategies were evaluated. The
+          options considered and their trade-offs are detailed in the table below.
+        </p>
+
+        <table-component id="gui-data-isolation"></table-component>
+
+        <p>
+          A per-user database file approach was selected as it provides complete data isolation, simplifies user management
+          (accounts can be added or removed by creating or deleting a single folder), and preserves user privacy. Each
+          user's data is stored in two files: <code>users/[username]/combos.db</code>, which records combination training
+          progress across all 50 combos, and <code>users/[username]/performance_history.db</code>, which stores results
+          from all Power, Stamina, and Reaction Time tests.
+        </p>
+
+        <h5>Feature Prioritisation</h5>
+        <p>
+          Given the constrained development timeline, MoSCoW prioritisation was applied to ensure that core functionality
+          would be delivered reliably before desirable enhancements were attempted. The critical path items—user
+          authentication, the navigation framework, combination training with CV placeholders, the database schema, and
+          Arduino sensor integration—were designated as Must Have features and addressed in the first four iterations.
+          Important but non-critical features such as the smart combo curriculum, performance history tracking, real-time
+          feedback, and settings management were classified as Should Have. Desirable enhancements including AI coaching
+          feedback, progress charts, customisable programs, and data export were placed in the Could Have category. Features
+          requiring infrastructure beyond the project scope—cloud synchronisation, a mobile companion app, social
+          leaderboards, and video recording—were explicitly deferred as future work.
+        </p>
+      </div>
+
+      <!-- 5.1.3 Detailed Design -->
+      <div id="gui-detailed-design">
+        <h4>5.1.3. Detailed Design</h4>
+
+        <h5>System Architecture</h5>
+        <p>
+          The GUI system follows a layered architecture pattern, separating concerns across five distinct layers to
+          maximise maintainability and modularity. The Presentation Layer contains all PySide6 widgets, page classes,
+          button handlers, and event callbacks directly visible to the user. Beneath it, the Application Layer manages
+          navigation history via the page stack, maintains user session state, and coordinates events between pages. The
+          Business Logic Layer houses the Combo Curriculum Engine, performance testing logic, and user management routines.
+          The Integration Layer abstracts communication with hardware subsystems, including Arduino serial communication,
+          the CV system interface, and ROS topic publishing for robot control. Finally, the Data Layer manages all SQLite
+          database operations and configuration file access.
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+┌─────────────────────────────────────────────────────────┐
+│           Presentation Layer (PySide6 Widgets)          │
+│  • Pages and UI Components                              │
+│  • Button Handlers and Event Callbacks                  │
+├─────────────────────────────────────────────────────────┤
+│              Application Layer                          │
+│  • Navigation Management (Page Stack)                   │
+│  • State Management (User Session, Config)              │
+│  • Event Coordination                                    │
+├─────────────────────────────────────────────────────────┤
+│             Business Logic Layer                        │
+│  • Combo Curriculum Engine                              │
+│  • Performance Testing Logic                            │
+│  • User Management                                       │
+├─────────────────────────────────────────────────────────┤
+│            Integration Layer                            │
+│  • Arduino Serial Communication                         │
+│  • CV System Interface                                   │
+│  • Robot Control (ROS Topics)                           │
+├─────────────────────────────────────────────────────────┤
+│              Data Layer                                 │
+│  • SQLite Databases (Per-User Files)                    │
+│  • Configuration Management                             │
+└─────────────────────────────────────────────────────────┘
+        </pre>
+
+        <h5>Navigation System Design</h5>
+        <p>
+          The application uses a <code>QStackedWidget</code> for page management, with all navigation routed through a
+          single centralised method. A key design innovation was implementing an automatic navigation stack to track page
+          history without requiring manual back button logic on each individual page. The <code>navigate_to()</code> method
+          records the current page index before switching to the destination, and <code>navigate_back()</code> pops from
+          this stack to return to whichever page the user came from. If the stack is empty, the system falls back safely
+          to the main menu. This design eliminates code duplication, ensures consistent navigation behaviour across all
+          87 page transitions in the application, and allows back button visibility to be managed automatically.
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+class MainWindow(QMainWindow):
+    def __init__(self):
+        self.pages = {}              # Dictionary: PageIndex → QWidget
+        self.stacked_widget = QStackedWidget()
+        self.navigation_stack = []   # Automatic page history
+
+    def navigate_to(self, page_index, add_to_stack=True):
+        """Central navigation with automatic history tracking"""
+        current = self.stacked_widget.currentIndex()
+        if add_to_stack and current != page_index:
+            self.navigation_stack.append(current)
+        self.stacked_widget.setCurrentIndex(page_index)
+        self.update_back_button_visibility()
+
+    def navigate_back(self):
+        """Return to previous page using stack"""
+        if self.navigation_stack:
+            previous = self.navigation_stack.pop()
+            self.navigate_to(previous, add_to_stack=False)
+        else:
+            self.navigate_to(PageIndex.MAIN_MENU, add_to_stack=False)
+        </pre>
+
+        <h5>Combo Curriculum Engine</h5>
+        <p>
+          Rather than presenting combinations randomly, the curriculum engine applies mastery-based pedagogical principles
+          to structure the user's progression through a library of 50 combinations. The library is organised into three
+          difficulty tiers: 15 Beginner combinations covering single punches and 2-punch sequences; 20 Intermediate
+          combinations introducing 3-punch sequences, body shots (using an "Xb" notation suffix), and basic defensive
+          moves; and 15 Advanced combinations requiring 4–6 punch chains with integrated defence and counter-punching
+          patterns. Within each tier, combinations are grouped by technique family, and the engine rotates through the
+          current group until all combinations in that group meet the mastery threshold before unlocking the next. Mastery
+          is defined as an average performance score of 3.0 or above over the five most recent sessions for Beginner
+          combinations, and 4.0 or above for Intermediate and Advanced combinations. The notation system used to encode
+          combinations is detailed in the table below.
+        </p>
+
+        <table-component id="gui-combo-notation"></table-component>
+
+        <p>
+          The group-based progression algorithm works by finding the first group containing unmastered combinations and
+          cycling through its members. For example, within the Beginner tier, Group 1 contains the six single punches
+          (Jab through to Lead Uppercut). The system rotates through these six combinations repeatedly until each has
+          achieved an average score of at least 3.0 over five sessions, at which point Group 2—covering 2-punch sequences
+          beginning with the Jab—is unlocked.
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+Beginner Groups:
+  Group 1: Single Punches (combos 1-6)
+  Group 2: 2-Punch with Jab (combos 7-12)
+  Group 3: 2-Punch Other (combos 13-15)
+
+Progression Example:
+  Rounds 1-6:   Rotate through Group 1 (Jab, Cross, Lead Hook, etc.)
+  Rounds 7-12:  Second pass through Group 1
+  ... continue until all 6 combos have avg ≥ 3.0 over 5 sessions ...
+  Round N:      Unlock Group 2, begin 2-punch sequences
+        </pre>
+
+        <h5>Arduino Multi-Mode Protocol</h5>
+        <p>
+          To support both Power and Stamina testing using a single MPU6050 accelerometer on the Arduino, a command-based
+          communication protocol was designed to allow the Arduino to operate in three distinct modes. In CONTINUOUS mode,
+          acceleration data is streamed at 100 Hz for debugging and sensor tuning purposes. In STAMINA mode, the Arduino
+          counts punches internally and returns the total count when issued a STOP command. In POWER mode, it tracks peak
+          and average acceleration across all detected punches, returning the full metrics summary on STOP. The mode and
+          associated command set are detailed in the table below.
+        </p>
+
+        <table-component id="gui-arduino-modes"></table-component>
+
+        <p>
+          The complete command and response vocabulary is as follows. Python sends mode selection commands
+          (<code>MODE:CONTINUOUS</code>, <code>MODE:STAMINA</code>, <code>MODE:POWER</code>), test lifecycle commands
+          (<code>START</code>, <code>STOP</code>), and receives structured responses including mode confirmations
+          (<code>OK:MODE_STAMINA</code>), real-time events (<code>PUNCH_DETECTED:5</code>,
+          <code>POWER_PUNCH:4.2</code>), final results (<code>RESULT:PUNCHES:150</code>,
+          <code>RESULT:PEAK:4.5,AVG:3.2,COUNT:10</code>), and error messages (<code>ERROR:UNKNOWN_COMMAND</code>).
+        </p>
+
+        <p>
+          To maintain compatibility with units running earlier firmware that did not support mode commands, a protocol
+          detection function was implemented. On connection, the GUI sends a <code>MODE:CONTINUOUS</code> command and
+          listens for a response beginning with <code>OK:</code>. If received within one second, the command-based
+          protocol is used; otherwise, the system falls back to a legacy streaming mode, ensuring backward compatibility
+          without requiring firmware upgrades in the field.
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+def check_protocol_version(serial_port):
+    serial_port.write(b"MODE:CONTINUOUS\n")
+    response = serial_port.readline(timeout=1.0)
+    if response.startswith("OK:"):
+        return "command_based"  # New firmware
+    else:
+        return "streaming"      # Old firmware, use fallback
+        </pre>
+
+        <h5>Database Schema Design</h5>
+        <p>
+          Each user's training data is stored across two SQLite databases. The combo progress database
+          (<code>users/[username]/combos.db</code>) contains a <code>combos</code> table recording each combination's
+          identifier, name, sequence notation, difficulty level, current mastery score, total attempt count, and
+          timestamps; and a <code>performance_history</code> table recording the score achieved in each individual
+          training session, linked by combination ID. The performance testing database
+          (<code>users/[username]/performance_history.db</code>) contains separate tables for each test type:
+          <code>power_tests</code> records peak and average g-force alongside total punch count;
+          <code>stamina_tests</code> records total punches, average punch rate, first- and last-30-second rates, an
+          overall stamina score, fatigue percentage, and test duration; and <code>reaction_tests</code> records reaction
+          time in seconds, accuracy as a fraction, and the counts of total and successful attempts.
+        </p>
+
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto;">
+-- Combo Progress Database (users/[username]/combos.db)
+CREATE TABLE combos (
+    combo_id TEXT PRIMARY KEY,
+    combo_name TEXT NOT NULL,
+    combo_sequence TEXT NOT NULL,
+    difficulty_level TEXT NOT NULL,
+    mastery_score REAL DEFAULT 0.0,
+    total_attempts INTEGER DEFAULT 0,
+    last_trained_timestamp TEXT,
+    created_date TEXT,
+    last_updated TEXT
+);
+
+CREATE TABLE performance_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    combo_id TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    performance_score REAL,
+    FOREIGN KEY (combo_id) REFERENCES combos(combo_id)
+);
+
+-- Performance Testing Database (users/[username]/performance_history.db)
+CREATE TABLE power_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    peak_power REAL,
+    average_power REAL,
+    total_punches INTEGER
+);
+
+CREATE TABLE stamina_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    total_punches INTEGER,
+    average_rate REAL,
+    first_30_rate REAL,
+    last_30_rate REAL,
+    stamina_score INTEGER,
+    fatigue_percentage REAL,
+    duration INTEGER
+);
+
+CREATE TABLE reaction_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    reaction_time REAL,
+    accuracy REAL,
+    total_attempts INTEGER,
+    successful_attempts INTEGER
+);
+        </pre>
+      </div>
+
+      <!-- 5.1.4 Implementation & Testing -->
+      <div id="gui-implementation">
+        <h4>5.1.4. Implementation &amp; Testing</h4>
+
+        <p>
+          The GUI was developed iteratively over 15 weeks (December 2024 – April 2025), with each iteration building
+          on the previous and resolving issues discovered through testing. Six major iterations were completed, each with
+          defined objectives, a distinct implementation phase, structured testing, and a set of concrete outcomes.
+        </p>
+
+        <h5>Iteration 1: Foundation &amp; Core Framework (Weeks 1–2, December)</h5>
+        <p>
+          The first iteration focused on establishing the development environment on the Jetson Nano, creating a basic
+          application shell with page management, and verifying that PySide6 was viable on the target hardware. A
+          <code>MainWindow</code> class was created around a <code>QStackedWidget</code>, with three placeholder pages
+          (Login, Main Menu, Settings) connected via basic button navigation. Testing on the physical Jetson with the
+          7-inch touchscreen confirmed that touch targets met the 80×60 px minimum and that page transitions completed
+          in approximately 200 ms. One issue discovered during this iteration was that Qt's default widget styling
+          produced fonts and padding that were too small for reliable gloved interaction; this was resolved by
+          implementing a custom <code>ButtonStyle</code> class applying 18px minimum fonts and 20px padding throughout
+          the application. This iteration concluded with a validated proof of concept and a reusable navigation
+          foundation for subsequent feature development.
+        </p>
+
+        <h5>Iteration 2: User Management &amp; Database (Weeks 3–4, January)</h5>
+        <p>
+          The second iteration introduced multi-user support, implementing login and signup flows, a user management
+          page, and session state tracking. Credentials were stored in a <code>users.csv</code> file with SHA-256
+          password hashing. Five test users were created to validate data persistence, login validation, and that
+          deleting one user had no effect on others' data. An initial issue was discovered whereby deleting an account
+          left that user's training data on disk; this was resolved by implementing cascade deletion, which removes the
+          entire <code>users/[username]</code> directory when an account is deleted. By the end of this iteration,
+          multi-user support was fully functional with zero observed data mixing across all five test accounts.
+        </p>
+
+        <h5>Iteration 3: Combo Curriculum System (Weeks 5–7, January–February)</h5>
+        <p>
+          The third iteration delivered the core training functionality: the 50-combo library, the mastery-based
+          progression algorithm, and the training session UI. A <code>ComboCurriculum</code> class was implemented
+          with the group-based selection algorithm described in Section 5.1.3, and the training session page was built
+          with a countdown timer, combo display, and scoring interface. A placeholder CV integration returning a fixed
+          score of 3.0/5.0 was used to allow full workflow testing before the CV system was available.
+        </p>
+        <p>
+          Three design issues were identified and resolved during this iteration. The initial curriculum design used a
+          spaced repetition algorithm similar to Anki-style scheduling, but this was found to be poorly matched to the
+          sequential, session-based nature of boxing practice; it was replaced with the group-based rotation approach
+          described in the detailed design. The database was initially configured to store performance scores on a 0–1
+          scale, which conflicted with the CV system's 0–5 output range; the schema was migrated to use a 0–5 scale
+          with appropriate CHECK constraints. Additionally, the original shared database design caused data mixing when
+          multiple users trained on the same unit, which was resolved by adopting the per-user database file structure.
+          Thirty simulated training sessions were run to validate the progression logic, confirming that combos rotated
+          correctly within groups and that the mastery threshold calculation produced correct results.
+        </p>
+
+        <h5>Iteration 4: Performance Testing Suite (Weeks 8–10, February)</h5>
+        <p>
+          The fourth iteration implemented all three performance tests. The Power test was built around a
+          <code>power_runner.py</code> module communicating with the Arduino at 115200 baud, detecting punches via
+          a 2.5g threshold with 300 ms debouncing to prevent double-counting, and displaying peak g-force, average
+          power, and total punch count on a result page. The Stamina test was implemented in
+          <code>stamina_runner.py</code> as a two-minute endurance protocol, calculating punch rate over a rolling
+          10-second window and comparing the first and last 30 seconds to produce a fatigue analysis. The overall
+          stamina score weights 60% on total punch volume and 40% on consistency. A simulation mode was included to
+          enable testing without Arduino hardware. The Reaction Time test was implemented in
+          <code>reaction_runner.py</code>, interfacing with Yogeeswaran's CV module to measure elapsed time between
+          a displayed visual cue and a detected punch, also tracking accuracy across multiple attempts.
+        </p>
+        <p>
+          Testing validated punch detection at the 2.5g threshold on a breadboard Arduino, confirmed the stamina
+          scoring formula produced a realistic 0–100 distribution across 10 simulated test runs, and exercised the
+          reaction test logic with mock CV data in the 0.3–0.6 second range. The key open issue identified in this
+          iteration—that both Stamina and Power tests shared the same Arduino connection but with no clear mode
+          separation—was carried forward to Iteration 5 for resolution.
+        </p>
+
+        <h5>Iteration 5: Arduino Multi-Mode Protocol (Weeks 11–12, March)</h5>
+        <p>
+          The fifth iteration resolved the Arduino mode ambiguity by designing and implementing the command-based
+          multi-mode protocol described in Section 5.1.3. On the firmware side, a state machine was implemented
+          with three distinct operating modes, a command parser handling <code>MODE:X</code>, <code>START</code>,
+          and <code>STOP</code> commands, structured response formatting, and 300 ms debouncing to prevent
+          double-counting. On the Python side, <code>check_protocol_version()</code> was added to detect firmware
+          capabilities, command-based measurement logic was integrated into both runner modules, and a streaming
+          fallback was retained for backward compatibility with older firmware.
+        </p>
+        <p>
+          The complete mode switching sequence (CONTINUOUS → STAMINA → POWER → CONTINUOUS) was validated using
+          the Arduino serial monitor. Backward compatibility was confirmed by testing the legacy streaming path with
+          old firmware that did not respond to MODE commands. Punch detection accuracy reached 95%, with the
+          remaining 5% attributed to punches falling below the 2.5g detection threshold. Two further issues were
+          resolved: serial buffer overflow caused by Arduino output outpacing Python reads was addressed by
+          increasing the Python read frequency to 100 Hz and clearing the buffer before each test; and occasional
+          command misalignment was mitigated by adding retry logic with a two-second response timeout.
+        </p>
+
+        <h5>Iteration 6: Unified History &amp; Navigation Stack (Weeks 13–15, March–April)</h5>
+        <p>
+          The sixth and final iteration unified performance history across all three test types, implemented the
+          automatic navigation stack, and introduced an AI coaching feedback framework. A new
+          <code>performance_database.py</code> module was created to manage a single consolidated database containing
+          Power, Stamina, and Reaction test tables. A <code>PerformanceHistoryPage</code> was built displaying the
+          latest test summary with trend indicators (↑ improved / ↓ declined / → stable), a filterable results
+          table, and per-test trend calculations comparing each result to the previous test of the same type.
+        </p>
+        <p>
+          The navigation stack was fully implemented during this iteration: 87 instances of
+          <code>setCurrentIndex()</code> were migrated to <code>navigate_to()</code>, the back button was given
+          automatic visibility control, and deep navigation paths of six or more levels were successfully validated.
+          The AI feedback framework was implemented as a template-based system that considers the current score,
+          historical average, trend direction, and test-specific metrics; the integration point for a future LLM
+          is prepared but not yet activated.
+        </p>
+        <p>
+          Three issues were resolved in this iteration. The back button had previously always returned to the
+          Settings page from the History page regardless of how the user arrived; the navigation stack resolved
+          this by returning to the actual entry point. A database schema mismatch between the 0–1 and 0–5 score
+          scales caused CHECK constraint violations that required the database to be recreated with corrected
+          constraints. A discrepancy between training session counts in the CSV file and combo attempts in the
+          database was resolved by resetting the CSV history on migration to the per-user database structure.
+        </p>
+
+        <h5>Validation Testing Summary</h5>
+        <p>
+          Upon completion of all six iterations, a structured validation pass was conducted across the full feature
+          set. The results of functional and performance testing are summarised in the tables below.
+        </p>
+
+        <table-component id="gui-functional-testing"></table-component>
+
+        <table-component id="gui-performance-testing"></table-component>
+
+        <p>
+          All performance targets were met or exceeded. The application achieved a startup time of 2.1 seconds
+          against a 3-second target, page transitions of 180–250 milliseconds against a 500-millisecond target,
+          and sensor data latency of 320 milliseconds, also within the 500-millisecond bound. These results confirm
+          that the GUI operates efficiently within the Jetson Nano's resource constraints.
+        </p>
+      </div>
+
+      <!-- 5.1.5 Evaluation & Outcomes -->
+      <div id="gui-evaluation">
+        <h4>5.1.5. Evaluation &amp; Outcomes</h4>
+
+        <h5>Requirements Achievement</h5>
+        <p>
+          The primary requirement—<strong>"as long as it is easy to use"</strong>—was successfully met across all
+          measurable dimensions. Maximum 3-click navigation to any feature was achieved throughout the interface;
+          all touch targets meet the 80×60 px minimum for gloved operation; critical information is displayed with
+          a clear visual hierarchy; the automatic navigation stack ensures consistent back button behaviour regardless
+          of entry path; and real-time sensor feedback was measured well below the 500 ms target. The status of all
+          core deliverables is detailed in the table below.
+        </p>
+
+        <table-component id="gui-deliverables-status"></table-component>
+
+        <h5>Technical Achievements</h5>
+        <p>
+          Several notable technical achievements were accomplished within the four-month development window. A
+          feature-complete GUI was delivered despite no prior PySide6 experience, demonstrating rapid technology
+          acquisition. The layered architecture enables straightforward feature additions and maintenance, providing
+          a robust foundation for future development. The multi-mode Arduino protocol elegantly handles three distinct
+          sensor operating modes within a single codebase, and the navigation stack eliminates the fragile per-page
+          back button logic that would otherwise be required across dozens of pages. Per-user database isolation
+          ensures complete privacy and prevents data mixing, a claim validated across five test users with zero
+          observed cross-contamination.
+        </p>
+
+        <h5>Design Strengths</h5>
+        <p>
+          Beyond meeting immediate requirements, several design qualities position the system well for future
+          development. The combo curriculum is grounded in mastery learning principles rather than arbitrary
+          selection, providing a pedagogically sound training progression. The modular architecture means that new
+          training modes or additional performance tests can be introduced with minimal changes to existing code.
+          All features function without internet connectivity, making the system suitable for gym environments where
+          network access may be unreliable. Protocol detection also ensures that the GUI remains compatible with
+          both current and legacy Arduino firmware, removing a potential barrier to hardware upgrades.
+        </p>
+
+        <h5>Limitations &amp; Constraints</h5>
+        <p>
+          The development process was subject to several constraints that imposed limitations on the final system.
+          Due to the academic timeline, it was not possible to conduct extensive usability studies with actual boxers
+          beyond team members, meaning that real-world ergonomic feedback remains limited. All GUI work was completed
+          by a single developer without the benefit of peer code review or collaborative refinement, which increases
+          the risk of undiscovered edge cases. Testing was frequently performed using simulation modes rather than
+          the fully integrated robot, as hardware access was limited during the development phase.
+        </p>
+        <p>
+          Technical limitations are also present. The 7-inch display constrains the amount of information that can
+          be presented simultaneously, making side-by-side metric comparison difficult. Despite the 80×60 px touch
+          target standard, users wearing thick gloves may still experience difficulty with some interface elements.
+          Arduino serial communication is subject to occasional glitches that require retry logic and graceful error
+          handling to manage. Known issues identified during testing are documented in the table below.
+        </p>
+
+        <table-component id="gui-known-issues"></table-component>
+
+        <h5>Lessons Learned</h5>
+        <p>
+          Several technical lessons emerged from this project. Framework selection proved critical: PySide6 enabled
+          rapid development without sacrificing professional quality, validating the decision to prioritise
+          familiarity over novelty. The modular architecture made iterative refactoring tractable; both the database
+          migration and the navigation stack addition were completed without disrupting unrelated features. Real
+          hardware testing proved essential for surfacing Arduino communication edge cases that simulation could not
+          reproduce. Documenting protocol decisions early—particularly the multi-mode command structure—also saved
+          significant debugging time when issues arose.
+        </p>
+        <p>
+          From a project management perspective, the MoSCoW prioritisation framework was effective in ensuring that
+          core features were delivered reliably before enhancements were attempted. The iterative development
+          structure allowed course corrections when requirements became clearer mid-project—most notably the shift
+          from spaced repetition to group-based rotation—without destabilising the overall delivery. The practice of
+          implementing CV and Arduino placeholders from the outset enabled GUI development to proceed in parallel
+          with hardware and software work being carried out by other team members.
+        </p>
+
+        <h5>Future Work Recommendations</h5>
+        <p>
+          In the short term (one to two months), the most impactful enhancements would be completing the LLM
+          integration to replace template-based AI coaching feedback with dynamically generated guidance, conducting
+          a usability study with ten to fifteen actual boxers to gather real-world ergonomic feedback, and adding
+          progress visualisation charts to the history page. Over a medium-term horizon (three to six months),
+          advanced analytics for trend analysis and weak area identification, user-customisable training programmes
+          with adjustable mastery thresholds, and data export to CSV or PDF for coaches would substantially extend
+          the system's utility. In the longer term (six months and beyond), cloud synchronisation across multiple
+          BoxBunny units, a mobile companion application, CV-integrated session recording with technique annotation,
+          and community features such as global leaderboards would position BoxBunny as a more complete training
+          ecosystem.
+        </p>
+
+        <h5>Conclusion</h5>
+        <p>
+          The GUI development for BoxBunny successfully delivered a comprehensive, user-friendly interface within
+          the constrained four-month timeline of December 2024 to April 2025. The system meets all core
+          requirements: ease of use for a broad range of users, multi-user support with complete data isolation, an
+          intelligent training curriculum structured around mastery learning principles, a three-mode performance
+          testing suite, and clean integration with all team members' hardware subsystems.
+        </p>
+        <p>
+          The iterative development approach proved essential, enabling the discovery and resolution of design issues—
+          including database schema mismatches, navigation flow inconsistencies, and Arduino protocol ambiguity—
+          before they could become critical failures in the final system. While limitations remain due to the
+          compressed timeline, single-developer development, and constrained hardware access, the architecture is
+          robust and the codebase is well-structured for future enhancement. The GUI component fulfils its role
+          within the BoxBunny system by providing an intuitive, responsive interface that unifies the contributions
+          of all team members into a coherent and functional training experience.
+        </p>
+      </div>
+    </div>
+
+        <sl-divider></sl-divider>
+
+    <!-- INSERT YOUR EXISTING SECTIONS 5.2-5.5 HERE -->
+    <!-- Copy your Upper Mechanism, Lower Mechanism, Robot Intelligence, and Control System sections -->
+
+    <!-- INSERT YOUR EXISTING SECTION 6 AND BEYOND HERE -->
+    <!-- Copy your Future Work, References, and Appendices sections -->
+
+
+  <!-- Scroll to top button -->
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+
+  <!-- Table components scripts -->
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script type="module" src="./components/table-component/table-component.js"></script>
+  <script src="./components/table-component/user-insights.js"></script>
+  <script src="./components/table-component/competitor-analysis.js"></script>
+  <script src="./components/table-component/design-improvement.js"></script>
+  <script src="./components/table-component/product-needs.js"></script>
+  <script src="./components/table-component/ui-func-spec.js"></script>
+  <script src="./components/table-component/interview-qn.js"></script>
+  <script src="./components/table-component/tables.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="./components/data-chart/boxer-pie.js"></script>
+  <script src="./components/data-chart/train-sp-pie.js"></script>
+
+  <!-- GUI-specific table data scripts (you'll need to create these) -->
+  <script>
+    // Add table data for GUI section tables
+    // gui-functional-requirements
+    // gui-integration-specs
+    // gui-framework-comparison
+    // gui-data-isolation
+    // gui-combo-notation
+    // gui-arduino-modes
+    // gui-functional-testing
+    // gui-performance-testing
+    // gui-deliverables-status
+    // gui-known-issues
+  </script>
+</body>
+</html>

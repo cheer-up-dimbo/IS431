@@ -5,7 +5,7 @@ This script demonstrates how to integrate the curriculum engine with
 the boxing training GUI.
 """
 
-from combo_curriculum import ComboCurriculum, create_mock_analytics
+from GUI.punch_combination.combo_curriculum import ComboCurriculum, create_mock_analytics
 
 
 def example_basic_usage():
@@ -117,17 +117,17 @@ def example_full_session():
 
 
 def example_gui_integration():
-    """Example showing how to integrate with TechCorrSessionPage."""
+    """Example showing how to integrate with TrainingSessionPage."""
     print("\n" + "=" * 60)
     print("EXAMPLE 3: GUI Integration Pattern")
     print("=" * 60)
     
     print("""
-# In TechCorrSessionPage.__init__():
+# In TrainingSessionPage.__init__():
 
 from combo_curriculum import ComboCurriculum
 
-class TechCorrSessionPage(QWidget):
+class TrainingSessionPage(QWidget):
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -298,7 +298,7 @@ def main():
     print("1. Install openpyxl: pip install openpyxl")
     print("2. Copy combo_curriculum/ folder to your project")
     print("3. Import in your GUI: from combo_curriculum import ComboCurriculum")
-    print("4. Initialize in TechCorrSessionPage.__init__()")
+    print("4. Initialize in TrainingSessionPage.__init__()")
     print("5. Call get_next_combo() and update_score() as shown above")
 
 

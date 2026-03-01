@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # Add current directory to path so we can import combo_curriculum
 sys.path.insert(0, '/home/claude')
 
-from combo_curriculum import (
+from GUI.punch_combination.combo_curriculum import (
     ComboCurriculum,
     Combo,
     create_mock_analytics,
