@@ -31,6 +31,15 @@ from reaction_time import reaction_time_runner as rt_runner
 from stamina.stamina_runner import StaminaRunner, USE_ARDUINO
 from combo_curriculum import ComboCurriculum
 from placeholders import format_feedback_data, get_performance_score
+from sparring.spar_pages import (
+    SparStyleSelectPage,
+    SparRoundConfigPage,
+    SparCountdownPage,
+    SparSessionPage,
+    SparRestPage,
+    SparProcessingPage,
+    SparResultPage,
+)
 
 # Import from new compartmentalized modules
 from core import TrainingConfig, AppState, PageIndex, ButtonStyle
@@ -2051,6 +2060,7 @@ class ReactionInstructionsPage(ButtonNavigationMixin, QWidget):
         instructions.setAlignment(Qt.AlignCenter)
         instructions.setStyleSheet("font-size: 28px; font-weight: bold;")
 
+        # Buttons at the bottom
         button_layout = QHBoxLayout()
         button_layout.setSpacing(20)
         button_layout.addStretch()
@@ -2091,7 +2101,7 @@ class ReactionInstructionsPage(ButtonNavigationMixin, QWidget):
 
     def on_start_clicked(self):
         if self.skip_countdown:
-            # Skip countdown and go directly to reaction test
+            # Skip countdown and go directly to test
             self.skip_countdown = False
             self.launch_reaction_test_page()
         else:
@@ -2976,36 +2986,74 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         self.self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
-        self.beginner_btn.clicked.connect(lambda: self.on_difficulty_clicked("Beginner"))
-        self.intermediate_btn.clicked.connect(lambda: self.on_difficulty_clicked("Intermediate"))
-        self.advanced_btn.clicked.connect(lambda: self.on_difficulty_clicked("Advanced"))
-        self.self_select_btn.clicked.connect(lambda: self.on_difficulty_clicked("Self-Select"))
+        self.beginner_btn.clicked.connect(self.on_difficulty_clicked("Beginner"))
+        self.intermediate_btn.clicked.connect(self.on_difficulty_clicked("Intermediate"))
+        self.advanced_btn.clicked.connect(self.on_difficulty_clicked("Advanced"))
+        self.self_select_btn.clicked.connect(self.on_difficulty_clicked("Self-Select"))
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
+        # center the buttons horizontally
         layout.addWidget(self.beginner_btn)
         layout.addWidget(self.intermediate_btn)
         layout.addWidget(self.advanced_btn)
         layout.addWidget(self.self_select_btn)
-        layout.addStretch()
-        layout.addWidget(back_btn)
+        # layout.addStretch()
+
+        # Create horizontal layout for back and continue buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(20)
+        button_layout.addStretch()  # Add space on the left
+        
+        back_btn = QPushButton("Back")
+        self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
+        
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        # Continue button should be green like Start actions
+        self.continue_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        
+        back_btn.clicked.connect(self.on_back_clicked)
+        self.continue_btn.clicked.connect(self.on_continue_clicked)
+        
+        button_layout.addWidget(back_btn)
+        button_layout.addWidget(self.continue_btn)
+        button_layout.addStretch()  # Add space on the right
+
+        layout.addLayout(button_layout)
 
         self.setLayout(layout)
 
-    def showEvent(self, event):
-        super().showEvent(event)
-        username = None
-        main_window = self.parent()
-        if hasattr(main_window, 'get_current_user'):
-            username = main_window.get_current_user()
-        elif self.app_state and hasattr(self.app_state, 'current_user'):
-            username = self.app_state.current_user
-        level = get_user_level(username) if username else 'Beginner'
-        # Only enable the button matching user level
-        self.beginner_btn.setEnabled(level == 'Beginner')
-        self.intermediate_btn.setEnabled(level == 'Intermediate')
-        self.advanced_btn.setEnabled(level == 'Advanced')
-        self.self_select_btn.setEnabled(level == 'Beginner')
+        # Initialize button displays from state and update continue availability
+        self.update_button_displays()
+
+    def update_button_displays(self):
+        """Refresh parameter buttons from app_state config and labels."""
+        if self.app_state:
+            config = self.app_state.get_config()
+            self.beginner_btn.setText(f"Round\n{config.rounds}")
+            self.speed_btn.setText(f"Speed\n{config.speed}")
+
+            time_text = self.app_state.time_label or config.get_time_str()
+            rest_text = self.app_state.rest_label or config.get_rest_str()
+            self.time_btn.setText(f"Time\n{time_text}")
+            self.rest_btn.setText(f"Rest\n{rest_text}")
+
+        self.update_continue_button()
+
+    def is_parameter_selected(self, btn):
+        """Check if a parameter button has been selected (has more than just the label)."""
+        text = btn.text()
+        return "\n" in text  # Selected buttons have format "Label\nValue"
+
+    def update_continue_button(self):
+        """Enable continue button only if all parameters are selected."""
+        all_selected = (
+            self.is_parameter_selected(self.beginner_btn) and
+            self.is_parameter_selected(self.intermediate_btn) and
+            self.is_parameter_selected(self.advanced_btn) and
+            self.is_parameter_selected(self.self_select_btn)
+        )
+        self.continue_btn.setEnabled(all_selected)
 
     def on_difficulty_clicked(self, difficulty):
         print(f"{difficulty} button clicked")
@@ -3525,7 +3573,7 @@ class CountdownPage(ButtonNavigationMixin, QWidget):
         self.pause_btn.setText("Pause")
         # Ensure Pause button starts in red style
         self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        self.timer.start(1000)  # Update every 1000ms (1 second)
+        self.timer.start(1000)  # Update every 1 second
 
     def update_countdown(self):
         """Update countdown display."""
@@ -4334,174 +4382,6 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
         
         button_layout.addWidget(back_btn)
         button_layout.addWidget(self.next_btn)
-
-        left_layout.addWidget(list_title)
-        left_layout.addLayout(self.sequence_buttons_layout)
-        left_layout.addStretch()
-        left_layout.addLayout(button_layout)
-
-        # RIGHT SIDE - Input Area
-        right_layout = QVBoxLayout()
-        right_layout.setSpacing(15)
-        right_layout.setContentsMargins(25, 25, 25, 25)
-
-        # Text box showing current sequence
-        self.sequence_input = QLabel("")
-        self.sequence_input.setAlignment(Qt.AlignCenter)
-        self.sequence_input.setStyleSheet("""
-            font-size: 24px;
-            padding: 15px;
-            background-color: white;
-            border: 2px solid #2196F3;
-            border-radius: 8px;
-            min-height: 60px;
-            color: black;
-        """)
-
-        # Numpad grid (1-6)
-        numpad_grid = QGridLayout()
-        numpad_grid.setHorizontalSpacing(20)
-        numpad_grid.setVerticalSpacing(20)
-
-        for i in range(6):
-            btn = QPushButton(str(i + 1))
-            btn.setFocusPolicy(Qt.StrongFocus)
-            btn.setFixedSize(140, 60)
-            btn.setStyleSheet("""
-                QPushButton {
-                    font-size: 28px;
-                    padding: 20px;
-                    min-width: 80px;
-                    min-height: 80px;
-                    background-color: #2196F3;
-                    color: white;
-                    border: 2px solid #0d47a1;
-                    border-radius: 8px;
-                }
-                QPushButton:hover {
-                    background-color: #1976D2;
-                }
-                QPushButton:focus {
-                    border: 4px solid #00ff00;
-                    background-color: #2d5016;
-                }
-                QPushButton:pressed {
-                    background-color: #0D47A1;
-                }
-            """)
-            btn.clicked.connect(lambda checked, val=str(i + 1): self.add_to_sequence(val))
-            row = i // 3
-            col = i % 3
-            numpad_grid.addWidget(btn, row, col)
-            # print(f"Adding button {i + 1} at row={row}, col={col}")
-
-        # Defense buttons (Slip-L, Slip-R, Block-L, Block-R)
-        defense_grid = QGridLayout()
-        defense_grid.setHorizontalSpacing(20)
-        defense_grid.setVerticalSpacing(20)
-
-        defense_moves = ["Slip-L", "Slip-R", "Block-L", "Block-R"]
-        for i, move in enumerate(defense_moves):
-            btn = QPushButton(move)
-            btn.setFocusPolicy(Qt.StrongFocus)
-            btn.setFixedSize(180, 58)
-            btn.setStyleSheet("""
-                QPushButton {
-                    font-size: 20px;
-                    padding: 15px;
-                    min-width: 100px;
-                    min-height: 60px;
-                    background-color: #FF9800;
-                    color: white;
-                    border: 2px solid #bf6a00;
-                    border-radius: 8px;
-                }
-                QPushButton:hover {
-                    background-color: #F57C00;
-                }
-                QPushButton:focus {
-                    border: 4px solid #00ff00;
-                    background-color: #2d5016;
-                }
-                QPushButton:pressed {
-                    background-color: #E65100;
-                }
-            """)
-            btn.clicked.connect(lambda checked, val=move: self.add_to_sequence(val))
-            row = i // 2
-            col = i % 2
-            defense_grid.addWidget(btn, row, col)
-            # print(f"Adding {move} at row={row}, col={col}")
-
-        # Backspace and Confirm buttons
-        action_layout = QHBoxLayout()
-        action_layout.setSpacing(15)
-        
-        backspace_btn = QPushButton("Backspace")
-        self.confirm_btn = QPushButton("Confirm")
-        backspace_btn.setFocusPolicy(Qt.StrongFocus)
-        self.confirm_btn.setFocusPolicy(Qt.StrongFocus)
-        
-        backspace_btn.setStyleSheet("""
-            QPushButton {
-                font-size: 18px;
-                padding: 12px 20px;
-                min-height: 50px;
-                background-color: #f44336;
-                color: white;
-                border: 2px solid #b71c1c;
-                border-radius: 8px;
-            }
-            QPushButton:hover {
-                background-color: #da190b;
-            }
-            QPushButton:focus {
-                border: 4px solid #00ff00;
-                background-color: #2d5016;
-                color: white;
-            }
-        """)
-        
-        self.confirm_btn.setStyleSheet("""
-            QPushButton {
-                font-size: 18px;
-                padding: 12px 20px;
-                min-height: 50px;
-                background-color: #4CAF50;
-                color: white;
-                border: 2px solid #2e7d32;
-                border-radius: 8px;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-            QPushButton:focus {
-                border: 4px solid #00ff00;
-                background-color: #2d5016;
-                color: white;
-                font-weight: bold;
-            }
-            QPushButton:disabled {
-                background-color: #cccccc;
-                border: 2px solid #a9a9a9;
-                color: #666666;
-            }
-        """)
-        
-        backspace_btn.clicked.connect(self.backspace_sequence)
-        self.confirm_btn.clicked.connect(self.confirm_sequence)
-        
-        action_layout.addWidget(backspace_btn)
-        action_layout.addWidget(self.confirm_btn)
-
-        right_layout.addWidget(self.sequence_input)
-        right_layout.addSpacing(15)
-        right_layout.addLayout(numpad_grid)
-        right_layout.addSpacing(15)
-        right_layout.addLayout(defense_grid)
-        right_layout.addSpacing(15)
-        right_layout.addLayout(action_layout)
-        right_layout.addStretch()
 
         # Add left and right layouts to main layout
         main_layout.addLayout(left_layout, 1)
@@ -5608,19 +5488,14 @@ class MainWindow(QWidget):
         self.spar_page = SparPage(self.stacked_widget)
         self.battle_page = BattlePage(self.stacked_widget, self.app_state)
         self.battle_style_description_page = BattleStyleDescriptionPage(self.stacked_widget, self.app_state)
-        self.performance_page = PerformancePage(self.stacked_widget)
-        self.power_instructions_page = PowerInstructionsPage(self.stacked_widget)
-        self.power_punch_page = PowerPunchPage(self.stacked_widget)
-        self.power_result_page = PowerResultPage(self.stacked_widget)
-        self.stamina_instructions_page = StaminaInstructionsPage(self.stacked_widget)
-        self.stamina_test_page = StaminaTestPage(self.stacked_widget)
-        self.stamina_result_page = StaminaResultPage(self.stacked_widget)
-        self.performance_history_page = PerformanceHistoryPage(self.stacked_widget)
-        self.reaction_instructions_page = ReactionInstructionsPage(self.stacked_widget)
-        self.reaction_test_page = ReactionTestPage(self.stacked_widget)
-        self.reaction_result_page = ReactionResultPage(self.stacked_widget)
-        self.others_page = OthersPage(self.stacked_widget, self.app_state)
-        
+        self.spar_style_select_page = SparStyleSelectPage(self.stacked_widget)
+        self.spar_round_config_page = SparRoundConfigPage(self.stacked_widget)
+        self.spar_countdown_page    = SparCountdownPage(self.stacked_widget)
+        self.spar_session_page      = SparSessionPage(self.stacked_widget)
+        self.spar_rest_page         = SparRestPage(self.stacked_widget)
+        self.spar_processing_page   = SparProcessingPage(self.stacked_widget)
+        self.spar_result_page       = SparResultPage(self.stacked_widget)
+
         # Login and User Management pages
         self.login_page = LoginPage(self.stacked_widget, self.app_state)
         self.user_management_page = UserManagementPage(self.stacked_widget)
@@ -5633,40 +5508,47 @@ class MainWindow(QWidget):
         self.countdown_page.on_finished = self.start_training_session
 
         # Add pages to stacked widget
-        self.stacked_widget.addWidget(self.homepage)                # 0
-        self.stacked_widget.addWidget(self.training_page)           # 1
-        self.stacked_widget.addWidget(self.techniques_page)         # 2
-        self.stacked_widget.addWidget(self.punch_combinations_page) # 3
-        self.stacked_widget.addWidget(self.basic_parameters_page)   # 4
-        self.stacked_widget.addWidget(self.round_selection_page)    # 5
-        self.stacked_widget.addWidget(self.speed_selection_page)    # 6
-        self.stacked_widget.addWidget(self.time_selection_page)     # 7
-        self.stacked_widget.addWidget(self.rest_selection_page)     # 8
-        self.stacked_widget.addWidget(self.countdown_page)          # 9
-        self.stacked_widget.addWidget(self.training_session_page)   # 10
-        self.stacked_widget.addWidget(self.self_select_sequence_page) # 11
-        self.stacked_widget.addWidget(self.spar_page)            # 12
-        self.stacked_widget.addWidget(self.battle_page)          # 13
-        self.stacked_widget.addWidget(self.performance_page)     # 14
-        self.stacked_widget.addWidget(self.power_instructions_page) # 15
-        self.stacked_widget.addWidget(self.power_punch_page) # 16
-        self.stacked_widget.addWidget(self.power_result_page) # 17
-        self.stacked_widget.addWidget(self.stamina_instructions_page) # 18
-        self.stacked_widget.addWidget(self.reaction_instructions_page) # 19
-        self.stacked_widget.addWidget(self.reaction_test_page) # 20
-        self.stacked_widget.addWidget(self.reaction_result_page) # 21
-        self.stacked_widget.addWidget(self.others_page) # 22
-        self.stacked_widget.addWidget(self.login_page) # 23
-        self.stacked_widget.addWidget(self.user_management_page) # 24
-        self.stacked_widget.addWidget(self.user_combo_progress_page) # 25
+        self.stacked_widget.addWidget(self.homepage)                    # 0
+        self.stacked_widget.addWidget(self.training_page)               # 1
+        self.stacked_widget.addWidget(self.techniques_page)             # 2
+        self.stacked_widget.addWidget(self.punch_combinations_page)     # 3
+        self.stacked_widget.addWidget(self.basic_parameters_page)       # 4
+        self.stacked_widget.addWidget(self.round_selection_page)        # 5
+        self.stacked_widget.addWidget(self.speed_selection_page)        # 6
+        self.stacked_widget.addWidget(self.time_selection_page)         # 7
+        self.stacked_widget.addWidget(self.rest_selection_page)         # 8
+        self.stacked_widget.addWidget(self.countdown_page)              # 9
+        self.stacked_widget.addWidget(self.training_session_page)       # 10
+        self.stacked_widget.addWidget(self.self_select_sequence_page)   # 11
+        self.stacked_widget.addWidget(self.spar_page)                   # 12
+        self.stacked_widget.addWidget(self.battle_page)                 # 13
+        self.stacked_widget.addWidget(self.performance_page)            # 14
+        self.stacked_widget.addWidget(self.power_instructions_page)     # 15
+        self.stacked_widget.addWidget(self.power_punch_page)            # 16
+        self.stacked_widget.addWidget(self.power_result_page)           # 17
+        self.stacked_widget.addWidget(self.stamina_instructions_page)   # 18
+        self.stacked_widget.addWidget(self.reaction_instructions_page)  # 19
+        self.stacked_widget.addWidget(self.reaction_test_page)          # 20
+        self.stacked_widget.addWidget(self.reaction_result_page)        # 21
+        self.stacked_widget.addWidget(self.others_page)                 # 22
+        self.stacked_widget.addWidget(self.login_page)                  # 23
+        self.stacked_widget.addWidget(self.user_management_page)        # 24
+        self.stacked_widget.addWidget(self.user_combo_progress_page)    # 25
         self.stacked_widget.addWidget(self.user_progress_overview_page) # 26
-        self.stacked_widget.addWidget(self.combo_results_page) # 27
-        self.stacked_widget.addWidget(self.combo_llm_chat_page) # 28
-        self.stacked_widget.addWidget(self.stamina_test_page) # 29
-        self.stacked_widget.addWidget(self.stamina_result_page) # 30
-        self.stacked_widget.addWidget(QWidget()) # 31 reserved (STAMINA_HISTORY)
-        self.stacked_widget.addWidget(self.performance_history_page) # 32
+        self.stacked_widget.addWidget(self.combo_results_page)          # 27
+        self.stacked_widget.addWidget(self.combo_llm_chat_page)         # 28
+        self.stacked_widget.addWidget(self.stamina_test_page)           # 29
+        self.stacked_widget.addWidget(self.stamina_result_page)         # 30
+        self.stacked_widget.addWidget(QWidget())                        # 31 reserved (STAMINA_HISTORY)
+        self.stacked_widget.addWidget(self.performance_history_page)    # 32
         self.stacked_widget.addWidget(self.battle_style_description_page) # 33
+        self.stacked_widget.addWidget(self.spar_style_select_page)      # 34
+        self.stacked_widget.addWidget(self.spar_round_config_page)      # 35
+        self.stacked_widget.addWidget(self.spar_countdown_page)         # 36
+        self.stacked_widget.addWidget(self.spar_session_page)           # 37
+        self.stacked_widget.addWidget(self.spar_rest_page)              # 38
+        self.stacked_widget.addWidget(self.spar_processing_page)        # 39
+        self.stacked_widget.addWidget(self.spar_result_page)            # 40
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
