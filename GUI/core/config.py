@@ -220,6 +220,8 @@ class AppState:
         self.rest_label: Optional[str] = "1min"
         # AI Chat setting
         self.ai_chat_enabled: bool = False
+        # Computer Vision toggle for sparring
+        self.cv_enabled: bool = False
     
     def update_rounds(self, rounds: int) -> None:
         """Update the number of rounds.

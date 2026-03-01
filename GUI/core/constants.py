@@ -39,6 +39,13 @@ class PageIndex:
     STAMINA_HISTORY = 31
     PERFORMANCE_HISTORY = 32
     BATTLE_STYLE_DESC = 33
+    SPAR_STYLE_SELECT = 34
+    SPAR_ROUND_CONFIG  = 35
+    SPAR_COUNTDOWN     = 36
+    SPAR_SESSION       = 37
+    SPAR_REST          = 38
+    SPAR_PROCESSING    = 39
+    SPAR_RESULT        = 40
 
 
 class ButtonStyle:

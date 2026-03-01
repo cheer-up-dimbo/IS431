@@ -4662,63 +4662,29 @@ class SparPage(ButtonNavigationMixin, QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
 
+        sparring_btn = QPushButton("Sparring")
         battle_btn = QPushButton("Battle")
         back_btn = QPushButton("Back")
 
-        battle_btn.setFixedSize(180, 65)
-        back_btn.setFixedSize(180, 65)
-        battle_btn.setStyleSheet("""
-            QPushButton {
-                font-size: 20px;
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 8px;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-            QPushButton:pressed {
-                background-color: #3d8b40;
-            }
-            QPushButton:focus {
-                border: 4px solid #00ff00;
-                background-color: #2d5016;
-                color: white;
-                font-weight: bold;
-            }
-        """)
-        back_btn.setStyleSheet("""
-            QPushButton {
-                font-size: 20px;
-                background-color: #f44336;
-                color: white;
-                border: none;
-                border-radius: 8px;
-            }
-            QPushButton:hover {
-                background-color: #da190b;
-            }
-            QPushButton:pressed {
-                background-color: #c41504;
-            }
-            QPushButton:focus {
-                border: 4px solid #00ff00;
-                background-color: #2d5016;
-                color: white;
-                font-weight: bold;
-            }
-        """)
+        sparring_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        battle_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
+        sparring_btn.clicked.connect(self.on_sparring_clicked)
         battle_btn.clicked.connect(self.on_battle_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
-        layout.addWidget(battle_btn)
+        layout.addWidget(sparring_btn, alignment=Qt.AlignCenter)
+        layout.addWidget(battle_btn, alignment=Qt.AlignCenter)
         layout.addStretch()
-        layout.addWidget(back_btn)
+        layout.addWidget(back_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(layout)
+        self.setup_navigation([sparring_btn, battle_btn, back_btn])
+
+    def on_sparring_clicked(self):
+        self.navigate_to(PageIndex.SPAR_STYLE_SELECT)
 
     def on_battle_clicked(self):
         # BattlePage index moved to 13 after removing defense page
