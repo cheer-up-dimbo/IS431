@@ -1440,8 +1440,8 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0,0,0,0)
 
         title = QLabel("Performance")
         title.setAlignment(Qt.AlignCenter)
@@ -1452,9 +1452,9 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
         reaction_time_btn = QPushButton("Reaction Time")
         back_btn = QPushButton("Back")
 
-        power_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
-        stamina_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
-        reaction_time_btn.setStyleSheet(ButtonStyle.PRIMARY_WIDE)
+        power_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
+        stamina_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
+        reaction_time_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         power_btn.clicked.connect(self.on_power_clicked)
@@ -4437,7 +4437,7 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             row = i // 3
             col = i % 3
             numpad_grid.addWidget(btn, row, col)
-            print(f"Adding button {i + 1} at row={row}, col={col}")
+            # print(f"Adding button {i + 1} at row={row}, col={col}")
 
         # Defense buttons (Slip-L, Slip-R, Block-L, Block-R)
         defense_grid = QGridLayout()
@@ -4473,7 +4473,7 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             row = i // 2
             col = i % 2
             defense_grid.addWidget(btn, row, col)
-            print(f"Adding {move} at row={row}, col={col}")
+            # print(f"Adding {move} at row={row}, col={col}")
 
         # Backspace and Confirm buttons
         action_layout = QHBoxLayout()
