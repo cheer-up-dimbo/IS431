@@ -4210,7 +4210,7 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
                     border-radius: 8px;
                     text-align: left;
                     color: black;
-                    min-height: 50px;
+                    min-height: 40px;
                 }
                 QPushButton:hover {
                     background-color: #e0e0e0;
@@ -4322,58 +4322,12 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
         
         back_btn = QPushButton("Back")
         self.next_btn = QPushButton("Next")
-
-        back_btn.setFocusPolicy(Qt.StrongFocus)
-        self.next_btn.setFocusPolicy(Qt.StrongFocus)
-
-        back_btn.setStyleSheet("""
-            QPushButton {
-                min-width: 140px;
-                min-height: 50px;
-                padding: 10px 15px;
-                font-size: 17px;
-                background-color: #f44336;
-                color: white;
-                border: 3px solid #b71c1c;
-                border-radius: 8px;
-            }
-            QPushButton:hover {
-                background-color: #d32f2f;
-            }
-            QPushButton:focus {
-                border: 6px solid #00ff00;
-                background-color: #2d5016;
-                color: white;
-                font-weight: bold;
-            }
-        """)
-
-        self.next_btn.setStyleSheet("""
-            QPushButton {
-                min-width: 140px;
-                min-height: 50px;
-                padding: 10px 15px;
-                font-size: 17px;
-                background-color: #4CAF50;
-                color: white;
-                border: 3px solid #2e7d32;
-                border-radius: 8px;
-            }
-            QPushButton:hover {
-                background-color: #43a047;
-            }
-            QPushButton:focus {
-                border: 6px solid #00ff00;
-                background-color: #2d5016;
-                color: white;
-                font-weight: bold;
-            }
-            QPushButton:disabled {
-                background-color: #cccccc;
-                border: 3px solid #a9a9a9;
-                color: #666666;
-            }
-        """)
+        
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.next_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        
+        back_btn.setFixedWidth(150)
+        self.next_btn.setFixedWidth(150)
         
         back_btn.clicked.connect(self.on_back_clicked)
         self.next_btn.clicked.connect(self.on_next_clicked)
@@ -4415,8 +4369,10 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             btn.setFixedSize(140, 60)
             btn.setStyleSheet("""
                 QPushButton {
-                    font-size: 26px;
-                    padding: 15px;
+                    font-size: 28px;
+                    padding: 20px;
+                    min-width: 80px;
+                    min-height: 80px;
                     background-color: #2196F3;
                     color: white;
                     border: 2px solid #0d47a1;
@@ -4451,8 +4407,10 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             btn.setFixedSize(180, 58)
             btn.setStyleSheet("""
                 QPushButton {
-                    font-size: 19px;
-                    padding: 12px;
+                    font-size: 20px;
+                    padding: 15px;
+                    min-width: 100px;
+                    min-height: 60px;
                     background-color: #FF9800;
                     color: white;
                     border: 2px solid #bf6a00;
