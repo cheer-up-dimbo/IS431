@@ -9,7 +9,7 @@ if (guiFunctionalRequirementsEl) {
       { name: 'Rationale', width: '25%' }
     ],
     data: [
-      ['User Management', 'Multi-user support with individual profiles', 'High', 'BoxBot may be shared in gym/home setting'],
+      ['User Management', 'Multi-user support with individual profiles', 'High', 'BoxBunny may be shared in gym/home setting'],
       ['Training Modes', 'Minimum 3 distinct modes: Combinations, Performance, Sparring', 'High', 'Addresses different training objectives'],
       ['Data Persistence', 'Store user progress, test results, training history', 'High', 'Essential for progress tracking and motivation'],
       ['Real-time Feedback', 'Display sensor/CV data with <500ms latency', 'High', 'Immediate feedback critical for motor learning'],

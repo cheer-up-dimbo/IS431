@@ -250,6 +250,341 @@ The app includes pages for:
 
 ---
 
+## GUI Architecture & Developer Guide
+
+This section explains how the GUI is built so a new developer can understand, modify, or extend it without prior knowledge of the codebase.
+
+### Framework
+
+The app uses **PySide6** (the official Python binding for Qt 6). All widgets, layouts, signals, and event handling come from PySide6:
+
+```python
+from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton,
+                               QLabel, QStackedWidget, QHBoxLayout, QLineEdit)
+from PySide6.QtCore import Qt, QTimer
+```
+
+### Main Window & Page System
+
+The entire app lives inside a single `MainWindow(QWidget)` that holds one `QStackedWidget`. Each screen the user sees is a separate `QWidget` added to the stack. The visible page is controlled by its integer index:
+
+```python
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Boxing Training App")
+        self.setFixedSize(1024, 600)         # Fixed for 7-inch touchscreen
+
+        self.stacked_widget = QStackedWidget()
+        self.app_state = AppState()          # Shared config object
+
+        # Create page instances — each receives stacked_widget so it can navigate
+        self.homepage = Homepage(self.stacked_widget)
+        self.training_page = TrainingPage(self.stacked_widget)
+        # ... more pages ...
+
+        # Register pages — order determines index (0, 1, 2, ...)
+        self.stacked_widget.addWidget(self.homepage)         # index 0
+        self.stacked_widget.addWidget(self.training_page)    # index 1
+        # ... more addWidget calls ...
+```
+
+Page indices are defined as named constants in `core/constants.py` so you never use raw numbers:
+
+```python
+# core/constants.py
+class PageIndex:
+    HOMEPAGE = 0
+    TRAINING = 1
+    TECHNIQUES = 2
+    PUNCH_COMBINATIONS = 3
+    BASIC_PARAMETERS = 4
+    # ... 40 pages total
+```
+
+### Creating a New Page
+
+Every page is a class that inherits from both `ButtonNavigationMixin` and `QWidget`. The mixin provides standardized button styling, keyboard/Arduino navigation, and the `navigate_to()` helper:
+
+```python
+from core.navigation import ButtonNavigationMixin
+from core import PageIndex, ButtonStyle
+
+class MyNewPage(ButtonNavigationMixin, QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget    # Required for navigation
+
+        # 1. Create a layout
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+
+        # 2. Create widgets
+        title = QLabel("My Page Title")
+        title.setStyleSheet("font-size: 30px; font-weight: bold;")
+
+        action_btn = QPushButton("Do Something")
+        back_btn = QPushButton("Back")
+
+        # 3. Style buttons with centralized ButtonStyle constants
+        action_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)   # Green
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)        # Red
+
+        # 4. Wire button clicks to handler methods
+        action_btn.clicked.connect(self.on_action_clicked)
+        back_btn.clicked.connect(self.on_back_clicked)
+
+        # 5. Add widgets to layout
+        layout.addWidget(title)
+        layout.addWidget(action_btn, alignment=Qt.AlignCenter)
+        layout.addWidget(back_btn, alignment=Qt.AlignCenter)
+        self.setLayout(layout)
+
+    def on_action_clicked(self):
+        print("Action triggered")
+        self.navigate_to(PageIndex.TRAINING)   # Switch to Training page
+
+    def on_back_clicked(self):
+        self.navigate_to(PageIndex.HOMEPAGE)   # Switch to Homepage
+```
+
+To register the new page, add it in `MainWindow.__init__`:
+
+```python
+# In MainWindow.__init__:
+self.my_new_page = MyNewPage(self.stacked_widget)
+self.stacked_widget.addWidget(self.my_new_page)   # Gets next available index
+
+# Add matching constant in core/constants.py:
+# MY_NEW_PAGE = 40
+```
+
+### Button Clicks & Callbacks
+
+PySide6 uses Qt's **signal/slot** pattern. Every `QPushButton` has a `clicked` signal. You connect it to any Python callable:
+
+```python
+# Direct method reference
+btn.clicked.connect(self.on_btn_clicked)
+
+# Lambda for passing arguments
+btn.clicked.connect(lambda: self.handle_choice("Option A"))
+
+# Lambda with default arg (important inside loops to capture loop variable)
+for i, label in enumerate(["Beginner", "Intermediate", "Advanced"]):
+    btn = QPushButton(label)
+    btn.clicked.connect(lambda checked, arg=label: self.on_difficulty_clicked(arg))
+```
+
+> **Important:** Inside a loop, always use `lambda checked, arg=val: ...` with a default argument. Without it, all lambdas would capture the final loop value.
+
+### Navigation
+
+Navigation between pages is handled by two mechanisms:
+
+**1. Page-level `navigate_to()`** — provided by `ButtonNavigationMixin`. Each page calls `self.navigate_to(PageIndex.SOME_PAGE)` which delegates to `MainWindow.navigate_to()`:
+
+```python
+# Inside any page class:
+def on_training_clicked(self):
+    self.navigate_to(PageIndex.TRAINING)    # Switches the visible page
+```
+
+**2. `MainWindow.navigate_to()` and `navigate_back()`** — manages a navigation stack for proper back-button behavior:
+
+```python
+# In MainWindow:
+def navigate_to(self, page_index: int):
+    self.stacked_widget.setCurrentIndex(page_index)  # Show the target page
+
+def navigate_back(self):
+    if self.navigation_stack:
+        previous = self.navigation_stack.pop()       # Pop last page from history
+        self.stacked_widget.setCurrentIndex(previous)
+    else:
+        self.stacked_widget.setCurrentIndex(PageIndex.MAIN_MENU)
+```
+
+### Data Flow: AppState
+
+Pages share data through a single `AppState` object (defined in `core/config.py`). It holds a `TrainingConfig` dataclass with all training parameters:
+
+```python
+# core/config.py
+class AppState:
+    def __init__(self):
+        self.config = TrainingConfig()     # rounds, speed, time, difficulty, etc.
+        self.previous_page = PageIndex.HOMEPAGE
+        self.ai_chat_enabled = False
+
+    def update_rounds(self, rounds):       # Setter methods for each parameter
+        self.config.rounds = rounds
+
+    def update_difficulty(self, difficulty):
+        self.config.difficulty = difficulty
+
+    def get_config(self):                  # Read current config
+        return self.config
+```
+
+Pages receive `app_state` in their constructor and use it to read/write shared training parameters:
+
+```python
+class BasicParametersPage(ButtonNavigationMixin, QWidget):
+    def __init__(self, stacked_widget, app_state=None):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.app_state = app_state      # Shared state object
+
+    def on_round_selected(self, value):
+        self.app_state.update_rounds(value)    # Write to shared state
+
+    def start_training(self):
+        config = self.app_state.get_config()   # Read from shared state
+        print(f"Starting {config.rounds} rounds at {config.difficulty}")
+```
+
+### Layout & Styling
+
+**Layouts** — Qt provides layout managers that arrange widgets automatically:
+
+```python
+# Vertical stack (most common for page content)
+layout = QVBoxLayout()
+layout.setAlignment(Qt.AlignCenter)
+layout.setSpacing(20)                          # Pixels between widgets
+layout.setContentsMargins(50, 50, 50, 50)      # Left, Top, Right, Bottom
+layout.addWidget(some_button)
+layout.addStretch()                            # Flexible space
+
+# Horizontal row (for side-by-side buttons)
+row = QHBoxLayout()
+row.addWidget(back_btn)
+row.addWidget(next_btn)
+layout.addLayout(row)                          # Nest layouts
+
+# Grid (for numpad-style grids)
+grid = QGridLayout()
+grid.addWidget(btn, row=0, col=0)              # Position by row/col
+```
+
+**Button Styling** — The `ButtonStyle` class in `core/constants.py` provides pre-built Qt stylesheets:
+
+```python
+# core/constants.py — available styles:
+ButtonStyle.PRIMARY_LARGE    # Green, large (main actions like "Start")
+ButtonStyle.PRIMARY_MEDIUM   # Green, medium
+ButtonStyle.BACK_LARGE       # Red, large (back/cancel actions)
+ButtonStyle.BACK_MEDIUM      # Red, medium
+ButtonStyle.INFO_SMALL       # Blue (informational/secondary)
+ButtonStyle.HOME_LARGE       # Green, homepage-sized
+
+# Usage:
+btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+```
+
+Custom inline styles use Qt's CSS subset:
+
+```python
+label.setStyleSheet("font-size: 28px; font-weight: bold; color: #333;")
+btn.setStyleSheet("""
+    QPushButton {
+        font-size: 18px;
+        background-color: #2196F3;
+        color: white;
+        border-radius: 8px;
+    }
+    QPushButton:hover { background-color: #1976D2; }
+    QPushButton:focus {
+        border: 6px solid #00ff00;          /* Green border for Arduino nav */
+        background-color: #2d5016;
+    }
+""")
+```
+
+### Arduino Physical Button Navigation
+
+The `ButtonNavigationMixin` provides a `setup_navigation()` method that registers buttons for keyboard and Arduino cycling. When the Arduino sends UP/DOWN/ENTER over serial, the focused button changes with a visible green glow effect:
+
+```python
+class MyPage(ButtonNavigationMixin, QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        btn_a = QPushButton("Option A")
+        btn_b = QPushButton("Option B")
+        back_btn = QPushButton("Back")
+
+        # ... set styles and connect clicks ...
+
+        self.setLayout(layout)
+
+        # Register buttons for Arduino up/down/enter navigation
+        self.setup_navigation([btn_a, btn_b, back_btn])
+```
+
+`setup_navigation()` does the following automatically:
+- Sets `Qt.StrongFocus` on each button
+- Applies the page's `NAV_BUTTON_STYLE` (or the default `BUTTON_STYLE`)
+- Installs an event filter for Up/Down/Enter key handling
+- Adds a green glow effect (`QGraphicsDropShadowEffect`) to the focused button
+- Focuses the first button on page show
+
+You can customize sizing per page with class-level constants:
+
+```python
+class MyPage(ButtonNavigationMixin, QWidget):
+    NAV_BUTTON_MIN_WIDTH = 300       # Override default 360
+    NAV_BUTTON_MAX_WIDTH = 500       # Override default 420
+    NAV_BUTTON_MIN_HEIGHT = 50       # Override default 65
+    NAV_BUTTON_AUTOSIZE = True       # Allow buttons to grow beyond max width
+    NAV_BUTTON_STYLE = "..."         # Override default button stylesheet
+```
+
+### Accessing Other Pages at Runtime
+
+Sometimes a page needs to update another page's state. Use the `stacked_widget` to get a reference by index:
+
+```python
+# Get a reference to another page widget by its PageIndex
+basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
+basic_page.update_button_displays()   # Call any method on it
+
+# Get the MainWindow from any page
+main_window = self.window()
+if hasattr(main_window, 'get_current_user'):
+    username = main_window.get_current_user()
+```
+
+### Per-User Data Storage
+
+Each user gets an isolated data directory at `GUI/users/<username>/`:
+
+```python
+# Database files are created automatically per user:
+# GUI/users/<username>/combos.db            — combo training progress
+# GUI/users/<username>/performance_history.db — power/stamina/reaction results
+
+# Access pattern (from performance_database.py):
+from performance_database import PerformanceDB
+db = PerformanceDB(username)
+db.save_power_result(peak_g=4.2, avg_power=3.1, punch_count=12)
+results = db.get_power_history(limit=10)
+```
+
+### Summary: Adding a Feature End-to-End
+
+1. **Add a `PageIndex` constant** in `core/constants.py`
+2. **Create the page class** inheriting `(ButtonNavigationMixin, QWidget)` in `main_gui.py`
+3. **Build the UI** in `__init__`: create layout → create widgets → style them → connect signals → add to layout → call `setup_navigation()`
+4. **Instantiate the page** in `MainWindow.__init__` and `addWidget()` it to the stacked widget
+5. **Wire navigation** from existing pages using `self.navigate_to(PageIndex.MY_NEW_PAGE)`
+6. **Share data** via `self.app_state` or by accessing other pages through `self.stacked_widget.widget(PageIndex.X)`
+
+---
+
 ## Development Notes
 
 - Navigation is centralized in `MainWindow` and driven by page indices.
