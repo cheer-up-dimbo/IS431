@@ -40,23 +40,7 @@ from sparring import sparring_database as spar_db
 # ---------------------------------------------------------------------------
 # Import ButtonNavigationMixin from main_gui — fallback stub for safety
 # ---------------------------------------------------------------------------
-try:
-    from main_gui import ButtonNavigationMixin
-except Exception:
-
-    class ButtonNavigationMixin:
-        """Minimal fallback when main_gui cannot be imported."""
-
-        def navigate_to(self, page_index: int) -> None:
-            if hasattr(self, "stacked_widget"):
-                self.stacked_widget.setCurrentIndex(page_index)
-
-        def navigate_back(self) -> None:
-            if hasattr(self, "stacked_widget"):
-                self.stacked_widget.setCurrentIndex(0)
-
-        def on_back_clicked(self) -> None:
-            self.navigate_back()
+from core.navigation import ButtonNavigationMixin
 
 
 # ============================================================================
