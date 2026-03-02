@@ -64,6 +64,16 @@ The GUI has been updated with the following major changes:
 - **Reaction**: camera + YOLO pose-based reaction timing.
 - Consolidated performance history page with per-test filtering and trends.
 
+### Self-Select Sequence with Unified Button Navigation
+- Custom punch sequence creation interface with 5-sequence management.
+- All input buttons (numpad 1-6, defense moves, backspace, confirm, back, next) support:
+  - **Unified styling** with standardized focus highlighting (green border).
+  - **Keyboard focus** support for seamless navigation via up/down keys.
+  - **Arduino physical button integration** enabling up/down/enter cycling without touching the screen.
+  - **Flexible sizing** that adapts to grid layout constraints while maintaining visual consistency.
+- Manages up to 9 moves per sequence; supports editing and reordering via sequence list controls.
+- Full integration with combo training workflow for custom difficulty progression.
+
 ### UI / Architecture
 - Single `QStackedWidget` app with indexed pages.
 - Shared `AppState` (`core/config.py`) for training/session configuration.

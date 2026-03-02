@@ -1110,6 +1110,15 @@ CREATE TABLE reaction_tests (
           is prepared but not yet activated.
         </p>
         <p>
+          As part of the ongoing enhancement to user input accessibility, the Self-Select Sequence page was refactored
+          to unify button styling and navigation. All 14 input buttons (numpad buttons 1-6, defense moves Slip-L/Slip-R/Block-L/Block-R,
+          Backspace, Confirm, Back, and Next) were standardized to use the application's
+          <code>ButtonNavigationMixin.BUTTON_STYLE</code> with the characteristic green focus border and were registered
+          with <code>setup_navigation()</code> to enable Arduino physical button cycling (up/down/enter) without requiring
+          screen touch. This enhancement ensures consistent focus highlighting across all input controls and provides a
+          seamless experience whether the user interacts via touch, keyboard, or physical buttons on the Arduino interface.
+        </p>
+        <p>
           Three issues were resolved in this iteration. The back button had previously always returned to the
           Settings page from the History page regardless of how the user arrived; the navigation stack resolved
           this by returning to the actual entry point. A database schema mismatch between the 0–1 and 0–5 score
