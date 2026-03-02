@@ -455,15 +455,20 @@ class _PunchWorker(QObject):
         self._running = False
 
     def run(self) -> None:
-        """Iterate through punches, sending each one with appropriate gaps."""
-        for i, punch in enumerate(self._punches):
-            if not self._running:
-                break
+        """Iterate through punches continuously until stopped by the round timer."""
+        if not self._punches:
+            return
+
+        idx = 0
+        while self._running:
+            punch = self._punches[idx % len(self._punches)]
+            idx += 1
+
             send_punch(punch)
             self.punch_sent.emit(punch)
 
             # Determine gap: combo boundary every 3rd punch
-            if (i + 1) % 3 == 0:
+            if idx % 3 == 0:
                 gap = INTER_COMBO_GAP_S
             else:
                 gap = INTRA_COMBO_GAP_S

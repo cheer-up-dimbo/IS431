@@ -2805,7 +2805,14 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         QPushButton:hover {
             background-color: #e8e8e8;
         }
+        QPushButton:disabled {
+            background-color: #cccccc;
+            color: #888888;
+            border: 3px solid #aaaaaa;
+        }
     """
+
+    LEVEL_HIERARCHY = ['Beginner', 'Intermediate', 'Advanced']
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
@@ -2833,10 +2840,10 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         self.self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
-        self.beginner_btn.clicked.connect(lambda arg="Beginner": self.on_difficulty_clicked(arg))
-        self.intermediate_btn.clicked.connect(lambda arg="Intermediate": self.on_difficulty_clicked(arg))
-        self.advanced_btn.clicked.connect(lambda arg="Advanced": self.on_difficulty_clicked(arg))
-        self.self_select_btn.clicked.connect(lambda arg="Self-Select": self.on_difficulty_clicked(arg))
+        self.beginner_btn.clicked.connect(lambda checked=False: self.on_difficulty_clicked("Beginner"))
+        self.intermediate_btn.clicked.connect(lambda checked=False: self.on_difficulty_clicked("Intermediate"))
+        self.advanced_btn.clicked.connect(lambda checked=False: self.on_difficulty_clicked("Advanced"))
+        self.self_select_btn.clicked.connect(lambda checked=False: self.on_difficulty_clicked("Self-Select"))
         back_btn.clicked.connect(self.on_back_clicked)
 
         def on_continue_clicked(self):
@@ -2878,26 +2885,57 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         # Initialize button displays from state and update continue availability
         self.update_button_displays()
 
+    def showEvent(self, event):
+        """Restrict difficulty buttons based on user's level when page is shown."""
+        super().showEvent(event)
+        self._update_buttons_for_user_level()
+
+    def _update_buttons_for_user_level(self):
+        """Enable or disable difficulty buttons based on the current user's level."""
+        user_level = 'Beginner'  # Default fallback
+        try:
+            main_window = self.window()
+            if main_window and hasattr(main_window, 'get_current_user'):
+                username = main_window.get_current_user()
+                if username:
+                    user_level = get_user_level(username)
+        except Exception as e:
+            print(f"Error getting user level: {e}")
+
+        level_index = self.LEVEL_HIERARCHY.index(user_level) if user_level in self.LEVEL_HIERARCHY else 0
+
+        # Beginner btn: always enabled
+        self.beginner_btn.setEnabled(True)
+        # Intermediate btn: enabled only if user is Intermediate or Advanced
+        self.intermediate_btn.setEnabled(level_index >= 1)
+        # Advanced btn: enabled only if user is Advanced
+        self.advanced_btn.setEnabled(level_index >= 2)
+        # Self-Select: always enabled
+        self.self_select_btn.setEnabled(True)
+
+        # Update tooltip hints for disabled buttons
+        if level_index < 1:
+            self.intermediate_btn.setToolTip("Reach 80% progress at Beginner level to unlock")
+        else:
+            self.intermediate_btn.setToolTip("")
+        if level_index < 2:
+            self.advanced_btn.setToolTip("Reach 80% progress at Intermediate level to unlock")
+        else:
+            self.advanced_btn.setToolTip("")
+
     def update_button_displays(self):
         """Refresh button states from app_state config."""
-        # Note: PunchCombinationPage displays difficulty levels only.
-        # Parameter buttons (speed, time, rest) are on BasicParametersPage.
+        self._update_buttons_for_user_level()
         self.update_continue_button()
 
-    def is_parameter_selected(self, btn):
-        """Check if a parameter button has been selected (has more than just the label)."""
-        text = btn.text()
-        return "\n" in text  # Selected buttons have format "Label\nValue"
-
     def update_continue_button(self):
-        """Enable continue button only if all parameters are selected."""
-        all_selected = (
-            self.is_parameter_selected(self.beginner_btn) and
-            self.is_parameter_selected(self.intermediate_btn) and
-            self.is_parameter_selected(self.advanced_btn) and
-            self.is_parameter_selected(self.self_select_btn)
+        """Enable continue button if a difficulty has been selected."""
+        has_difficulty = (
+            self.app_state is not None
+            and self.app_state.config.difficulty is not None
+            and self.app_state.config.difficulty != ""
         )
-        self.continue_btn.setEnabled(all_selected)
+        self.continue_btn.setEnabled(has_difficulty)
 
     def on_difficulty_clicked(self, difficulty):
         print(f"{difficulty} button clicked")
@@ -4065,6 +4103,30 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
 
 class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
     """Page for creating custom punch sequences."""
+    NAV_BUTTON_MIN_WIDTH = 80
+    NAV_BUTTON_MAX_WIDTH = 500
+    NAV_BUTTON_MIN_HEIGHT = 40
+    NAV_BUTTON_AUTOSIZE = True
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 18px;
+            padding: 12px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 8px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -4089,68 +4151,6 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
         self.sequence_buttons_layout = QVBoxLayout()
         self.sequence_buttons_layout.setSpacing(10)
         self.sequence_buttons = []
-
-        left_layout.addWidget(list_title)
-        left_layout.addLayout(self.sequence_buttons_layout)
-        left_layout.addStretch()
-
-        # RIGHT SIDE - Sequence Builder
-        right_layout = QVBoxLayout()
-        right_layout.setSpacing(15)
-
-        builder_title = QLabel("Current Sequence")
-        builder_title.setAlignment(Qt.AlignCenter)
-        builder_title.setStyleSheet("font-size: 28px; font-weight: bold; margin-bottom: 10px;")
-
-        self.sequence_input = QLineEdit()
-        self.sequence_input.setReadOnly(True)
-        self.sequence_input.setStyleSheet("font-size: 16px; padding: 8px; background-color: #f5f5f5; border: 2px solid #ccc; border-radius: 4px;")
-        self.sequence_input.setMinimumHeight(40)
-
-        # Punch move buttons grid
-        moves_grid = QVBoxLayout()
-        moves_grid.setSpacing(10)
-
-        # Row 1: Jab, Cross, Hook
-        row1 = QHBoxLayout()
-        row1.setSpacing(10)
-        for move in ["Jab", "Cross", "Hook"]:
-            btn = QPushButton(move)
-            btn.setStyleSheet("font-size: 14px; padding: 8px; background-color: #2196F3; color: white; border-radius: 4px;")
-            btn.clicked.connect(lambda checked, m=move: self.add_to_sequence(m))
-            row1.addWidget(btn)
-        moves_grid.addLayout(row1)
-
-        # Row 2: Uppercut, Kick, Spin
-        row2 = QHBoxLayout()
-        row2.setSpacing(10)
-        for move in ["Uppercut", "Kick", "Spin"]:
-            btn = QPushButton(move)
-            btn.setStyleSheet("font-size: 14px; padding: 8px; background-color: #2196F3; color: white; border-radius: 4px;")
-            btn.clicked.connect(lambda checked, m=move: self.add_to_sequence(m))
-            row2.addWidget(btn)
-        moves_grid.addLayout(row2)
-
-        # Backspace and Confirm buttons
-        action_layout = QHBoxLayout()
-        action_layout.setSpacing(10)
-        
-        backspace_btn = QPushButton("⌫ Backspace")
-        backspace_btn.setStyleSheet("font-size: 12px; padding: 6px; background-color: #ff9800; color: white; border-radius: 4px;")
-        backspace_btn.clicked.connect(self.backspace_sequence)
-        
-        self.confirm_btn = QPushButton("✓ Confirm")
-        self.confirm_btn.setStyleSheet("font-size: 12px; padding: 6px; background-color: #4CAF50; color: white; border-radius: 4px;")
-        self.confirm_btn.clicked.connect(self.confirm_sequence)
-        
-        action_layout.addWidget(backspace_btn)
-        action_layout.addWidget(self.confirm_btn)
-
-        right_layout.addWidget(builder_title)
-        right_layout.addWidget(self.sequence_input)
-        right_layout.addLayout(moves_grid)
-        right_layout.addLayout(action_layout)
-        right_layout.addStretch()
         
         # Create 5 sequence slots
         for i in range(5):
@@ -4279,26 +4279,116 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
         button_layout = QHBoxLayout()
         button_layout.setSpacing(15)
         
-        back_btn = QPushButton("Back")
+        self.back_btn = QPushButton("Back")
         self.next_btn = QPushButton("Next")
         
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        self.next_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.back_btn.setFocusPolicy(Qt.StrongFocus)
+        self.next_btn.setFocusPolicy(Qt.StrongFocus)
+        self.back_btn.setStyleSheet(self.NAV_BUTTON_STYLE)
+        self.next_btn.setStyleSheet(self.NAV_BUTTON_STYLE)
         
-        back_btn.setFixedWidth(150)
-        self.next_btn.setFixedWidth(150)
-        
-        back_btn.clicked.connect(self.on_back_clicked)
+        self.back_btn.clicked.connect(self.on_back_clicked)
         self.next_btn.clicked.connect(self.on_next_clicked)
         
-        button_layout.addWidget(back_btn)
+        button_layout.addWidget(self.back_btn)
         button_layout.addWidget(self.next_btn)
+
+        left_layout.addWidget(list_title)
+        left_layout.addLayout(self.sequence_buttons_layout)
+        left_layout.addStretch()
+        left_layout.addLayout(button_layout)
+
+        # RIGHT SIDE - Input Area
+        right_layout = QVBoxLayout()
+        right_layout.setSpacing(15)
+        right_layout.setContentsMargins(25, 25, 25, 25)
+
+        # Text box showing current sequence
+        self.sequence_input = QLabel("")
+        self.sequence_input.setAlignment(Qt.AlignCenter)
+        self.sequence_input.setStyleSheet("""
+            font-size: 24px;
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            min-height: 60px;
+            color: black;
+        """)
+
+        # Numpad grid (1-6)
+        numpad_grid = QGridLayout()
+        numpad_grid.setHorizontalSpacing(20)
+        numpad_grid.setVerticalSpacing(20)
+
+        self.numpad_buttons = []
+        for i in range(6):
+            btn = QPushButton(str(i + 1))
+            btn.setFocusPolicy(Qt.StrongFocus)
+            btn.setStyleSheet(self.NAV_BUTTON_STYLE)
+            btn.clicked.connect(lambda checked, val=str(i + 1): self.add_to_sequence(val))
+            row = i // 3
+            col = i % 3
+            numpad_grid.addWidget(btn, row, col)
+            self.numpad_buttons.append(btn)
+
+        # Defense buttons (Slip-L, Slip-R, Block-L, Block-R)
+        defense_grid = QGridLayout()
+        defense_grid.setHorizontalSpacing(20)
+        defense_grid.setVerticalSpacing(20)
+
+        self.defense_buttons = []
+        defense_moves = ["Slip-L", "Slip-R", "Block-L", "Block-R"]
+        for i, move in enumerate(defense_moves):
+            btn = QPushButton(move)
+            btn.setFocusPolicy(Qt.StrongFocus)
+            btn.setStyleSheet(self.NAV_BUTTON_STYLE)
+            btn.clicked.connect(lambda checked, val=move: self.add_to_sequence(val))
+            row = i // 2
+            col = i % 2
+            defense_grid.addWidget(btn, row, col)
+            self.defense_buttons.append(btn)
+
+        # Backspace and Confirm buttons
+        action_layout = QHBoxLayout()
+        action_layout.setSpacing(15)
+        
+        self.backspace_btn = QPushButton("Backspace")
+        self.confirm_btn = QPushButton("Confirm")
+        self.backspace_btn.setFocusPolicy(Qt.StrongFocus)
+        self.confirm_btn.setFocusPolicy(Qt.StrongFocus)
+        
+        self.backspace_btn.setStyleSheet(self.NAV_BUTTON_STYLE)
+        self.confirm_btn.setStyleSheet(self.NAV_BUTTON_STYLE)
+        
+        self.backspace_btn.clicked.connect(self.backspace_sequence)
+        self.confirm_btn.clicked.connect(self.confirm_sequence)
+        
+        action_layout.addWidget(self.backspace_btn)
+        action_layout.addWidget(self.confirm_btn)
+
+        right_layout.addWidget(self.sequence_input)
+        right_layout.addSpacing(15)
+        right_layout.addLayout(numpad_grid)
+        right_layout.addSpacing(15)
+        right_layout.addLayout(defense_grid)
+        right_layout.addSpacing(15)
+        right_layout.addLayout(action_layout)
+        right_layout.addStretch()
 
         # Add left and right layouts to main layout
         main_layout.addLayout(left_layout, 1)
         main_layout.addLayout(right_layout, 2)
 
         self.setLayout(main_layout)
+
+        # Register all navigable buttons for Arduino up/down/enter support
+        all_nav_buttons = (
+            self.numpad_buttons +
+            self.defense_buttons +
+            [self.backspace_btn, self.confirm_btn, self.back_btn, self.next_btn]
+        )
+        self.setup_navigation(all_nav_buttons)
         
         # Initial state
         self.update_sequence_buttons()
@@ -4454,149 +4544,39 @@ class SparPage(ButtonNavigationMixin, QWidget):
         title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
 
         sparring_btn = QPushButton("Sparring")
-        battle_btn = QPushButton("Battle")
         back_btn = QPushButton("Back")
 
         sparring_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-        battle_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
 
         sparring_btn.clicked.connect(self.on_sparring_clicked)
-        battle_btn.clicked.connect(self.on_battle_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
         layout.addWidget(sparring_btn, alignment=Qt.AlignCenter)
-        layout.addWidget(battle_btn, alignment=Qt.AlignCenter)
         layout.addStretch()
         layout.addWidget(back_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(layout)
-        self.setup_navigation([sparring_btn, battle_btn, back_btn])
+        self.setup_navigation([sparring_btn, back_btn])
 
     def on_sparring_clicked(self):
+        """Navigate to sparring if user level is not Beginner, otherwise show restriction message."""
+        try:
+            main_window = self.window()
+            if main_window and hasattr(main_window, 'get_current_user'):
+                username = main_window.get_current_user()
+                current_level = get_user_level(username)
+                if current_level == "Beginner":
+                    QMessageBox.information(self, "Sparring Locked", "Sparring mode is unlocked at Intermediate level.")
+                    return
+        except Exception as e:
+            print(f"Error checking user level for sparring: {e}")
+        
         self.navigate_to(PageIndex.SPAR_STYLE_SELECT)
-
-    def on_battle_clicked(self):
-        # BattlePage index moved to 13 after removing defense page
-        self.navigate_to(PageIndex.BATTLE)
 
     def on_back_clicked(self):
         self.navigate_to(PageIndex.TRAINING)
-
-class BattlePage(ButtonNavigationMixin, QWidget):
-    NAV_BUTTON_MIN_WIDTH = 225
-    NAV_BUTTON_MAX_WIDTH = 420
-    NAV_BUTTON_MIN_HEIGHT = 65
-    NAV_BUTTON_STYLE = """
-        QPushButton {
-            font-size: 18px;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
-            border-radius: 10px;
-            min-height: 65px;
-            color: #111111;
-        }
-        QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #e8e8e8;
-        }
-    """
-
-    def __init__(self, stacked_widget, app_state=None):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        self.app_state = app_state
-
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setContentsMargins(40, 40, 40, 40)
-        main_layout.setSpacing(20)
-
-        title = QLabel("Battle")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold;")
-
-        pressure_btn = QPushButton("Pressure Fighter")
-        counter_btn = QPushButton("Counter Puncher")
-        infighter_btn = QPushButton("Infighter")
-        outboxer_btn = QPushButton("Out Boxer")
-        random_btn = QPushButton("Random")
-        back_btn = QPushButton("Back")
-
-        style_buttons = [pressure_btn, counter_btn, infighter_btn, outboxer_btn, random_btn]
-        for button in style_buttons:
-            button.setStyleSheet(self.NAV_BUTTON_STYLE)
-            button.setFocusPolicy(Qt.StrongFocus)
-
-        back_btn.setStyleSheet(self.NAV_BUTTON_STYLE)
-        back_btn.setFocusPolicy(Qt.StrongFocus)
-
-        self.navigation_buttons = style_buttons + [back_btn]
-        self.setup_navigation(self.navigation_buttons)
-
-        for button in style_buttons:
-            button.setFixedSize(225, 65)
-
-        back_btn.setMinimumWidth(200)
-        back_btn.setMinimumHeight(60)
-
-        # --- Alternative approach: Use HBoxLayouts for both rows ---
-        # Row 0: Pressure Fighter, Counter Puncher, Infighter
-        row0_layout = QHBoxLayout()
-        row0_layout.setSpacing(15)
-        row0_layout.addWidget(pressure_btn)
-        row0_layout.addWidget(counter_btn)
-        row0_layout.addWidget(infighter_btn)
-
-        # Row 1: Out Boxer, Random (centered)
-        row1_layout = QHBoxLayout()
-        row1_layout.setSpacing(15)
-        row1_layout.addStretch()
-        row1_layout.addWidget(outboxer_btn)
-        row1_layout.addWidget(random_btn)
-        row1_layout.addStretch()
-
-        # wire clicks
-        pressure_btn.clicked.connect(lambda: self.on_style_clicked("Pressure Fighter"))
-        counter_btn.clicked.connect(lambda: self.on_style_clicked("Counter Puncher"))
-        infighter_btn.clicked.connect(lambda: self.on_style_clicked("Infighter"))
-        outboxer_btn.clicked.connect(lambda: self.on_style_clicked("Out Boxer"))
-        random_btn.clicked.connect(lambda: self.on_style_clicked("Random"))
-        back_btn.clicked.connect(self.on_back_clicked)
-
-        # Layout assembly
-        main_layout.setContentsMargins(40, 40, 40, 40)
-        main_layout.setSpacing(25)
-        main_layout.addStretch(1)  # Top stretch
-        main_layout.addWidget(title)
-        main_layout.addSpacing(30)
-        main_layout.addLayout(row0_layout)
-        main_layout.addSpacing(20)
-        main_layout.addLayout(row1_layout)
-        main_layout.addSpacing(30)
-        main_layout.addWidget(back_btn, alignment=Qt.AlignCenter)
-        main_layout.addStretch(1)  # Bottom stretch
-
-        self.setLayout(main_layout)
-
-    def on_style_clicked(self, style):
-        """Navigate to style description page."""
-        print(f"{style} selected")
-        desc_page = self.stacked_widget.widget(PageIndex.BATTLE_STYLE_DESC)
-        if isinstance(desc_page, BattleStyleDescriptionPage):
-            desc_page.set_style_info(style)
-        self.navigate_to(PageIndex.BATTLE_STYLE_DESC)
-
-    def on_back_clicked(self):
-        self.navigate_to(PageIndex.SPAR)
-
 
 class BattleStyleDescriptionPage(ButtonNavigationMixin, QWidget):
     def __init__(self, stacked_widget, app_state=None):
@@ -4686,7 +4666,7 @@ class BattleStyleDescriptionPage(ButtonNavigationMixin, QWidget):
         self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self):
-        self.navigate_to(PageIndex.BATTLE)
+        self.navigate_to(PageIndex.TRAINING)
 
 
 class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
@@ -5397,7 +5377,6 @@ class MainWindow(QWidget):
         self.training_session_page = TrainingSessionPage(self.stacked_widget, self.app_state)
         self.self_select_sequence_page = SelfSelectSequencePage(self.stacked_widget, self.app_state)
         self.spar_page = SparPage(self.stacked_widget)
-        self.battle_page = BattlePage(self.stacked_widget, self.app_state)
         self.battle_style_description_page = BattleStyleDescriptionPage(self.stacked_widget, self.app_state)
         
         # Performance and Power pages (may be placeholders)
@@ -5453,34 +5432,33 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.training_session_page)       # 10
         self.stacked_widget.addWidget(self.self_select_sequence_page)   # 11
         self.stacked_widget.addWidget(self.spar_page)                   # 12
-        self.stacked_widget.addWidget(self.battle_page)                 # 13
-        self.stacked_widget.addWidget(self.performance_page)            # 14
-        self.stacked_widget.addWidget(self.power_instructions_page)     # 15
-        self.stacked_widget.addWidget(self.power_punch_page)            # 16
-        self.stacked_widget.addWidget(self.power_result_page)           # 17
-        self.stacked_widget.addWidget(self.stamina_instructions_page)   # 18
-        self.stacked_widget.addWidget(self.reaction_instructions_page)  # 19
-        self.stacked_widget.addWidget(self.reaction_test_page)          # 20
-        self.stacked_widget.addWidget(self.reaction_result_page)        # 21
-        self.stacked_widget.addWidget(self.others_page)                 # 22
-        self.stacked_widget.addWidget(self.login_page)                  # 23
-        self.stacked_widget.addWidget(self.user_management_page)        # 24
-        self.stacked_widget.addWidget(self.user_combo_progress_page)    # 25
-        self.stacked_widget.addWidget(self.user_progress_overview_page) # 26
-        self.stacked_widget.addWidget(self.combo_results_page)          # 27
-        self.stacked_widget.addWidget(self.combo_llm_chat_page)         # 28
-        self.stacked_widget.addWidget(self.stamina_test_page)           # 29
-        self.stacked_widget.addWidget(self.stamina_result_page)         # 30
-        self.stacked_widget.addWidget(QWidget())                        # 31 reserved (STAMINA_HISTORY)
-        self.stacked_widget.addWidget(self.performance_history_page)    # 32
-        self.stacked_widget.addWidget(self.battle_style_description_page) # 33
-        self.stacked_widget.addWidget(self.spar_style_select_page)      # 34
-        self.stacked_widget.addWidget(self.spar_round_config_page)      # 35
-        self.stacked_widget.addWidget(self.spar_countdown_page)         # 36
-        self.stacked_widget.addWidget(self.spar_session_page)           # 37
-        self.stacked_widget.addWidget(self.spar_rest_page)              # 38
-        self.stacked_widget.addWidget(self.spar_processing_page)        # 39
-        self.stacked_widget.addWidget(self.spar_result_page)            # 40
+        self.stacked_widget.addWidget(self.performance_page)            # 13
+        self.stacked_widget.addWidget(self.power_instructions_page)     # 14
+        self.stacked_widget.addWidget(self.power_punch_page)            # 15
+        self.stacked_widget.addWidget(self.power_result_page)           # 16
+        self.stacked_widget.addWidget(self.stamina_instructions_page)   # 17
+        self.stacked_widget.addWidget(self.reaction_instructions_page)  # 18
+        self.stacked_widget.addWidget(self.reaction_test_page)          # 19
+        self.stacked_widget.addWidget(self.reaction_result_page)        # 20
+        self.stacked_widget.addWidget(self.others_page)                 # 21
+        self.stacked_widget.addWidget(self.login_page)                  # 22
+        self.stacked_widget.addWidget(self.user_management_page)        # 23
+        self.stacked_widget.addWidget(self.user_combo_progress_page)    # 24
+        self.stacked_widget.addWidget(self.user_progress_overview_page) # 25
+        self.stacked_widget.addWidget(self.combo_results_page)          # 26
+        self.stacked_widget.addWidget(self.combo_llm_chat_page)         # 27
+        self.stacked_widget.addWidget(self.stamina_test_page)           # 28
+        self.stacked_widget.addWidget(self.stamina_result_page)         # 29
+        self.stacked_widget.addWidget(QWidget())                        # 30 reserved (STAMINA_HISTORY)
+        self.stacked_widget.addWidget(self.performance_history_page)    # 31
+        self.stacked_widget.addWidget(self.battle_style_description_page) # 32
+        self.stacked_widget.addWidget(self.spar_style_select_page)      # 33
+        self.stacked_widget.addWidget(self.spar_round_config_page)      # 34
+        self.stacked_widget.addWidget(self.spar_countdown_page)         # 35
+        self.stacked_widget.addWidget(self.spar_session_page)           # 36
+        self.stacked_widget.addWidget(self.spar_rest_page)              # 37
+        self.stacked_widget.addWidget(self.spar_processing_page)        # 38
+        self.stacked_widget.addWidget(self.spar_result_page)            # 39
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -5530,9 +5508,6 @@ class MainWindow(QWidget):
                 continue
 
             if isinstance(page, SelfSelectSequencePage):
-                continue
-
-            if isinstance(page, BattlePage):
                 continue
 
             explicit_buttons = getattr(page, "navigation_buttons", None)
