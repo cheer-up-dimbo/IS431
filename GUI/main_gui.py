@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton, 
                                QStackedWidget, QGridLayout, QSizePolicy, QHBoxLayout,
                                QLineEdit, QMessageBox, QScrollArea, QTableWidget, 
                                QTableWidgetItem, QHeaderView, QAbstractItemView, QTextEdit,
-                               QComboBox, QGraphicsDropShadowEffect)
+                               QComboBox, QGraphicsDropShadowEffect, QFrame)
 from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject, QEvent
 from PySide6.QtGui import QTextCursor, QKeyEvent, QCloseEvent, QColor
 
@@ -1101,6 +1101,31 @@ class Homepage(ButtonNavigationMixin, QWidget):
 
 class OthersPage(ButtonNavigationMixin, QWidget):
     """Others page with stable layout and explicit focus navigation."""
+    NAV_BUTTON_MIN_WIDTH = 224
+    NAV_BUTTON_MAX_WIDTH = 256
+    NAV_BUTTON_MIN_HEIGHT = 40
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 13px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 224px;
+            max-width: 256px;
+            min-height: 40px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
@@ -1111,6 +1136,7 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.history_btn = QPushButton("History")
         self.stance_btn = QPushButton("Orthodox")
         self.ai_chat_btn = QPushButton("AI Chat: Off")
+        self.cv_enabled_btn = QPushButton("CV: Off")
         self.arduino_port_combo = QComboBox()
         self.arduino_port_apply_btn = QPushButton("Apply Arduino Port")
         self.back_btn = QPushButton("Back")
@@ -1121,6 +1147,7 @@ class OthersPage(ButtonNavigationMixin, QWidget):
             self.history_btn,
             self.stance_btn,
             self.ai_chat_btn,
+            self.cv_enabled_btn,
             self.arduino_port_apply_btn,
             self.back_btn,
         ]
@@ -1131,8 +1158,20 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self._setup_connections()
         self.setup_navigation(self._nav_buttons)
 
+        # Reset arduino_port_apply_btn and back_btn to original size
+        self.arduino_port_apply_btn.setStyleSheet(self.BUTTON_STYLE)
+        self.arduino_port_apply_btn.setMinimumWidth(280)
+        self.arduino_port_apply_btn.setMaximumWidth(320)
+        self.arduino_port_apply_btn.setMinimumHeight(50)
+
+        self.back_btn.setStyleSheet(self.BUTTON_STYLE)
+        self.back_btn.setMinimumWidth(280)
+        self.back_btn.setMaximumWidth(320)
+        self.back_btn.setMinimumHeight(50)
+
         if self.app_state:
             self.ai_chat_btn.setText("AI Chat: On" if self.app_state.ai_chat_enabled else "AI Chat: Off")
+            self.cv_enabled_btn.setText("CV: On" if self.app_state.cv_enabled else "CV: Off")
 
         self._refresh_arduino_ports()
         self._refresh_listener_status()
@@ -1141,9 +1180,8 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         for button in self._nav_buttons:
             button.setFocusPolicy(Qt.StrongFocus)
 
-        self.arduino_port_combo.setFixedWidth(360)
+        self.arduino_port_combo.setFixedWidth(300)
         self.arduino_port_combo.setFocusPolicy(Qt.NoFocus)
-        self.arduino_port_apply_btn.setFixedWidth(320)
         self.arduino_port_status.setAlignment(Qt.AlignCenter)
         self.arduino_port_status.setStyleSheet("color: #666; font-size: 13px;")
         self.arduino_listener_status.setAlignment(Qt.AlignCenter)
@@ -1151,34 +1189,66 @@ class OthersPage(ButtonNavigationMixin, QWidget):
 
     def _setup_layout(self):
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(40, 28, 40, 28)
-        main_layout.setSpacing(14)
+        main_layout.setContentsMargins(40, 20, 40, 20)
+        main_layout.setSpacing(20)
 
+        # Top: Title
         title = QLabel("Others")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 32px; font-weight: bold;")
-
-        button_stack = QVBoxLayout()
-        button_stack.setSpacing(12)
-        button_stack.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        button_stack.addWidget(self.history_btn, alignment=Qt.AlignCenter)
-        button_stack.addWidget(self.stance_btn, alignment=Qt.AlignCenter)
-        button_stack.addWidget(self.ai_chat_btn, alignment=Qt.AlignCenter)
-
-        serial_stack = QVBoxLayout()
-        serial_stack.setSpacing(8)
-        serial_stack.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        serial_stack.addWidget(self.arduino_port_combo, alignment=Qt.AlignCenter)
-        serial_stack.addWidget(self.arduino_port_apply_btn, alignment=Qt.AlignCenter)
-        serial_stack.addWidget(self.arduino_port_status, alignment=Qt.AlignCenter)
-        serial_stack.addWidget(self.arduino_listener_status, alignment=Qt.AlignCenter)
-
         main_layout.addWidget(title, alignment=Qt.AlignCenter)
-        main_layout.addSpacing(8)
-        main_layout.addLayout(button_stack)
-        main_layout.addSpacing(10)
-        main_layout.addLayout(serial_stack)
-        main_layout.addStretch(1)
+
+        # Middle: Two-column layout
+        columns_layout = QHBoxLayout()
+        columns_layout.setSpacing(30)
+
+        # Left column: Settings
+        left_column = QVBoxLayout()
+        left_column.setSpacing(12)
+        left_column.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+
+        settings_header = QLabel("Settings")
+        settings_header.setAlignment(Qt.AlignCenter)
+        settings_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #555;")
+        left_column.addWidget(settings_header)
+
+        left_column.addWidget(self.history_btn, alignment=Qt.AlignCenter)
+        left_column.addWidget(self.stance_btn, alignment=Qt.AlignCenter)
+        left_column.addWidget(self.ai_chat_btn, alignment=Qt.AlignCenter)
+        left_column.addWidget(self.cv_enabled_btn, alignment=Qt.AlignCenter)
+        left_column.addStretch()
+
+        # Divider line
+        divider = QFrame()
+        divider.setFrameShape(QFrame.VLine)
+        divider.setFrameShadow(QFrame.Sunken)
+        divider.setStyleSheet("color: #cccccc;")
+
+        # Right column: Hardware
+        right_column = QVBoxLayout()
+        right_column.setSpacing(8)
+        right_column.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+
+        hardware_header = QLabel("Hardware")
+        hardware_header.setAlignment(Qt.AlignCenter)
+        hardware_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #555;")
+        right_column.addWidget(hardware_header)
+
+        right_column.addWidget(self.arduino_port_combo, alignment=Qt.AlignCenter)
+        right_column.addWidget(self.arduino_port_apply_btn, alignment=Qt.AlignCenter)
+        right_column.addWidget(self.arduino_port_status, alignment=Qt.AlignCenter)
+        right_column.addWidget(self.arduino_listener_status, alignment=Qt.AlignCenter)
+        right_column.addStretch()
+
+        # Add columns and divider to main layout
+        columns_layout.addLayout(left_column, 1)
+        columns_layout.addWidget(divider)
+        columns_layout.addLayout(right_column, 1)
+
+        main_layout.addLayout(columns_layout, 1)
+
+        # Bottom: Back button centered
+        main_layout.addStretch()
         main_layout.addWidget(self.back_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(main_layout)
@@ -1187,6 +1257,7 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.history_btn.clicked.connect(self.on_history_clicked)
         self.stance_btn.clicked.connect(self.on_stance_clicked)
         self.ai_chat_btn.clicked.connect(self.on_ai_chat_clicked)
+        self.cv_enabled_btn.clicked.connect(self.on_cv_enabled_clicked)
         self.arduino_port_apply_btn.clicked.connect(self.on_apply_arduino_port)
         self.back_btn.clicked.connect(self.on_back_clicked)
 
@@ -1265,6 +1336,14 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.ai_chat_btn.setText(new_label)
         print(f"AI Chat {'enabled' if self.app_state.ai_chat_enabled else 'disabled'}")
 
+    def on_cv_enabled_clicked(self):
+        if self.app_state is None:
+            return
+        self.app_state.cv_enabled = not self.app_state.cv_enabled
+        new_label = "CV: On" if self.app_state.cv_enabled else "CV: Off"
+        self.cv_enabled_btn.setText(new_label)
+        print(f"CV {'enabled' if self.app_state.cv_enabled else 'disabled'}")
+
     def _apply_arduino_port(self, selected_port: str, user_initiated: bool):
         _set_env_key(GUI_ENV_PATH, "ARDUINO_BUTTON_PORT", selected_port)
         main_window = self.window()
@@ -1290,6 +1369,30 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.navigate_to(PageIndex.HOMEPAGE)
 
 class PerformancePage(ButtonNavigationMixin, QWidget):
+    NAV_BUTTON_MIN_HEIGHT = 52
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 360px;
+            max-width: 420px;
+            min-height: 52px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -1353,6 +1456,31 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
 
 class StaminaInstructionsPage(ButtonNavigationMixin, QWidget):
     """Instructions page for the Stamina mode."""
+    NAV_BUTTON_MIN_WIDTH = 180
+    NAV_BUTTON_MAX_WIDTH = 210
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 180px;
+            max-width: 210px;
+            min-height: 65px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -1692,6 +1820,31 @@ class StaminaResultPage(ButtonNavigationMixin, QWidget):
 
 class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
     """Unified performance history page for Power, Stamina, and Reaction tests."""
+    NAV_BUTTON_MIN_WIDTH = 180
+    NAV_BUTTON_MAX_WIDTH = 210
+    NAV_BUTTON_MIN_HEIGHT = 32
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 180px;
+            max-width: 210px;
+            min-height: 32px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
 
     def __init__(self, stacked_widget):
         super().__init__()
@@ -1885,6 +2038,31 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
 
 class ReactionInstructionsPage(ButtonNavigationMixin, QWidget):
     """Instructions page for the Reaction Time mode."""
+    NAV_BUTTON_MIN_WIDTH = 180
+    NAV_BUTTON_MAX_WIDTH = 210
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 180px;
+            max-width: 210px;
+            min-height: 65px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -1983,6 +2161,31 @@ class ReactionInstructionsPage(ButtonNavigationMixin, QWidget):
 
 class PowerInstructionsPage(ButtonNavigationMixin, QWidget):
     """Instructions page for the Power mode."""
+    NAV_BUTTON_MIN_WIDTH = 180
+    NAV_BUTTON_MAX_WIDTH = 210
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 180px;
+            max-width: 210px;
+            min-height: 65px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -4971,7 +5174,32 @@ class ComboResultsPage(ButtonNavigationMixin, QWidget):
 
 class UserComboProgressPage(ButtonNavigationMixin, QWidget):
     """Page showing a user's combo progress and mastery status."""
-    
+    NAV_BUTTON_MIN_WIDTH = 180
+    NAV_BUTTON_MAX_WIDTH = 210
+    NAV_BUTTON_MIN_HEIGHT = 32
+    NAV_BUTTON_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 3px solid #cccccc;
+            border-radius: 10px;
+            min-width: 180px;
+            max-width: 210px;
+            min-height: 32px;
+            color: #111111;
+        }
+        QPushButton:focus {
+            border: 6px solid #00ff00;
+            background-color: #2d5016;
+            color: white;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #e8e8e8;
+        }
+    """
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -5381,20 +5609,20 @@ class MainWindow(QWidget):
         
         # Performance and Power pages (may be placeholders)
         self.performance_page = PerformancePage(self.stacked_widget)
-        self.power_instructions_page = QWidget()
-        self.power_punch_page = QWidget()
-        self.power_result_page = QWidget()
+        self.power_instructions_page = PowerInstructionsPage(self.stacked_widget)
+        self.power_punch_page = PowerPunchPage(self.stacked_widget)
+        self.power_result_page = PowerResultPage(self.stacked_widget)
         
         # Reaction and Other pages (may be placeholders)
-        self.reaction_instructions_page = QWidget()
-        self.reaction_test_page = QWidget()
-        self.reaction_result_page = QWidget()
+        self.reaction_instructions_page = ReactionInstructionsPage(self.stacked_widget)
+        self.reaction_test_page = ReactionTestPage(self.stacked_widget)
+        self.reaction_result_page = ReactionResultPage(self.stacked_widget)
         self.others_page = OthersPage(self.stacked_widget, self.app_state)
         
         # Stamina pages (may be placeholders)
-        self.stamina_instructions_page = QWidget()
-        self.stamina_test_page = QWidget()
-        self.stamina_result_page = QWidget()
+        self.stamina_instructions_page = StaminaInstructionsPage(self.stacked_widget)
+        self.stamina_test_page = StaminaTestPage(self.stacked_widget)
+        self.stamina_result_page = StaminaResultPage(self.stacked_widget)
         
         self.spar_style_select_page = SparStyleSelectPage(self.stacked_widget)
         self.spar_round_config_page = SparRoundConfigPage(self.stacked_widget)
@@ -5412,8 +5640,8 @@ class MainWindow(QWidget):
         self.combo_results_page = ComboResultsPage(self.stacked_widget)
         self.combo_llm_chat_page = ComboLLMChatPage(self.stacked_widget, self.app_state)
         
-        # Performance history page (may be placeholder)
-        self.performance_history_page = QWidget()
+        # Performance history page
+        self.performance_history_page = PerformanceHistoryPage(self.stacked_widget)
 
         # Wire countdown completion to start the training session
         self.countdown_page.on_finished = self.start_training_session
