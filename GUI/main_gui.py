@@ -43,6 +43,7 @@ from sparring.spar_pages import (
 
 # Import from new compartmentalized modules
 from core import TrainingConfig, AppState, PageIndex, ButtonStyle
+from core.constants import DS, GLOBAL_QSS
 from utils import (
     get_users_csv_path, hash_password, load_users, save_users,
     get_user_level, set_user_level, get_user_progress, update_user_progress,
@@ -343,21 +344,27 @@ PARAMETER_SELECTION_BUTTON_STYLE = """
     QPushButton {
         font-size: 17px;
         padding: 10px 20px;
-        background-color: #f5f5f5;
-        border: 3px solid #cccccc;
+        background-color: #1E293B;
+        border: 2px solid #334155;
         border-radius: 10px;
         min-width: 280px;
         min-height: 55px;
-        color: #111111;
+        color: #F8FAFC;
+        font-weight: 600;
     }
     QPushButton:focus {
-        border: 6px solid #00ff00;
-        background-color: #2d5016;
-        color: white;
+        border: 4px solid #F97316;
+        background-color: #263347;
+        color: #F8FAFC;
         font-weight: bold;
     }
     QPushButton:hover {
-        background-color: #e8e8e8;
+        background-color: #263347;
+        border-color: #F97316;
+    }
+    QPushButton:pressed {
+        background-color: #F97316;
+        color: #0F172A;
     }
 """
 
@@ -567,21 +574,27 @@ class LoginPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 20px;
             padding: 15px 30px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 280px;
             min-height: 70px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
     
@@ -614,14 +627,14 @@ class LoginPage(ButtonNavigationMixin, QWidget):
             QLineEdit {
                 font-size: 16px;
                 padding: 10px;
-                border: 2px solid #ccc;
+                border: 2px solid #334155;
                 border-radius: 8px;
                 min-width: 350px;
-                background-color: white;
-                color: black;
+                background-color: #1E293B;
+                color: #F8FAFC;
             }
             QLineEdit:focus {
-                border-color: #4CAF50;
+                border-color: #F97316;
             }
         """)
         
@@ -637,21 +650,21 @@ class LoginPage(ButtonNavigationMixin, QWidget):
             QLineEdit {
                 font-size: 16px;
                 padding: 10px;
-                border: 2px solid #ccc;
+                border: 2px solid #334155;
                 border-radius: 8px;
                 min-width: 350px;
-                background-color: white;
-                color: black;
+                background-color: #1E293B;
+                color: #F8FAFC;
             }
             QLineEdit:focus {
-                border-color: #4CAF50;
+                border-color: #F97316;
             }
         """)
         
         # Status label for error messages
         self.status_label = QLabel("")
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+        self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
         self.status_label.setFixedHeight(20)
         
         # Buttons
@@ -715,7 +728,7 @@ class LoginPage(ButtonNavigationMixin, QWidget):
         
         if not username or not password:
             self.status_label.setText("Please enter both username and password")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
             return
         
         users = load_users()
@@ -724,7 +737,7 @@ class LoginPage(ButtonNavigationMixin, QWidget):
         if username in users and isinstance(users[username], dict) and users[username]['password_hash'] == password_hash:
             self.current_user = username
             self.status_label.setText(f"Welcome back, {username}!")
-            self.status_label.setStyleSheet("font-size: 14px; color: #4CAF50;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #22C55E; background-color: transparent;")
             # Clear inputs
             self.username_input.clear()
             self.password_input.clear()
@@ -732,7 +745,7 @@ class LoginPage(ButtonNavigationMixin, QWidget):
             QTimer.singleShot(500, lambda: self.navigate_to(PageIndex.HOMEPAGE))
         else:
             self.status_label.setText("Invalid username or password")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
     
     def on_signup(self):
         """Handle signup button click."""
@@ -741,24 +754,24 @@ class LoginPage(ButtonNavigationMixin, QWidget):
         
         if not username or not password:
             self.status_label.setText("Please enter both username and password")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
             return
         
         if len(username) < 3:
             self.status_label.setText("Username must be at least 3 characters")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
             return
         
         if len(password) < 4:
             self.status_label.setText("Password must be at least 4 characters")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
             return
         
         users = load_users()
         
         if username in users:
             self.status_label.setText("Username already exists")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
             return
         
         # Add new user with Beginner level and 0% progress
@@ -770,7 +783,7 @@ class LoginPage(ButtonNavigationMixin, QWidget):
         if save_users(users):
             self.current_user = username
             self.status_label.setText(f"Account created! Welcome, {username}!")
-            self.status_label.setStyleSheet("font-size: 14px; color: #4CAF50;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #22C55E; background-color: transparent;")
             # Clear inputs
             self.username_input.clear()
             self.password_input.clear()
@@ -778,7 +791,7 @@ class LoginPage(ButtonNavigationMixin, QWidget):
             QTimer.singleShot(500, lambda: self.navigate_to(PageIndex.HOMEPAGE))
         else:
             self.status_label.setText("Error creating account. Please try again.")
-            self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
+            self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
     
     def on_manage_users(self):
         """Navigate to user management page."""
@@ -820,18 +833,23 @@ class UserManagementPage(ButtonNavigationMixin, QWidget):
         self.user_table.setStyleSheet("""
             QTableWidget {
                 font-size: 16px;
-                border: 1px solid #ccc;
+                border: 1px solid #334155;
                 border-radius: 8px;
-                background-color: white;
-                color: black;
+                background-color: #1E293B;
+                color: #F8FAFC;
+                gridline-color: #334155;
             }
             QTableWidget::item {
                 padding: 10px;
-                color: black;
+                color: #F8FAFC;
+                background-color: #1E293B;
+            }
+            QTableWidget::item:selected {
+                background-color: #263347;
             }
             QHeaderView::section {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #F97316;
+                color: #0F172A;
                 padding: 10px;
                 font-size: 16px;
                 font-weight: bold;
@@ -914,15 +932,19 @@ class UserManagementPage(ButtonNavigationMixin, QWidget):
             view_combo_btn = QPushButton("View Combos")
             view_combo_btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #2196F3;
-                    color: white;
+                    background-color: #3B82F6;
+                    color: #F8FAFC;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     padding: 8px 16px;
                     font-size: 12px;
+                    font-weight: 600;
                 }
                 QPushButton:hover {
-                    background-color: #1976D2;
+                    background-color: #2563EB;
+                }
+                QPushButton:pressed {
+                    background-color: #1D4ED8;
                 }
             """)
             view_combo_btn.clicked.connect(partial(self.view_user_combos, username))
@@ -932,18 +954,19 @@ class UserManagementPage(ButtonNavigationMixin, QWidget):
             delete_btn = QPushButton("Delete")
             delete_btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #f44336;
-                    color: white;
+                    background-color: #EF4444;
+                    color: #F8FAFC;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     padding: 8px 8px;
                     font-size: 12px;
+                    font-weight: 600;
                 }
                 QPushButton:hover {
-                    background-color: #da190b;
+                    background-color: #DC2626;
                 }
                 QPushButton:pressed {
-                    background-color: #c41504;
+                    background-color: #B91C1C;
                 }
             """)
             delete_btn.clicked.connect(partial(self.delete_user, username))
@@ -1001,21 +1024,27 @@ class Homepage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 18px;
             padding: 12px 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 320px;
             min-height: 65px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -1108,22 +1137,28 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 13px;
             padding: 15px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 224px;
             max-width: 256px;
             min-height: 40px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -1183,9 +1218,9 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.arduino_port_combo.setFixedWidth(300)
         self.arduino_port_combo.setFocusPolicy(Qt.NoFocus)
         self.arduino_port_status.setAlignment(Qt.AlignCenter)
-        self.arduino_port_status.setStyleSheet("color: #666; font-size: 13px;")
+        self.arduino_port_status.setStyleSheet("color: #94A3B8; font-size: 13px; background-color: transparent;")
         self.arduino_listener_status.setAlignment(Qt.AlignCenter)
-        self.arduino_listener_status.setStyleSheet("color: #666; font-size: 13px;")
+        self.arduino_listener_status.setStyleSheet("color: #94A3B8; font-size: 13px; background-color: transparent;")
 
     def _setup_layout(self):
         main_layout = QVBoxLayout()
@@ -1209,7 +1244,7 @@ class OthersPage(ButtonNavigationMixin, QWidget):
 
         settings_header = QLabel("Settings")
         settings_header.setAlignment(Qt.AlignCenter)
-        settings_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #555;")
+        settings_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #F97316; background-color: transparent;")
         left_column.addWidget(settings_header)
 
         left_column.addWidget(self.history_btn, alignment=Qt.AlignCenter)
@@ -1222,7 +1257,7 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         divider = QFrame()
         divider.setFrameShape(QFrame.VLine)
         divider.setFrameShadow(QFrame.Sunken)
-        divider.setStyleSheet("color: #cccccc;")
+        divider.setStyleSheet("color: #334155;")
 
         # Right column: Hardware
         right_column = QVBoxLayout()
@@ -1231,7 +1266,7 @@ class OthersPage(ButtonNavigationMixin, QWidget):
 
         hardware_header = QLabel("Hardware")
         hardware_header.setAlignment(Qt.AlignCenter)
-        hardware_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #555;")
+        hardware_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #F97316; background-color: transparent;")
         right_column.addWidget(hardware_header)
 
         right_column.addWidget(self.arduino_port_combo, alignment=Qt.AlignCenter)
@@ -1374,22 +1409,28 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 20px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 360px;
             max-width: 420px;
             min-height: 52px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -1462,22 +1503,28 @@ class StaminaInstructionsPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 14px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 180px;
             max-width: 210px;
             min-height: 65px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -1701,7 +1748,7 @@ class StaminaResultPage(ButtonNavigationMixin, QWidget):
 
         self.score_label = QLabel("Stamina Score: --/100")
         self.score_label.setAlignment(Qt.AlignCenter)
-        self.score_label.setStyleSheet("font-size: 30px; font-weight: bold; color: #4CAF50;")
+        self.score_label.setStyleSheet("font-size: 30px; font-weight: bold; color: #22C55E; background-color: transparent;")
 
         self.metrics_label = QLabel("")
         self.metrics_label.setAlignment(Qt.AlignCenter)
@@ -1714,10 +1761,10 @@ class StaminaResultPage(ButtonNavigationMixin, QWidget):
             """
             font-size: 16px;
             padding: 16px;
-            background-color: #f0f0f0;
+            background-color: #1E293B;
             border-radius: 10px;
-            color: black;
-            """
+            color: #F8FAFC;
+"""
         )
 
         button_row = QHBoxLayout()
@@ -1827,22 +1874,28 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 14px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 180px;
             max-width: 210px;
             min-height: 32px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -1862,12 +1915,12 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
         self.title_label.setAlignment(Qt.AlignCenter)
 
         summary_group = QWidget()
-        summary_group.setStyleSheet("background-color: #1f1f1f; border-radius: 10px;")
+        summary_group.setStyleSheet("background-color: #1E293B; border-radius: 10px; border: 1px solid #334155;")
         summary_layout = QVBoxLayout()
         summary_layout.setContentsMargins(15, 12, 15, 12)
 
         summary_title = QLabel("LATEST PERFORMANCE SUMMARY")
-        summary_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #4CAF50;")
+        summary_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #F97316; background-color: transparent;")
 
         self.power_summary_label = QLabel("Power: No data yet")
         self.stamina_summary_label = QLabel("Stamina: No data yet")
@@ -1875,8 +1928,8 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
         self.trend_label = QLabel("Overall Trend: --")
 
         for lbl in [self.power_summary_label, self.stamina_summary_label, self.reaction_summary_label]:
-            lbl.setStyleSheet("font-size: 16px; color: white;")
-        self.trend_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #4CAF50;")
+            lbl.setStyleSheet("font-size: 16px; color: #F8FAFC; background-color: transparent;")
+        self.trend_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #22C55E; background-color: transparent;")
 
         summary_layout.addWidget(summary_title)
         summary_layout.addWidget(self.power_summary_label)
@@ -1915,8 +1968,8 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
         for i in range(5):
             self.table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
         self.table.setStyleSheet("""
-            QTableWidget { font-size: 14px; background-color: white; color: black; }
-            QHeaderView::section { background-color: #4CAF50; color: white; font-weight: bold; }
+            QTableWidget { font-size: 14px; background-color: #1E293B; color: #F8FAFC; border: 1px solid #334155; gridline-color: #334155; }
+            QHeaderView::section { background-color: #F97316; color: #0F172A; font-weight: bold; padding: 8px; }
         """)
 
         self.back_button = QPushButton("Back to Main Menu")
@@ -2044,22 +2097,28 @@ class ReactionInstructionsPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 14px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 180px;
             max-width: 210px;
             min-height: 65px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -2167,22 +2226,28 @@ class PowerInstructionsPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 14px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 180px;
             max-width: 210px;
             min-height: 65px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -2450,10 +2515,10 @@ class PowerResultPage(ButtonNavigationMixin, QWidget):
             """
             font-size: 16px;
             padding: 16px;
-            background-color: #f0f0f0;
+            background-color: #1E293B;
             border-radius: 10px;
-            color: black;
-            """
+            color: #F8FAFC;
+"""
         )
 
         # Bottom buttons
@@ -2761,10 +2826,10 @@ class ReactionResultPage(ButtonNavigationMixin, QWidget):
             """
             font-size: 16px;
             padding: 16px;
-            background-color: #f0f0f0;
+            background-color: #1E293B;
             border-radius: 10px;
-            color: black;
-            """
+            color: #F8FAFC;
+"""
         )
 
         button_layout = QHBoxLayout()
@@ -2992,26 +3057,32 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 18px;
             padding: 12px 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 300px;
             min-height: 55px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
         QPushButton:disabled {
-            background-color: #cccccc;
-            color: #888888;
-            border: 3px solid #aaaaaa;
+            background-color: #263347;
+            color: #64748B;
+            border: 1px solid #334155;
         }
     """
 
@@ -3310,22 +3381,28 @@ class RoundSelectionPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 18px;
             padding: 10px 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 90px;
             max-width: 120px;
             min-height: 55px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
     LAYOUT_SPACING = 15
@@ -3622,7 +3699,7 @@ class CountdownPage(ButtonNavigationMixin, QWidget):
 
         self.countdown_label = QLabel(str(self.countdown_value))
         self.countdown_label.setAlignment(Qt.AlignCenter)
-        self.countdown_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+        self.countdown_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
 
         # Create horizontal layout for pause and back buttons
         button_layout = QHBoxLayout()
@@ -3759,7 +3836,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         # Timer in the middle
         self.timer_label = QLabel(self.format_time(self.time_remaining))
         self.timer_label.setAlignment(Qt.AlignCenter)
-        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
 
         # Create horizontal layout for pause and back buttons
         button_layout = QHBoxLayout()
@@ -4036,7 +4113,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
         self.rest_label.hide()
         self.timer_label.setText(self.format_time(self.time_remaining))
-        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
         self.pause_btn.setText("Pause")
         # Ensure Pause button starts in red style
         self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
@@ -4089,7 +4166,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
                 self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
                 self.rest_label.hide()
                 self.timer_label.setText(self.format_time(self.time_remaining))
-                self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #4CAF50;")
+                self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
 
                 # reset sequence cycling for new round
                 if self.is_self_select_mode and self.sequences:
@@ -4314,19 +4391,25 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 18px;
             padding: 12px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 8px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -4367,25 +4450,27 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
                 QPushButton {
                     font-size: 16px;
                     padding: 8px 12px;
-                    background-color: #f0f0f0;
-                    border: 2px solid #ccc;
+                    background-color: #1E293B;
+                    border: 2px solid #334155;
                     border-radius: 8px;
                     text-align: left;
-                    color: black;
+                    color: #F8FAFC;
                     min-height: 40px;
+                    font-weight: 500;
                 }
                 QPushButton:hover {
-                    background-color: #e0e0e0;
-                    border: 2px solid #2196F3;
+                    background-color: #263347;
+                    border-color: #F97316;
                 }
                 QPushButton:focus {
-                    border: 6px solid #00ff00;
-                    background-color: #2d5016;
-                    color: white;
+                    border: 4px solid #F97316;
+                    background-color: #263347;
+                    color: #F8FAFC;
                     font-weight: bold;
                 }
                 QPushButton:pressed {
-                    background-color: #d0d0d0;
+                    background-color: #F97316;
+                    color: #0F172A;
                 }
             """)
             seq_btn.clicked.connect(lambda checked, idx=i: self.edit_sequence(idx))
@@ -4397,20 +4482,22 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             up_btn.setStyleSheet("""
                 QPushButton {
                     font-size: 20px;
-                    background-color: #4CAF50;
-                    color: white;
-                    border: 2px solid #2f7f32;
+                    background-color: #22C55E;
+                    color: #0F172A;
+                    border: none;
                     border-radius: 4px;
+                    font-weight: bold;
                 }
                 QPushButton:hover {
-                    background-color: #45a049;
+                    background-color: #16A34A;
                 }
                 QPushButton:focus {
-                    border: 3px solid #00ff00;
-                    background-color: #2d5016;
+                    border: 3px solid #F97316;
+                    background-color: #16A34A;
                 }
                 QPushButton:disabled {
-                    background-color: #cccccc;
+                    background-color: #263347;
+                    color: #64748B;
                 }
             """)
             up_btn.clicked.connect(lambda checked, idx=i: self.move_sequence_up(idx))
@@ -4422,20 +4509,22 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             down_btn.setStyleSheet("""
                 QPushButton {
                     font-size: 20px;
-                    background-color: #4CAF50;
-                    color: white;
-                    border: 2px solid #2f7f32;
+                    background-color: #22C55E;
+                    color: #0F172A;
+                    border: none;
                     border-radius: 4px;
+                    font-weight: bold;
                 }
                 QPushButton:hover {
-                    background-color: #45a049;
+                    background-color: #16A34A;
                 }
                 QPushButton:focus {
-                    border: 3px solid #00ff00;
-                    background-color: #2d5016;
+                    border: 3px solid #F97316;
+                    background-color: #16A34A;
                 }
                 QPushButton:disabled {
-                    background-color: #cccccc;
+                    background-color: #263347;
+                    color: #64748B;
                 }
             """)
             down_btn.clicked.connect(lambda checked, idx=i: self.move_sequence_down(idx))
@@ -4447,20 +4536,22 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
             del_btn.setStyleSheet("""
                 QPushButton {
                     font-size: 20px;
-                    background-color: #f44336;
-                    color: white;
-                    border: 2px solid #9e1f17;
+                    background-color: #EF4444;
+                    color: #F8FAFC;
+                    border: none;
                     border-radius: 4px;
+                    font-weight: bold;
                 }
                 QPushButton:hover {
-                    background-color: #da190b;
+                    background-color: #DC2626;
                 }
                 QPushButton:focus {
-                    border: 3px solid #00ff00;
-                    background-color: #a52a2a;
+                    border: 3px solid #F97316;
+                    background-color: #DC2626;
                 }
                 QPushButton:disabled {
-                    background-color: #cccccc;
+                    background-color: #263347;
+                    color: #64748B;
                 }
             """)
             del_btn.clicked.connect(lambda checked, idx=i: self.delete_sequence(idx))
@@ -4512,11 +4603,11 @@ class SelfSelectSequencePage(ButtonNavigationMixin, QWidget):
         self.sequence_input.setStyleSheet("""
             font-size: 24px;
             padding: 15px;
-            background-color: white;
-            border: 2px solid #2196F3;
+            background-color: #1E293B;
+            border: 2px solid #3B82F6;
             border-radius: 8px;
             min-height: 60px;
-            color: black;
+            color: #F8FAFC;
         """)
 
         # Numpad grid (1-6)
@@ -4803,11 +4894,11 @@ class BattleStyleDescriptionPage(ButtonNavigationMixin, QWidget):
         self.description_label.setStyleSheet("""
             font-size: 18px;
             padding: 25px;
-            background-color: #f5f5f5;
-            border: 2px solid #cccccc;
+            background-color: #1E293B;
+            border: 1px solid #334155;
             border-radius: 10px;
             line-height: 1.6;
-            color: #000000;
+            color: #F8FAFC;
             text-align: center;
             max-width: 900px;
             min-width: 800px;
@@ -4890,7 +4981,7 @@ class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
         # Title
         title = QLabel("AI Coach Feedback")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 28px; font-weight: bold; color: #4CAF50;")
+        title.setStyleSheet("font-size: 28px; font-weight: bold; color: #F97316; background-color: transparent;")
         
         # Score and combo info (compact)
         info_layout = QHBoxLayout()
@@ -5060,7 +5151,7 @@ class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
         elif who == "You":
             cursor.insertHtml(f"<p><b style='color:#2196F3;'>You:</b> {text}</p>")
         else:  # AI Coach
-            cursor.insertHtml(f"<p><b style='color:#4CAF50;'>AI Coach:</b> {text}</p>")
+            cursor.insertHtml(f"<p><b style='color:#F97316;'>AI Coach:</b> {text}</p>")
         
         self.chat_view.ensureCursorVisible()
     
@@ -5099,7 +5190,7 @@ class ComboResultsPage(ButtonNavigationMixin, QWidget):
         # Title
         title = QLabel("Training Complete!")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 36px; font-weight: bold; color: #4CAF50;")
+        title.setStyleSheet("font-size: 36px; font-weight: bold; color: #F97316; background-color: transparent;")
         
         # Combo info
         self.combo_name_label = QLabel("Combo: -")
@@ -5164,7 +5255,7 @@ class ComboResultsPage(ButtonNavigationMixin, QWidget):
         
         if score >= threshold:
             self.status_label.setText("✓ Great Job! Combo performance recorded!")
-            self.status_label.setStyleSheet("font-size: 18px; color: #4CAF50; font-weight: bold;")
+            self.status_label.setStyleSheet("font-size: 18px; color: #22C55E; font-weight: bold; background-color: transparent;")
         else:
             self.status_label.setText(f"Keep practicing! Target: {threshold_text}/5")
             self.status_label.setStyleSheet("font-size: 18px; color: #FFC107; font-weight: bold;")
@@ -5181,22 +5272,28 @@ class UserComboProgressPage(ButtonNavigationMixin, QWidget):
         QPushButton {
             font-size: 14px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 180px;
             max-width: 210px;
             min-height: 32px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
         }
     """
 
@@ -5249,14 +5346,23 @@ class UserComboProgressPage(ButtonNavigationMixin, QWidget):
         self.combo_table.setStyleSheet("""
             QTableWidget {
                 font-size: 14px;
-                border: 1px solid #ccc;
+                border: 1px solid #334155;
                 border-radius: 8px;
-                background-color: white;
-                color: black;
+                background-color: #1E293B;
+                color: #F8FAFC;
+                gridline-color: #334155;
+            }
+            QTableWidget::item {
+                padding: 8px;
+                color: #F8FAFC;
+                background-color: #1E293B;
+            }
+            QTableWidget::item:selected {
+                background-color: #263347;
             }
             QHeaderView::section {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #F97316;
+                color: #0F172A;
                 padding: 10px;
                 font-weight: bold;
                 border: none;
@@ -5430,14 +5536,23 @@ class UserProgressOverviewPage(ButtonNavigationMixin, QWidget):
         self.user_table.setStyleSheet("""
             QTableWidget {
                 font-size: 14px;
-                border: 1px solid #ccc;
+                border: 1px solid #334155;
                 border-radius: 8px;
-                background-color: white;
-                color: black;
+                background-color: #1E293B;
+                color: #F8FAFC;
+                gridline-color: #334155;
+            }
+            QTableWidget::item {
+                padding: 8px;
+                color: #F8FAFC;
+                background-color: #1E293B;
+            }
+            QTableWidget::item:selected {
+                background-color: #263347;
             }
             QHeaderView::section {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #F97316;
+                color: #0F172A;
                 padding: 10px;
                 font-weight: bold;
                 border: none;
@@ -5562,8 +5677,9 @@ class UserProgressOverviewPage(ButtonNavigationMixin, QWidget):
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Boxing Training App")
+        self.setWindowTitle("BoxBunny — Training System")
         self.setFixedSize(1024, 600)
+        self.setStyleSheet(GLOBAL_QSS)
         self.setFocusPolicy(Qt.StrongFocus)
 
         self.arduino_button_listener: Optional[ArduinoButtonListener] = None

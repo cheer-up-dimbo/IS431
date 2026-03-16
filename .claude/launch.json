@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Main Boxing GUI",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["GUI/main_gui.py"],
+      "port": 0
+    },
+    {
+      "name": "CDE AI Fair - Boxing GUI",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["CDE_AI_fair/simply_boxing_gui.py"],
+      "port": 0
+    },
+    {
+      "name": "CDE AI Fair - Dual Arm GUI",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["CDE_AI_fair/Arms/dual_arm_control/arm_GUI.py"],
+      "port": 0
+    },
+    {
+      "name": "CDE AI Fair - Single Arm GUI",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["CDE_AI_fair/Arms/Single_arm/arm_GUI.py"],
+      "port": 0
+    },
+    {
+      "name": "CDE AI Fair - Height Adjustment GUI",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["CDE_AI_fair/Height_adjustment/leadscrew_gui.py"],
+      "port": 0
+    },
+    {
+      "name": "CV - Real-time Inference",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["CV/model_lstm_default/inference_real_time.py"],
+      "port": 0
+    }
+  ]
+}

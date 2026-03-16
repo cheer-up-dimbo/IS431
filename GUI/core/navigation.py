@@ -11,22 +11,29 @@ class ButtonNavigationMixin:
         QPushButton {
             font-size: 20px;
             padding: 20px;
-            background-color: #f5f5f5;
-            border: 3px solid #cccccc;
+            background-color: #1E293B;
+            border: 2px solid #334155;
             border-radius: 10px;
             min-width: 360px;
             max-width: 420px;
             min-height: 65px;
-            color: #111111;
+            color: #F8FAFC;
+            font-weight: 600;
         }
         QPushButton:focus {
-            border: 6px solid #00ff00;
-            background-color: #2d5016;
-            color: white;
+            border: 4px solid #F97316;
+            background-color: #263347;
+            color: #F8FAFC;
             font-weight: bold;
         }
         QPushButton:hover {
-            background-color: #e8e8e8;
+            background-color: #263347;
+            border-color: #F97316;
+        }
+        QPushButton:pressed {
+            background-color: #F97316;
+            color: #0F172A;
+            border-color: #F97316;
         }
     """
 
@@ -92,7 +99,7 @@ class ButtonNavigationMixin:
             if idx == self._focused_button_index:
                 glow = QGraphicsDropShadowEffect(self)
                 glow.setBlurRadius(36)
-                glow.setColor(QColor(0, 255, 0, 230))
+                glow.setColor(QColor(249, 115, 22, 220))
                 glow.setOffset(0, 0)
                 button.setGraphicsEffect(glow)
             else:

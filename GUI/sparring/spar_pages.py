@@ -381,7 +381,7 @@ class SparCountdownPage(ButtonNavigationMixin, QWidget):
         # Round + style info
         self._info_label = QLabel()
         self._info_label.setAlignment(Qt.AlignCenter)
-        self._info_label.setStyleSheet("font-size: 22px; color: #cccccc;")
+        self._info_label.setStyleSheet("font-size: 22px; color: #94A3B8; background-color: transparent;")
         layout.addWidget(self._info_label)
 
         layout.addStretch()
@@ -422,7 +422,7 @@ class SparCountdownPage(ButtonNavigationMixin, QWidget):
         elif self._count == 0:
             self._countdown_label.setText("GO!")
             self._countdown_label.setStyleSheet(
-                "font-size: 120px; font-weight: bold; color: #4CAF50;"
+                "font-size: 120px; font-weight: bold; color: #22C55E; background-color: transparent;"
             )
         else:
             # count < 0 → transition after "GO!" display
@@ -499,7 +499,7 @@ class SparSessionPage(ButtonNavigationMixin, QWidget):
         # Style + round info
         self._info_label = QLabel()
         self._info_label.setAlignment(Qt.AlignCenter)
-        self._info_label.setStyleSheet("font-size: 22px; color: #cccccc;")
+        self._info_label.setStyleSheet("font-size: 22px; color: #94A3B8; background-color: transparent;")
         layout.addWidget(self._info_label)
 
         layout.addStretch()
@@ -515,7 +515,7 @@ class SparSessionPage(ButtonNavigationMixin, QWidget):
         # Current punch feedback
         self._punch_label = QLabel("")
         self._punch_label.setAlignment(Qt.AlignCenter)
-        self._punch_label.setStyleSheet("font-size: 28px; color: #4CAF50;")
+        self._punch_label.setStyleSheet("font-size: 28px; color: #22C55E; background-color: transparent;")
         layout.addWidget(self._punch_label)
 
         layout.addStretch()
@@ -659,14 +659,14 @@ class SparRestPage(ButtonNavigationMixin, QWidget):
         self._timer_label = QLabel("0:00")
         self._timer_label.setAlignment(Qt.AlignCenter)
         self._timer_label.setStyleSheet(
-            "font-size: 100px; font-weight: bold; color: #4CAF50;"
+            "font-size: 100px; font-weight: bold; color: #F97316; background-color: transparent;"
         )
         layout.addWidget(self._timer_label)
 
         # Next round info
         self._next_label = QLabel("")
         self._next_label.setAlignment(Qt.AlignCenter)
-        self._next_label.setStyleSheet("font-size: 20px; color: #cccccc;")
+        self._next_label.setStyleSheet("font-size: 20px; color: #94A3B8; background-color: transparent;")
         layout.addWidget(self._next_label)
 
         layout.addStretch()
@@ -901,7 +901,7 @@ class SparResultPage(ButtonNavigationMixin, QWidget):
         self._feedback_label = QLabel("")
         self._feedback_label.setAlignment(Qt.AlignCenter)
         self._feedback_label.setWordWrap(True)
-        self._feedback_label.setStyleSheet("font-size: 16px; color: #555; margin-top: 10px;")
+        self._feedback_label.setStyleSheet("font-size: 16px; color: #94A3B8; margin-top: 10px; background-color: transparent;")
         layout.addWidget(self._feedback_label)
 
         layout.addStretch()

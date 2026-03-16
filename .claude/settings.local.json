@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rl \"mainloop\\\\|app\\\\.run\\\\|tkinter\\\\|customtkinter\" C:/Users/royst/Documents/GITHUB/IS431 --include=*.py)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(grep -rh \"^import \\\\|^from \" C:/Users/royst/Documents/GITHUB/IS431/GUI --include=*.py)",
+      "Bash(grep -rh \"import cv2\\\\|import numpy\\\\|import serial\\\\|import mediapipe\\\\|import torch\\\\|import sklearn\" C:/Users/royst/Documents/GITHUB/IS431/GUI --include=*.py)",
+      "Bash(pip install:*)",
+      "Read(//c/Users/royst/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.0.1/.claude/skills/ui-ux-pro-max/**)",
+      "Bash(python3 scripts/search.py \"combat sports boxing training fitness tracker desktop app\" --design-system -p \"BoxBunny\" -f markdown)"
+    ]
+  }
+}
