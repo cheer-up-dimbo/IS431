@@ -17,6 +17,7 @@ class DS:
 
     # Borders
     BORDER        = "#334155"   # Default border / divider
+    BORDER_LIGHT  = "#475569"   # Elevated / hover border
 
     # Primary — Energy orange (main actions, CTAs)
     PRIMARY       = "#F97316"
@@ -48,35 +49,171 @@ class DS:
     ACCENT  = "#F97316"
     WARNING = "#FFC107"
 
+    # Radius tokens
+    RADIUS_SM   = "8px"
+    RADIUS_MD   = "12px"
+    RADIUS_LG   = "16px"
+    RADIUS_PILL = "22px"
+
+    # Card border helpers
+    CARD_BORDER          = "1px solid #334155"
+    CARD_BORDER_ELEVATED = "1px solid #475569"
+    CARD_BORDER_ACCENT   = "2px solid #F97316"
+
+    # Spacing scale (int px, use in setSpacing / setContentsMargins)
+    SPACE_XS  = 4
+    SPACE_SM  = 8
+    SPACE_MD  = 16
+    SPACE_LG  = 24
+    SPACE_XL  = 32
+    SPACE_2XL = 48
+
+    # Font sizes (int px)
+    FONT_XS   = 11
+    FONT_SM   = 13
+    FONT_BASE = 15
+    FONT_MD   = 18
+    FONT_LG   = 24
+    FONT_XL   = 32
+    FONT_2XL  = 48
+    FONT_HERO = 64
+
 
 # ============================================================================
 # Global Application Stylesheet (apply once to QApplication or MainWindow)
 # ============================================================================
 
 GLOBAL_QSS = f"""
+    /* ── Base ──────────────────────────────────────────────────────────────── */
     QWidget {{
         background-color: {DS.BG_DARK};
         color: {DS.TEXT_PRIMARY};
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family: "Barlow Condensed", "Arial Narrow", "Liberation Sans Narrow",
+                     "DejaVu Sans Condensed", Arial, sans-serif;
+        font-size: 15px;
     }}
     QLabel {{
         background-color: transparent;
         color: {DS.TEXT_PRIMARY};
     }}
 
+    /* ── Named label roles ──────────────────────────────────────────────────── */
+    QLabel#pageTitle {{
+        font-size: 32px;
+        font-weight: 700;
+        color: {DS.PRIMARY};
+        letter-spacing: 1px;
+    }}
+    QLabel#sectionHeader {{
+        font-size: 11px;
+        font-weight: 600;
+        color: {DS.TEXT_MUTED};
+        letter-spacing: 2px;
+    }}
+    QLabel#metricValue {{
+        font-size: 64px;
+        font-weight: 800;
+        color: {DS.TEXT_PRIMARY};
+    }}
+    QLabel#metricLabel {{
+        font-size: 13px;
+        color: {DS.TEXT_SECONDARY};
+        letter-spacing: 1px;
+    }}
+    QLabel#subtitleLabel {{
+        font-size: 15px;
+        color: {DS.TEXT_SECONDARY};
+    }}
+    QLabel#heroText {{
+        font-size: 64px;
+        font-weight: 800;
+        color: {DS.TEXT_PRIMARY};
+        letter-spacing: 2px;
+    }}
+    QLabel#countdownHero {{
+        font-size: 120px;
+        font-weight: 900;
+        color: {DS.PRIMARY};
+    }}
+    QLabel#badgeLabel {{
+        font-size: 11px;
+        font-weight: 700;
+        color: {DS.PRIMARY_TEXT};
+        background-color: {DS.PRIMARY};
+        border-radius: 8px;
+        padding: 2px 8px;
+    }}
+
+    /* ── Card QFrame — setProperty("class","card") ──────────────────────── */
+    QFrame[class="card"] {{
+        background-color: {DS.BG_SURFACE};
+        border: 1px solid {DS.BORDER};
+        border-radius: 12px;
+    }}
+    QFrame[class="card--accent"] {{
+        background-color: {DS.BG_SURFACE};
+        border: 2px solid {DS.PRIMARY};
+        border-radius: 12px;
+    }}
+    QFrame[class="card--elevated"] {{
+        background-color: {DS.BG_ELEVATED};
+        border: 1px solid {DS.BORDER_LIGHT};
+        border-radius: 12px;
+    }}
+    QFrame[class="header-bar"] {{
+        background-color: {DS.BG_SURFACE};
+        border-bottom: 1px solid {DS.BORDER};
+        border-radius: 0px;
+    }}
+    QFrame[class="footer-bar"] {{
+        background-color: {DS.BG_SURFACE};
+        border-top: 1px solid {DS.BORDER};
+        border-radius: 0px;
+    }}
+
+    /* ── Inputs ─────────────────────────────────────────────────────────────── */
     QLineEdit {{
         background-color: {DS.BG_SURFACE};
-        border: 2px solid {DS.BORDER};
+        border: 1px solid {DS.BORDER};
         border-radius: 8px;
-        padding: 10px 12px;
+        padding: 10px 14px;
         color: {DS.TEXT_PRIMARY};
-        font-size: 16px;
+        font-size: 15px;
         selection-background-color: {DS.PRIMARY};
     }}
     QLineEdit:focus {{
-        border-color: {DS.PRIMARY};
+        border: 2px solid {DS.PRIMARY};
     }}
 
+    /* ── Pill buttons (objectName="pillBtn") ────────────────────────────────── */
+    QPushButton#pillBtn {{
+        background-color: {DS.BG_SURFACE};
+        border: 1px solid {DS.BORDER};
+        border-radius: 22px;
+        min-width: 80px;
+        min-height: 44px;
+        padding: 0 20px;
+        font-size: 15px;
+        font-weight: 600;
+        color: {DS.TEXT_SECONDARY};
+    }}
+    QPushButton#pillBtn:hover {{
+        background-color: {DS.BG_ELEVATED};
+        border-color: {DS.BORDER_LIGHT};
+        color: {DS.TEXT_PRIMARY};
+    }}
+    QPushButton#pillBtn:checked {{
+        background-color: {DS.PRIMARY};
+        border-color: {DS.PRIMARY};
+        color: {DS.PRIMARY_TEXT};
+        font-weight: 700;
+    }}
+    QPushButton#pillBtn:focus {{
+        border: 2px solid {DS.PRIMARY};
+        color: {DS.TEXT_PRIMARY};
+    }}
+
+    /* ── Table ──────────────────────────────────────────────────────────────── */
     QTableWidget {{
         background-color: {DS.BG_SURFACE};
         color: {DS.TEXT_PRIMARY};
@@ -91,35 +228,38 @@ GLOBAL_QSS = f"""
         background-color: {DS.BG_SURFACE};
     }}
     QTableWidget::item:selected {{
-        background-color: {DS.BG_ELEVATED};
-        color: {DS.TEXT_PRIMARY};
-    }}
-    QHeaderView::section {{
         background-color: {DS.PRIMARY};
         color: {DS.PRIMARY_TEXT};
-        padding: 10px;
-        font-size: 14px;
-        font-weight: bold;
+    }}
+    QHeaderView::section {{
+        background-color: {DS.BG_ELEVATED};
+        color: {DS.TEXT_SECONDARY};
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
         border: none;
+        border-bottom: 1px solid {DS.BORDER};
     }}
     QTableCornerButton::section {{
-        background-color: {DS.PRIMARY};
+        background-color: {DS.BG_ELEVATED};
         border: none;
     }}
 
+    /* ── ScrollArea / ScrollBar ─────────────────────────────────────────────── */
     QScrollArea {{
         background-color: transparent;
         border: none;
     }}
     QScrollBar:vertical {{
-        background-color: {DS.BG_SURFACE};
-        width: 8px;
+        background-color: {DS.BG_DARK};
+        width: 6px;
         margin: 0;
-        border-radius: 4px;
+        border-radius: 3px;
     }}
     QScrollBar::handle:vertical {{
         background-color: {DS.BORDER};
-        border-radius: 4px;
+        border-radius: 3px;
         min-height: 20px;
     }}
     QScrollBar::handle:vertical:hover {{
@@ -129,13 +269,13 @@ GLOBAL_QSS = f"""
         height: 0;
     }}
     QScrollBar:horizontal {{
-        background-color: {DS.BG_SURFACE};
-        height: 8px;
-        border-radius: 4px;
+        background-color: {DS.BG_DARK};
+        height: 6px;
+        border-radius: 3px;
     }}
     QScrollBar::handle:horizontal {{
         background-color: {DS.BORDER};
-        border-radius: 4px;
+        border-radius: 3px;
         min-width: 20px;
     }}
     QScrollBar::handle:horizontal:hover {{
@@ -145,17 +285,18 @@ GLOBAL_QSS = f"""
         width: 0;
     }}
 
+    /* ── ComboBox ───────────────────────────────────────────────────────────── */
     QComboBox {{
         background-color: {DS.BG_SURFACE};
-        border: 2px solid {DS.BORDER};
+        border: 1px solid {DS.BORDER};
         border-radius: 8px;
         padding: 8px 12px;
         color: {DS.TEXT_PRIMARY};
-        font-size: 14px;
-        min-height: 40px;
+        font-size: 15px;
+        min-height: 44px;
     }}
     QComboBox:focus {{
-        border-color: {DS.PRIMARY};
+        border: 2px solid {DS.PRIMARY};
     }}
     QComboBox::drop-down {{
         border: none;
@@ -164,12 +305,14 @@ GLOBAL_QSS = f"""
     QComboBox QAbstractItemView {{
         background-color: {DS.BG_SURFACE};
         color: {DS.TEXT_PRIMARY};
-        selection-background-color: {DS.BG_ELEVATED};
+        selection-background-color: {DS.PRIMARY};
+        selection-color: {DS.PRIMARY_TEXT};
         border: 1px solid {DS.BORDER};
         border-radius: 4px;
         outline: 0;
     }}
 
+    /* ── TextEdit ───────────────────────────────────────────────────────────── */
     QTextEdit {{
         background-color: {DS.BG_SURFACE};
         border: 1px solid {DS.BORDER};
@@ -180,6 +323,7 @@ GLOBAL_QSS = f"""
         selection-background-color: {DS.PRIMARY};
     }}
 
+    /* ── Frame dividers ─────────────────────────────────────────────────────── */
     QFrame[frameShape="4"] {{
         background-color: {DS.BORDER};
         max-width: 1px;
@@ -189,6 +333,7 @@ GLOBAL_QSS = f"""
         max-height: 1px;
     }}
 
+    /* ── MessageBox ─────────────────────────────────────────────────────────── */
     QMessageBox {{
         background-color: {DS.BG_SURFACE};
         color: {DS.TEXT_PRIMARY};
@@ -377,3 +522,179 @@ class ButtonStyle:
         pressed_color=DS.PRIMARY, border_radius=8,
         text_color=DS.TEXT_PRIMARY,
     )
+
+    # ── Nav card — large card-style navigation button ────────────────────────
+    NAV_CARD = f"""
+        QPushButton {{
+            background-color: {DS.BG_SURFACE};
+            border: 1px solid {DS.BORDER};
+            border-radius: 12px;
+            padding: 20px 24px;
+            font-size: 17px;
+            font-weight: 600;
+            color: {DS.TEXT_PRIMARY};
+            min-height: 120px;
+            text-align: left;
+        }}
+        QPushButton:hover {{
+            background-color: {DS.BG_ELEVATED};
+            border: 1px solid {DS.BORDER_LIGHT};
+            border-left: 3px solid {DS.PRIMARY};
+        }}
+        QPushButton:pressed {{
+            background-color: #1a2a3a;
+        }}
+        QPushButton:focus {{
+            border: 2px solid {DS.PRIMARY};
+        }}
+    """
+
+    # ── Pill — compact rounded selector button ───────────────────────────────
+    PILL = f"""
+        QPushButton {{
+            background-color: {DS.BG_SURFACE};
+            border: 1px solid {DS.BORDER};
+            border-radius: 22px;
+            min-width: 80px;
+            min-height: 44px;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: {DS.TEXT_SECONDARY};
+        }}
+        QPushButton:hover {{
+            background-color: {DS.BG_ELEVATED};
+            border-color: {DS.BORDER_LIGHT};
+            color: {DS.TEXT_PRIMARY};
+        }}
+        QPushButton:focus {{
+            border: 2px solid {DS.PRIMARY};
+            color: {DS.TEXT_PRIMARY};
+        }}
+    """
+
+    PILL_SELECTED = f"""
+        QPushButton {{
+            background-color: {DS.PRIMARY};
+            border: 1px solid {DS.PRIMARY};
+            border-radius: 22px;
+            min-width: 80px;
+            min-height: 44px;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 700;
+            color: {DS.PRIMARY_TEXT};
+        }}
+        QPushButton:hover {{
+            background-color: {DS.PRIMARY_HOVER};
+        }}
+        QPushButton:pressed {{
+            background-color: {DS.PRIMARY_PRESS};
+        }}
+        QPushButton:focus {{
+            border: 2px solid {DS.TEXT_PRIMARY};
+        }}
+    """
+
+    # ── Session action — large touch-friendly CTA ────────────────────────────
+    SESSION_ACTION = f"""
+        QPushButton {{
+            background-color: {DS.PRIMARY};
+            border: none;
+            border-radius: 16px;
+            min-height: 72px;
+            min-width: 200px;
+            font-size: 20px;
+            font-weight: 800;
+            color: {DS.PRIMARY_TEXT};
+            letter-spacing: 1px;
+        }}
+        QPushButton:hover {{
+            background-color: {DS.PRIMARY_HOVER};
+        }}
+        QPushButton:pressed {{
+            background-color: {DS.PRIMARY_PRESS};
+        }}
+        QPushButton:disabled {{
+            background-color: {DS.BORDER};
+            color: {DS.TEXT_MUTED};
+        }}
+        QPushButton:focus {{
+            border: 2px solid {DS.TEXT_PRIMARY};
+        }}
+    """
+
+    SESSION_ACTION_DANGER = f"""
+        QPushButton {{
+            background-color: {DS.DANGER};
+            border: none;
+            border-radius: 16px;
+            min-height: 72px;
+            min-width: 200px;
+            font-size: 20px;
+            font-weight: 800;
+            color: {DS.TEXT_PRIMARY};
+            letter-spacing: 1px;
+        }}
+        QPushButton:hover {{
+            background-color: {DS.DANGER_HOVER};
+        }}
+        QPushButton:pressed {{
+            background-color: {DS.DANGER_PRESS};
+        }}
+        QPushButton:focus {{
+            border: 2px solid {DS.TEXT_PRIMARY};
+        }}
+    """
+
+    # ── Ghost — flat text-only button ───────────────────────────────────────
+    GHOST = f"""
+        QPushButton {{
+            background-color: transparent;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            color: {DS.TEXT_MUTED};
+        }}
+        QPushButton:hover {{
+            color: {DS.TEXT_PRIMARY};
+            background-color: {DS.BG_ELEVATED};
+        }}
+        QPushButton:pressed {{
+            color: {DS.PRIMARY};
+        }}
+    """
+
+    @staticmethod
+    def preset_card_colored(accent_hex: str) -> str:
+        """Generate a preset card button style with a colored top accent bar."""
+        return f"""
+            QPushButton {{
+                background-color: {DS.BG_SURFACE};
+                border: 1px solid {DS.BORDER};
+                border-top: 3px solid {accent_hex};
+                border-radius: 12px;
+                padding: 14px 12px;
+                font-size: 13px;
+                font-weight: 600;
+                color: {DS.TEXT_PRIMARY};
+                min-height: 90px;
+                min-width: 130px;
+                text-align: center;
+            }}
+            QPushButton:hover {{
+                background-color: {DS.BG_ELEVATED};
+                border-top: 3px solid {accent_hex};
+                border-left: 1px solid {DS.BORDER_LIGHT};
+                border-right: 1px solid {DS.BORDER_LIGHT};
+                border-bottom: 1px solid {DS.BORDER_LIGHT};
+            }}
+            QPushButton:pressed {{
+                background-color: #1a2a3a;
+            }}
+            QPushButton:focus {{
+                border: 2px solid {accent_hex};
+                border-top: 3px solid {accent_hex};
+            }}
+        """

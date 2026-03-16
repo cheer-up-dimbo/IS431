@@ -42,7 +42,7 @@ from sparring.spar_pages import (
 )
 
 # Import from new compartmentalized modules
-from core import TrainingConfig, AppState, PageIndex, ButtonStyle
+from core import TrainingConfig, AppState, PageIndex, ButtonStyle, DS, TRAINING_PRESETS, apply_preset
 from core.constants import DS, GLOBAL_QSS
 from utils import (
     get_users_csv_path, hash_password, load_users, save_users,
@@ -567,159 +567,109 @@ def get_training_csv_path(username: str):
 class LoginPage(ButtonNavigationMixin, QWidget):
     """Login/Signup page shown on application startup."""
 
-    NAV_BUTTON_AUTOSIZE = True
-    NAV_BUTTON_MIN_WIDTH = 280
-    NAV_BUTTON_MIN_HEIGHT = 70
-    NAV_BUTTON_STYLE = """
-        QPushButton {
-            font-size: 20px;
-            padding: 15px 30px;
-            background-color: #1E293B;
-            border: 2px solid #334155;
-            border-radius: 10px;
-            min-width: 280px;
-            min-height: 70px;
-            color: #F8FAFC;
-            font-weight: 600;
-        }
-        QPushButton:focus {
-            border: 4px solid #F97316;
-            background-color: #263347;
-            color: #F8FAFC;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #263347;
-            border-color: #F97316;
-        }
-        QPushButton:pressed {
-            background-color: #F97316;
-            color: #0F172A;
-        }
-    """
-    
+    LAYOUT_SPACING = 0
+    LAYOUT_MARGINS = (0, 0, 0, 0)
+
     def __init__(self, stacked_widget, app_state):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
         self.current_user = None
-        
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(60, 40, 60, 40)
-        
-        # Title
-        title = QLabel("Boxing Training App")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold; color: white;")
-        title.setFixedHeight(50)
 
-        
-        # Username field
-        username_label = QLabel("Username:")
-        username_label.setStyleSheet("font-size: 16px; font-weight: bold; color: white;")
-        username_label.setFixedHeight(25)
+        # ── Outer layout: centres the card ───────────────────────────────────
+        outer = QVBoxLayout()
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+        outer.setAlignment(Qt.AlignCenter)
+
+        # ── Login card ────────────────────────────────────────────────────────
+        card = QFrame()
+        card.setProperty("class", "card")
+        card.setMaximumWidth(460)
+        card.setMinimumWidth(340)
+        card_layout = QVBoxLayout(card)
+        card_layout.setContentsMargins(40, 36, 40, 36)
+        card_layout.setSpacing(0)
+
+        # Icon + brand
+        icon_lbl = QLabel("🥊")
+        icon_lbl.setAlignment(Qt.AlignCenter)
+        icon_lbl.setStyleSheet("font-size: 48px; background: transparent;")
+
+        title = QLabel("BOXBUNNY")
+        title.setAlignment(Qt.AlignCenter)
+        title.setObjectName("pageTitle")
+
+        tagline = QLabel("Train Smarter. Hit Harder.")
+        tagline.setAlignment(Qt.AlignCenter)
+        tagline.setObjectName("subtitleLabel")
+
+        # Inputs
+        user_hdr = QLabel("USERNAME")
+        user_hdr.setObjectName("sectionHeader")
         self.username_input = QLineEdit()
         self.username_input.setPlaceholderText("Enter username")
-        self.username_input.setFixedHeight(45)
-        self.username_input.setStyleSheet("""
-            QLineEdit {
-                font-size: 16px;
-                padding: 10px;
-                border: 2px solid #334155;
-                border-radius: 8px;
-                min-width: 350px;
-                background-color: #1E293B;
-                color: #F8FAFC;
-            }
-            QLineEdit:focus {
-                border-color: #F97316;
-            }
-        """)
-        
-        # Password field
-        password_label = QLabel("Password:")
-        password_label.setStyleSheet("font-size: 16px; font-weight: bold; color: white;")
-        password_label.setFixedHeight(25)
+        self.username_input.setFixedHeight(44)
+
+        pass_hdr = QLabel("PASSWORD")
+        pass_hdr.setObjectName("sectionHeader")
         self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("Enter password")
+        self.password_input.setPlaceholderText("••••••••")
         self.password_input.setEchoMode(QLineEdit.Password)
-        self.password_input.setFixedHeight(45)
-        self.password_input.setStyleSheet("""
-            QLineEdit {
-                font-size: 16px;
-                padding: 10px;
-                border: 2px solid #334155;
-                border-radius: 8px;
-                min-width: 350px;
-                background-color: #1E293B;
-                color: #F8FAFC;
-            }
-            QLineEdit:focus {
-                border-color: #F97316;
-            }
-        """)
-        
-        # Status label for error messages
+        self.password_input.setFixedHeight(44)
+
+        # Status
         self.status_label = QLabel("")
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setStyleSheet("font-size: 14px; color: #EF4444; background-color: transparent;")
-        self.status_label.setFixedHeight(20)
-        
+        self.status_label.setStyleSheet(
+            f"font-size: 13px; color: {DS.DANGER}; background: transparent;"
+        )
+        self.status_label.setFixedHeight(18)
+
         # Buttons
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        
-        login_btn = QPushButton("Login")
-        signup_btn = QPushButton("Sign Up")
-        manage_users_btn = QPushButton("Manage Users")
-        
-        login_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        login_btn = QPushButton("LOG IN")
+        login_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        login_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        signup_btn = QPushButton("SIGN UP")
         signup_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
-        manage_users_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
-        
-        login_btn.setMinimumHeight(70)
-        signup_btn.setMinimumHeight(70)
-        manage_users_btn.setMinimumHeight(70)
-        login_btn.setMinimumWidth(280)
-        signup_btn.setMinimumWidth(280)
-        manage_users_btn.setMinimumWidth(280)
-        login_btn.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        signup_btn.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        manage_users_btn.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        
+        signup_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        signup_btn.setMinimumHeight(48)
+
         login_btn.clicked.connect(self.on_login)
         signup_btn.clicked.connect(self.on_signup)
-        manage_users_btn.clicked.connect(self.on_manage_users)
-        
-        # Enable login on Enter key press
+
+        # Enter key shortcuts
         self.password_input.returnPressed.connect(self.on_login)
         self.username_input.returnPressed.connect(lambda: self.password_input.setFocus())
-        
-        button_layout.addStretch()
-        button_layout.addWidget(login_btn)
-        button_layout.addWidget(signup_btn)
-        button_layout.addStretch()
-        
-        # Layout assembly - compact spacing
-        layout.addStretch(1)
-        layout.addWidget(title)
-        layout.addSpacing(30)
-        layout.addWidget(username_label)
-        layout.addWidget(self.username_input)
-        layout.addSpacing(15)
-        layout.addWidget(password_label)
-        layout.addWidget(self.password_input)
-        layout.addSpacing(5)
-        layout.addWidget(self.status_label)
-        layout.addSpacing(15)
-        layout.addLayout(button_layout)
-        layout.addSpacing(10)
-        layout.addWidget(manage_users_btn, alignment=Qt.AlignCenter)
-        layout.addStretch(1)
-        
-        self.setLayout(layout)
+
+        # Assemble card
+        card_layout.addWidget(icon_lbl)
+        card_layout.addSpacing(4)
+        card_layout.addWidget(title)
+        card_layout.addSpacing(2)
+        card_layout.addWidget(tagline)
+        card_layout.addSpacing(24)
+        card_layout.addWidget(user_hdr)
+        card_layout.addSpacing(6)
+        card_layout.addWidget(self.username_input)
+        card_layout.addSpacing(14)
+        card_layout.addWidget(pass_hdr)
+        card_layout.addSpacing(6)
+        card_layout.addWidget(self.password_input)
+        card_layout.addSpacing(6)
+        card_layout.addWidget(self.status_label)
+        card_layout.addSpacing(16)
+        card_layout.addWidget(login_btn)
+        card_layout.addSpacing(8)
+        card_layout.addWidget(signup_btn)
+
+        outer.addWidget(card, alignment=Qt.AlignCenter)
+        self.setLayout(outer)
+
+        # Keep refs for Arduino nav
+        self._login_btn = login_btn
+        self._signup_btn = signup_btn
     
     def on_login(self):
         """Handle login button click."""
@@ -804,24 +754,38 @@ class LoginPage(ButtonNavigationMixin, QWidget):
 
 class UserManagementPage(ButtonNavigationMixin, QWidget):
     """Page to view and delete users."""
-    
+    LAYOUT_SPACING = 12
+    LAYOUT_MARGINS = (32, 20, 32, 20)
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        
+
         layout = QVBoxLayout()
-        layout.setSpacing(20)
-        layout.setContentsMargins(50, 30, 50, 30)
-        
+
         # Title
-        title = QLabel("User Management")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 20px; color: white;")
-        
+        title = QLabel("USER MANAGEMENT")
+        title.setObjectName("pageTitle")
+
+        # Search + refresh row
+        search_row = QHBoxLayout()
+        search_row.setSpacing(12)
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search users...")
+        self.search_input.textChanged.connect(self._filter_users)
+        refresh_btn = QPushButton("↻  REFRESH")
+        refresh_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
+        refresh_btn.setFixedWidth(140)
+        refresh_btn.clicked.connect(self.refresh_users)
+        search_row.addWidget(self.search_input, stretch=1)
+        search_row.addWidget(refresh_btn)
+
         # User table
         self.user_table = QTableWidget()
         self.user_table.setColumnCount(6)
-        self.user_table.setHorizontalHeaderLabels(["Username", "Level", "Progress", "Training Sessions", "Combo Progress", "Delete"])
+        self.user_table.setHorizontalHeaderLabels(
+            ["Username", "Level", "Progress", "Sessions", "Combo Progress", "Delete"]
+        )
         self.user_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.user_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.user_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
@@ -830,60 +794,27 @@ class UserManagementPage(ButtonNavigationMixin, QWidget):
         self.user_table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
         self.user_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.user_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.user_table.setStyleSheet("""
-            QTableWidget {
-                font-size: 16px;
-                border: 1px solid #334155;
-                border-radius: 8px;
-                background-color: #1E293B;
-                color: #F8FAFC;
-                gridline-color: #334155;
-            }
-            QTableWidget::item {
-                padding: 10px;
-                color: #F8FAFC;
-                background-color: #1E293B;
-            }
-            QTableWidget::item:selected {
-                background-color: #263347;
-            }
-            QHeaderView::section {
-                background-color: #F97316;
-                color: #0F172A;
-                padding: 10px;
-                font-size: 16px;
-                font-weight: bold;
-                border: none;
-            }
-        """)
-        
-        # Buttons
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        
-        refresh_btn = QPushButton("Refresh")
-        back_btn = QPushButton("Back to Login")
-        
-        refresh_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
-        back_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
-        
-        refresh_btn.setFixedSize(200, 50)
-        back_btn.setFixedSize(200, 50)
-        
-        refresh_btn.clicked.connect(self.refresh_users)
+
+        # Back button
+        back_btn = QPushButton("← BACK")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
         back_btn.clicked.connect(self.on_back)
-        
-        button_layout.addStretch()
-        button_layout.addWidget(refresh_btn)
-        button_layout.addWidget(back_btn)
-        button_layout.addStretch()
-        
-        # Layout assembly
+
         layout.addWidget(title)
-        layout.addWidget(self.user_table)
-        layout.addLayout(button_layout)
-        
+        layout.addLayout(search_row)
+        layout.addWidget(self.user_table, stretch=1)
+        layout.addWidget(back_btn)
+
         self.setLayout(layout)
+        self.navigation_buttons = [back_btn]
+
+    def _filter_users(self, text: str):
+        """Show only rows whose username contains the search text."""
+        text = text.lower().strip()
+        for row in range(self.user_table.rowCount()):
+            item = self.user_table.item(row, 0)
+            username = item.text().lower() if item else ""
+            self.user_table.setRowHidden(row, bool(text) and text not in username)
     
     def showEvent(self, event):
         """Refresh user list when page is shown."""
@@ -1017,96 +948,133 @@ class UserManagementPage(ButtonNavigationMixin, QWidget):
 
 
 class Homepage(ButtonNavigationMixin, QWidget):
-    NAV_BUTTON_AUTOSIZE = True
-    NAV_BUTTON_MIN_WIDTH = 320
-    NAV_BUTTON_MIN_HEIGHT = 65
-    NAV_BUTTON_STYLE = """
-        QPushButton {
-            font-size: 18px;
-            padding: 12px 20px;
-            background-color: #1E293B;
-            border: 2px solid #334155;
-            border-radius: 10px;
-            min-width: 320px;
-            min-height: 65px;
-            color: #F8FAFC;
-            font-weight: 600;
-        }
-        QPushButton:focus {
-            border: 4px solid #F97316;
-            background-color: #263347;
-            color: #F8FAFC;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #263347;
-            border-color: #F97316;
-        }
-        QPushButton:pressed {
-            background-color: #F97316;
-            color: #0F172A;
-        }
-    """
+    # Override normalize so full-bleed header/footer aren't squeezed
+    LAYOUT_SPACING = 0
+    LAYOUT_MARGINS = (0, 0, 0, 0)
 
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0,0,0,0)
+        # ── Root layout ──────────────────────────────────────────────────────
+        root = QVBoxLayout()
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
 
-        title = QLabel("Homepage")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
+        # ── Header bar ───────────────────────────────────────────────────────
+        header = QFrame()
+        header.setProperty("class", "header-bar")
+        header.setFixedHeight(64)
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(24, 0, 24, 0)
+        header_layout.setSpacing(12)
 
-        training_btn = QPushButton("Training")
-        performance_btn = QPushButton("Performance")
-        combo_progress_btn = QPushButton("Combo Progress")
-        others_btn = QPushButton("Others")
-        back_btn = QPushButton("Back to Login")
+        brand_lbl = QLabel("🥊 BOXBUNNY")
+        brand_lbl.setObjectName("pageTitle")
+        brand_lbl.setStyleSheet(
+            f"font-size: 22px; font-weight: 800; color: {DS.PRIMARY}; background: transparent;"
+        )
 
-        training_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
-        performance_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
-        combo_progress_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
-        others_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
+        self._username_lbl = QLabel("")
+        self._username_lbl.setStyleSheet(
+            f"font-size: 13px; color: {DS.TEXT_SECONDARY}; background: transparent;"
+        )
+        self._level_badge = QLabel("")
+        self._level_badge.setObjectName("badgeLabel")
+        self._level_badge.setStyleSheet(
+            f"font-size: 11px; font-weight: 700; color: {DS.PRIMARY_TEXT};"
+            f"background-color: {DS.PRIMARY}; border-radius: 8px; padding: 2px 8px;"
+        )
 
-        training_btn.clicked.connect(self.on_training_clicked)
-        performance_btn.clicked.connect(self.on_performance_clicked)
-        combo_progress_btn.clicked.connect(self.on_combo_progress_clicked)
-        others_btn.clicked.connect(self.on_others_clicked)
-        back_btn.clicked.connect(self.on_back_clicked)
+        header_layout.addWidget(brand_lbl)
+        header_layout.addStretch()
+        header_layout.addWidget(self._username_lbl)
+        header_layout.addWidget(self._level_badge)
 
-        layout.addStretch()
-        layout.addWidget(title)
-        layout.addStretch()
-        layout.addWidget(training_btn)
-        layout.addStretch()
-        layout.addWidget(performance_btn)
-        layout.addStretch()
-        layout.addWidget(combo_progress_btn)
-        layout.addStretch()
-        layout.addWidget(others_btn)
-        layout.addStretch()
-        layout.addWidget(back_btn)
-        layout.addStretch()
+        # ── Body ─────────────────────────────────────────────────────────────
+        body = QWidget()
+        body_layout = QVBoxLayout(body)
+        body_layout.setContentsMargins(32, 24, 32, 16)
+        body_layout.setSpacing(16)
 
-        self.setLayout(layout)
+        section_lbl = QLabel("MAIN MENU")
+        section_lbl.setObjectName("sectionHeader")
+
+        # 2×2 card grid
+        grid = QGridLayout()
+        grid.setSpacing(16)
+
+        cards = [
+            ("🥊", "Training",    "Start a session",   self.on_training_clicked),
+            ("📊", "Performance", "View your stats",   self.on_performance_clicked),
+            ("📋", "Combos",      "Manage training",   self.on_combo_progress_clicked),
+            ("⚙",  "Settings",   "App preferences",   self.on_others_clicked),
+        ]
+
+        self._nav_buttons = []
+        for i, (icon, title, sub, cb) in enumerate(cards):
+            btn = QPushButton(f"{icon}\n{title}\n{sub}")
+            btn.setStyleSheet(ButtonStyle.NAV_CARD)
+            btn.setMinimumHeight(120)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            btn.clicked.connect(cb)
+            grid.addWidget(btn, i // 2, i % 2)
+            self._nav_buttons.append(btn)
+
+        body_layout.addWidget(section_lbl)
+        body_layout.addLayout(grid)
+
+        # ── Footer bar ───────────────────────────────────────────────────────
+        footer = QFrame()
+        footer.setProperty("class", "footer-bar")
+        footer.setFixedHeight(44)
+        footer_layout = QHBoxLayout(footer)
+        footer_layout.setContentsMargins(24, 0, 24, 0)
+
+        self._footer_user_lbl = QLabel("")
+        self._footer_user_lbl.setStyleSheet(
+            f"font-size: 12px; color: {DS.TEXT_MUTED}; background: transparent;"
+        )
+
+        logout_btn = QPushButton("Logout")
+        logout_btn.setStyleSheet(ButtonStyle.GHOST)
+        logout_btn.setFixedHeight(32)
+        logout_btn.clicked.connect(self.on_back_clicked)
+        self._nav_buttons.append(logout_btn)
+
+        footer_layout.addWidget(self._footer_user_lbl)
+        footer_layout.addStretch()
+        footer_layout.addWidget(logout_btn)
+
+        root.addWidget(header)
+        root.addWidget(body, stretch=1)
+        root.addWidget(footer)
+
+        self.setLayout(root)
+
+    def showEvent(self, event):
+        """Refresh username and level badge when page becomes visible."""
+        super().showEvent(event)
+        try:
+            mw = self.window()
+            if mw and hasattr(mw, "get_current_user"):
+                username = mw.get_current_user() or ""
+                level = get_user_level(username) if username else ""
+                self._username_lbl.setText(username)
+                self._level_badge.setText(level if level else "")
+                self._level_badge.setVisible(bool(level))
+                self._footer_user_lbl.setText(f"Logged in as {username}" if username else "")
+        except Exception:
+            pass
 
     def on_training_clicked(self):
-        print("Training button clicked")
         self.navigate_to(PageIndex.TRAINING)
 
     def on_performance_clicked(self):
-        print("Performance button clicked")
         self.navigate_to(PageIndex.PERFORMANCE)
 
     def on_combo_progress_clicked(self):
         """Navigate to combo progress page for current user."""
-        print("Combo Progress button clicked")
-        # Set current user immediately so page always refreshes with latest data
         try:
             main_window = self.window()
             if main_window and hasattr(main_window, 'get_current_user'):
@@ -1120,7 +1088,6 @@ class Homepage(ButtonNavigationMixin, QWidget):
         self.navigate_to(PageIndex.USER_COMBO_PROGRESS)
 
     def on_others_clicked(self):
-        print("Others button clicked")
         self.navigate_to(PageIndex.OTHERS)
 
     def on_back_clicked(self):
@@ -1224,69 +1191,129 @@ class OthersPage(ButtonNavigationMixin, QWidget):
 
     def _setup_layout(self):
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(40, 20, 40, 20)
-        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(32, 24, 32, 24)
+        main_layout.setSpacing(16)
 
-        # Top: Title
-        title = QLabel("Others")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold;")
-        main_layout.addWidget(title, alignment=Qt.AlignCenter)
+        # ── Title ─────────────────────────────────────────────────────────────
+        title = QLabel("SETTINGS")
+        title.setObjectName("pageTitle")
+        main_layout.addWidget(title)
 
-        # Middle: Two-column layout
-        columns_layout = QHBoxLayout()
-        columns_layout.setSpacing(30)
+        # ── Section 1: Training Settings ──────────────────────────────────────
+        train_hdr = QLabel("TRAINING SETTINGS")
+        train_hdr.setObjectName("sectionHeader")
+        main_layout.addWidget(train_hdr)
 
-        # Left column: Settings
-        left_column = QVBoxLayout()
-        left_column.setSpacing(12)
-        left_column.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        train_card = QFrame()
+        train_card.setProperty("class", "card")
+        train_card_layout = QVBoxLayout(train_card)
+        train_card_layout.setContentsMargins(16, 12, 16, 12)
+        train_card_layout.setSpacing(10)
 
-        settings_header = QLabel("Settings")
-        settings_header.setAlignment(Qt.AlignCenter)
-        settings_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #F97316; background-color: transparent;")
-        left_column.addWidget(settings_header)
+        for lbl_text, btn in [
+            ("AI Assistant Chat", self.ai_chat_btn),
+            ("Computer Vision",   self.cv_enabled_btn),
+            ("Stance",            self.stance_btn),
+        ]:
+            row = QWidget()
+            row.setStyleSheet("background: transparent;")
+            hl = QHBoxLayout(row)
+            hl.setContentsMargins(0, 0, 0, 0)
+            lbl = QLabel(lbl_text)
+            lbl.setStyleSheet(f"font-size: 14px; color: {DS.TEXT_PRIMARY}; background: transparent;")
+            btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+            btn.setMinimumHeight(40)
+            btn.setMaximumWidth(160)
+            hl.addWidget(lbl, stretch=1)
+            hl.addWidget(btn)
+            train_card_layout.addWidget(row)
 
-        left_column.addWidget(self.history_btn, alignment=Qt.AlignCenter)
-        left_column.addWidget(self.stance_btn, alignment=Qt.AlignCenter)
-        left_column.addWidget(self.ai_chat_btn, alignment=Qt.AlignCenter)
-        left_column.addWidget(self.cv_enabled_btn, alignment=Qt.AlignCenter)
-        left_column.addStretch()
+        main_layout.addWidget(train_card)
 
-        # Divider line
-        divider = QFrame()
-        divider.setFrameShape(QFrame.VLine)
-        divider.setFrameShadow(QFrame.Sunken)
-        divider.setStyleSheet("color: #334155;")
+        # ── Section 2: Hardware ───────────────────────────────────────────────
+        hw_hdr = QLabel("HARDWARE")
+        hw_hdr.setObjectName("sectionHeader")
+        main_layout.addWidget(hw_hdr)
 
-        # Right column: Hardware
-        right_column = QVBoxLayout()
-        right_column.setSpacing(8)
-        right_column.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        hw_card = QFrame()
+        hw_card.setProperty("class", "card")
+        hw_card_layout = QVBoxLayout(hw_card)
+        hw_card_layout.setContentsMargins(16, 12, 16, 12)
+        hw_card_layout.setSpacing(10)
 
-        hardware_header = QLabel("Hardware")
-        hardware_header.setAlignment(Qt.AlignCenter)
-        hardware_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #F97316; background-color: transparent;")
-        right_column.addWidget(hardware_header)
+        # Port row
+        port_row = QWidget()
+        port_row.setStyleSheet("background: transparent;")
+        port_hl = QHBoxLayout(port_row)
+        port_hl.setContentsMargins(0, 0, 0, 0)
+        port_lbl = QLabel("Arduino Port")
+        port_lbl.setStyleSheet(f"font-size: 14px; color: {DS.TEXT_PRIMARY}; background: transparent;")
+        self.arduino_port_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        port_hl.addWidget(port_lbl, stretch=1)
+        port_hl.addWidget(self.arduino_port_combo)
+        hw_card_layout.addWidget(port_row)
 
-        right_column.addWidget(self.arduino_port_combo, alignment=Qt.AlignCenter)
-        right_column.addWidget(self.arduino_port_apply_btn, alignment=Qt.AlignCenter)
-        right_column.addWidget(self.arduino_port_status, alignment=Qt.AlignCenter)
-        right_column.addWidget(self.arduino_listener_status, alignment=Qt.AlignCenter)
-        right_column.addStretch()
+        # Connect row
+        connect_row = QWidget()
+        connect_row.setStyleSheet("background: transparent;")
+        connect_hl = QHBoxLayout(connect_row)
+        connect_hl.setContentsMargins(0, 0, 0, 0)
+        connect_hl.setSpacing(12)
+        self.arduino_port_apply_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.arduino_port_apply_btn.setMinimumHeight(40)
+        self.arduino_port_apply_btn.setMaximumWidth(200)
+        self.arduino_port_status.setStyleSheet(
+            f"color: {DS.TEXT_SECONDARY}; font-size: 12px; background: transparent;"
+        )
+        connect_hl.addWidget(self.arduino_port_apply_btn)
+        connect_hl.addWidget(self.arduino_port_status, stretch=1)
+        hw_card_layout.addWidget(connect_row)
 
-        # Add columns and divider to main layout
-        columns_layout.addLayout(left_column, 1)
-        columns_layout.addWidget(divider)
-        columns_layout.addLayout(right_column, 1)
+        self.arduino_listener_status.setStyleSheet(
+            f"color: {DS.TEXT_MUTED}; font-size: 11px; background: transparent;"
+        )
+        hw_card_layout.addWidget(self.arduino_listener_status)
 
-        main_layout.addLayout(columns_layout, 1)
+        main_layout.addWidget(hw_card)
 
-        # Bottom: Back button centered
+        # ── Section 3: Quick Presets ──────────────────────────────────────────
+        presets_hdr = QLabel("QUICK PRESETS")
+        presets_hdr.setObjectName("sectionHeader")
+        main_layout.addWidget(presets_hdr)
+
+        presets_row = QHBoxLayout()
+        presets_row.setSpacing(10)
+        self._preset_btns = []
+        for key, p in TRAINING_PRESETS.items():
+            btn = QPushButton(f"{p['icon']}\n{p['name']}\n{p['description']}")
+            btn.setStyleSheet(ButtonStyle.preset_card_colored(p["color"]))
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            btn.setMinimumHeight(80)
+            btn.clicked.connect(lambda checked=False, k=key: self._apply_preset(k))
+            presets_row.addWidget(btn)
+            self._preset_btns.append(btn)
+            self._nav_buttons.append(btn)
+        main_layout.addLayout(presets_row)
+
+        # ── Footer ────────────────────────────────────────────────────────────
         main_layout.addStretch()
-        main_layout.addWidget(self.back_btn, alignment=Qt.AlignCenter)
+        footer_row = QHBoxLayout()
+        footer_row.setSpacing(12)
+        self.history_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.history_btn.setMinimumHeight(48)
+        self.back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.back_btn.setMinimumHeight(48)
+        footer_row.addWidget(self.history_btn)
+        footer_row.addStretch()
+        footer_row.addWidget(self.back_btn)
+        main_layout.addLayout(footer_row)
 
         self.setLayout(main_layout)
+
+    def _apply_preset(self, preset_key: str):
+        """Apply a training preset to app_state config."""
+        if self.app_state:
+            apply_preset(self.app_state, preset_key)
 
     def _setup_connections(self):
         self.history_btn.clicked.connect(self.on_history_clicked)
@@ -1439,22 +1466,24 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
         self.stacked_widget = stacked_widget
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(32, 24, 32, 24)
+        layout.setSpacing(20)
 
-        title = QLabel("Performance")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
+        title = QLabel("PERFORMANCE")
+        title.setObjectName("pageTitle")
+        sub = QLabel("Select a test")
+        sub.setObjectName("subtitleLabel")
 
-        power_btn = QPushButton("Power")
-        stamina_btn = QPushButton("Stamina")
-        reaction_time_btn = QPushButton("Reaction Time")
-        back_btn = QPushButton("Back")
+        power_btn        = QPushButton("💥\nPower\nMax punch force")
+        stamina_btn      = QPushButton("⏱\nStamina\nEndurance rounds")
+        reaction_time_btn = QPushButton("⚡\nReaction\nSpeed & timing")
 
-        power_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
-        stamina_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
-        reaction_time_btn.setStyleSheet(ButtonStyle.HOME_LARGE)
+        for btn in (power_btn, stamina_btn, reaction_time_btn):
+            btn.setStyleSheet(ButtonStyle.NAV_CARD)
+            btn.setMinimumHeight(120)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        back_btn = QPushButton("← BACK")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         power_btn.clicked.connect(self.on_power_clicked)
@@ -1462,33 +1491,26 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
         reaction_time_btn.clicked.connect(self.on_reaction_time_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
-        layout.addStretch()
+        grid = QGridLayout()
+        grid.setSpacing(16)
+        grid.addWidget(power_btn, 0, 0)
+        grid.addWidget(stamina_btn, 0, 1)
+        grid.addWidget(reaction_time_btn, 1, 0, 1, 2)  # full width on second row
+
         layout.addWidget(title)
-        layout.addStretch()
-        layout.addWidget(power_btn)
-        layout.addStretch()
-        layout.addWidget(stamina_btn)
-        layout.addStretch()
-        layout.addWidget(reaction_time_btn)
-        layout.addStretch()
+        layout.addWidget(sub)
+        layout.addLayout(grid, stretch=1)
         layout.addWidget(back_btn)
-        layout.addStretch()
 
         self.setLayout(layout)
 
     def on_power_clicked(self):
-        print("Power button clicked")
-        # Navigate to Power Instructions page (index 15)
         self.navigate_to(PageIndex.POWER_INSTRUCTIONS)
 
     def on_stamina_clicked(self):
-        print("Stamina button clicked")
-        # Navigate to Stamina Instructions page (index 18)
         self.navigate_to(PageIndex.STAMINA_INSTRUCTIONS)
 
     def on_reaction_time_clicked(self):
-        print("Reaction Time button clicked")
-        # Navigate to Reaction Instructions page (index 19)
         self.navigate_to(PageIndex.REACTION_INSTRUCTIONS)
 
     def on_back_clicked(self):
@@ -2970,30 +2992,37 @@ class TrainingPage(ButtonNavigationMixin, QWidget):
         self.main_window = main_window
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(32, 24, 32, 24)
         layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
 
-        title = QLabel("Training")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 30px;")
+        title = QLabel("TRAINING")
+        title.setObjectName("pageTitle")
+        sub = QLabel("Select a mode")
+        sub.setObjectName("subtitleLabel")
 
-        techniques_btn = QPushButton("Techniques")
-        self.spar_btn = QPushButton("Spar")
-        back_btn = QPushButton("Back")
+        techniques_btn = QPushButton("🥊\nTechniques\nCombos & curriculum")
+        self.spar_btn   = QPushButton("🤼\nSpar\nFight simulation")
 
-        techniques_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
-        self.spar_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        for btn in (techniques_btn, self.spar_btn):
+            btn.setStyleSheet(ButtonStyle.NAV_CARD)
+            btn.setMinimumHeight(120)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        back_btn = QPushButton("← BACK")
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         techniques_btn.clicked.connect(self.on_techniques_clicked)
         self.spar_btn.clicked.connect(self.on_spar_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
+        grid = QGridLayout()
+        grid.setSpacing(16)
+        grid.addWidget(techniques_btn, 0, 0)
+        grid.addWidget(self.spar_btn, 0, 1)
+
         layout.addWidget(title)
-        layout.addWidget(techniques_btn)
-        layout.addWidget(self.spar_btn)
-        layout.addStretch()
+        layout.addWidget(sub)
+        layout.addLayout(grid, stretch=1)
         layout.addWidget(back_btn)
 
         self.setLayout(layout)
@@ -3098,20 +3127,22 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         layout.setSpacing(self.LAYOUT_SPACING)
         layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
-        title = QLabel("Punch Combinations")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
+        title = QLabel("PUNCH COMBINATIONS")
+        title.setObjectName("pageTitle")
 
-        self.beginner_btn = QPushButton("Beginner")
-        self.intermediate_btn = QPushButton("Intermediate")
-        self.advanced_btn = QPushButton("Advanced")
-        self.self_select_btn = QPushButton("Self-Select")
-        back_btn = QPushButton("Back")
+        subtitle = QLabel("Choose your difficulty")
+        subtitle.setObjectName("subtitleLabel")
 
-        self.beginner_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self.intermediate_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self.advanced_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self.self_select_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        self.beginner_btn = QPushButton("⭐  BEGINNER")
+        self.intermediate_btn = QPushButton("🔥  INTERMEDIATE")
+        self.advanced_btn = QPushButton("💥  ADVANCED")
+        self.self_select_btn = QPushButton("✏  SELF-SELECT")
+        back_btn = QPushButton("← BACK")
+
+        self.beginner_btn.setStyleSheet(ButtonStyle.NAV_CARD)
+        self.intermediate_btn.setStyleSheet(ButtonStyle.NAV_CARD)
+        self.advanced_btn.setStyleSheet(ButtonStyle.NAV_CARD)
+        self.self_select_btn.setStyleSheet(ButtonStyle.NAV_CARD)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         self.beginner_btn.clicked.connect(lambda checked=False: self.on_difficulty_clicked("Beginner"))
@@ -3125,34 +3156,23 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
                 if self.app_state and self.app_state.config.difficulty:
                     self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
+        self.continue_btn = QPushButton("CONTINUE →")
+        self.continue_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        self.continue_btn.clicked.connect(self.on_continue_clicked)
+
         layout.addWidget(title)
-        # center the buttons horizontally
+        layout.addWidget(subtitle)
         layout.addWidget(self.beginner_btn)
         layout.addWidget(self.intermediate_btn)
         layout.addWidget(self.advanced_btn)
         layout.addWidget(self.self_select_btn)
-        # layout.addStretch()
+        layout.addStretch()
 
-        # Create horizontal layout for back and continue buttons
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        button_layout.addStretch()  # Add space on the left
-        
-        back_btn = QPushButton("Back")
-        self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
-        
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        # Continue button should be green like Start actions
-        self.continue_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-        
-        back_btn.clicked.connect(self.on_back_clicked)
-        self.continue_btn.clicked.connect(self.on_continue_clicked)
-        
-        button_layout.addWidget(back_btn)
-        button_layout.addWidget(self.continue_btn)
-        button_layout.addStretch()  # Add space on the right
-
-        layout.addLayout(button_layout)
+        footer_row = QHBoxLayout()
+        footer_row.setSpacing(16)
+        footer_row.addWidget(back_btn)
+        footer_row.addWidget(self.continue_btn, stretch=1)
+        layout.addLayout(footer_row)
 
         self.setLayout(layout)
 
@@ -3242,89 +3262,113 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
 
 class BasicParametersPage(ButtonNavigationMixin, QWidget):
     """Page for basic parameters (index 4)."""
-    NAV_BUTTON_MIN_WIDTH = 280
-    NAV_BUTTON_MAX_WIDTH = 340
-    NAV_BUTTON_MIN_HEIGHT = 55
-    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
-    LAYOUT_SPACING = 15
-    LAYOUT_MARGINS = (50, 25, 50, 25)
+    LAYOUT_SPACING = 0
+    LAYOUT_MARGINS = (0, 0, 0, 0)
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
-        self.previous_page = PageIndex.PUNCH_COMBINATIONS  # Fallback for when no app_state
+        self.previous_page = PageIndex.PUNCH_COMBINATIONS
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(self.LAYOUT_SPACING)
-        layout.setContentsMargins(*self.LAYOUT_MARGINS)
+        root = QVBoxLayout()
+        root.setContentsMargins(32, 24, 32, 24)
+        root.setSpacing(20)
 
-        title = QLabel("Basic Parameters")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
+        # ── Page title ────────────────────────────────────────────────────────
+        title = QLabel("TRAINING SETUP")
+        title.setObjectName("pageTitle")
 
-        # store as instance attribute so other pages can update it
-        self.round_btn = QPushButton("Round")
-        self.speed_btn = QPushButton("Speed")
-        self.time_btn = QPushButton("Time")
-        self.rest_btn = QPushButton("Rest")
-        
-        self.round_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self.speed_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self.time_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
-        self.rest_btn.setStyleSheet(ButtonStyle.INFO_SMALL)
+        # ── Quick Presets section ─────────────────────────────────────────────
+        presets_hdr = QLabel("QUICK PRESETS")
+        presets_hdr.setObjectName("sectionHeader")
+
+        presets_row = QHBoxLayout()
+        presets_row.setSpacing(10)
+
+        self._preset_btns = []
+        for key, p in TRAINING_PRESETS.items():
+            btn = QPushButton(f"{p['icon']}\n{p['name']}\n{p['description']}")
+            btn.setStyleSheet(ButtonStyle.preset_card_colored(p["color"]))
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            btn.setMinimumHeight(90)
+            btn.clicked.connect(lambda checked=False, k=key: self._apply_preset(k))
+            presets_row.addWidget(btn)
+            self._preset_btns.append(btn)
+
+        # ── Customize section ─────────────────────────────────────────────────
+        customize_hdr = QLabel("CUSTOMIZE")
+        customize_hdr.setObjectName("sectionHeader")
+
+        # Config card buttons (still QPushButton for Arduino nav)
+        config_grid = QGridLayout()
+        config_grid.setSpacing(12)
+
+        self.round_btn = QPushButton("ROUNDS\n–")
+        self.speed_btn = QPushButton("SPEED\n–")
+        self.time_btn  = QPushButton("WORK TIME\n–")
+        self.rest_btn  = QPushButton("REST TIME\n–")
+
+        for btn in (self.round_btn, self.speed_btn, self.time_btn, self.rest_btn):
+            btn.setStyleSheet(ButtonStyle.NAV_CARD)
+            btn.setMinimumHeight(90)
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.round_btn.clicked.connect(self.on_round_clicked)
         self.speed_btn.clicked.connect(self.on_speed_clicked)
         self.time_btn.clicked.connect(self.on_time_clicked)
         self.rest_btn.clicked.connect(self.on_rest_clicked)
 
-        layout.addWidget(title)
-        # center the buttons horizontally
-        layout.addWidget(self.round_btn)
-        layout.addWidget(self.speed_btn)
-        layout.addWidget(self.time_btn)
-        layout.addWidget(self.rest_btn)
-        # layout.addStretch()
+        config_grid.addWidget(self.round_btn, 0, 0)
+        config_grid.addWidget(self.speed_btn, 0, 1)
+        config_grid.addWidget(self.time_btn,  1, 0)
+        config_grid.addWidget(self.rest_btn,  1, 1)
 
-        # Create horizontal layout for back and continue buttons
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        button_layout.addStretch()  # Add space on the left
-        
-        back_btn = QPushButton("Back")
-        self.continue_btn = QPushButton("Continue")  # Initialize continue_btn here
-        
+        # ── Footer buttons ────────────────────────────────────────────────────
+        footer_row = QHBoxLayout()
+        footer_row.setSpacing(12)
+
+        back_btn = QPushButton("← BACK")
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        # Continue button should be green like Start actions
-        self.continue_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-        
+
+        self.continue_btn = QPushButton("START TRAINING →")
+        self.continue_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        self.continue_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
         back_btn.clicked.connect(self.on_back_clicked)
         self.continue_btn.clicked.connect(self.on_continue_clicked)
-        
-        button_layout.addWidget(back_btn)
-        button_layout.addWidget(self.continue_btn)
-        button_layout.addStretch()  # Add space on the right
 
-        layout.addLayout(button_layout)
+        footer_row.addWidget(back_btn)
+        footer_row.addWidget(self.continue_btn, stretch=1)
 
-        self.setLayout(layout)
+        # ── Assemble ──────────────────────────────────────────────────────────
+        root.addWidget(title)
+        root.addWidget(presets_hdr)
+        root.addLayout(presets_row)
+        root.addWidget(customize_hdr)
+        root.addLayout(config_grid, stretch=1)
+        root.addLayout(footer_row)
 
-        # Initialize button displays from state and update continue availability
+        self.setLayout(root)
         self.update_button_displays()
+
+    def _apply_preset(self, preset_key: str):
+        """Apply a training preset and refresh card displays."""
+        if self.app_state:
+            apply_preset(self.app_state, preset_key)
+            self.update_button_displays()
 
     def update_button_displays(self):
         """Refresh parameter buttons from app_state config and labels."""
         if self.app_state:
             config = self.app_state.get_config()
-            self.round_btn.setText(f"Round\n{config.rounds}")
-            self.speed_btn.setText(f"Speed\n{config.speed}")
+            self.round_btn.setText(f"ROUNDS\n{config.rounds}")
+            self.speed_btn.setText(f"SPEED\n{config.speed}")
 
             time_text = self.app_state.time_label or config.get_time_str()
             rest_text = self.app_state.rest_label or config.get_rest_str()
-            self.time_btn.setText(f"Time\n{time_text}")
-            self.rest_btn.setText(f"Rest\n{rest_text}")
+            self.time_btn.setText(f"WORK TIME\n{time_text}")
+            self.rest_btn.setText(f"REST TIME\n{rest_text}")
 
         self.update_continue_button()
 
@@ -3405,54 +3449,82 @@ class RoundSelectionPage(ButtonNavigationMixin, QWidget):
             color: #0F172A;
         }
     """
-    LAYOUT_SPACING = 15
-    LAYOUT_MARGINS = (50, 25, 50, 25)
+    LAYOUT_SPACING = 16
+    LAYOUT_MARGINS = (32, 24, 32, 24)
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
+        self.selected_value = None
+        self.pill_map: dict = {}
 
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(self.LAYOUT_SPACING)
-        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
-        title = QLabel("Select Round")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+        # Header row
+        header = QHBoxLayout()
+        back_btn = QPushButton("←")
+        back_btn.setFixedSize(44, 44)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        self.back_btn = back_btn
+        title = QLabel("ROUNDS")
+        title.setObjectName("pageTitle")
+        header.addWidget(back_btn)
+        header.addSpacing(12)
+        header.addWidget(title)
+        header.addStretch()
 
+        subtitle = QLabel("Tap to select")
+        subtitle.setObjectName("subtitleLabel")
+
+        # Pill grid — 4 columns, 3 rows (1–12)
         grid = QGridLayout()
-        grid.setHorizontalSpacing(15)
-        grid.setVerticalSpacing(15)
-        grid.setContentsMargins(30, 30, 30, 30)
-
-        self.round_buttons: List[QPushButton] = []
+        grid.setSpacing(12)
         for idx in range(12):
             n = idx + 1
             btn = QPushButton(str(n))
-            btn.setStyleSheet(ButtonStyle.ROUND_SELECTION)
-            btn.clicked.connect(partial(self.select_round, n))
-            row = idx // 4
-            col = idx % 4
-            grid.addWidget(btn, row, col)
-            self.round_buttons.append(btn)
+            btn.setStyleSheet(ButtonStyle.PILL)
+            btn.clicked.connect(partial(self._select_round, n))
+            grid.addWidget(btn, idx // 4, idx % 4)
+            self.pill_map[btn] = n
 
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.setMinimumWidth(280)
-        back_btn.setMaximumWidth(360)
-        # go back to BasicParametersPage (index 4)
-        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
-        self.back_btn = back_btn
-        self.navigation_buttons = [*self.round_buttons]
+        confirm_btn = QPushButton("CONFIRM")
+        confirm_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        confirm_btn.clicked.connect(self._confirm_round)
+        self.confirm_btn = confirm_btn
 
-        main_layout.addWidget(title)
+        main_layout.addLayout(header)
+        main_layout.addWidget(subtitle)
+        main_layout.addStretch(1)
         main_layout.addLayout(grid)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn, alignment=Qt.AlignCenter)
+        main_layout.addStretch(1)
+        main_layout.addWidget(confirm_btn)
 
         self.setLayout(main_layout)
+        self.navigation_buttons = list(self.pill_map.keys()) + [confirm_btn, back_btn]
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self.app_state:
+            self.selected_value = self.app_state.config.rounds
+        self._refresh_round_pills()
+
+    def _select_round(self, value: int):
+        self.selected_value = value
+        self._refresh_round_pills()
+
+    def _refresh_round_pills(self):
+        for btn, val in self.pill_map.items():
+            btn.setStyleSheet(
+                ButtonStyle.PILL_SELECTED if val == self.selected_value else ButtonStyle.PILL
+            )
+
+    def _confirm_round(self):
+        if self.selected_value is not None:
+            self.select_round(self.selected_value)
+        else:
+            self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def select_round(self, n: int):
         """Set the chosen round on BasicParametersPage and switch back."""
@@ -3474,48 +3546,83 @@ class RoundSelectionPage(ButtonNavigationMixin, QWidget):
 
 class SpeedSelectionPage(ButtonNavigationMixin, QWidget):
     """Page offering speed choices (25, 50, 75, 100)."""
-    NAV_BUTTON_MIN_WIDTH = 280
-    NAV_BUTTON_MAX_WIDTH = 340
-    NAV_BUTTON_MIN_HEIGHT = 55
-    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
-    LAYOUT_SPACING = 15
-    LAYOUT_MARGINS = (50, 25, 50, 25)
+    LAYOUT_SPACING = 16
+    LAYOUT_MARGINS = (32, 24, 32, 24)
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
+        self.selected_value = None
+        self.pill_map: dict = {}
 
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(self.LAYOUT_SPACING)
-        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
-        title = QLabel("Select Speed")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+        # Header row
+        header = QHBoxLayout()
+        back_btn = QPushButton("←")
+        back_btn.setFixedSize(44, 44)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        self.back_btn = back_btn
+        title = QLabel("SPEED")
+        title.setObjectName("pageTitle")
+        header.addWidget(back_btn)
+        header.addSpacing(12)
+        header.addWidget(title)
+        header.addStretch()
 
-        options_layout = QVBoxLayout()
-        options_layout.setSpacing(self.LAYOUT_SPACING)
-        options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        subtitle = QLabel("Tap to select")
+        subtitle.setObjectName("subtitleLabel")
 
-        speeds = [("Slow", "25%"), ("Medium", "50%"), ("Fast", "75%")]
+        # Pill row — 4 options
+        speeds = [("SLOW\n25%", "25%"), ("MEDIUM\n50%", "50%"), ("FAST\n75%", "75%"), ("MAX\n100%", "100%")]
+        pill_row = QHBoxLayout()
+        pill_row.setSpacing(12)
         for label, value in speeds:
             btn = QPushButton(label)
-            btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
-            btn.clicked.connect(partial(self.select_speed, value))
-            options_layout.addWidget(btn, alignment=Qt.AlignCenter)
+            btn.setStyleSheet(ButtonStyle.PILL)
+            btn.setMinimumHeight(72)
+            btn.clicked.connect(partial(self._select_speed, value))
+            pill_row.addWidget(btn)
+            self.pill_map[btn] = value
 
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        confirm_btn = QPushButton("CONFIRM")
+        confirm_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        confirm_btn.clicked.connect(self._confirm_speed)
+        self.confirm_btn = confirm_btn
 
-        main_layout.addWidget(title)
-        main_layout.addLayout(options_layout)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
+        main_layout.addLayout(header)
+        main_layout.addWidget(subtitle)
+        main_layout.addStretch(1)
+        main_layout.addLayout(pill_row)
+        main_layout.addStretch(1)
+        main_layout.addWidget(confirm_btn)
 
         self.setLayout(main_layout)
+        self.navigation_buttons = list(self.pill_map.keys()) + [confirm_btn, back_btn]
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self.app_state:
+            self.selected_value = self.app_state.config.speed
+        self._refresh_speed_pills()
+
+    def _select_speed(self, value: str):
+        self.selected_value = value
+        self._refresh_speed_pills()
+
+    def _refresh_speed_pills(self):
+        for btn, val in self.pill_map.items():
+            btn.setStyleSheet(
+                ButtonStyle.PILL_SELECTED if val == self.selected_value else ButtonStyle.PILL
+            )
+
+    def _confirm_speed(self):
+        if self.selected_value is not None:
+            self.select_speed(self.selected_value)
+        else:
+            self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def select_speed(self, n: int):
         """Update BasicParametersPage speed button text and return."""
@@ -3537,53 +3644,92 @@ class SpeedSelectionPage(ButtonNavigationMixin, QWidget):
 
 class TimeSelectionPage(ButtonNavigationMixin, QWidget):
     """Page offering time choices (30sec, 1min, 1min30sec, 2min, 2min30sec, 3min)."""
-    NAV_BUTTON_MIN_WIDTH = 280
-    NAV_BUTTON_MAX_WIDTH = 340
-    NAV_BUTTON_MIN_HEIGHT = 55
-    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
-    LAYOUT_SPACING = 15
-    LAYOUT_MARGINS = (50, 25, 50, 25)
+    LAYOUT_SPACING = 16
+    LAYOUT_MARGINS = (32, 24, 32, 24)
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
+        self.selected_value = None  # seconds (int)
+        self.pill_map: dict = {}    # btn -> (seconds, label)
 
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(self.LAYOUT_SPACING)
-        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
-        title = QLabel("Select Time")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+        # Header row
+        header = QHBoxLayout()
+        back_btn = QPushButton("←")
+        back_btn.setFixedSize(44, 44)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        self.back_btn = back_btn
+        title = QLabel("WORK TIME")
+        title.setObjectName("pageTitle")
+        header.addWidget(back_btn)
+        header.addSpacing(12)
+        header.addWidget(title)
+        header.addStretch()
 
-        options_layout = QVBoxLayout()
-        options_layout.setSpacing(self.LAYOUT_SPACING)
-        options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        subtitle = QLabel("Tap to select")
+        subtitle.setObjectName("subtitleLabel")
 
+        # Pill row — 4 options
         times = [
             ("30s", 30),
-            ("1min", 60),
-            ("2min", 90),
-            ("3min", 120),
+            ("1 min", 60),
+            ("2 min", 90),
+            ("3 min", 120),
         ]
+        pill_row = QHBoxLayout()
+        pill_row.setSpacing(12)
         for label, seconds in times:
             btn = QPushButton(label)
-            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
-            btn.clicked.connect(partial(self.select_time, seconds, label))
-            options_layout.addWidget(btn, alignment=Qt.AlignCenter)
+            btn.setStyleSheet(ButtonStyle.PILL)
+            btn.setMinimumHeight(60)
+            btn.clicked.connect(partial(self._select_time, seconds))
+            pill_row.addWidget(btn)
+            self.pill_map[btn] = (seconds, label)
 
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        confirm_btn = QPushButton("CONFIRM")
+        confirm_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        confirm_btn.clicked.connect(self._confirm_time)
+        self.confirm_btn = confirm_btn
 
-        main_layout.addWidget(title)
-        main_layout.addLayout(options_layout)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
+        main_layout.addLayout(header)
+        main_layout.addWidget(subtitle)
+        main_layout.addStretch(1)
+        main_layout.addLayout(pill_row)
+        main_layout.addStretch(1)
+        main_layout.addWidget(confirm_btn)
 
         self.setLayout(main_layout)
+        self.navigation_buttons = list(self.pill_map.keys()) + [confirm_btn, back_btn]
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self.app_state:
+            self.selected_value = (
+                self.app_state.config.time_minutes * 60 + self.app_state.config.time_seconds
+            )
+        self._refresh_time_pills()
+
+    def _select_time(self, seconds: int):
+        self.selected_value = seconds
+        self._refresh_time_pills()
+
+    def _refresh_time_pills(self):
+        for btn, (secs, _) in self.pill_map.items():
+            btn.setStyleSheet(
+                ButtonStyle.PILL_SELECTED if secs == self.selected_value else ButtonStyle.PILL
+            )
+
+    def _confirm_time(self):
+        if self.selected_value is not None:
+            for secs, label in self.pill_map.values():
+                if secs == self.selected_value:
+                    self.select_time(secs, label)
+                    return
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def select_time(self, seconds: int, label: str):
         """Update BasicParametersPage time button text and return."""
@@ -3607,53 +3753,92 @@ class TimeSelectionPage(ButtonNavigationMixin, QWidget):
 
 class RestSelectionPage(ButtonNavigationMixin, QWidget):
     """Page offering rest choices (10sec to 60sec in 10sec increments)."""
-    NAV_BUTTON_MIN_WIDTH = 280
-    NAV_BUTTON_MAX_WIDTH = 340
-    NAV_BUTTON_MIN_HEIGHT = 55
-    NAV_BUTTON_STYLE = PARAMETER_SELECTION_BUTTON_STYLE
-    LAYOUT_SPACING = 15
-    LAYOUT_MARGINS = (50, 25, 50, 25)
+    LAYOUT_SPACING = 16
+    LAYOUT_MARGINS = (32, 24, 32, 24)
 
     def __init__(self, stacked_widget, app_state=None):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.app_state = app_state
+        self.selected_value = None  # seconds (int)
+        self.pill_map: dict = {}    # btn -> (seconds, label)
 
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(self.LAYOUT_SPACING)
-        main_layout.setContentsMargins(*self.LAYOUT_MARGINS)
 
-        title = QLabel("Select Rest Time")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 26px; font-weight: bold; margin-bottom: 10px;")
+        # Header row
+        header = QHBoxLayout()
+        back_btn = QPushButton("←")
+        back_btn.setFixedSize(44, 44)
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        self.back_btn = back_btn
+        title = QLabel("REST TIME")
+        title.setObjectName("pageTitle")
+        header.addWidget(back_btn)
+        header.addSpacing(12)
+        header.addWidget(title)
+        header.addStretch()
 
-        options_layout = QVBoxLayout()
-        options_layout.setSpacing(self.LAYOUT_SPACING)
-        options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        subtitle = QLabel("Tap to select")
+        subtitle.setObjectName("subtitleLabel")
 
+        # Pill row — 4 options
         rest_times = [
             ("10s", 10),
             ("30s", 30),
-            ("1min", 60),
-            ("1min 30s", 90),
+            ("1 min", 60),
+            ("1 min 30s", 90),
         ]
+        pill_row = QHBoxLayout()
+        pill_row.setSpacing(12)
         for label, seconds in rest_times:
             btn = QPushButton(label)
-            btn.setStyleSheet(ButtonStyle.TIME_SELECTION)
-            btn.clicked.connect(partial(self.select_rest, seconds, label))
-            options_layout.addWidget(btn, alignment=Qt.AlignCenter)
+            btn.setStyleSheet(ButtonStyle.PILL)
+            btn.setMinimumHeight(60)
+            btn.clicked.connect(partial(self._select_rest, seconds))
+            pill_row.addWidget(btn)
+            self.pill_map[btn] = (seconds, label)
 
-        back_btn = QPushButton("Back")
-        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
-        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
+        confirm_btn = QPushButton("CONFIRM")
+        confirm_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        confirm_btn.clicked.connect(self._confirm_rest)
+        self.confirm_btn = confirm_btn
 
-        main_layout.addWidget(title)
-        main_layout.addLayout(options_layout)
-        main_layout.addStretch()
-        main_layout.addWidget(back_btn)
+        main_layout.addLayout(header)
+        main_layout.addWidget(subtitle)
+        main_layout.addStretch(1)
+        main_layout.addLayout(pill_row)
+        main_layout.addStretch(1)
+        main_layout.addWidget(confirm_btn)
 
         self.setLayout(main_layout)
+        self.navigation_buttons = list(self.pill_map.keys()) + [confirm_btn, back_btn]
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self.app_state:
+            self.selected_value = (
+                self.app_state.config.rest_minutes * 60 + self.app_state.config.rest_seconds
+            )
+        self._refresh_rest_pills()
+
+    def _select_rest(self, seconds: int):
+        self.selected_value = seconds
+        self._refresh_rest_pills()
+
+    def _refresh_rest_pills(self):
+        for btn, (secs, _) in self.pill_map.items():
+            btn.setStyleSheet(
+                ButtonStyle.PILL_SELECTED if secs == self.selected_value else ButtonStyle.PILL
+            )
+
+    def _confirm_rest(self):
+        if self.selected_value is not None:
+            for secs, label in self.pill_map.values():
+                if secs == self.selected_value:
+                    self.select_rest(secs, label)
+                    return
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def select_rest(self, seconds: int, label: str):
         """Update BasicParametersPage rest button text and return."""
@@ -3677,6 +3862,9 @@ class RestSelectionPage(ButtonNavigationMixin, QWidget):
 
 class CountdownPage(ButtonNavigationMixin, QWidget):
     """Page with 20 second countdown and pause button."""
+    LAYOUT_SPACING = 0
+    LAYOUT_MARGINS = (0, 0, 0, 0)
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -3689,57 +3877,64 @@ class CountdownPage(ButtonNavigationMixin, QWidget):
         self.timer.timeout.connect(self.update_countdown)
 
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(30)
-        main_layout.setContentsMargins(50, 50, 50, 50)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        title = QLabel("Wear Your Gloves")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 36px; font-weight: bold; margin-bottom: 20px;")
+        # "GET READY" header
+        header_label = QLabel("GET READY")
+        header_label.setObjectName("sectionHeader")
+        header_label.setAlignment(Qt.AlignCenter)
+        header_label.setStyleSheet(
+            "QLabel#sectionHeader { letter-spacing: 4px; padding-top: 32px; padding-bottom: 8px; }"
+        )
 
+        # Giant countdown number
         self.countdown_label = QLabel(str(self.countdown_value))
+        self.countdown_label.setObjectName("countdownHero")
         self.countdown_label.setAlignment(Qt.AlignCenter)
-        self.countdown_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
 
-        # Create horizontal layout for pause and back buttons
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        button_layout.addStretch()
+        # Instruction subtitle
+        sub_label = QLabel("WEAR YOUR GLOVES")
+        sub_label.setObjectName("subtitleLabel")
+        sub_label.setAlignment(Qt.AlignCenter)
 
-        self.pause_btn = QPushButton("Pause")
-        back_btn = QPushButton("Back")
+        # Footer bar with buttons
+        footer = QFrame()
+        footer.setProperty("class", "footer-bar")
+        footer.setFixedHeight(96)
+        footer_layout = QHBoxLayout(footer)
+        footer_layout.setContentsMargins(24, 12, 24, 12)
+        footer_layout.setSpacing(16)
 
-        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-
-        self.pause_btn.setFixedWidth(250)
-        back_btn.setFixedWidth(250)
-
+        self.pause_btn = QPushButton("⏸  PAUSE")
+        self.pause_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
         self.pause_btn.clicked.connect(self.toggle_pause)
+
+        back_btn = QPushButton("← BACK")
+        back_btn.setStyleSheet(ButtonStyle.SESSION_ACTION_DANGER)
         back_btn.clicked.connect(self.on_back_clicked)
 
-        button_layout.addWidget(self.pause_btn)
-        button_layout.addWidget(back_btn)
-        button_layout.addStretch()
+        footer_layout.addWidget(self.pause_btn)
+        footer_layout.addWidget(back_btn)
 
-        main_layout.addStretch()
-        main_layout.addWidget(title)
-        main_layout.addStretch()
+        main_layout.addWidget(header_label)
+        main_layout.addStretch(1)
         main_layout.addWidget(self.countdown_label)
-        main_layout.addStretch()
-        main_layout.addLayout(button_layout)
-        main_layout.addStretch()
+        main_layout.addSpacing(8)
+        main_layout.addWidget(sub_label)
+        main_layout.addStretch(1)
+        main_layout.addWidget(footer)
 
         self.setLayout(main_layout)
+        self.navigation_buttons = [self.pause_btn, back_btn]
 
     def start_countdown(self):
         """Start the countdown timer."""
         self.countdown_value = 3
         self.is_paused = False
         self.countdown_label.setText(str(self.countdown_value))
-        self.pause_btn.setText("Pause")
-        # Ensure Pause button starts in red style
-        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self.pause_btn.setText("⏸  PAUSE")
+        self.pause_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
         self.timer.start(1000)  # Update every 1 second
 
     def update_countdown(self):
@@ -3756,15 +3951,13 @@ class CountdownPage(ButtonNavigationMixin, QWidget):
         """Pause or resume the countdown."""
         if self.is_paused:
             self.timer.start(1000)
-            self.pause_btn.setText("Pause")
-            # Back to red when resuming (showing "Pause")
-            self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+            self.pause_btn.setText("⏸  PAUSE")
+            self.pause_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
             self.is_paused = False
         else:
             self.timer.stop()
-            self.pause_btn.setText("Resume")
-            # Green while paused (showing "Resume")
-            self.pause_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+            self.pause_btn.setText("▶  RESUME")
+            self.pause_btn.setStyleSheet(ButtonStyle.SESSION_ACTION_DANGER)
             self.is_paused = True
 
     def on_back_clicked(self):
@@ -3812,63 +4005,94 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         self.sequence_time_remaining = 0
 
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(30)
-        main_layout.setContentsMargins(50, 50, 50, 50)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        # Round counter at the top
-        self.round_label = QLabel(f"Round {self.current_round}/{self.total_rounds}")
-        self.round_label.setAlignment(Qt.AlignCenter)
-        self.round_label.setStyleSheet("font-size: 40px; font-weight: bold; margin-bottom: 20px;")
+        # ── Top bar ───────────────────────────────────────────────────────────
+        top_bar = QFrame()
+        top_bar.setProperty("class", "header-bar")
+        top_bar.setFixedHeight(64)
+        top_bar_layout = QHBoxLayout(top_bar)
+        top_bar_layout.setContentsMargins(24, 0, 24, 0)
 
-        # Rest indicator (hidden during work periods)
-        self.rest_label = QLabel("Rest")
-        self.rest_label.setAlignment(Qt.AlignCenter)
-        self.rest_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #FF9800; margin-bottom: 10px;")
-        self.rest_label.hide()
+        self.round_label = QLabel(f"ROUND {self.current_round}/{self.total_rounds}")
+        self.round_label.setObjectName("sectionHeader")
+        self.round_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
-        # Sequence display (visible for combo/self-select modes during work)
-        self.sequence_label = QLabel("")
-        self.sequence_label.setAlignment(Qt.AlignCenter)
-        self.sequence_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #2196F3; margin-bottom: 20px;")
-        self.sequence_label.hide()
-
-        # Timer in the middle
         self.timer_label = QLabel(self.format_time(self.time_remaining))
         self.timer_label.setAlignment(Qt.AlignCenter)
-        self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
+        self.timer_label.setStyleSheet(
+            f"font-size: 36px; font-weight: 800; color: {DS.PRIMARY}; background: transparent;"
+        )
 
-        # Create horizontal layout for pause and back buttons
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(20)
-        button_layout.addStretch()
+        self.score_label = QLabel("SCORE: 0")
+        self.score_label.setObjectName("sectionHeader")
+        self.score_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
-        self.pause_btn = QPushButton("Pause")
-        stop_btn = QPushButton("Stop")
+        top_bar_layout.addWidget(self.round_label, stretch=1)
+        top_bar_layout.addWidget(self.timer_label, stretch=2)
+        top_bar_layout.addWidget(self.score_label, stretch=1)
 
-        self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        stop_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        # ── Hero area ─────────────────────────────────────────────────────────
+        hero_widget = QWidget()
+        hero_layout = QVBoxLayout(hero_widget)
+        hero_layout.setAlignment(Qt.AlignCenter)
+        hero_layout.setSpacing(12)
+        hero_layout.setContentsMargins(32, 0, 32, 0)
 
-        self.pause_btn.setFixedWidth(250)
-        stop_btn.setFixedWidth(250)
+        # Rest indicator
+        self.rest_label = QLabel("REST")
+        self.rest_label.setAlignment(Qt.AlignCenter)
+        self.rest_label.setStyleSheet(
+            f"font-size: 56px; font-weight: 800; color: {DS.WARNING}; background: transparent;"
+        )
+        self.rest_label.hide()
+
+        combo_hdr = QLabel("CURRENT COMBO")
+        combo_hdr.setObjectName("sectionHeader")
+        combo_hdr.setAlignment(Qt.AlignCenter)
+
+        self.sequence_label = QLabel("")
+        self.sequence_label.setObjectName("heroText")
+        self.sequence_label.setAlignment(Qt.AlignCenter)
+        self.sequence_label.setWordWrap(True)
+        self.sequence_label.hide()
+
+        self.feedback_label = QLabel("")
+        self.feedback_label.setObjectName("subtitleLabel")
+        self.feedback_label.setAlignment(Qt.AlignCenter)
+
+        hero_layout.addWidget(self.rest_label)
+        hero_layout.addWidget(combo_hdr)
+        hero_layout.addWidget(self.sequence_label)
+        hero_layout.addWidget(self.feedback_label)
+
+        # ── Footer controls ───────────────────────────────────────────────────
+        footer_bar = QFrame()
+        footer_bar.setProperty("class", "footer-bar")
+        footer_bar.setFixedHeight(96)
+        footer_layout = QHBoxLayout(footer_bar)
+        footer_layout.setContentsMargins(24, 12, 24, 12)
+        footer_layout.setSpacing(16)
+
+        self.pause_btn = QPushButton("⏸ PAUSE")
+        stop_btn = QPushButton("⏹ STOP")
+
+        self.pause_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
+        stop_btn.setStyleSheet(ButtonStyle.SESSION_ACTION_DANGER)
+
+        self.pause_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        stop_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         self.pause_btn.clicked.connect(self.toggle_pause)
         stop_btn.clicked.connect(self.on_stop_clicked)
 
-        button_layout.addWidget(self.pause_btn)
-        button_layout.addWidget(stop_btn)
-        button_layout.addStretch()
+        footer_layout.addWidget(self.pause_btn)
+        footer_layout.addWidget(stop_btn)
 
-        main_layout.addStretch()
-        main_layout.addWidget(self.round_label)
-        main_layout.addStretch()
-        main_layout.addWidget(self.rest_label)
-        main_layout.addStretch()
-        main_layout.addWidget(self.sequence_label)  # combo display above timer
-        main_layout.addWidget(self.timer_label)
-        main_layout.addStretch()
-        main_layout.addLayout(button_layout)
-        main_layout.addStretch()
+        main_layout.addWidget(top_bar)
+        main_layout.addWidget(hero_widget, stretch=1)
+        main_layout.addWidget(footer_bar)
 
         self.setLayout(main_layout)
 
@@ -4110,7 +4334,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         self.is_resting = False
         self.is_paused = False
 
-        self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
+        self.round_label.setText(f"ROUND {self.current_round}/{self.total_rounds}")
         self.rest_label.hide()
         self.timer_label.setText(self.format_time(self.time_remaining))
         self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
@@ -4163,7 +4387,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
                 self.current_round += 1
                 self.is_resting = False
                 self.time_remaining = self.work_time
-                self.round_label.setText(f"Round {self.current_round}/{self.total_rounds}")
+                self.round_label.setText(f"ROUND {self.current_round}/{self.total_rounds}")
                 self.rest_label.hide()
                 self.timer_label.setText(self.format_time(self.time_remaining))
                 self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #F97316; background-color: transparent;")
@@ -4829,27 +5053,29 @@ class SparPage(ButtonNavigationMixin, QWidget):
         self.stacked_widget = stacked_widget
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(32, 24, 32, 24)
         layout.setSpacing(20)
-        layout.setContentsMargins(50,50,50,50)
 
-        title = QLabel("Spar")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
+        title = QLabel("SPARRING")
+        title.setObjectName("pageTitle")
+        sub = QLabel("Choose your fight mode")
+        sub.setObjectName("subtitleLabel")
 
-        sparring_btn = QPushButton("Sparring")
-        back_btn = QPushButton("Back")
+        sparring_btn = QPushButton("🤼\nSparring\nFull fight simulation vs AI")
+        sparring_btn.setStyleSheet(ButtonStyle.NAV_CARD)
+        sparring_btn.setMinimumHeight(140)
+        sparring_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        sparring_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn = QPushButton("← BACK")
+        back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         sparring_btn.clicked.connect(self.on_sparring_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
         layout.addWidget(title)
-        layout.addWidget(sparring_btn, alignment=Qt.AlignCenter)
-        layout.addStretch()
-        layout.addWidget(back_btn, alignment=Qt.AlignCenter)
+        layout.addWidget(sub)
+        layout.addWidget(sparring_btn, stretch=1)
+        layout.addWidget(back_btn)
 
         self.setLayout(layout)
         self.setup_navigation([sparring_btn, back_btn])
@@ -4885,32 +5111,25 @@ class BattleStyleDescriptionPage(ButtonNavigationMixin, QWidget):
         layout.setContentsMargins(40, 40, 40, 40)
 
         self.style_title = QLabel("")
+        self.style_title.setObjectName("pageTitle")
         self.style_title.setAlignment(Qt.AlignCenter)
-        self.style_title.setStyleSheet("font-size: 28px; font-weight: bold; margin-bottom: 10px;")
 
+        desc_card = QFrame()
+        desc_card.setProperty("class", "card")
+        desc_card_layout = QVBoxLayout(desc_card)
         self.description_label = QLabel("")
+        self.description_label.setObjectName("subtitleLabel")
         self.description_label.setAlignment(Qt.AlignCenter)
         self.description_label.setWordWrap(True)
-        self.description_label.setStyleSheet("""
-            font-size: 18px;
-            padding: 25px;
-            background-color: #1E293B;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            line-height: 1.6;
-            color: #F8FAFC;
-            text-align: center;
-            max-width: 900px;
-            min-width: 800px;
-        """)
+        desc_card_layout.addWidget(self.description_label)
 
-        continue_btn = QPushButton("Continue to Training")
-        back_btn = QPushButton("Back")
+        continue_btn = QPushButton("START TRAINING →")
+        back_btn = QPushButton("← BACK")
 
-        continue_btn.setMinimumSize(250, 60)
-        back_btn.setMinimumSize(200, 60)
+        continue_btn.setMinimumHeight(60)
+        back_btn.setMinimumHeight(60)
 
-        continue_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        continue_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
         back_btn.setStyleSheet(ButtonStyle.BACK_LARGE)
 
         continue_btn.clicked.connect(self.on_continue_clicked)
@@ -4923,7 +5142,7 @@ class BattleStyleDescriptionPage(ButtonNavigationMixin, QWidget):
 
         layout.addWidget(self.style_title)
         layout.addSpacing(15)
-        layout.addWidget(self.description_label, alignment=Qt.AlignCenter)
+        layout.addWidget(desc_card)
         layout.addSpacing(25)
         layout.addLayout(button_layout)
 
@@ -5177,67 +5396,102 @@ class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
 
 class ComboResultsPage(ButtonNavigationMixin, QWidget):
     """Page showing combo training results with score and progress."""
-    
+    LAYOUT_SPACING = 12
+    LAYOUT_MARGINS = (32, 20, 32, 20)
+
     def __init__(self, stacked_widget):
         super().__init__()
         self.stacked_widget = stacked_widget
-        
+
         main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(10)
-        main_layout.setContentsMargins(30, 20, 30, 20)
-        
+
         # Title
-        title = QLabel("Training Complete!")
+        title = QLabel("SESSION COMPLETE")
+        title.setObjectName("pageTitle")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 36px; font-weight: bold; color: #F97316; background-color: transparent;")
-        
-        # Combo info
-        self.combo_name_label = QLabel("Combo: -")
-        self.combo_name_label.setAlignment(Qt.AlignCenter)
-        self.combo_name_label.setStyleSheet("font-size: 24px; font-weight: bold; color: white;")
-        
-        self.combo_sequence_label = QLabel("Sequence: -")
-        self.combo_sequence_label.setAlignment(Qt.AlignCenter)
-        self.combo_sequence_label.setStyleSheet("font-size: 20px; color: white;")
-        
-        # Score display
-        self.score_label = QLabel("Score: 0.0/5.0")
+
+        # Score card (accent border)
+        score_card = QFrame()
+        score_card.setProperty("class", "card--accent")
+        score_card.setFixedHeight(130)
+        score_card.setMaximumWidth(320)
+        score_card_layout = QVBoxLayout(score_card)
+        score_card_layout.setAlignment(Qt.AlignCenter)
+        score_hdr = QLabel("SCORE")
+        score_hdr.setObjectName("sectionHeader")
+        score_hdr.setAlignment(Qt.AlignCenter)
+        self.score_label = QLabel("0/5")
         self.score_label.setAlignment(Qt.AlignCenter)
-        self.score_label.setStyleSheet("font-size: 48px; font-weight: bold; color: #2196F3;")
-        
-        # Status message
+        self.score_label.setStyleSheet("font-size: 48px; font-weight: 800; color: #F97316;")
+        score_card_layout.addWidget(score_hdr)
+        score_card_layout.addWidget(self.score_label)
+
+        score_center = QHBoxLayout()
+        score_center.addStretch()
+        score_center.addWidget(score_card)
+        score_center.addStretch()
+
+        # Stat cards row — combo name + sequence
+        stats_row = QHBoxLayout()
+        stats_row.setSpacing(12)
+
+        combo_card = QFrame()
+        combo_card.setProperty("class", "card")
+        combo_card_layout = QVBoxLayout(combo_card)
+        combo_card_layout.setAlignment(Qt.AlignCenter)
+        combo_hdr = QLabel("COMBO")
+        combo_hdr.setObjectName("sectionHeader")
+        combo_hdr.setAlignment(Qt.AlignCenter)
+        self.combo_name_label = QLabel("-")
+        self.combo_name_label.setObjectName("subtitleLabel")
+        self.combo_name_label.setAlignment(Qt.AlignCenter)
+        self.combo_name_label.setWordWrap(True)
+        combo_card_layout.addWidget(combo_hdr)
+        combo_card_layout.addWidget(self.combo_name_label)
+        stats_row.addWidget(combo_card)
+
+        seq_card = QFrame()
+        seq_card.setProperty("class", "card")
+        seq_card_layout = QVBoxLayout(seq_card)
+        seq_card_layout.setAlignment(Qt.AlignCenter)
+        seq_hdr = QLabel("SEQUENCE")
+        seq_hdr.setObjectName("sectionHeader")
+        seq_hdr.setAlignment(Qt.AlignCenter)
+        self.combo_sequence_label = QLabel("-")
+        self.combo_sequence_label.setObjectName("subtitleLabel")
+        self.combo_sequence_label.setAlignment(Qt.AlignCenter)
+        self.combo_sequence_label.setWordWrap(True)
+        seq_card_layout.addWidget(seq_hdr)
+        seq_card_layout.addWidget(self.combo_sequence_label)
+        stats_row.addWidget(seq_card)
+
+        # Status + details labels
         self.status_label = QLabel("")
+        self.status_label.setObjectName("subtitleLabel")
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setStyleSheet("font-size: 18px; color: #FFC107;")
-        
-        # Details
+        self.status_label.setWordWrap(True)
+
         self.details_label = QLabel("")
+        self.details_label.setObjectName("subtitleLabel")
         self.details_label.setAlignment(Qt.AlignCenter)
-        self.details_label.setStyleSheet("font-size: 16px; color: white;")
-        
+
         # Continue button
-        continue_btn = QPushButton("Continue Training")
-        continue_btn.setStyleSheet(ButtonStyle.PRIMARY_LARGE)
+        continue_btn = QPushButton("CONTINUE TRAINING →")
+        continue_btn.setStyleSheet(ButtonStyle.SESSION_ACTION)
         continue_btn.clicked.connect(lambda: self.navigate_to(PageIndex.BASIC_PARAMETERS))
-        
-        # Assembly
-        main_layout.addStretch()
+
         main_layout.addWidget(title)
-        main_layout.addSpacing(10)
-        main_layout.addWidget(self.combo_name_label)
-        main_layout.addWidget(self.combo_sequence_label)
-        main_layout.addSpacing(15)
-        main_layout.addWidget(self.score_label)
-        main_layout.addSpacing(5)
+        main_layout.addSpacing(4)
+        main_layout.addLayout(score_center)
+        main_layout.addSpacing(4)
+        main_layout.addLayout(stats_row)
         main_layout.addWidget(self.status_label)
-        main_layout.addSpacing(10)
         main_layout.addWidget(self.details_label)
-        main_layout.addSpacing(15)
-        main_layout.addWidget(continue_btn)
         main_layout.addStretch()
-        
+        main_layout.addWidget(continue_btn)
+
         self.setLayout(main_layout)
+        self.navigation_buttons = [continue_btn]
     
     def set_results(self, combo_name, combo_sequence, score, difficulty, rounds):
         """Display the training results."""
