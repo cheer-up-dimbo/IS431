@@ -40,6 +40,7 @@ from sparring.spar_pages import (
     SparProcessingPage,
     SparResultPage,
 )
+from proficiency.proficiency_pages import ProfiencyChecklistPage, ProfiencyResultPage
 
 # Import from new compartmentalized modules
 from core import TrainingConfig, AppState, PageIndex, ButtonStyle
@@ -774,8 +775,12 @@ class LoginPage(ButtonNavigationMixin, QWidget):
             # Clear inputs
             self.username_input.clear()
             self.password_input.clear()
-            # Navigate to homepage
-            QTimer.singleShot(500, lambda: self.navigate_to(PageIndex.HOMEPAGE))
+            # Navigate to proficiency checklist for new users
+            def _go_to_checklist():
+                checklist_page = self.stacked_widget.widget(PageIndex.PROFICIENCY_CHECKLIST)
+                checklist_page.load_for_user(username)
+                self.navigate_to(PageIndex.PROFICIENCY_CHECKLIST)
+            QTimer.singleShot(500, _go_to_checklist)
         else:
             self.status_label.setText("Error creating account. Please try again.")
             self.status_label.setStyleSheet("font-size: 14px; color: #f44336;")
@@ -1761,7 +1766,7 @@ class StaminaResultPage(ButtonNavigationMixin, QWidget):
 
         if username:
             try:
-                from performance_database import save_stamina_result, get_latest_performance_summary
+               
                 save_stamina_result(username, results)
                 stats = get_latest_performance_summary(username)
             except Exception as e:
@@ -5631,6 +5636,9 @@ class MainWindow(QWidget):
         self.spar_rest_page         = SparRestPage(self.stacked_widget)
         self.spar_processing_page   = SparProcessingPage(self.stacked_widget)
         self.spar_result_page       = SparResultPage(self.stacked_widget)
+        
+        self.proficiency_checklist_page = ProfiencyChecklistPage(self.stacked_widget)
+        self.proficiency_result_page = ProfiencyResultPage(self.stacked_widget)
 
         # Login and User Management pages
         self.login_page = LoginPage(self.stacked_widget, self.app_state)
@@ -5687,6 +5695,8 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.spar_rest_page)              # 37
         self.stacked_widget.addWidget(self.spar_processing_page)        # 38
         self.stacked_widget.addWidget(self.spar_result_page)            # 39
+        self.stacked_widget.addWidget(self.proficiency_checklist_page)  # 40
+        self.stacked_widget.addWidget(self.proficiency_result_page)     # 41
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -5710,6 +5720,8 @@ class MainWindow(QWidget):
         for index in range(self.stacked_widget.count()):
             page = self.stacked_widget.widget(index)
             if page is None:
+                continue
+            if getattr(page, "SKIP_NORMALIZE", False):
                 continue
 
             page_layout = page.layout()
