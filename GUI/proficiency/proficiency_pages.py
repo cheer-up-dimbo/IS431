@@ -15,6 +15,7 @@ class ProfiencyChecklistPage(ButtonNavigationMixin, QWidget):
     LAYOUT_SPACING = 12
     LAYOUT_MARGINS = (40, 20, 40, 20)
     SKIP_NORMALIZE = True
+    SKIP_NAV_SETUP = True
 
     _QUESTIONS = [
         ("Have you trained boxing before?", ["Never", "A few times", "Regularly"]),

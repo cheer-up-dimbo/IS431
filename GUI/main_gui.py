@@ -1,4 +1,4 @@
-    import sys
+import sys
 import json
 import csv
 import os
@@ -5742,6 +5742,9 @@ class MainWindow(QWidget):
         for index in range(self.stacked_widget.count()):
             page = self.stacked_widget.widget(index)
             if not isinstance(page, ButtonNavigationMixin):
+                continue
+
+            if getattr(page, "SKIP_NAV_SETUP", False):
                 continue
 
             if isinstance(page, OthersPage):
