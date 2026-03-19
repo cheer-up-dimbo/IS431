@@ -12,13 +12,33 @@ To implement real serial communication:
 - Replace the `print` statements with `serial.write` or equivalent.
 """
 
-# Intra-combo gap: time between punches within a combo (seconds)
-# Will be controlled by speed parameter in future
-INTRA_COMBO_GAP_S = 0.3
+_speed: str = "medium"
 
-# Inter-combo gap: time between combos (seconds)
-# Will be controlled by speed parameter in future
-INTER_COMBO_GAP_S = 1.0
+
+def set_speed(speed: str) -> None:
+    """Set the robot arm speed. Valid values: 'slow', 'medium', 'fast'."""
+    global _speed
+    _speed = speed
+    print(f"[ROBOT] Speed: {speed}")
+
+
+def get_intra_gap() -> float:
+    """Return intra-combo gap (seconds between punches within a combo)."""
+    if _speed == "slow":
+        return 0.8
+    if _speed == "fast":
+        return 0.3
+    return 0.5  # medium (default)
+
+
+def get_inter_gap() -> float:
+    """Return inter-combo gap (seconds between combos)."""
+    if _speed == "slow":
+        return 2.0
+    if _speed == "fast":
+        return 1.0
+    return 1.5  # medium (default)
+
 
 def send_punch(punch: str) -> None:
     """

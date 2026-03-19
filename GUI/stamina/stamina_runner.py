@@ -15,7 +15,8 @@ except Exception:
     serial = None
 
 
-USE_ARDUINO = False
+import os
+USE_ARDUINO = os.getenv('STAMINA_USE_ARDUINO', 'false').lower() == 'true'
 
 
 @dataclass
@@ -41,8 +42,8 @@ class StaminaResult:
 
 
 class StaminaRunner:
-    def __init__(self, com_port: str = "COM10", duration_seconds: int = 120, use_arduino: bool = USE_ARDUINO):
-        self.com_port = com_port
+    def __init__(self, com_port: str = None, duration_seconds: int = 120, use_arduino: bool = USE_ARDUINO):
+        self.com_port = com_port or os.getenv('ARDUINO_BUTTON_PORT', 'COM10')
         self.duration = duration_seconds
         self.use_arduino = use_arduino
         self.punch_count = 0

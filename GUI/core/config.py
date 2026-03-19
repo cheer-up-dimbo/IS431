@@ -23,8 +23,8 @@ class TrainingConfig:
         time_seconds: Work time in seconds (0-59, default: 0)
         rest_minutes: Rest time in minutes (default: 1)
         rest_seconds: Rest time in seconds (0-59, default: 0)
-        speed: Training speed percentage.
-            Valid values: "25%", "50%", "75%", "100%" (default: "100%")
+        speed: Training speed level.
+            Valid values: "slow", "medium", "fast" (default: "medium")
         difficulty: Training difficulty mode.
             Valid values: "Beginner", "Intermediate", "Advanced", "Self-Select", "Battle", None
         battle_style: Boxing style for Battle mode.
@@ -38,7 +38,7 @@ class TrainingConfig:
         >>> config.rounds = 5
         >>> config.set_time_from_str("3:30")
         >>> config.difficulty = "Advanced"
-        >>> config.speed = "75%"
+        >>> config.speed = "fast"
         >>> print(config.to_dict())
     """
     rounds: int = 12
@@ -46,7 +46,7 @@ class TrainingConfig:
     time_seconds: int = 0
     rest_minutes: int = 1
     rest_seconds: int = 0
-    speed: str = "100%"
+    speed: str = "medium"
     difficulty: Optional[str] = None
     battle_style: Optional[str] = None
     custom_sequences: List[str] = field(default_factory=list)
@@ -142,7 +142,7 @@ class TrainingConfig:
         - rounds: 3
         - time: 3:00
         - rest: 1:00
-        - speed: "100%"
+        - speed: "medium"
         - difficulty, battle_style, custom_sequences: cleared
         
         Example:
@@ -155,7 +155,7 @@ class TrainingConfig:
         self.time_seconds = 0
         self.rest_minutes = 1
         self.rest_seconds = 0
-        self.speed = "100%"
+        self.speed = "medium"
 
 class AppState:
     """Manages application state and training configuration.
@@ -271,10 +271,10 @@ class AppState:
         """Update the speed setting.
         
         Args:
-            speed: Speed percentage. Valid: "25%", "50%", "75%", "100%"
-            
+            speed: Speed level. Valid: "slow", "medium", "fast"
+
         Example:
-            >>> app_state.update_speed("75%")
+            >>> app_state.update_speed("fast")
         """
         self.config.speed = speed
     

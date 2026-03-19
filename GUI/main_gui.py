@@ -40,6 +40,7 @@ from sparring.spar_pages import (
     SparProcessingPage,
     SparResultPage,
 )
+from sparring.robot_interface import send_punch, send_round_start, send_round_stop, set_speed, get_intra_gap, get_inter_gap
 from proficiency.proficiency_pages import ProfiencyChecklistPage, ProfiencyResultPage
 
 # Import from new compartmentalized modules
@@ -2460,9 +2461,11 @@ class PowerPunchPage(ButtonNavigationMixin, QWidget):
             def run(self):
                 try:
                     # Use the callback version for real-time updates
+                    port = os.getenv('ARDUINO_BUTTON_PORT', 'COM10')
+                    baud = int(os.getenv('ARDUINO_BUTTON_BAUD', '115200'))
                     punches = power_runner.measure_punches_with_callback(
-                        port="COM10",  # Changed from COM10 to match your other script
-                        baud=115200,
+                        port=port,
+                        baud=baud,
                         punch_threshold_ms2=100.0,
                         max_punches=10,
                         debounce_ms=300,
@@ -3372,7 +3375,7 @@ class BasicParametersPage(ButtonNavigationMixin, QWidget):
         if self.app_state:
             config = self.app_state.get_config()
             self.round_btn.setText(f"Round\n{config.rounds}")
-            self.speed_btn.setText(f"Speed\n{config.speed}")
+            self.speed_btn.setText(f"Speed\n{config.speed.title()}")
 
             time_text = self.app_state.time_label or config.get_time_str()
             rest_text = self.app_state.rest_label or config.get_rest_str()
@@ -3634,7 +3637,7 @@ class SpeedSelectionPage(ButtonNavigationMixin, QWidget):
         options_layout.setSpacing(self.LAYOUT_SPACING)
         options_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
-        speeds = [("Slow", "25%"), ("Medium", "50%"), ("Fast", "75%")]
+        speeds = [("Slow", "slow"), ("Medium", "medium"), ("Fast", "fast")]
         for label, value in speeds:
             btn = QPushButton(label)
             btn.setStyleSheet(ButtonStyle.SPEED_SELECTION)
@@ -3907,6 +3910,46 @@ class CountdownPage(ButtonNavigationMixin, QWidget):
         self.timer.stop()
         self.stacked_widget.setCurrentIndex(self.return_page_index)
 
+class _DrillPunchWorker(QObject):
+    """Sends drill punches to the robot on a background thread, repeating the combo."""
+    finished = Signal()
+    punch_sent = Signal(str)
+
+    def __init__(self, punches):
+        super().__init__()
+        self._punches = punches
+        self._running = True
+
+    def stop(self):
+        self._running = False
+
+    def run(self):
+        """Loop through the punch list, repeating it until stopped."""
+        iteration = 0
+        while self._running:
+            for idx, punch in enumerate(self._punches):
+                if not self._running:
+                    break
+                send_punch(punch)
+                self.punch_sent.emit(punch)
+
+                # Determine gap: use inter-combo gap after completing the full sequence
+                if idx == len(self._punches) - 1 and iteration > 0:
+                    gap = get_inter_gap()
+                else:
+                    gap = get_intra_gap()
+
+                # Sleep in small increments so we can check _running
+                elapsed = 0.0
+                while elapsed < gap and self._running:
+                    time.sleep(min(0.05, gap - elapsed))
+                    elapsed += 0.05
+
+            iteration += 1
+
+        self.finished.emit()
+
+
 class TrainingSessionPage(ButtonNavigationMixin, QWidget):
     """Page showing the actual training session with round counter and timer."""
     def __init__(self, stacked_widget, app_state=None):
@@ -3945,6 +3988,10 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         self.sequence_index = 0
         self.sequence_cycle_seconds = 6  # each sequence shows for 6 seconds
         self.sequence_time_remaining = 0
+
+        # Drill punch worker state
+        self._drill_punch_thread = None
+        self._drill_punch_worker = None
 
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
@@ -4012,6 +4059,40 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         mins = seconds // 60
         secs = seconds % 60
         return f"{mins:02d}:{secs:02d}"
+
+    @staticmethod
+    def _parse_combo_punches(combo_sequence: str) -> list:
+        """Parse a dash-separated combo sequence string into a list of valid punch codes.
+        Filters out non-punch tokens like 'slip' and 'block'.
+        Valid codes: '1','2','3','4','5','6','3b','2b'
+        Example: '1-slip-2-block-3' -> ['1', '2', '3']
+        """
+        valid = {'1', '2', '3', '4', '5', '6', '3b', '2b'}
+        return [p for p in combo_sequence.split('-') if p in valid]
+
+    def _start_drill_punch_worker(self, punches: list) -> None:
+        """Start the drill punch worker thread with the given punch list."""
+        self._stop_drill_punch_worker()
+        if not punches:
+            return
+        self._drill_punch_thread = QThread()
+        self._drill_punch_worker = _DrillPunchWorker(punches)
+        self._drill_punch_worker.moveToThread(self._drill_punch_thread)
+        self._drill_punch_thread.started.connect(self._drill_punch_worker.run)
+        self._drill_punch_worker.finished.connect(self._drill_punch_thread.quit)
+        self._drill_punch_worker.finished.connect(self._drill_punch_worker.deleteLater)
+        self._drill_punch_thread.finished.connect(self._drill_punch_thread.deleteLater)
+        self._drill_punch_thread.start()
+
+    def _stop_drill_punch_worker(self) -> None:
+        """Stop the drill punch worker thread if running."""
+        if self._drill_punch_worker is not None:
+            self._drill_punch_worker.stop()
+            self._drill_punch_worker = None
+        if self._drill_punch_thread is not None:
+            self._drill_punch_thread.quit()
+            self._drill_punch_thread.wait()
+            self._drill_punch_thread = None
 
     def parse_time_to_seconds(self, time_str):
         """Convert time string to seconds."""
@@ -4168,6 +4249,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
 
     def send_round_start_message(self):
         """Send JSON message at the start of each round for non-Self-Select modes."""
+        send_round_start()
         if self.is_self_select_mode:
             return  # Skip for Self-Select mode
         
@@ -4200,6 +4282,12 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
 
     def start_session(self, rounds, time_str, rest_str, difficulty=None, sequences=None, battle_style=None, username=None):
         """Start the training session with the given parameters."""
+        if self.app_state:
+            try:
+                set_speed(self.app_state.get_config().speed)
+            except Exception:
+                pass
+
         self.current_round = 1
         self.total_rounds = rounds
         config_difficulty = None
@@ -4259,6 +4347,14 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
         # Send round start message for non-Self-Select modes
         self.send_round_start_message()
 
+        # Start punch worker for combo and self-select modes
+        if self.is_self_select_mode and self.sequences:
+            punches = self._parse_combo_punches(self.sequences[self.sequence_index])
+            self._start_drill_punch_worker(punches)
+        elif self.current_difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo:
+            punches = self._parse_combo_punches(self.current_combo.get('combo_sequence', ''))
+            self._start_drill_punch_worker(punches)
+
         self.timer.start(1000)  # Update every 1 second
 
     def update_sequence_display(self):
@@ -4292,6 +4388,8 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
                     self.sequence_index = (self.sequence_index + 1) % len(self.sequences)
                     self.sequence_time_remaining = self.sequence_cycle_seconds
                     self.update_sequence_display()
+                    punches = self._parse_combo_punches(self.sequences[self.sequence_index])
+                    self._start_drill_punch_worker(punches)
         else:
             if self.is_resting:
                 # Rest finished -> next round
@@ -4317,6 +4415,14 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
 
                 # Send round start message after combo has been selected/displayed
                 self.send_round_start_message()
+
+                # Restart punch worker for new round
+                if self.is_self_select_mode and self.sequences:
+                    punches = self._parse_combo_punches(self.sequences[self.sequence_index])
+                    self._start_drill_punch_worker(punches)
+                elif self.current_difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo:
+                    punches = self._parse_combo_punches(self.current_combo.get('combo_sequence', ''))
+                    self._start_drill_punch_worker(punches)
             else:
                 # Work finished
                 if self.current_difficulty in ["Beginner", "Intermediate", "Advanced"]:
@@ -4330,6 +4436,8 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
                     self.timer_label.setText(self.format_time(self.time_remaining))
                     self.timer_label.setStyleSheet("font-size: 120px; font-weight: bold; color: #FF9800;")
                     self.sequence_label.hide()
+                    self._stop_drill_punch_worker()
+                    send_round_stop()
                     # Send Rest JSON message
                     try:
                         print(json.dumps({"action": "Rest"}))
@@ -4339,6 +4447,8 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
                     # final round done
                     self.timer.stop()
                     self.sequence_label.hide()
+                    self._stop_drill_punch_worker()
+                    send_round_stop()
                     # Send Log Training Session JSON message
                     try:
                         print(json.dumps({"action": "Log Training Session"}))
@@ -4364,6 +4474,13 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
             self.pause_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
             self.is_paused = False
             if not self.is_resting:
+                # Restart punch worker when resuming
+                if self.is_self_select_mode and self.sequences:
+                    punches = self._parse_combo_punches(self.sequences[self.sequence_index])
+                    self._start_drill_punch_worker(punches)
+                elif self.current_difficulty in ["Beginner", "Intermediate", "Advanced"] and self.current_combo:
+                    punches = self._parse_combo_punches(self.current_combo.get('combo_sequence', ''))
+                    self._start_drill_punch_worker(punches)
                 # Send Resume JSON message
                 try:
                     print(json.dumps({"action": "Resume"}))
@@ -4403,6 +4520,7 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
             # Green while paused (showing "Resume")
             self.pause_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
             self.is_paused = True
+            self._stop_drill_punch_worker()
             if not self.is_resting:
                 # Send Pause JSON message
                 try:
@@ -4413,6 +4531,8 @@ class TrainingSessionPage(ButtonNavigationMixin, QWidget):
     def on_stop_clicked(self):
         """Stop timer and go back to BasicParametersPage."""
         self.timer.stop()
+        self._stop_drill_punch_worker()
+        send_round_stop()
         # Send Stop JSON message
         try:
             print(json.dumps({"action": "Stop"}))
@@ -5241,14 +5361,11 @@ class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
         self._generate_ai_response(prompt)
     
     def _generate_ai_response(self, prompt):
-        """Generate AI response (placeholder - prints to chat)."""
-        # Placeholder implementation: Generate a simple response without using actual LLM
-        # In a real implementation, this would call the LLM model
-        
+        """Generate AI response using Anthropic API with QThread worker, falling back to hardcoded responses."""
         combo_name = self.combo_data.get('combo_name', 'this combo')
         score = self.combo_data.get('score', 0)
-        
-        # Generate contextual response based on score
+
+        # Hardcoded fallback responses
         if score >= 4:
             responses = [
                 f"Excellent work on {combo_name}! Your technique is solid. Focus on increasing speed while maintaining this accuracy.",
@@ -5267,12 +5384,74 @@ class ComboLLMChatPage(ButtonNavigationMixin, QWidget):
                 f"Don't worry, {combo_name} takes time. Focus on form over speed. Watch your footwork.",
                 f"Good try! For {combo_name}, practice each punch separately, then gradually increase combo speed.",
             ]
-        
-        import random
-        response = random.choice(responses)
-        
-        # Simulate typing delay
-        QTimer.singleShot(500, lambda: self._append_chat("AI Coach", response))
+        fallback_response = random.choice(responses)
+
+        api_key = os.getenv('ANTHROPIC_API_KEY', '')
+        if not api_key:
+            print("[ComboLLMChatPage] ANTHROPIC_API_KEY not set, using hardcoded response.")
+            QTimer.singleShot(500, lambda: self._append_chat("AI Coach", fallback_response))
+            return
+
+        self._append_chat("AI Coach", "Thinking...")
+
+        class _AnthropicWorker(QObject):
+            finished = Signal(str)
+            error = Signal(str)
+
+            def __init__(self, prompt, api_key):
+                super().__init__()
+                self._prompt = prompt
+                self._api_key = api_key
+
+            def run(self):
+                try:
+                    import anthropic
+                    client = anthropic.Anthropic(api_key=self._api_key)
+                    message = client.messages.create(
+                        model="claude-haiku-4-5",
+                        max_tokens=256,
+                        system="You are an encouraging boxing coach. Give concise, practical feedback in 2-3 sentences.",
+                        messages=[{"role": "user", "content": self._prompt}],
+                    )
+                    self.finished.emit(message.content[0].text)
+                except Exception as e:
+                    self.error.emit(str(e))
+
+        self._ai_thread = QThread()
+        self._ai_worker = _AnthropicWorker(prompt, api_key)
+        self._ai_worker.moveToThread(self._ai_thread)
+        self._ai_thread.started.connect(self._ai_worker.run)
+        self._ai_worker.finished.connect(self._ai_thread.quit)
+        self._ai_worker.finished.connect(self._ai_worker.deleteLater)
+        self._ai_thread.finished.connect(self._ai_thread.deleteLater)
+
+        def _on_finished(response_text):
+            html = self.chat_view.toHtml()
+            if "Thinking..." in html:
+                self.chat_view.setHtml(html.replace("Thinking...", response_text, 1))
+                cursor = self.chat_view.textCursor()
+                cursor.movePosition(QTextCursor.MoveOperation.End)
+                self.chat_view.setTextCursor(cursor)
+                self.chat_view.ensureCursorVisible()
+            else:
+                self._append_chat("AI Coach", response_text)
+
+        def _on_error(_err):
+            html = self.chat_view.toHtml()
+            if "Thinking..." in html:
+                self.chat_view.setHtml(
+                    html.replace("Thinking...", "Sorry, couldn't get a response right now.", 1)
+                )
+                cursor = self.chat_view.textCursor()
+                cursor.movePosition(QTextCursor.MoveOperation.End)
+                self.chat_view.setTextCursor(cursor)
+                self.chat_view.ensureCursorVisible()
+            else:
+                self._append_chat("AI Coach", "Sorry, couldn't get a response right now.")
+
+        self._ai_worker.finished.connect(_on_finished)
+        self._ai_worker.error.connect(_on_error)
+        self._ai_thread.start()
     
     def _append_chat(self, who, text):
         """Append a message to the chat view."""

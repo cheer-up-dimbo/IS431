@@ -34,8 +34,9 @@ from sparring.combo_pools import STYLE_TRANSITION_MATRICES
 from sparring.sequence_generator import generate_session_sequence
 from sparring.robot_interface import (
     send_punch, send_round_start, send_round_stop,
-    INTRA_COMBO_GAP_S, INTER_COMBO_GAP_S,
+    get_intra_gap, get_inter_gap, set_speed,
 )
+import sparring.robot_interface as robot_interface
 from sparring import sparring_database as spar_db
 
 # ---------------------------------------------------------------------------
@@ -230,6 +231,31 @@ class _SequenceWorker(QObject):
             self._duration,
         )
         self.finished.emit(sequence)
+
+
+class _FeedbackWorker(QObject):
+    """Fetches AI coach feedback from the Anthropic API on a background thread."""
+    finished = Signal(str)
+    error = Signal(str)
+
+    def __init__(self, prompt: str, api_key: str) -> None:
+        super().__init__()
+        self._prompt = prompt
+        self._api_key = api_key
+
+    def run(self) -> None:
+        try:
+            import anthropic
+            client = anthropic.Anthropic(api_key=self._api_key)
+            message = client.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=128,
+                system="You are a boxing coach giving brief encouraging feedback after a sparring session. Keep it under 3 sentences.",
+                messages=[{"role": "user", "content": self._prompt}],
+            )
+            self.finished.emit(message.content[0].text)
+        except Exception as e:
+            self.error.emit(str(e))
 
 
 class SparRoundConfigPage(ButtonNavigationMixin, QWidget):
@@ -540,9 +566,9 @@ class _PunchWorker(QObject):
 
             # Determine gap: combo boundary every 3rd punch
             if idx % 3 == 0:
-                gap = INTER_COMBO_GAP_S
+                gap = get_inter_gap()
             else:
-                gap = INTRA_COMBO_GAP_S
+                gap = get_intra_gap()
 
             # Sleep in small increments so we can check _running
             elapsed = 0.0
@@ -608,6 +634,17 @@ class SparSessionPage(ButtonNavigationMixin, QWidget):
 
         self._punch_thread: Optional[QThread] = None
         self._punch_worker: Optional[_PunchWorker] = None
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        mw = self.window()
+        speed = "medium"
+        if mw and hasattr(mw, "app_state") and mw.app_state:
+            try:
+                speed = mw.app_state.get_config().speed
+            except Exception:
+                pass
+        robot_interface.set_speed(speed)
 
     def start_round(self) -> None:
         """Begin the current round: start timer and robot punches."""
@@ -1019,7 +1056,7 @@ class SparResultPage(ButtonNavigationMixin, QWidget):
 
         prefix = "🤖 Coach Feedback:" if ai_chat_enabled else "🥊 Feedback:"
 
-        # Build feedback text
+        # Build hardcoded feedback text (used as fallback or when AI is disabled)
         if total > 0:
             most_common = max(punch_counts, key=punch_counts.get)  # type: ignore[arg-type]
             most_common_count = punch_counts[most_common]
@@ -1042,7 +1079,49 @@ class SparResultPage(ButtonNavigationMixin, QWidget):
         else:
             feedback = f"{prefix} No CV data was available for analysis this session."
 
-        self._feedback_label.setText(feedback)
+        if not ai_chat_enabled:
+            self._feedback_label.setText(feedback)
+            return
+
+        # ai_chat_enabled is True — attempt live API feedback
+        self._feedback_label.setText("🤖 Coach Feedback: Analysing your session...")
+
+        api_key = os.getenv('ANTHROPIC_API_KEY', '')
+        if not api_key:
+            print("[SparResultPage] ANTHROPIC_API_KEY not set, using hardcoded feedback.")
+            self._feedback_label.setText(feedback)
+            return
+
+        # Build prompt
+        if total > 0:
+            prompt = (
+                f"The boxer just finished a sparring session against a {_spar_state.style} style robot. "
+                f"They threw {total} punches in total. "
+                f"Their most used punch was '{most_common}' ({most_common_count} times). "
+                f"Please give brief encouraging feedback for this performance."
+            )
+        else:
+            prompt = (
+                f"The boxer just finished a sparring session against a {_spar_state.style} style robot. "
+                f"No punch data was recorded. Please give brief encouraging feedback."
+            )
+
+        self._feedback_thread = QThread()
+        self._feedback_worker = _FeedbackWorker(prompt, api_key)
+        self._feedback_worker.moveToThread(self._feedback_thread)
+        self._feedback_thread.started.connect(self._feedback_worker.run)
+        self._feedback_worker.finished.connect(self._feedback_thread.quit)
+        self._feedback_worker.finished.connect(self._feedback_worker.deleteLater)
+        self._feedback_thread.finished.connect(self._feedback_thread.deleteLater)
+
+        self._feedback_worker.finished.connect(
+            lambda text: self._feedback_label.setText(f"🤖 Coach Feedback: {text}")
+        )
+        self._feedback_worker.error.connect(
+            lambda _err: self._feedback_label.setText(feedback)
+        )
+
+        self._feedback_thread.start()
 
     # -- navigation --
 
