@@ -43,7 +43,7 @@ from sparring.spar_pages import (
 from proficiency.proficiency_pages import ProfiencyChecklistPage, ProfiencyResultPage
 
 # Import from new compartmentalized modules
-from core import TrainingConfig, AppState, PageIndex, ButtonStyle
+from core import TrainingConfig, AppState, PageIndex, ButtonStyle, attach_tooltip
 from utils import (
     get_users_csv_path, hash_password, load_users, save_users,
     get_user_level, set_user_level, get_user_progress, update_user_progress,
@@ -1071,6 +1071,24 @@ class Homepage(ButtonNavigationMixin, QWidget):
 
         self.setLayout(layout)
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        tips = {
+            "Training": "Improve your boxing techniques or spar with the robot (Intermediate & Advanced only)",
+            "Performance": "Test your power, stamina and reaction time",
+            "Combo Progress": "View your combo mastery and level progression",
+            "Others": "App settings and Arduino configuration",
+        }
+        for btn in self.findChildren(QPushButton):
+            if btn.text() in tips:
+                attach_tooltip(btn, tips[btn.text()], mw)
+
     def on_training_clicked(self):
         print("Training button clicked")
         self.navigate_to(PageIndex.TRAINING)
@@ -1180,6 +1198,37 @@ class OthersPage(ButtonNavigationMixin, QWidget):
 
         self._refresh_arduino_ports()
         self._refresh_listener_status()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not getattr(self, '_tooltips_attached', False):
+            self._tooltips_attached = True
+            self._attach_tooltips()
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        if not mw:
+            return
+        attach_tooltip(
+            self.history_btn,
+            "View your performance test history — power, stamina and reaction",
+            mw
+        )
+        attach_tooltip(
+            self.stance_btn,
+            "Toggle between Orthodox (right-handed) and Southpaw (left-handed) stance",
+            mw
+        )
+        attach_tooltip(
+            self.ai_chat_btn,
+            "Enable AI coach feedback after training sessions",
+            mw
+        )
+        attach_tooltip(
+            self.cv_enabled_btn,
+            "Enable computer vision to track punches during sparring",
+            mw
+        )
 
     def _setup_widgets(self):
         for button in self._nav_buttons:
@@ -1439,6 +1488,23 @@ class PerformancePage(ButtonNavigationMixin, QWidget):
         layout.addStretch()
 
         self.setLayout(layout)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        tips = {
+            "Power": "Test your punching power with the force sensor",
+            "Stamina": "Test how many punches you can throw in a timed session",
+            "Reaction Time": "Test your reaction time using the camera",
+        }
+        for btn in self.findChildren(QPushButton):
+            if btn.text() in tips:
+                attach_tooltip(btn, tips[btn.text()], mw)
 
     def on_power_clicked(self):
         print("Power button clicked")
@@ -1824,6 +1890,7 @@ class StaminaResultPage(ButtonNavigationMixin, QWidget):
 
 
 class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
+    SKIP_NAV_SETUP = True
     """Unified performance history page for Power, Stamina, and Reaction tests."""
     NAV_BUTTON_MIN_WIDTH = 180
     NAV_BUTTON_MAX_WIDTH = 210
@@ -1902,9 +1969,19 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
 
         for btn in [self.all_btn, self.power_btn, self.stamina_btn, self.reaction_btn]:
             btn.setCheckable(True)
+            btn.setMinimumSize(1, 1)
+            btn.setMaximumSize(16777215, 16777215)
+            btn.setFixedSize(90, 36)
             btn.setStyleSheet("""
-                QPushButton { font-size: 14px; padding: 8px 14px; }
+                QPushButton {
+                    font-size: 14px;
+                    background-color: #555555;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                }
                 QPushButton:checked { background-color: #3498db; color: white; }
+                QPushButton:hover { background-color: #666666; }
             """)
             filter_row.addWidget(btn)
 
@@ -2938,6 +3015,22 @@ class TrainingPage(ButtonNavigationMixin, QWidget):
 
         self.setLayout(layout)
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        tips = {
+            "Techniques": "Learn combos intuitively through spaced repetition — like Anki for boxing",
+            "Spar": "Enter sparring mode — Intermediate and above only",
+        }
+        for btn in self.findChildren(QPushButton):
+            if btn.text() in tips:
+                attach_tooltip(btn, tips[btn.text()], mw)
+
     def on_techniques_clicked(self):
         print("Techniques button clicked")
         self.navigate_to(PageIndex.TECHNIQUES)
@@ -3097,6 +3190,16 @@ class PunchCombinationPage(ButtonNavigationMixin, QWidget):
         """Restrict difficulty buttons based on user's level when page is shown."""
         super().showEvent(event)
         self._update_buttons_for_user_level()
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        attach_tooltip(self.beginner_btn, "15 foundational combos — jabs, crosses and basic sequences", mw)
+        attach_tooltip(self.intermediate_btn, "20 combos with body shots, hooks and defensive counters", mw)
+        attach_tooltip(self.advanced_btn, "15 complex combos — unlocked at Advanced level", mw)
+        attach_tooltip(self.self_select_btn, "Build your own custom punch sequence", mw)
 
     def _update_buttons_for_user_level(self):
         """Enable or disable difficulty buttons based on the current user's level."""
@@ -3188,6 +3291,8 @@ class BasicParametersPage(ButtonNavigationMixin, QWidget):
         self.stacked_widget = stacked_widget
         self.app_state = app_state
         self.previous_page = PageIndex.PUNCH_COMBINATIONS  # Fallback for when no app_state
+        self._spar_mode = False
+        self._spar_style = ""
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
@@ -3248,6 +3353,20 @@ class BasicParametersPage(ButtonNavigationMixin, QWidget):
         # Initialize button displays from state and update continue availability
         self.update_button_displays()
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.update_button_displays()
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        attach_tooltip(self.round_btn, "Set the number of rounds for your session", mw)
+        attach_tooltip(self.speed_btn, "Set the robot arm speed", mw)
+        attach_tooltip(self.time_btn, "Set the duration of each round", mw)
+        attach_tooltip(self.rest_btn, "Set the rest time between rounds", mw)
+
     def update_button_displays(self):
         """Refresh parameter buttons from app_state config and labels."""
         if self.app_state:
@@ -3290,10 +3409,16 @@ class BasicParametersPage(ButtonNavigationMixin, QWidget):
         self.navigate_to(PageIndex.REST_SELECTION)
 
     def on_back_clicked(self):
-        prev_page = self.app_state.previous_page if self.app_state else self.previous_page
-        self.stacked_widget.setCurrentIndex(prev_page)
+        if self._spar_mode:
+            self.deactivate_spar_mode()
+            self.navigate_to(PageIndex.SPAR_STYLE_SELECT)
+        else:
+            self.navigate_to(PageIndex.PUNCH_COMBINATIONS)
 
     def on_continue_clicked(self):
+        if self._spar_mode:
+            self._start_spar_session()
+            return
         print("Continue button clicked")
         # Start countdown and move to CountdownPage
         countdown_page = self.stacked_widget.widget(PageIndex.COUNTDOWN)
@@ -3305,6 +3430,88 @@ class BasicParametersPage(ButtonNavigationMixin, QWidget):
         countdown_page.return_page_index = PageIndex.BASIC_PARAMETERS
         countdown_page.start_countdown()
         self.navigate_to(PageIndex.COUNTDOWN)
+
+    def activate_spar_mode(self, style: str) -> None:
+        self._spar_mode = True
+        self._spar_style = style
+
+    def deactivate_spar_mode(self) -> None:
+        self._spar_mode = False
+        self._spar_style = ""
+
+    def _start_spar_session(self) -> None:
+        from sparring.spar_pages import _spar_state, _SequenceWorker
+        from sparring import sparring_database as spar_db
+        from PySide6.QtCore import QThread
+
+        # Read current parameter values from app_state
+        if self.app_state:
+            config = self.app_state.get_config()
+            rounds = config.rounds
+            round_duration = config.time_minutes * 60 + config.time_seconds
+            rest_duration = config.rest_minutes * 60 + config.rest_seconds
+        else:
+            rounds = 3
+            round_duration = 120
+            rest_duration = 60
+
+        # Populate spar state
+        _spar_state.style = self._spar_style
+        _spar_state.rounds = rounds
+        _spar_state.round_duration = round_duration
+        _spar_state.rest_duration = rest_duration
+        _spar_state.current_round = 1
+
+        # Get username
+        main_window = self.window()
+        username = ""
+        if main_window and hasattr(main_window, "get_current_user"):
+            username = main_window.get_current_user() or ""
+        _spar_state.username = username
+
+        # Get weakness profile
+        weakness_profile = {}
+        if username:
+            try:
+                weakness_profile = spar_db.get_weakness_profile(username)
+            except Exception:
+                weakness_profile = {}
+
+        # Disable continue button while generating
+        self._spar_start_btn_ref = self.continue_btn
+        self._spar_start_btn_ref.setEnabled(False)
+        self._spar_start_btn_ref.setText("Generating…")
+
+        # Generate sequence in background thread
+        self._spar_thread = QThread()
+        self._spar_worker = _SequenceWorker(
+            _spar_state.style,
+            weakness_profile,
+            _spar_state.rounds,
+            _spar_state.round_duration,
+        )
+        self._spar_worker.moveToThread(self._spar_thread)
+        self._spar_thread.started.connect(self._spar_worker.run)
+        self._spar_worker.finished.connect(self._on_spar_sequence_ready)
+        self._spar_worker.finished.connect(self._spar_thread.quit)
+        self._spar_worker.finished.connect(self._spar_worker.deleteLater)
+        self._spar_thread.finished.connect(self._spar_thread.deleteLater)
+        self._spar_thread.start()
+
+    def _on_spar_sequence_ready(self, sequence) -> None:
+        from sparring.spar_pages import _spar_state
+        _spar_state.session_sequence = sequence
+
+        # Re-enable continue button
+        if self._spar_start_btn_ref:
+            self._spar_start_btn_ref.setEnabled(True)
+            self._spar_start_btn_ref.setText("Start")
+
+        # Navigate to spar countdown
+        countdown_page = self.stacked_widget.widget(PageIndex.SPAR_COUNTDOWN)
+        if hasattr(countdown_page, "start_countdown"):
+            countdown_page.start_countdown()
+        self.navigate_to(PageIndex.SPAR_COUNTDOWN)
 
 class RoundSelectionPage(ButtonNavigationMixin, QWidget):
     """Page showing 12 numbered round buttons and a back button."""
@@ -4767,6 +4974,18 @@ class SparPage(ButtonNavigationMixin, QWidget):
 
         self.setLayout(layout)
         self.setup_navigation([sparring_btn, back_btn])
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self):
+        mw = self.window()
+        for btn in self.findChildren(QPushButton):
+            if btn.text() == "Sparring":
+                attach_tooltip(btn, "Start an adaptive sparring session against the robot", mw)
 
     def on_sparring_clicked(self):
         """Navigate to sparring if user level is not Beginner, otherwise show restriction message."""

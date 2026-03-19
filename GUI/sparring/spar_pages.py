@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.constants import PageIndex, ButtonStyle
+from core.tooltip import attach_tooltip
 from sparring.combo_pools import STYLE_TRANSITION_MATRICES
 from sparring.sequence_generator import generate_session_sequence
 from sparring.robot_interface import (
@@ -81,50 +82,120 @@ def _users_dir() -> Path:
 # ============================================================================
 
 class SparStyleSelectPage(ButtonNavigationMixin, QWidget):
+    SKIP_NAV_SETUP = True
     """Allows the user to pick a fighting style for the sparring session."""
 
     def __init__(self, stacked_widget: QStackedWidget) -> None:
         super().__init__()
         self.stacked_widget = stacked_widget
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
-        layout.setContentsMargins(50, 50, 50, 50)
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(50, 40, 50, 40)
 
-        # Title
         title = QLabel("Choose Fighting Style")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 30px; font-weight: bold; margin-bottom: 15px;")
-        layout.addWidget(title)
+        title.setStyleSheet(
+            "font-size: 30px; font-weight: bold; margin-bottom: 15px;"
+        )
+        main_layout.addWidget(title)
 
-        # One button per style from the transition matrices
+        STYLE_BTN_STYLE = """
+            QPushButton {
+                font-size: 16px;
+                padding: 10px 16px;
+                min-width: 150px;
+                max-width: 180px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover { background-color: #45a049; }
+            QPushButton:pressed { background-color: #3d8b40; }
+        """
+
+        style_names = list(STYLE_TRANSITION_MATRICES.keys())
         nav_buttons: List[QPushButton] = []
-        for style_name in STYLE_TRANSITION_MATRICES.keys():
-            btn = QPushButton(style_name)
-            btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-            btn.clicked.connect(lambda checked=False, s=style_name: self._select_style(s))
-            layout.addWidget(btn, alignment=Qt.AlignCenter)
+
+        # Row 1: first 3 styles
+        row1 = QHBoxLayout()
+        row1.setSpacing(12)
+        for name in style_names[:3]:
+            btn = QPushButton(name)
+            btn.setStyleSheet(STYLE_BTN_STYLE)
+            btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            btn.setFixedHeight(150)
+            btn.clicked.connect(
+                lambda checked=False, s=name: self._select_style(s)
+            )
+            row1.addWidget(btn)
             nav_buttons.append(btn)
+        main_layout.addLayout(row1)
 
-        layout.addStretch()
+        # Row 2: remaining styles centered
+        row2 = QHBoxLayout()
+        row2.setSpacing(12)
+        row2.addStretch()
+        for name in style_names[3:]:
+            btn = QPushButton(name)
+            btn.setStyleSheet(STYLE_BTN_STYLE)
+            btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            btn.setFixedHeight(150)
+            btn.clicked.connect(
+                lambda checked=False, s=name: self._select_style(s)
+            )
+            row2.addWidget(btn)
+            nav_buttons.append(btn)
+        row2.addStretch()
+        main_layout.addLayout(row2)
 
-        # Back button
+        main_layout.addStretch()
+
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         back_btn.clicked.connect(self.on_back_clicked)
-        layout.addWidget(back_btn, alignment=Qt.AlignCenter)
+        main_layout.addWidget(back_btn, alignment=Qt.AlignCenter)
         nav_buttons.append(back_btn)
 
-        self.setLayout(layout)
+        self.setLayout(main_layout)
         self.setup_navigation(nav_buttons)
+        # Re-apply style button stylesheet after setup_navigation overrides it
+        style_buttons = nav_buttons[:-1]  # all except back button
+        for btn in style_buttons:
+            btn.setStyleSheet(STYLE_BTN_STYLE)
+            btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            btn.setFixedHeight(150)
+            btn.setMinimumWidth(150)
+            btn.setMaximumWidth(180)
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        if not getattr(self, '_tooltips_attached', False):
+            self._attach_tooltips()
+            self._tooltips_attached = True
+
+    def _attach_tooltips(self) -> None:
+        mw = self.window()
+        tips = {
+            "Pressure Fighter": "Aggressive combos focusing on hooks and body shots",
+            "Counter Puncher": "Precise single punches that wait for openings",
+            "Infighter": "Close-range uppercuts and hooks",
+            "Out-Boxer": "Jab-heavy style that maintains distance",
+            "Random": "Balanced mix of all punch types",
+        }
+        for btn in self.findChildren(QPushButton):
+            if btn.text() in tips:
+                attach_tooltip(btn, tips[btn.text()], mw)
 
     # -- actions --
 
     def _select_style(self, style_name: str) -> None:
-        """Store the chosen style and navigate to round config."""
-        _spar_state.style = style_name
-        self.navigate_to(PageIndex.SPAR_ROUND_CONFIG)
+        basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
+        if hasattr(basic_page, "activate_spar_mode"):
+            basic_page.activate_spar_mode(style_name)
+        self.navigate_to(PageIndex.BASIC_PARAMETERS)
 
     def on_back_clicked(self) -> None:
         self.navigate_to(PageIndex.SPAR)
