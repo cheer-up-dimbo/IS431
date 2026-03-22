@@ -39,9 +39,10 @@ from sparring.spar_pages import (
     SparRestPage,
     SparProcessingPage,
     SparResultPage,
+    SparHistoryPage,
 )
 from sparring.robot_interface import send_punch, send_round_start, send_round_stop, set_speed, get_intra_gap, get_inter_gap
-from proficiency.proficiency_pages import ProfiencyChecklistPage, ProfiencyResultPage
+from proficiency.proficiency_pages import ProficiencyChecklistPage, ProficiencyResultPage
 
 # Import from new compartmentalized modules
 from core import TrainingConfig, AppState, PageIndex, ButtonStyle, attach_tooltip
@@ -1040,7 +1041,7 @@ class Homepage(ButtonNavigationMixin, QWidget):
 
         training_btn = QPushButton("Training")
         performance_btn = QPushButton("Performance")
-        combo_progress_btn = QPushButton("Combo Progress")
+        combo_progress_btn = QPushButton("History")
         others_btn = QPushButton("Others")
         back_btn = QPushButton("Back to Login")
 
@@ -1052,7 +1053,7 @@ class Homepage(ButtonNavigationMixin, QWidget):
 
         training_btn.clicked.connect(self.on_training_clicked)
         performance_btn.clicked.connect(self.on_performance_clicked)
-        combo_progress_btn.clicked.connect(self.on_combo_progress_clicked)
+        combo_progress_btn.clicked.connect(self.on_history_clicked)
         others_btn.clicked.connect(self.on_others_clicked)
         back_btn.clicked.connect(self.on_back_clicked)
 
@@ -1083,7 +1084,7 @@ class Homepage(ButtonNavigationMixin, QWidget):
         tips = {
             "Training": "Improve your boxing techniques or spar with the robot (Intermediate & Advanced only)",
             "Performance": "Test your power, stamina and reaction time",
-            "Combo Progress": "View your combo mastery and level progression",
+            "History": "View your power, stamina, reaction and combo progress history",
             "Others": "App settings and Arduino configuration",
         }
         for btn in self.findChildren(QPushButton):
@@ -1098,21 +1099,9 @@ class Homepage(ButtonNavigationMixin, QWidget):
         print("Performance button clicked")
         self.navigate_to(PageIndex.PERFORMANCE)
 
-    def on_combo_progress_clicked(self):
-        """Navigate to combo progress page for current user."""
-        print("Combo Progress button clicked")
-        # Set current user immediately so page always refreshes with latest data
-        try:
-            main_window = self.window()
-            if main_window and hasattr(main_window, 'get_current_user'):
-                current_user = main_window.get_current_user()
-                if current_user:
-                    page = self.stacked_widget.widget(PageIndex.USER_COMBO_PROGRESS)
-                    if page and hasattr(page, 'set_user'):
-                        page.set_user(current_user, return_to_page=PageIndex.HOMEPAGE)
-        except Exception as e:
-            print(f"Error preparing combo progress page: {e}")
-        self.navigate_to(PageIndex.USER_COMBO_PROGRESS)
+    def on_history_clicked(self):
+        """Navigate to the history hub page."""
+        self.navigate_to(PageIndex.HISTORY_HUB)
 
     def on_others_clicked(self):
         print("Others button clicked")
@@ -1157,7 +1146,6 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.app_state = app_state
         self.setFocusPolicy(Qt.StrongFocus)
 
-        self.history_btn = QPushButton("History")
         self.stance_btn = QPushButton("Orthodox")
         self.ai_chat_btn = QPushButton("AI Chat: Off")
         self.cv_enabled_btn = QPushButton("CV: Off")
@@ -1168,7 +1156,6 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.arduino_listener_status = QLabel("Listener: initializing")
 
         self._nav_buttons: List[QPushButton] = [
-            self.history_btn,
             self.stance_btn,
             self.ai_chat_btn,
             self.cv_enabled_btn,
@@ -1210,11 +1197,6 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         mw = self.window()
         if not mw:
             return
-        attach_tooltip(
-            self.history_btn,
-            "View your performance test history — power, stamina and reaction",
-            mw
-        )
         attach_tooltip(
             self.stance_btn,
             "Toggle between Orthodox (right-handed) and Southpaw (left-handed) stance",
@@ -1267,7 +1249,6 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         settings_header.setStyleSheet("font-size: 18px; font-weight: bold; color: #555;")
         left_column.addWidget(settings_header)
 
-        left_column.addWidget(self.history_btn, alignment=Qt.AlignCenter)
         left_column.addWidget(self.stance_btn, alignment=Qt.AlignCenter)
         left_column.addWidget(self.ai_chat_btn, alignment=Qt.AlignCenter)
         left_column.addWidget(self.cv_enabled_btn, alignment=Qt.AlignCenter)
@@ -1309,7 +1290,6 @@ class OthersPage(ButtonNavigationMixin, QWidget):
         self.setLayout(main_layout)
 
     def _setup_connections(self):
-        self.history_btn.clicked.connect(self.on_history_clicked)
         self.stance_btn.clicked.connect(self.on_stance_clicked)
         self.ai_chat_btn.clicked.connect(self.on_ai_chat_clicked)
         self.cv_enabled_btn.clicked.connect(self.on_cv_enabled_clicked)
@@ -1362,17 +1342,6 @@ class OthersPage(ButtonNavigationMixin, QWidget):
             self._apply_arduino_port(unique_arduino_like[0], user_initiated=False)
 
         self._refresh_listener_status()
-
-    def on_history_clicked(self):
-        try:
-            main_window = self.window()
-            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
-            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
-            if username and hasattr(history_page, "load_history"):
-                history_page.load_history(username)
-            self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
-        except Exception:
-            self.navigate_to(PageIndex.HOMEPAGE)
 
     def on_stance_clicked(self):
         current = self.stance_btn.text().strip()
@@ -2016,15 +1985,21 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
         layout.addWidget(self.back_button, alignment=Qt.AlignCenter)
         self.setLayout(layout)
 
-    def load_history(self, username: str, return_to: Optional[int] = None):
+    def load_history(self, username: str, return_to: Optional[int] = None, initial_filter: str = "All"):
         from performance_database import get_all_performance_history, get_latest_performance_summary
 
         self.return_to_page = return_to
         self.title_label.setText(f"Performance History - {username}")
         summary = get_latest_performance_summary(username)
         self._update_summary(summary)
+        self._apply_summary_filter(initial_filter)
         self.all_history = get_all_performance_history(username, limit=100)
-        self.apply_filter(self.current_filter)
+        self.apply_filter(initial_filter)
+        # Hide filter buttons — page is always pre-filtered from HistoryHubPage
+        self.all_btn.setVisible(False)
+        self.power_btn.setVisible(False)
+        self.stamina_btn.setVisible(False)
+        self.reaction_btn.setVisible(False)
 
     def _update_summary(self, summary: dict):
         if 'power' in summary:
@@ -2066,6 +2041,17 @@ class PerformanceHistoryPage(ButtonNavigationMixin, QWidget):
                 self.trend_label.setText("Overall Trend: Stable →")
         else:
             self.trend_label.setText("Overall Trend: --")
+
+    def _apply_summary_filter(self, filter_type: str) -> None:
+        """Show only the summary label relevant to filter_type."""
+        show_power    = filter_type in ("All", "Power")
+        show_stamina  = filter_type in ("All", "Stamina")
+        show_reaction = filter_type in ("All", "Reaction")
+        self.power_summary_label.setVisible(show_power)
+        self.stamina_summary_label.setVisible(show_stamina)
+        self.reaction_summary_label.setVisible(show_reaction)
+        # Overall trend label only makes sense when showing all types
+        self.trend_label.setVisible(filter_type == "All")
 
     def apply_filter(self, filter_type: str):
         self.current_filter = filter_type
@@ -2963,6 +2949,137 @@ class ReactionResultPage(ButtonNavigationMixin, QWidget):
     def get_main_window(self):
         window = self.window()
         return window if hasattr(window, "get_current_user") else None
+
+class HistoryHubPage(ButtonNavigationMixin, QWidget):
+    """History hub — lets the user choose which history type to view."""
+
+    SKIP_NAV_SETUP = True
+
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(60, 40, 60, 40)
+
+        title = QLabel("History")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 20px;")
+        main_layout.addWidget(title)
+
+        grid = QGridLayout()
+        grid.setSpacing(16)
+
+        power_btn    = QPushButton("Power History")
+        stamina_btn  = QPushButton("Stamina History")
+        reaction_btn = QPushButton("Reaction Time History")
+        combo_btn    = QPushButton("Combo Progress History")
+        spar_btn     = QPushButton("Spar History")
+        back_btn     = QPushButton("Back")
+
+        GRID_BTN_STYLE = """
+            QPushButton {
+                font-size: 20px;
+                padding: 20px;
+                min-width: 220px;
+                max-width: 250px;
+                min-height: 65px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover { background-color: #45a049; }
+            QPushButton:pressed { background-color: #3d8b40; }
+        """
+
+        GRID_BACK_STYLE = """
+            QPushButton {
+                font-size: 20px;
+                padding: 20px;
+                min-width: 220px;
+                max-width: 250px;
+                min-height: 65px;
+                background-color: #f44336;
+                color: white;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover { background-color: #d32f2f; }
+            QPushButton:pressed { background-color: #b71c1c; }
+        """
+
+        for btn in [power_btn, stamina_btn, reaction_btn, combo_btn, spar_btn]:
+            btn.setStyleSheet(GRID_BTN_STYLE)
+
+        back_btn.setStyleSheet(GRID_BACK_STYLE)
+
+        power_btn.clicked.connect(self._on_power_clicked)
+        stamina_btn.clicked.connect(self._on_stamina_clicked)
+        reaction_btn.clicked.connect(self._on_reaction_clicked)
+        combo_btn.clicked.connect(self._on_combo_clicked)
+        spar_btn.clicked.connect(self._on_spar_clicked)
+        back_btn.clicked.connect(self._on_back_clicked)
+
+        # Row 0: Power | Stamina | Reaction
+        grid.addWidget(power_btn,    0, 0)
+        grid.addWidget(stamina_btn,  0, 1)
+        grid.addWidget(reaction_btn, 0, 2)
+
+        # Row 1: Combo | Spar | Back
+        grid.addWidget(combo_btn,    1, 0)
+        grid.addWidget(spar_btn,     1, 1)
+        grid.addWidget(back_btn,     1, 2)
+
+        main_layout.addStretch()
+        main_layout.addLayout(grid)
+        main_layout.addStretch()
+
+        self.setLayout(main_layout)
+
+    def _load_performance_history(self, filter_type: str) -> None:
+        """Load PerformanceHistoryPage pre-filtered to the given type."""
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            history_page = self.stacked_widget.widget(PageIndex.PERFORMANCE_HISTORY)
+            if username and hasattr(history_page, "load_history"):
+                history_page.load_history(
+                    username,
+                    return_to=PageIndex.HISTORY_HUB,
+                    initial_filter=filter_type,
+                )
+        except Exception:
+            pass
+        self.navigate_to(PageIndex.PERFORMANCE_HISTORY)
+
+    def _on_power_clicked(self):
+        self._load_performance_history("Power")
+
+    def _on_stamina_clicked(self):
+        self._load_performance_history("Stamina")
+
+    def _on_reaction_clicked(self):
+        self._load_performance_history("Reaction")
+
+    def _on_combo_clicked(self):
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            page = self.stacked_widget.widget(PageIndex.USER_COMBO_PROGRESS)
+            if username and hasattr(page, "set_user"):
+                page.set_user(username, return_to_page=PageIndex.HISTORY_HUB)
+        except Exception:
+            pass
+        self.navigate_to(PageIndex.USER_COMBO_PROGRESS)
+
+    def _on_spar_clicked(self):
+        self.navigate_to(PageIndex.SPAR_HISTORY)
+
+    def _on_back_clicked(self):
+        self.navigate_to(PageIndex.HOMEPAGE)
 
 class TrainingPage(ButtonNavigationMixin, QWidget):
     """
@@ -6034,9 +6151,11 @@ class MainWindow(QWidget):
         self.spar_rest_page         = SparRestPage(self.stacked_widget)
         self.spar_processing_page   = SparProcessingPage(self.stacked_widget)
         self.spar_result_page       = SparResultPage(self.stacked_widget)
-        
-        self.proficiency_checklist_page = ProfiencyChecklistPage(self.stacked_widget)
-        self.proficiency_result_page = ProfiencyResultPage(self.stacked_widget)
+        self.spar_history_page      = SparHistoryPage(self.stacked_widget)
+
+        self.proficiency_checklist_page = ProficiencyChecklistPage(self.stacked_widget)
+        self.proficiency_result_page = ProficiencyResultPage(self.stacked_widget)
+        self.history_hub_page = HistoryHubPage(self.stacked_widget)
 
         # Login and User Management pages
         self.login_page = LoginPage(self.stacked_widget, self.app_state)
@@ -6083,7 +6202,7 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.combo_llm_chat_page)         # 27
         self.stacked_widget.addWidget(self.stamina_test_page)           # 28
         self.stacked_widget.addWidget(self.stamina_result_page)         # 29
-        self.stacked_widget.addWidget(QWidget())                        # 30 reserved (STAMINA_HISTORY)
+        self.stacked_widget.addWidget(QWidget())  # 30 TODO: StaminaHistoryPage not yet implemented — navigating here shows a blank screen
         self.stacked_widget.addWidget(self.performance_history_page)    # 31
         self.stacked_widget.addWidget(self.battle_style_description_page) # 32
         self.stacked_widget.addWidget(self.spar_style_select_page)      # 33
@@ -6095,6 +6214,8 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.spar_result_page)            # 39
         self.stacked_widget.addWidget(self.proficiency_checklist_page)  # 40
         self.stacked_widget.addWidget(self.proficiency_result_page)     # 41
+        self.stacked_widget.addWidget(self.history_hub_page)            # 42
+        self.stacked_widget.addWidget(self.spar_history_page)           # 43
 
         # Connect stack widget page changes to update user references
         self.stacked_widget.currentChanged.connect(self.on_page_changed)
@@ -6301,7 +6422,7 @@ class MainWindow(QWidget):
             self._navigating_back = True
             self.stacked_widget.setCurrentIndex(previous_page)
         else:
-            self.stacked_widget.setCurrentIndex(PageIndex.MAIN_MENU)
+            self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
 
         self.update_back_button_visibility()
 
@@ -6409,16 +6530,6 @@ class MainWindow(QWidget):
             difficulty = config.difficulty
             sequences = config.custom_sequences
             battle_style = config.battle_style
-
-            # Emit payload when countdown ends (battle or punch-library flows)
-            # Skip emission for Self-Select; it will emit per-sequence refresh instead
-            # if (difficulty != "Self-Select") and (difficulty or battle_style):
-            #     payload = {
-            #         "mode": difficulty,
-            #         "battle_style": battle_style,
-            #         "sequences": sequences,
-            #     }
-            #     print(json.dumps(payload))
 
             training_page = self.stacked_widget.widget(PageIndex.TRAINING_SESSION)
             current_user = self.get_current_user()

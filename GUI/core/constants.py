@@ -47,6 +47,8 @@ class PageIndex:
     SPAR_RESULT        = 39
     PROFICIENCY_CHECKLIST = 40
     PROFICIENCY_RESULT = 41
+    HISTORY_HUB = 42
+    SPAR_HISTORY = 43
 
 
 class ButtonStyle:

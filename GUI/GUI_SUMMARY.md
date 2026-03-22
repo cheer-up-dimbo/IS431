@@ -54,7 +54,7 @@ GUI/
 - **`AppState`** — central singleton-style state manager; all pages read/write training config through this object. Also holds `cv_enabled` and `ai_chat_enabled` flags.
 
 ### `constants.py`
-- **`PageIndex`** — 40 named integer constants for `QStackedWidget` page navigation (e.g., `HOMEPAGE=0`, `SPAR_RESULT=39`).
+- **`PageIndex`** — 42 named integer constants for `QStackedWidget` page navigation (e.g., `HOMEPAGE=0`, `SPAR_RESULT=39`).
 - **`ButtonStyle`** — static Qt stylesheet strings for all button variants (Primary/Back/Info in Large/Medium/Small sizes, plus special selection button styles).
 
 ### `navigation.py`
@@ -270,7 +270,11 @@ LOGIN (22)
         │           ├─> STAMINA: STAMINA_INSTRUCTIONS (17) -> STAMINA_TEST (28) -> STAMINA_RESULT (29)
         │           └─> REACTION: REACTION_INSTRUCTIONS (18) -> REACTION_TEST (19) -> REACTION_RESULT (20)
         │
-        └─> USER_MANAGEMENT (23)
-              ├─> USER_COMBO_PROGRESS (24)
-              └─> USER_PROGRESS_OVERVIEW (25)
+        ├─> USER_MANAGEMENT (23)
+        │     ├─> USER_COMBO_PROGRESS (24)
+        │     └─> USER_PROGRESS_OVERVIEW (25)
+        │
+        └─> PROFICIENCY_CHECKLIST (40)   [post-signup only]
+              └─> PROFICIENCY_RESULT (41)
+                    └─> HOMEPAGE (0)
 ```

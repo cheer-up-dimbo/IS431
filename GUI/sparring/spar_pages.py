@@ -3,14 +3,14 @@ GUI page classes for the sparring flow.
 
 Flow:
     SparPage (existing, PageIndex.SPAR = 12)
-      -> SparStyleSelectPage     (SPAR_STYLE_SELECT = 34)
-      -> SparRoundConfigPage     (SPAR_ROUND_CONFIG  = 35)
-      -> SparCountdownPage       (SPAR_COUNTDOWN     = 36)
-      -> SparSessionPage         (SPAR_SESSION       = 37)
-      -> SparRestPage            (SPAR_REST          = 38)
+      -> SparStyleSelectPage     (SPAR_STYLE_SELECT = 33)
+      -> SparRoundConfigPage     (SPAR_ROUND_CONFIG  = 34)
+      -> SparCountdownPage       (SPAR_COUNTDOWN     = 35)
+      -> SparSessionPage         (SPAR_SESSION       = 36)
+      -> SparRestPage            (SPAR_REST          = 37)
       -> (repeat countdown -> session -> rest for each round)
-      -> SparProcessingPage      (SPAR_PROCESSING    = 39)
-      -> SparResultPage          (SPAR_RESULT        = 40)
+      -> SparProcessingPage      (SPAR_PROCESSING    = 38)
+      -> SparResultPage          (SPAR_RESULT        = 39)
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from typing import List, Optional, Dict
 from PySide6.QtCore import Qt, QThread, QTimer, QObject, Signal
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QStackedWidget,
-    QSizePolicy,
+    QSizePolicy, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView,
 )
 
 from core.constants import PageIndex, ButtonStyle
@@ -492,7 +492,14 @@ class SparCountdownPage(ButtonNavigationMixin, QWidget):
         layout.addWidget(self._countdown_label)
 
         layout.addStretch()
+
+        self._stop_session_btn = QPushButton("Stop Session")
+        self._stop_session_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self._stop_session_btn.clicked.connect(self._stop_session)
+        layout.addWidget(self._stop_session_btn, alignment=Qt.AlignCenter)
+
         self.setLayout(layout)
+        self.setup_navigation([self._stop_session_btn])
 
         # Timer for the countdown ticks
         self._timer = QTimer(self)
@@ -532,6 +539,13 @@ class SparCountdownPage(ButtonNavigationMixin, QWidget):
         if hasattr(session_page, "start_round"):
             session_page.start_round()
         self.navigate_to(PageIndex.SPAR_SESSION)
+
+    def _stop_session(self) -> None:
+        """User aborted the session during countdown."""
+        self._timer.stop()
+        send_round_stop()
+        _spar_state.reset()
+        self.navigate_to(PageIndex.SPAR_ROUND_CONFIG)
 
 
 # ============================================================================
@@ -617,14 +631,25 @@ class SparSessionPage(ButtonNavigationMixin, QWidget):
 
         layout.addStretch()
 
-        # Stop Round button
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(16)
+        btn_row.addStretch()
+
         self._stop_btn = QPushButton("Stop Round")
         self._stop_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
         self._stop_btn.clicked.connect(self._stop_round)
-        layout.addWidget(self._stop_btn, alignment=Qt.AlignCenter)
+        btn_row.addWidget(self._stop_btn)
+
+        self._stop_session_btn = QPushButton("Stop Session")
+        self._stop_session_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self._stop_session_btn.clicked.connect(self._stop_session)
+        btn_row.addWidget(self._stop_session_btn)
+
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
 
         self.setLayout(layout)
-        self.setup_navigation([self._stop_btn])
+        self.setup_navigation([self._stop_btn, self._stop_session_btn])
 
         # Internal state
         self._remaining: int = 0
@@ -701,6 +726,15 @@ class SparSessionPage(ButtonNavigationMixin, QWidget):
     def _stop_round(self) -> None:
         """User pressed Stop Round."""
         self._end_round()
+
+    def _stop_session(self) -> None:
+        """User aborted the entire session mid-round."""
+        self._tick_timer.stop()
+        if self._punch_worker is not None:
+            self._punch_worker.stop()
+        send_round_stop()
+        _spar_state.reset()
+        self.navigate_to(PageIndex.SPAR_ROUND_CONFIG)
 
     def _end_round(self) -> None:
         """Clean up and decide: rest or processing."""
@@ -779,14 +813,25 @@ class SparRestPage(ButtonNavigationMixin, QWidget):
 
         layout.addStretch()
 
-        # Skip Rest button
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(16)
+        btn_row.addStretch()
+
         self._skip_btn = QPushButton("Skip Rest")
         self._skip_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         self._skip_btn.clicked.connect(self._skip_rest)
-        layout.addWidget(self._skip_btn, alignment=Qt.AlignCenter)
+        btn_row.addWidget(self._skip_btn)
+
+        self._stop_session_btn = QPushButton("Stop Session")
+        self._stop_session_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        self._stop_session_btn.clicked.connect(self._stop_session)
+        btn_row.addWidget(self._stop_session_btn)
+
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
 
         self.setLayout(layout)
-        self.setup_navigation([self._skip_btn])
+        self.setup_navigation([self._skip_btn, self._stop_session_btn])
 
         # Internal timer
         self._remaining: int = 0
@@ -819,6 +864,12 @@ class SparRestPage(ButtonNavigationMixin, QWidget):
         """User pressed Skip Rest."""
         self._tick_timer.stop()
         self._transition_to_next_round()
+
+    def _stop_session(self) -> None:
+        """User aborted the entire session during rest."""
+        self._tick_timer.stop()
+        _spar_state.reset()
+        self.navigate_to(PageIndex.SPAR_ROUND_CONFIG)
 
     def _transition_to_next_round(self) -> None:
         """Increment round and go to countdown."""
@@ -1020,6 +1071,8 @@ class SparResultPage(ButtonNavigationMixin, QWidget):
         restart_btn.clicked.connect(self._on_restart)
 
         history_btn = QPushButton("History")
+        history_btn.setEnabled(False)
+        history_btn.setToolTip("Sparring history not yet implemented")
         history_btn.setStyleSheet(ButtonStyle.INFO_MEDIUM)
         history_btn.clicked.connect(self._on_history)
 
@@ -1130,9 +1183,103 @@ class SparResultPage(ButtonNavigationMixin, QWidget):
         self.navigate_to(PageIndex.SPAR_STYLE_SELECT)
 
     def _on_history(self) -> None:
+        # TODO: link to sparring history page when implemented
         # Placeholder — will be linked to sparring history page in future
         print("[Spar] History view placeholder — not yet implemented")
 
     def on_back_clicked(self) -> None:
         _spar_state.reset()
         self.navigate_to(PageIndex.SPAR)
+
+
+class SparHistoryPage(ButtonNavigationMixin, QWidget):
+    """Displays the user's sparring session history."""
+
+    SKIP_NAV_SETUP = True
+
+    def __init__(self, stacked_widget: QStackedWidget) -> None:
+        super().__init__()
+        self.stacked_widget = stacked_widget
+
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(40, 20, 40, 20)
+
+        title = QLabel("Spar History")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 28px; font-weight: bold;")
+        main_layout.addWidget(title)
+
+        # Table
+        self._table = QTableWidget()
+        self._table.setColumnCount(6)
+        self._table.setHorizontalHeaderLabels([
+            "Date", "Time", "Style", "Rounds", "Total Punches", "Top Punch"
+        ])
+        self._table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self._table.setSelectionMode(QAbstractItemView.NoSelection)
+        self._table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self._table.verticalHeader().setVisible(False)
+        self._table.setStyleSheet("""
+            QTableWidget {
+                font-size: 14px;
+                background-color: white;
+                color: black;
+            }
+            QHeaderView::section {
+                background-color: #4CAF50;
+                color: white;
+                font-weight: bold;
+            }
+        """)
+        main_layout.addWidget(self._table)
+
+        back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.clicked.connect(self._on_back)
+        main_layout.addWidget(back_btn, alignment=Qt.AlignCenter)
+
+        self.setLayout(main_layout)
+
+    def load_history(self, username: str) -> None:
+        """Fetch and display sparring history for the given user."""
+        from sparring.sparring_database import get_sparring_history
+
+        sessions = get_sparring_history(username, limit=50)
+        self._table.setRowCount(len(sessions))
+
+        for row, session in enumerate(sessions):
+            try:
+                dt = datetime.fromisoformat(session["timestamp"])
+                date_str = dt.strftime("%Y-%m-%d")
+                time_str = dt.strftime("%H:%M")
+            except Exception:
+                date_str = session.get("timestamp", "")[:10]
+                time_str = ""
+
+            style     = session.get("style", "")
+            rounds    = str(session.get("total_rounds", ""))
+            punch_counts = session.get("punch_counts", {})
+            total     = str(sum(punch_counts.values())) if punch_counts else "0"
+            top_punch = (
+                max(punch_counts, key=punch_counts.get)
+                if punch_counts else "—"
+            )
+
+            for col, value in enumerate([date_str, time_str, style, rounds, total, top_punch]):
+                item = QTableWidgetItem(value)
+                item.setTextAlignment(Qt.AlignCenter)
+                self._table.setItem(row, col, item)
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        try:
+            main_window = self.window()
+            username = main_window.get_current_user() if hasattr(main_window, "get_current_user") else None
+            if username:
+                self.load_history(username)
+        except Exception:
+            pass
+
+    def _on_back(self) -> None:
+        self.navigate_to(PageIndex.HISTORY_HUB)

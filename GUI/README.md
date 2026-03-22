@@ -403,7 +403,7 @@ def navigate_back(self):
         previous = self.navigation_stack.pop()       # Pop last page from history
         self.stacked_widget.setCurrentIndex(previous)
     else:
-        self.stacked_widget.setCurrentIndex(PageIndex.MAIN_MENU)
+        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
 ```
 
 ### Data Flow: AppState

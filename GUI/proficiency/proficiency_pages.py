@@ -7,11 +7,7 @@ from core.constants import PageIndex, ButtonStyle
 from utils import load_users, save_users, set_user_level
 
 
-PROFICIENCY_CHECKLIST_PAGE_INDEX = getattr(PageIndex, "PROFICIENCY_CHECKLIST", -1)
-PROFICIENCY_RESULT_PAGE_INDEX = getattr(PageIndex, "PROFICIENCY_RESULT", -1)
-
-
-class ProfiencyChecklistPage(ButtonNavigationMixin, QWidget):
+class ProficiencyChecklistPage(ButtonNavigationMixin, QWidget):
     LAYOUT_SPACING = 12
     LAYOUT_MARGINS = (40, 20, 40, 20)
     SKIP_NORMALIZE = True
@@ -59,6 +55,40 @@ class ProfiencyChecklistPage(ButtonNavigationMixin, QWidget):
             background-color: #4CAF50;
             border-color: #2e7d32;
         }
+    """
+
+    _SMALL_BTN_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+        QPushButton:hover { background-color: #d32f2f; }
+    """
+
+    _NEXT_DISABLED_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            background-color: #777777;
+            color: #dddddd;
+            border: none;
+            border-radius: 8px;
+        }
+        QPushButton:hover { background-color: #777777; }
+    """
+
+    _NEXT_ENABLED_STYLE = """
+        QPushButton {
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        QPushButton:hover { background-color: #388e3c; }
     """
 
     def __init__(self, stacked_widget):
@@ -118,38 +148,8 @@ class ProfiencyChecklistPage(ButtonNavigationMixin, QWidget):
         bottom_row.setSpacing(16)
         bottom_row.setContentsMargins(0, 0, 0, 0)
 
-        SMALL_STYLE = """
-            QPushButton {
-                font-size: 14px;
-                background-color: #f44336;
-                color: white;
-                border: none;
-                border-radius: 8px;
-            }
-            QPushButton:hover { background-color: #d32f2f; }
-        """
-        NEXT_DISABLED_STYLE = """
-            QPushButton {
-                font-size: 14px;
-                background-color: #777777;
-                color: #dddddd;
-                border: none;
-                border-radius: 8px;
-            }
-            QPushButton:hover { background-color: #777777; }
-        """
-        self._next_enabled_style = """
-            QPushButton {
-                font-size: 14px;
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-weight: bold;
-            }
-            QPushButton:hover { background-color: #388e3c; }
-        """
-        self._next_disabled_style = NEXT_DISABLED_STYLE
+        self._next_enabled_style = self._NEXT_ENABLED_STYLE
+        self._next_disabled_style = self._NEXT_DISABLED_STYLE
 
         def _make_small_widget(btn, style):
             btn.setStyleSheet(style)
@@ -173,10 +173,10 @@ class ProfiencyChecklistPage(ButtonNavigationMixin, QWidget):
         self.next_btn.setEnabled(False)
         self.next_btn.clicked.connect(self._on_next)
 
-        bottom_row.addWidget(_make_small_widget(skip_btn, SMALL_STYLE))
-        bottom_row.addWidget(_make_small_widget(back_btn, SMALL_STYLE))
+        bottom_row.addWidget(_make_small_widget(skip_btn, self._SMALL_BTN_STYLE))
+        bottom_row.addWidget(_make_small_widget(back_btn, self._SMALL_BTN_STYLE))
         bottom_row.addStretch()
-        bottom_row.addWidget(_make_small_widget(self.next_btn, NEXT_DISABLED_STYLE))
+        bottom_row.addWidget(_make_small_widget(self.next_btn, self._NEXT_DISABLED_STYLE))
 
         main_layout.addLayout(bottom_row)
         self.setLayout(main_layout)
@@ -238,13 +238,13 @@ class ProfiencyChecklistPage(ButtonNavigationMixin, QWidget):
         else:
             suggested_level = "Advanced"
 
-        result_page = self.stacked_widget.widget(PROFICIENCY_RESULT_PAGE_INDEX)
+        result_page = self.stacked_widget.widget(PageIndex.PROFICIENCY_RESULT)
         if result_page is not None and hasattr(result_page, "load"):
             result_page.load(self._username, suggested_level)
-        self.navigate_to(PROFICIENCY_RESULT_PAGE_INDEX)
+        self.navigate_to(PageIndex.PROFICIENCY_RESULT)
 
 
-class ProfiencyResultPage(ButtonNavigationMixin, QWidget):
+class ProficiencyResultPage(ButtonNavigationMixin, QWidget):
     LAYOUT_SPACING = 18
     LAYOUT_MARGINS = (80, 30, 80, 30)
 
@@ -352,7 +352,7 @@ class ProfiencyResultPage(ButtonNavigationMixin, QWidget):
 
         back_btn = QPushButton("Back")
         back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
-        back_btn.clicked.connect(lambda: self.navigate_to(PROFICIENCY_CHECKLIST_PAGE_INDEX))
+        back_btn.clicked.connect(lambda: self.navigate_to(PageIndex.PROFICIENCY_CHECKLIST))
 
         confirm_btn = QPushButton("Confirm")
         confirm_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
