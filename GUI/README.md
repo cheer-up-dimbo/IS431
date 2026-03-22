@@ -1,706 +1,594 @@
-# Boxing Training GUI (PySide6)
+# BoxBunny — Boxing Training GUI
 
-A touchscreen-first boxing training interface built with PySide6 for the BoxBunny project.
+## 1. Overview
 
-This GUI integrates:
-- combo curriculum training,
-- performance testing (Power / Stamina / Reaction),
-- per-user progress tracking,
-- and hardware/CV integration points.
+BoxBunny is an interactive boxing training system built with PySide6 for a Jetson Nano–based embedded platform with a 1024×600 touchscreen. The GUI manages the full training loop: combo curriculum drills (Beginner / Intermediate / Advanced / Self-Select), multi-round sparring sessions against a robot arm opponent, three fitness performance tests (power, stamina, reaction time), per-user progress tracking, history review, and AI-assisted coaching feedback. Hardware integration points include Arduino-based punch sensors, physical navigation buttons, and a file-based interface to a computer-vision punch-detection pipeline.
 
 ---
 
-## What’s New (Current GUI)
+## 2. Prerequisites
 
-The GUI has been updated with the following major changes:
+### Platform
 
-1. **Automatic navigation stack**
-   - Centralized navigation with `navigate_to()` / `navigate_back()`.
-   - Back button behavior now follows real page history instead of hardcoded return pages.
+- Target: Jetson Nano (Ubuntu), 1024×600 touchscreen
+- Development: Windows 10/11 (tested)
 
-2. **Per-user combo database**
-   - Each user gets their own `combos.db` at:
-     - `GUI/users/<username>/combos.db`
-   - Database is initialized automatically on first use.
+### Python
 
-3. **Unified per-user performance history database**
-   - Power, Stamina, and Reaction test results are stored in:
-     - `GUI/users/<username>/performance_history.db`
-   - Includes latest-vs-average summary helpers for trend display.
+- Python 3.9 or later
 
-4. **Arduino multi-mode protocol with fallback**
-   - Supports command-based modes (`MODE:POWER`, `MODE:STAMINA`, etc.).
-   - Falls back to legacy streaming behavior if firmware does not support mode commands.
+### Required packages
 
-5. **Expanded user progress pages**
-   - Added overview and detailed combo progress pages.
-   - Progress and mastery are tracked with difficulty-aware thresholds.
-
-6. **AI feedback plumbing (template-based now, LLM-ready path included)**
-   - Feedback data formatting and combo-result pages are integrated.
-   - `ComboLLMChatPage` exists behind app state configuration.
-
----
-
-## Key Features
-
-### User & Session Management
-- Login/Signup with SHA-256 password hashing.
-- User records in `GUI/users.csv`.
-- User management page for viewing/deleting accounts.
-
-### Combo Curriculum Training
-- 50 combos total:
-  - 15 Beginner
-  - 20 Intermediate
-  - 15 Advanced
-- Group-based progression by difficulty.
-- Mastery based on average recent performance and attempts.
-- Self-select sequence mode and spar/battle entry flows.
-
-### Performance Testing
-- **Power**: serial-based punch power workflow.
-- **Stamina**: timed punch endurance workflow (Arduino + simulation path).
-- **Reaction**: camera + YOLO pose-based reaction timing.
-- Consolidated performance history page with per-test filtering and trends.
-
-### Self-Select Sequence with Unified Button Navigation
-- Custom punch sequence creation interface with 5-sequence management.
-- All input buttons (numpad 1-6, defense moves, backspace, confirm, back, next) support:
-  - **Unified styling** with standardized focus highlighting (green border).
-  - **Keyboard focus** support for seamless navigation via up/down keys.
-  - **Arduino physical button integration** enabling up/down/enter cycling without touching the screen.
-  - **Flexible sizing** that adapts to grid layout constraints while maintaining visual consistency.
-- Manages up to 9 moves per sequence; supports editing and reordering via sequence list controls.
-- Full integration with combo training workflow for custom difficulty progression.
-
-### UI / Architecture
-- Single `QStackedWidget` app with indexed pages.
-- Shared `AppState` (`core/config.py`) for training/session configuration.
-- Shared page constants in `core/constants.py`.
-
----
-
-## Project Structure
-
-```text
-GUI/
-├── main_gui.py
-├── README.md
-├── users.csv
-├── performance_database.py
-├── placeholders.py
-│
-├── core/
-│   ├── __init__.py
-│   ├── config.py
-│   └── constants.py
-│
-├── utils/
-│   ├── __init__.py
-│   └── user_management.py
-│
-├── combo_curriculum/
-│   ├── __init__.py
-│   ├── curriculum.py
-│   ├── action_recognition_placeholder.py
-│   ├── docs/
-│   ├── examples/
-│   └── tests/
-│
-├── power/
-│   └── power_runner.py
-├── stamina/
-│   └── stamina_runner.py
-├── reaction_time/
-│   └── reaction_time_runner.py
-│
-├── setup/
-│   ├── setup_combo_database.py
-│   ├── create_database_schema.py
-│   ├── populate_combos.py
-│   └── combos.db
-│
-├── users/
-├── training_history/
-└── training_history_archive/
-```
-
----
-
-## Prerequisites
-
-- Python 3.9+
-- Windows/Linux with camera access (for reaction test)
-- Optional Arduino + sensor setup (for hardware power/stamina path)
-
-Python packages used by the GUI include:
-- `PySide6`
-- `opencv-python`
-- `numpy`
-- `ultralytics`
-- `pyserial`
-
-> Note: There is currently no dedicated `requirements.txt` in `GUI/`. Install the packages manually in your environment.
-
----
-
-## Setup
-
-From the repository root:
+No `requirements.txt` — install manually:
 
 ```bash
+pip install PySide6 opencv-python numpy ultralytics pyserial anthropic
+```
+
+| Package | Purpose |
+| --- | --- |
+| `PySide6` | Qt 6 GUI framework |
+| `opencv-python` | Webcam capture for reaction test |
+| `numpy` | Numerical ops (pose estimation) |
+| `ultralytics` | YOLO11 pose estimation model |
+| `pyserial` | Arduino serial communication |
+| `anthropic` | Claude API for AI coaching chat |
+
+### Hardware (optional)
+
+- Arduino with punch force sensors (power and stamina tests)
+- Arduino with three navigation buttons (UP/ENTER/DOWN — whole-app navigation)
+- Webcam (reaction time test)
+
+---
+
+## 3. Setup & Run
+
+```bash
+# 1. Clone and enter the GUI directory
 cd GUI
+
+# 2. Create and activate a virtual environment
 python -m venv .venv
+# Windows:
 .venv\Scripts\activate
-```
+# Linux / Jetson:
+source .venv/bin/activate
 
-Install dependencies:
+# 3. Install dependencies
+pip install PySide6 opencv-python numpy ultralytics pyserial anthropic
 
-```bash
-pip install PySide6 opencv-python numpy ultralytics pyserial
-```
+# 4. Configure environment
+cp .env.example .env
+# Edit .env — set ARDUINO_BUTTON_PORT and any other values you need.
+# Add ANTHROPIC_API_KEY=sk-ant-... manually if you want AI chat features.
 
-### Database setup
-
-`main_gui.py` auto-runs combo DB setup when needed. You can also run it manually:
-
-```bash
+# 5. Set up the shared combo database (auto-runs on first login, but can be run manually)
 python setup/setup_combo_database.py --db-path data/combos.db --force
-```
 
----
+# 6. Place the YOLO pose model at the repo-root models/ directory
+#    models/yolo11s-pose.pt
 
-## Run
-
-```bash
-cd GUI
+# 7. Run
 python main_gui.py
 ```
 
 ---
 
-## Data Storage
+## 4. Project Structure
 
-### User accounts
-- `GUI/users.csv`
-
-### Combo training DB
-- Shared template DB: `GUI/data/combos.db`
-- Per-user DBs (auto-created): `GUI/users/<username>/combos.db`
-
-### Performance history DB
-- Per-user DB (auto-created): `GUI/users/<username>/performance_history.db`
-- Tables:
-  - `power_tests`
-  - `stamina_tests`
-  - `reaction_tests`
-
-### Training CSV logs
-- `GUI/training_history/training_<username>.csv`
-
----
-
-## Hardware / CV Notes
-
-### Arduino protocol behavior
-- GUI first probes command-based protocol support.
-- If available, it uses explicit mode commands and structured responses.
-- If unavailable, it falls back to legacy streaming mode.
-
-### Arduino physical-button navigation (new)
-- Upload sketch: `GUI/arduino/button_navigation/button_navigation.ino`
-- Wiring: buttons on pins `2` (UP), `4` (ENTER), `7` (DOWN) using `INPUT_PULLUP` to GND.
-- Arduino sends serial commands at `115200`: `BTN1_PRESS`, `BTN2_PRESS`, `BTN3_PRESS`.
-- Python listener in `main_gui.py` runs in background thread and maps to Up/Down/Enter navigation.
-- Optional config via `.env` (copy from `GUI/.env.example`):
-   - `ARDUINO_BUTTONS_ENABLED=true|false`
-   - `ARDUINO_BUTTON_PORT=COM3` (recommended on Windows)
-   - `ARDUINO_BUTTON_BAUD=115200`
-   - `ARDUINO_BUTTON_DEBOUNCE_MS=120`
-   - `ARDUINO_BUTTON_TIMEOUT_SEC=0.05`
-   - `ARDUINO_BUTTON_STARTUP_DELAY_SEC=1.2`
-   - `ARDUINO_BUTTON_RECONNECT_SEC=2.0`
-   - `ARDUINO_BUTTONS_SUSPEND_DURING_TESTS=true`
-   - `ARDUINO_BUTTON_WATCHDOG_MS=5000`
-- You can also set COM port directly in app: `Others` → dropdown (`Auto Detect` or COMx) → `Apply Arduino Port`.
-- The dropdown refreshes each time `Others` opens, so newly plugged USB serial devices appear without restarting the app.
-- If exactly one Arduino-like serial device is detected and no fixed port is configured, the app auto-applies that port.
-- Button listener is temporarily suspended on serial-heavy Power/Stamina test pages to avoid COM-port contention, then resumed automatically.
-- `Others` page shows live listener state (`connected`, `starting`, `reconnecting`, `suspended`, `disabled`).
-- A watchdog auto-restarts the listener thread if it stops unexpectedly.
-
-### Reaction-time model path
-- Expected YOLO model file:
-  - `models/yolo11s-pose.pt` (repo root `models/` folder)
-
----
-
-## Main Pages (High-Level)
-
-The app includes pages for:
-- Login, Home, Training, Techniques
-- Parameter selection (round/time/rest/speed)
-- Countdown + Training Session
-- Self-select sequences, Spar, Battle
-- Power/Stamina/Reaction test flows and result pages
-- Performance history
-- User management, user combo progress, user progress overview
-- Combo results + LLM chat page scaffold
-
----
-
-## GUI Architecture & Developer Guide
-
-This section explains how the GUI is built so a new developer can understand, modify, or extend it without prior knowledge of the codebase.
-
-### Framework
-
-The app uses **PySide6** (the official Python binding for Qt 6). All widgets, layouts, signals, and event handling come from PySide6:
-
-```python
-from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton,
-                               QLabel, QStackedWidget, QHBoxLayout, QLineEdit)
-from PySide6.QtCore import Qt, QTimer
+```text
+GUI/
+├── main_gui.py                   # Main entry point; all page classes and MainWindow
+├── placeholders.py               # Shared scoring/feedback helper
+├── performance_database.py       # Per-user SQLite DB for power/stamina/reaction history
+├── users.csv                     # User credentials (username, SHA-256 hash, level, progress)
+├── .env                          # Runtime config (not committed — copy from .env.example)
+├── .env.example                  # Template for .env
+│
+├── core/                         # Shared config, constants, navigation mixin
+│   ├── config.py                 # TrainingConfig dataclass and AppState singleton
+│   ├── constants.py              # PageIndex (44 entries) and ButtonStyle stylesheet strings
+│   ├── navigation.py             # ButtonNavigationMixin — keyboard/Arduino focus cycling
+│   └── tooltip.py                # attach_tooltip() helper
+│
+├── sparring/                     # Multi-round sparring flow and robot interface
+│   ├── spar_pages.py             # 8 page classes: StyleSelect → RoundConfig → Countdown →
+│   │                             #   Session → Rest → Processing → Result → SparHistory
+│   ├── combo_pools.py            # Markov-chain transition matrices for 5 boxing styles
+│   ├── sequence_generator.py     # Generates punch sequences using style matrices + weakness bias
+│   ├── robot_interface.py        # Stub serial interface: set_speed, send_punch, round signals
+│   ├── sparring_database.py      # SQLite logging for sessions and weakness profiles
+│   └── __init__.py
+│
+├── proficiency/                  # Post-signup proficiency assessment
+│   ├── proficiency_pages.py      # ProficiencyChecklistPage and ProficiencyResultPage
+│   └── __init__.py
+│
+├── combo_curriculum/             # Combo database and progression logic
+│   ├── curriculum.py             # ComboCurriculum class — SQLite-backed combo manager
+│   ├── action_recognition_placeholder.py  # Stub for future CV action recognition
+│   ├── docs/                     # Scoring, progression, and progress documentation
+│   ├── examples/                 # Usage examples
+│   ├── tests/                    # pytest test suite (5 files)
+│   └── __init__.py
+│
+├── power/
+│   └── power_runner.py           # Arduino serial protocol for punch force measurement
+│
+├── stamina/
+│   └── stamina_runner.py         # Timed punch endurance test; Arduino or simulated mode
+│
+├── reaction_time/
+│   └── reaction_time_runner.py   # YOLO11 pose + webcam reaction timing
+│
+├── utils/
+│   ├── user_management.py        # users.csv CRUD: load, save, hash, level, progress helpers
+│   └── __init__.py
+│
+├── arduino/
+│   └── button_navigation/
+│       └── button_navigation.ino # 3-button navigation firmware (UP/ENTER/DOWN)
+│
+├── setup/
+│   ├── setup_combo_database.py   # Orchestrates schema + populate + verify for combos.db
+│   ├── create_database_schema.py # Creates SQLite schema
+│   └── populate_combos.py        # Inserts all 50 Beginner/Intermediate/Advanced combos
+│
+├── scripts/                      # Dev/debug scripts (verify imports, inspect DB, smoke tests)
+│
+├── data/
+│   └── combos.db                 # Shared fallback combo template database
+│
+├── users/                        # Per-user directories created automatically at first login
+│   └── <username>/
+│       ├── combos.db
+│       ├── performance_history.db
+│       └── spar_trigger.json     # Written by GUI after each sparring session (CV trigger)
+│
+├── training_history/             # CSV training session logs: training_<username>.csv
+└── training_history_archive/     # Archived training CSVs (timestamped copies)
 ```
 
-### Main Window & Page System
+---
 
-The entire app lives inside a single `MainWindow(QWidget)` that holds one `QStackedWidget`. Each screen the user sees is a separate `QWidget` added to the stack. The visible page is controlled by its integer index:
+## 5. Architecture Overview
 
-```python
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Boxing Training App")
-        self.setFixedSize(1024, 600)         # Fixed for 7-inch touchscreen
+### QStackedWidget page model
 
-        self.stacked_widget = QStackedWidget()
-        self.app_state = AppState()          # Shared config object
+The entire application lives inside a single `MainWindow(QWidget)` that contains one `QStackedWidget`. Every screen is a `QWidget` subclass added to the stack at startup. Exactly one page is visible at a time, selected by its integer index.
 
-        # Create page instances — each receives stacked_widget so it can navigate
-        self.homepage = Homepage(self.stacked_widget)
-        self.training_page = TrainingPage(self.stacked_widget)
-        # ... more pages ...
+All 44 pages are instantiated in `MainWindow.__init__()` before the window is shown. The order of `addWidget()` calls determines the index, which must match the constant defined in `core/constants.py`.
 
-        # Register pages — order determines index (0, 1, 2, ...)
-        self.stacked_widget.addWidget(self.homepage)         # index 0
-        self.stacked_widget.addWidget(self.training_page)    # index 1
-        # ... more addWidget calls ...
+### AppState
+
+`core/config.py` defines a `TrainingConfig` dataclass (rounds, work time, rest time, speed, difficulty, battle style, custom punch sequence) and an `AppState` object that wraps it. `AppState` is created once in `MainWindow` and passed to pages that need it. Pages write their selections back to `AppState` so downstream pages can read the fully configured session when training starts.
+
+`AppState` also carries boolean flags:
+
+- `cv_enabled` — whether to write the CV trigger file after sparring
+- `ai_chat_enabled` — whether to call the Claude API for coaching feedback
+
+### ButtonNavigationMixin
+
+Every page class inherits from `(ButtonNavigationMixin, QWidget)`. The mixin provides:
+
+- `self.navigate_to(page_index)` — delegates to `MainWindow.navigate_to()`, which calls `stacked_widget.setCurrentIndex()`
+- `self.setup_navigation(buttons)` — registers a list of buttons for keyboard and Arduino cycling:
+  - Sets `Qt.StrongFocus` on each button
+  - Installs a key event filter for Up/Down/Enter
+  - Applies a green `QGraphicsDropShadowEffect` to the focused button
+  - Focuses the first button when the page is shown
+
+### navigate_to() patch on QWidget
+
+At startup, `MainWindow` monkey-patches `navigate_to()` onto `QWidget` itself so that any page can call `self.navigate_to(index)` without needing a direct reference to `MainWindow`.
+
+### The SKIP_NAV_SETUP class attribute
+
+If a page sets `SKIP_NAV_SETUP = True` as a class attribute, `ButtonNavigationMixin` skips the automatic call to `setup_navigation()` when the page is shown. Use this on pages that manage their own button focus (e.g., grids where the mixin's linear cycling would not make sense) or pages with no navigable buttons.
+
+### SKIP_NORMALIZE
+
+If a page sets `SKIP_NORMALIZE = True`, the mixin skips overriding button `min-width`/`min-height` to its normalized defaults. Use this when a page's buttons intentionally differ from the standard navigation button size (e.g., the proficiency checklist option buttons).
+
+---
+
+## 6. Page Index Reference
+
+| Index | PageIndex constant | Class | Description |
+| --- | --- | --- | --- |
+| 0 | `HOMEPAGE` | `Homepage` | Main menu with Training, Spar, History, User Management, and Others |
+| 1 | `TRAINING` | `TrainingPage` | Top-level training mode menu |
+| 2 | `TECHNIQUES` | `TechniquesPage` | Difficulty level selection (Beginner / Intermediate / Advanced / Self-Select) |
+| 3 | `PUNCH_COMBINATIONS` | `PunchCombinationPage` | Browse and select a combo from the curriculum |
+| 4 | `BASIC_PARAMETERS` | `BasicParametersPage` | Configure rounds, time, rest, speed before session |
+| 5 | `ROUND_SELECTION` | `RoundSelectionPage` | Grid selector for number of rounds (1–12) |
+| 6 | `SPEED_SELECTION` | `SpeedSelectionPage` | Speed selector (25% / 50% / 75% / 100%) |
+| 7 | `TIME_SELECTION` | `TimeSelectionPage` | Work time per round selector |
+| 8 | `REST_SELECTION` | `RestSelectionPage` | Rest time between rounds selector |
+| 9 | `COUNTDOWN` | `CountdownPage` | 5-second countdown before training session starts |
+| 10 | `TRAINING_SESSION` | `TrainingSessionPage` | Live combo display with round and rest timers |
+| 11 | `SELF_SELECT_SEQUENCE` | `SelfSelectSequencePage` | Build a custom punch sequence (up to 9 moves, up to 5 sequences) |
+| 12 | `SPAR` | `SparPage` | Sparring mode entry page |
+| 13 | `PERFORMANCE` | `PerformancePage` | Hub for power, stamina, and reaction tests |
+| 14 | `POWER_INSTRUCTIONS` | `PowerInstructionsPage` | Pre-test instructions for power punch test |
+| 15 | `POWER_PUNCH` | `PowerPunchPage` | Live power punch test (Arduino or simulated) |
+| 16 | `POWER_RESULT` | `PowerResultPage` | Display peak power, average power, punch count |
+| 17 | `STAMINA_INSTRUCTIONS` | `StaminaInstructionsPage` | Pre-test instructions for stamina test |
+| 18 | `REACTION_INSTRUCTIONS` | `ReactionInstructionsPage` | Instructions for YOLO reaction time test |
+| 19 | `REACTION_TEST` | `ReactionTestPage` | Live reaction time measurement (webcam + YOLO) |
+| 20 | `REACTION_RESULT` | `ReactionResultPage` | Display reaction time result |
+| 21 | `OTHERS` | `OthersPage` | Settings hub: Arduino port, CV toggle, AI chat toggle |
+| 22 | `LOGIN` | `LoginPage` | Username/password login and account creation |
+| 23 | `USER_MANAGEMENT` | `UserManagementPage` | View/delete users, view stamina history table |
+| 24 | `USER_COMBO_PROGRESS` | `UserComboProgressPage` | Per-combo mastery progress table |
+| 25 | `USER_PROGRESS_OVERVIEW` | `UserProgressOverviewPage` | Level progress and group completion overview |
+| 26 | `COMBO_RESULTS` | `ComboResultsPage` | Results after completing a combo drill session |
+| 27 | `COMBO_LLM_CHAT` | `ComboLLMChatPage` | AI coaching chat for combo performance feedback |
+| 28 | `STAMINA_TEST` | `StaminaTestPage` | Live 2-minute stamina test with countdown |
+| 29 | `STAMINA_RESULT` | `StaminaResultPage` | Display score, fatigue %, punch rate |
+| 30 | `STAMINA_HISTORY` | `StaminaHistoryPage` | Historical stamina results table |
+| 31 | `PERFORMANCE_HISTORY` | `PerformanceHistoryPage` | Tabbed history view for power / stamina / reaction |
+| 32 | `BATTLE_STYLE_DESC` | `BattleStyleDescriptionPage` | Descriptions of each boxing style |
+| 33 | `SPAR_STYLE_SELECT` | `SparStyleSelectPage` | Boxing style selection for sparring session |
+| 34 | `SPAR_ROUND_CONFIG` | `SparRoundConfigPage` | Configure rounds, round time, and rest time |
+| 35 | `SPAR_COUNTDOWN` | `SparCountdownPage` | 5-second countdown before each sparring round |
+| 36 | `SPAR_SESSION` | `SparSessionPage` | Live sparring round — timer, punch display, stop control |
+| 37 | `SPAR_REST` | `SparRestPage` | Rest period between sparring rounds |
+| 38 | `SPAR_PROCESSING` | `SparProcessingPage` | Polling screen while CV pipeline analyses session |
+| 39 | `SPAR_RESULT` | `SparResultPage` | Sparring session summary with punch breakdown and AI feedback |
+| 40 | `PROFICIENCY_CHECKLIST` | `ProficiencyChecklistPage` | 6-question background survey shown once after account creation |
+| 41 | `PROFICIENCY_RESULT` | `ProficiencyResultPage` | Shows suggested level; user can override and confirm |
+| 42 | `HISTORY_HUB` | `HistoryHubPage` | Central hub to navigate to all history views |
+| 43 | `SPAR_HISTORY` | `SparHistoryPage` | Table of past sparring sessions |
+
+---
+
+## 7. Navigation Flow
+
+```text
+LOGIN (22)
+  │
+  ├─> [new account] ──> PROFICIENCY_CHECKLIST (40)
+  │                           └─> PROFICIENCY_RESULT (41) ──> HOMEPAGE (0)
+  │
+  └─> [existing account] ──> HOMEPAGE (0)
+        │
+        ├─> TRAINING (1)
+        │     └─> TECHNIQUES (2)
+        │           └─> PUNCH_COMBINATIONS (3)
+        │                 └─> BASIC_PARAMETERS (4)
+        │                       ├─> ROUND_SELECTION (5) ──> BASIC_PARAMETERS
+        │                       ├─> SPEED_SELECTION (6) ──> BASIC_PARAMETERS
+        │                       ├─> TIME_SELECTION (7)  ──> BASIC_PARAMETERS
+        │                       ├─> REST_SELECTION (8)  ──> BASIC_PARAMETERS
+        │                       └─> COUNTDOWN (9)
+        │                             └─> TRAINING_SESSION (10)
+        │                                   └─> COMBO_RESULTS (26)
+        │                                         └─> COMBO_LLM_CHAT (27) [if AI enabled]
+        │
+        ├─> SPAR (12)
+        │     └─> SPAR_STYLE_SELECT (33)
+        │           └─> BATTLE_STYLE_DESC (32) [info popup]
+        │           └─> SPAR_ROUND_CONFIG (34)
+        │                 └─> SPAR_COUNTDOWN (35)
+        │                       └─> SPAR_SESSION (36)
+        │                             └─> SPAR_REST (37)
+        │                                   └─> [next round: SPAR_COUNTDOWN → SPAR_SESSION → SPAR_REST]
+        │                                         └─> [final round done]
+        │                                               └─> SPAR_PROCESSING (38)
+        │                                                     └─> SPAR_RESULT (39)
+        │
+        ├─> OTHERS (21)
+        │     └─> PERFORMANCE (13)
+        │           ├─> Power:    POWER_INSTRUCTIONS (14) → POWER_PUNCH (15) → POWER_RESULT (16)
+        │           ├─> Stamina:  STAMINA_INSTRUCTIONS (17) → STAMINA_TEST (28) → STAMINA_RESULT (29)
+        │           └─> Reaction: REACTION_INSTRUCTIONS (18) → REACTION_TEST (19) → REACTION_RESULT (20)
+        │
+        ├─> HISTORY (42)  [HistoryHubPage]
+        │     ├─> PERFORMANCE_HISTORY (31) filtered to Power
+        │     ├─> PERFORMANCE_HISTORY (31) filtered to Stamina
+        │     ├─> PERFORMANCE_HISTORY (31) filtered to Reaction
+        │     ├─> USER_COMBO_PROGRESS (24)
+        │     └─> SPAR_HISTORY (43)
+        │
+        └─> USER_MANAGEMENT (23)
+              ├─> USER_COMBO_PROGRESS (24)
+              └─> USER_PROGRESS_OVERVIEW (25)
 ```
 
-Page indices are defined as named constants in `core/constants.py` so you never use raw numbers:
+Self-select sequence: `TECHNIQUES (2)` → `SELF_SELECT_SEQUENCE (11)` → `BASIC_PARAMETERS (4)`
+
+Stamina history: reachable from `STAMINA_RESULT (29)` → `STAMINA_HISTORY (30)`.
+
+---
+
+## 8. Data Storage
+
+### users.csv
+
+One row per user. Fields:
+
+| Column | Type | Description |
+| --- | --- | --- |
+| `username` | string | Login name (also used as directory name under `users/`) |
+| `password_hash` | string | SHA-256 hex digest of the plaintext password |
+| `level` | string | `Beginner`, `Intermediate`, or `Advanced` |
+| `progress` | float | 0.0–1.0 overall progress within the current level |
+
+### users/\<username\>/combos.db
+
+Per-user SQLite database created at first login. Mirrors the shared `data/combos.db` schema but adds mastery scores and attempt counts per user. Managed by `combo_curriculum/curriculum.py`.
+
+### users/\<username\>/performance_history.db
+
+Per-user SQLite database. Contains five tables:
+
+**`power_tests`** — one row per power test session
+
+| Column | Type |
+| --- | --- |
+| `timestamp` | TEXT (ISO-8601) |
+| `peak_power` | REAL |
+| `average_power` | REAL |
+| `total_punches` | INTEGER |
+
+**`stamina_tests`** — one row per stamina test session
+
+| Column | Type |
+| --- | --- |
+| `timestamp` | TEXT (ISO-8601) |
+| `total_punches` | INTEGER |
+| `average_rate` | REAL (punches/min) |
+| `first_30s_rate` | REAL |
+| `last_30s_rate` | REAL |
+| `fatigue_percentage` | REAL |
+| `score` | REAL |
+| `duration` | INTEGER (seconds) |
+
+**`reaction_tests`** — one row per reaction test session
+
+| Column | Type |
+| --- | --- |
+| `timestamp` | TEXT (ISO-8601) |
+| `reaction_time` | REAL (milliseconds) |
+| `accuracy` | REAL |
+| `total_attempts` | INTEGER |
+
+**`sparring_sessions`** — one row per sparring session
+
+| Column | Type |
+| --- | --- |
+| `id` | INTEGER PK |
+| `timestamp` | TEXT (ISO-8601) |
+| `style` | TEXT |
+| `total_rounds` | INTEGER |
+| `round_duration` | INTEGER (seconds) |
+| `rest_duration` | INTEGER (seconds) |
+| `cv_raw_output` | TEXT (raw comma-separated punch labels from CV) |
+| `punch_counts` | TEXT (JSON dict: `{"jab": 5, "cross": 3, ...}`) |
+| `notes` | TEXT |
+
+**`sparring_weakness_profile`** — one row per user (upserted after each session)
+
+| Column | Type |
+| --- | --- |
+| `username` | TEXT UNIQUE |
+| `jab_freq` | REAL |
+| `cross_freq` | REAL |
+| `lead_hook_freq` | REAL |
+| `rear_hook_freq` | REAL |
+| `lead_upper_freq` | REAL |
+| `rear_upper_freq` | REAL |
+| `sessions_count` | INTEGER |
+| `last_updated` | TEXT (ISO-8601) |
+
+### training_history/training_\<username\>.csv
+
+Append-only log of training session events (round start/stop, combo selection, timestamps). One file per user. Archived copies go to `training_history_archive/`.
+
+### data/combos.db
+
+Shared SQLite template database holding all 50 combos (15 Beginner, 20 Intermediate, 15 Advanced). Read-only at runtime; copied into per-user directories on first login.
+
+### .env
+
+Runtime configuration file. Copy `.env.example` to `.env` and edit. Keys defined in `.env.example`:
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `ARDUINO_BUTTONS_ENABLED` | `true` | Enable/disable physical button listener |
+| `ARDUINO_BUTTON_PORT` | `COM3` | Serial port for navigation buttons. Leave empty to auto-detect |
+| `ARDUINO_BUTTON_BAUD` | `115200` | Baud rate for button navigation Arduino |
+| `ARDUINO_BUTTON_DEBOUNCE_MS` | `120` | Software debounce window in milliseconds |
+| `ARDUINO_BUTTON_TIMEOUT_SEC` | `0.05` | Serial read timeout in seconds |
+| `ARDUINO_BUTTON_STARTUP_DELAY_SEC` | `1.2` | Delay before first read after port opens |
+| `ARDUINO_BUTTON_RECONNECT_SEC` | `2.0` | Retry interval when connection is lost |
+| `ARDUINO_BUTTONS_SUSPEND_DURING_TESTS` | `true` | Suspend button listener during Power/Stamina tests to avoid port conflicts |
+| `ARDUINO_BUTTON_WATCHDOG_MS` | `5000` | Auto-restart listener thread if it stops unexpectedly |
+| `STAMINA_USE_ARDUINO` | `false` | Use Arduino for stamina punch counting (false = simulated) |
+
+Key not in `.env.example` — add manually:
+
+| Key | Purpose |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | API key for Claude AI coaching chat (`sk-ant-...`). Leave unset to run without AI features |
+
+---
+
+## 9. Adding a New Page (Developer Guide)
+
+### Step-by-step
+
+**1. Add a `PageIndex` constant** in `core/constants.py`:
 
 ```python
-# core/constants.py
 class PageIndex:
-    HOMEPAGE = 0
-    TRAINING = 1
-    TECHNIQUES = 2
-    PUNCH_COMBINATIONS = 3
-    BASIC_PARAMETERS = 4
-    # ... 40 pages total
+    ...
+    MY_NEW_PAGE = 44   # Next available index
 ```
 
-### Creating a New Page
-
-Every page is a class that inherits from both `ButtonNavigationMixin` and `QWidget`. The mixin provides standardized button styling, keyboard/Arduino navigation, and the `navigate_to()` helper:
+**2. Create the page class** inheriting `(ButtonNavigationMixin, QWidget)`. Place it in `main_gui.py` or a dedicated module:
 
 ```python
 from core.navigation import ButtonNavigationMixin
-from core import PageIndex, ButtonStyle
+from core.constants import PageIndex, ButtonStyle
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PySide6.QtCore import Qt
 
 class MyNewPage(ButtonNavigationMixin, QWidget):
+
     def __init__(self, stacked_widget):
         super().__init__()
-        self.stacked_widget = stacked_widget    # Required for navigation
+        self.stacked_widget = stacked_widget
 
-        # 1. Create a layout
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(20)
+        layout.setContentsMargins(60, 40, 60, 40)
 
-        # 2. Create widgets
-        title = QLabel("My Page Title")
-        title.setStyleSheet("font-size: 30px; font-weight: bold;")
+        title = QLabel("My Page")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 30px; font-weight: bold; color: white;")
 
         action_btn = QPushButton("Do Something")
+        action_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
+        action_btn.clicked.connect(self._on_action)
+
         back_btn = QPushButton("Back")
+        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)
+        back_btn.clicked.connect(self._on_back)
 
-        # 3. Style buttons with centralized ButtonStyle constants
-        action_btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)   # Green
-        back_btn.setStyleSheet(ButtonStyle.BACK_MEDIUM)        # Red
-
-        # 4. Wire button clicks to handler methods
-        action_btn.clicked.connect(self.on_action_clicked)
-        back_btn.clicked.connect(self.on_back_clicked)
-
-        # 5. Add widgets to layout
         layout.addWidget(title)
         layout.addWidget(action_btn, alignment=Qt.AlignCenter)
         layout.addWidget(back_btn, alignment=Qt.AlignCenter)
         self.setLayout(layout)
 
-    def on_action_clicked(self):
-        print("Action triggered")
-        self.navigate_to(PageIndex.TRAINING)   # Switch to Training page
+        # Register buttons for Arduino/keyboard navigation
+        self.setup_navigation([action_btn, back_btn])
 
-    def on_back_clicked(self):
-        self.navigate_to(PageIndex.HOMEPAGE)   # Switch to Homepage
+    def _on_action(self):
+        self.navigate_to(PageIndex.SOME_OTHER_PAGE)
+
+    def _on_back(self):
+        self.navigate_to(PageIndex.HOMEPAGE)
 ```
 
-To register the new page, add it in `MainWindow.__init__`:
+**3. Instantiate in `MainWindow.__init__`** and add at the correct index:
 
 ```python
 # In MainWindow.__init__:
 self.my_new_page = MyNewPage(self.stacked_widget)
-self.stacked_widget.addWidget(self.my_new_page)   # Gets next available index
-
-# Add matching constant in core/constants.py:
-# MY_NEW_PAGE = 40
+self.stacked_widget.addWidget(self.my_new_page)   # must become index 44
 ```
 
-### Button Clicks & Callbacks
+The index is determined by the order of `addWidget()` calls. Count them carefully to ensure they match the `PageIndex` constant.
 
-PySide6 uses Qt's **signal/slot** pattern. Every `QPushButton` has a `clicked` signal. You connect it to any Python callable:
+**4. Wire navigation from an existing page** — in the page that should link to yours:
 
 ```python
-# Direct method reference
-btn.clicked.connect(self.on_btn_clicked)
-
-# Lambda for passing arguments
-btn.clicked.connect(lambda: self.handle_choice("Option A"))
-
-# Lambda with default arg (important inside loops to capture loop variable)
-for i, label in enumerate(["Beginner", "Intermediate", "Advanced"]):
-    btn = QPushButton(label)
-    btn.clicked.connect(lambda checked, arg=label: self.on_difficulty_clicked(arg))
+some_btn.clicked.connect(lambda: self.navigate_to(PageIndex.MY_NEW_PAGE))
 ```
 
-> **Important:** Inside a loop, always use `lambda checked, arg=val: ...` with a default argument. Without it, all lambdas would capture the final loop value.
+### SKIP_NAV_SETUP
 
-### Navigation
+Do not call `self.setup_navigation()` and set `SKIP_NAV_SETUP = True` when:
 
-Navigation between pages is handled by two mechanisms:
-
-**1. Page-level `navigate_to()`** — provided by `ButtonNavigationMixin`. Each page calls `self.navigate_to(PageIndex.SOME_PAGE)` which delegates to `MainWindow.navigate_to()`:
-
-```python
-# Inside any page class:
-def on_training_clicked(self):
-    self.navigate_to(PageIndex.TRAINING)    # Switches the visible page
-```
-
-**2. `MainWindow.navigate_to()` and `navigate_back()`** — manages a navigation stack for proper back-button behavior:
+- The page uses a grid layout where linear focus cycling would be confusing
+- The page has no buttons that need keyboard/Arduino navigation
+- You are managing focus manually
 
 ```python
-# In MainWindow:
-def navigate_to(self, page_index: int):
-    self.stacked_widget.setCurrentIndex(page_index)  # Show the target page
+class MyGridPage(ButtonNavigationMixin, QWidget):
+    SKIP_NAV_SETUP = True
 
-def navigate_back(self):
-    if self.navigation_stack:
-        previous = self.navigation_stack.pop()       # Pop last page from history
-        self.stacked_widget.setCurrentIndex(previous)
-    else:
-        self.stacked_widget.setCurrentIndex(PageIndex.LOGIN)
-```
-
-### Data Flow: AppState
-
-Pages share data through a single `AppState` object (defined in `core/config.py`). It holds a `TrainingConfig` dataclass with all training parameters:
-
-```python
-# core/config.py
-class AppState:
-    def __init__(self):
-        self.config = TrainingConfig()     # rounds, speed, time, difficulty, etc.
-        self.previous_page = PageIndex.HOMEPAGE
-        self.ai_chat_enabled = False
-
-    def update_rounds(self, rounds):       # Setter methods for each parameter
-        self.config.rounds = rounds
-
-    def update_difficulty(self, difficulty):
-        self.config.difficulty = difficulty
-
-    def get_config(self):                  # Read current config
-        return self.config
-```
-
-Pages receive `app_state` in their constructor and use it to read/write shared training parameters:
-
-```python
-class BasicParametersPage(ButtonNavigationMixin, QWidget):
-    def __init__(self, stacked_widget, app_state=None):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        self.app_state = app_state      # Shared state object
-
-    def on_round_selected(self, value):
-        self.app_state.update_rounds(value)    # Write to shared state
-
-    def start_training(self):
-        config = self.app_state.get_config()   # Read from shared state
-        print(f"Starting {config.rounds} rounds at {config.difficulty}")
-```
-
-### Layout & Styling
-
-**Layouts** — Qt provides layout managers that arrange widgets automatically:
-
-```python
-# Vertical stack (most common for page content)
-layout = QVBoxLayout()
-layout.setAlignment(Qt.AlignCenter)
-layout.setSpacing(20)                          # Pixels between widgets
-layout.setContentsMargins(50, 50, 50, 50)      # Left, Top, Right, Bottom
-layout.addWidget(some_button)
-layout.addStretch()                            # Flexible space
-
-# Horizontal row (for side-by-side buttons)
-row = QHBoxLayout()
-row.addWidget(back_btn)
-row.addWidget(next_btn)
-layout.addLayout(row)                          # Nest layouts
-
-# Grid (for numpad-style grids)
-grid = QGridLayout()
-grid.addWidget(btn, row=0, col=0)              # Position by row/col
-```
-
-**Button Styling** — The `ButtonStyle` class in `core/constants.py` provides pre-built Qt stylesheets:
-
-```python
-# core/constants.py — available styles:
-ButtonStyle.PRIMARY_LARGE    # Green, large (main actions like "Start")
-ButtonStyle.PRIMARY_MEDIUM   # Green, medium
-ButtonStyle.BACK_LARGE       # Red, large (back/cancel actions)
-ButtonStyle.BACK_MEDIUM      # Red, medium
-ButtonStyle.INFO_SMALL       # Blue (informational/secondary)
-ButtonStyle.HOME_LARGE       # Green, homepage-sized
-
-# Usage:
-btn.setStyleSheet(ButtonStyle.PRIMARY_MEDIUM)
-```
-
-Custom inline styles use Qt's CSS subset:
-
-```python
-label.setStyleSheet("font-size: 28px; font-weight: bold; color: #333;")
-btn.setStyleSheet("""
-    QPushButton {
-        font-size: 18px;
-        background-color: #2196F3;
-        color: white;
-        border-radius: 8px;
-    }
-    QPushButton:hover { background-color: #1976D2; }
-    QPushButton:focus {
-        border: 6px solid #00ff00;          /* Green border for Arduino nav */
-        background-color: #2d5016;
-    }
-""")
-```
-
-### Arduino Physical Button Navigation
-
-The `ButtonNavigationMixin` provides a `setup_navigation()` method that registers buttons for keyboard and Arduino cycling. When the Arduino sends UP/DOWN/ENTER over serial, the focused button changes with a visible green glow effect:
-
-```python
-class MyPage(ButtonNavigationMixin, QWidget):
     def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-
-        btn_a = QPushButton("Option A")
-        btn_b = QPushButton("Option B")
-        back_btn = QPushButton("Back")
-
-        # ... set styles and connect clicks ...
-
-        self.setLayout(layout)
-
-        # Register buttons for Arduino up/down/enter navigation
-        self.setup_navigation([btn_a, btn_b, back_btn])
+        ...
+        # setup_navigation() will NOT be called automatically
 ```
 
-`setup_navigation()` does the following automatically:
-- Sets `Qt.StrongFocus` on each button
-- Applies the page's `NAV_BUTTON_STYLE` (or the default `BUTTON_STYLE`)
-- Installs an event filter for Up/Down/Enter key handling
-- Adds a green glow effect (`QGraphicsDropShadowEffect`) to the focused button
-- Focuses the first button on page show
+### Lambda capture bug inside loops
 
-You can customize sizing per page with class-level constants:
+When creating buttons inside a loop and connecting each to a handler that uses the loop variable, you must use a default-argument capture:
 
 ```python
-class MyPage(ButtonNavigationMixin, QWidget):
-    NAV_BUTTON_MIN_WIDTH = 300       # Override default 360
-    NAV_BUTTON_MAX_WIDTH = 500       # Override default 420
-    NAV_BUTTON_MIN_HEIGHT = 50       # Override default 65
-    NAV_BUTTON_AUTOSIZE = True       # Allow buttons to grow beyond max width
-    NAV_BUTTON_STYLE = "..."         # Override default button stylesheet
+# WRONG — all buttons end up calling with the last value of label
+for label in ["Beginner", "Intermediate", "Advanced"]:
+    btn = QPushButton(label)
+    btn.clicked.connect(lambda: self.on_level(label))   # captures by reference
+
+# CORRECT — each lambda captures its own copy of label
+for label in ["Beginner", "Intermediate", "Advanced"]:
+    btn = QPushButton(label)
+    btn.clicked.connect(lambda checked=False, lvl=label: self.on_level(lvl))
 ```
 
-### Accessing Other Pages at Runtime
-
-Sometimes a page needs to update another page's state. Use the `stacked_widget` to get a reference by index:
-
-```python
-# Get a reference to another page widget by its PageIndex
-basic_page = self.stacked_widget.widget(PageIndex.BASIC_PARAMETERS)
-basic_page.update_button_displays()   # Call any method on it
-
-# Get the MainWindow from any page
-main_window = self.window()
-if hasattr(main_window, 'get_current_user'):
-    username = main_window.get_current_user()
-```
-
-### Per-User Data Storage
-
-Each user gets an isolated data directory at `GUI/users/<username>/`:
-
-```python
-# Database files are created automatically per user:
-# GUI/users/<username>/combos.db            — combo training progress
-# GUI/users/<username>/performance_history.db — power/stamina/reaction results
-
-# Access pattern (from performance_database.py):
-from performance_database import PerformanceDB
-db = PerformanceDB(username)
-db.save_power_result(peak_g=4.2, avg_power=3.1, punch_count=12)
-results = db.get_power_history(limit=10)
-```
-
-### Summary: Adding a Feature End-to-End
-
-1. **Add a `PageIndex` constant** in `core/constants.py`
-2. **Create the page class** inheriting `(ButtonNavigationMixin, QWidget)` in `main_gui.py`
-3. **Build the UI** in `__init__`: create layout → create widgets → style them → connect signals → add to layout → call `setup_navigation()`
-4. **Instantiate the page** in `MainWindow.__init__` and `addWidget()` it to the stacked widget
-5. **Wire navigation** from existing pages using `self.navigate_to(PageIndex.MY_NEW_PAGE)`
-6. **Share data** via `self.app_state` or by accessing other pages through `self.stacked_widget.widget(PageIndex.X)`
-
 ---
 
-## Development Notes
+## 10. Integration Guide — Robot Arms
 
-- Navigation is centralized in `MainWindow` and driven by page indices.
-- `AppState` carries mutable training config between pages.
-- Combo scoring currently uses placeholder integration via `placeholders.py` / `combo_curriculum` helper functions.
-- Existing combo curriculum tests are under:
-  - `GUI/combo_curriculum/tests/`
+### Modes that use robot arms
 
----
+- **Sparring mode**: The arms throw punches continuously throughout each round. The sequence is generated by a Markov chain weighted by the chosen boxing style and the user's historical weakness profile.
+- **Combo drill mode** (all difficulty levels): The arms loop the current displayed combo for the full duration of each round so the user can mirror it.
 
-## Troubleshooting
+In both modes the arms pause during rest periods and stop when the session ends or the user presses stop.
 
-1. **Camera fails to initialize**
-   - Check camera permissions and index.
-   - Ensure no other app is locking the webcam.
+### Interface — sparring/robot_interface.py
 
-2. **Reaction model not found**
-   - Ensure `models/yolo11s-pose.pt` exists at repo root.
+Four functions are called by the GUI. All are currently stubs that print to console.
 
-3. **Serial/Arduino issues**
-   - Verify COM port and baud settings.
-   - For physical-button nav, set `ARDUINO_BUTTON_PORT` in `GUI/.env` if auto-detect picks wrong port.
-   - Check firmware compatibility (command-based mode support).
-   - The app should fallback to streaming mode if needed.
-
-4. **User data not appearing as expected**
-   - Check `GUI/users.csv`.
-   - Check per-user DB files under `GUI/users/<username>/`.
-
----
-
-## Maintainer Note
-
-If you add new GUI pages or data tables, update this README section order:
-1. What’s New
-2. Project Structure
-3. Data Storage
-4. Main Pages
-
----
-
-## BoxBunny GUI — Integration Guide
-
-This guide is for groupmates who need to connect their subsystem to the GUI. One section per role. Each section tells you what the GUI already does, what state it's in, what you need to implement on your side, and how to test the connection.
-
----
-
-## 1. Robot Arms
-
-### 1.1 What the GUI does
-
-The robot arms are active in two modes:
-
-- **Sparring mode**: The arms throw punches continuously throughout each round. The punch sequence is generated by a Markov chain weighted by the chosen boxing style (Pressure Fighter, Counter Puncher, Infighter, Out-Boxer, Balanced) and the user's historical weakness profile built from past CV data.
-- **Combo Drill mode** (Beginner / Intermediate / Advanced / Self-Select): The arms loop the current displayed combo for the full duration of each round so the user can mirror it.
-
-In both modes the arms pause during rest periods and stop cleanly when a session ends or is stopped early.
-
-### 1.2 GUI-side status
-
-Fully implemented. `sparring/robot_interface.py` contains placeholder `print` functions. Every call site is wired:
-
-| Call | When it fires |
+| Function | When it fires |
 | --- | --- |
-| `set_speed(speed)` | Once, at session start |
+| `set_speed(speed: str)` | Once, immediately before the session loop starts |
 | `send_round_start()` | Start of every round |
-| `send_punch(punch)` | Each individual punch in the sequence |
-| `send_round_stop()` | End of every round (natural finish, stop button, or session end) |
+| `send_punch(punch: str)` | Each individual punch, with timing gaps handled by the GUI thread |
+| `send_round_stop()` | End of every round — natural timeout, stop button, or session abort |
 
-### 1.3 What you need to implement
+### Speed and timing
 
-Open `sparring/robot_interface.py` and replace the `print` statements with real `pyserial` serial writes. **Do not change any function signatures.** The file has clear comments showing exactly what to replace.
+`set_speed()` receives one of three string values. The GUI reads the corresponding gap durations from `get_intra_gap()` and `get_inter_gap()` in the same module:
 
-```python
-# Current placeholder — replace this body only:
-def send_punch(punch: str) -> None:
-    print(f"[ROBOT] Punch: {punch}")
-```
-
-```python
-# After your change:
-import serial
-_port = serial.Serial('/dev/ttyUSB0', <baud_rate>)
-
-def send_punch(punch: str) -> None:
-    _port.write(f"PUNCH:{punch}\n".encode())
-```
-
-### 1.4 Interface contract
-
-`set_speed(speed: str)` — called once before the session starts.
-
-| Value | Intra-punch gap | Inter-combo gap |
+| Speed value | Intra-punch gap | Inter-combo gap |
 | --- | --- | --- |
 | `"slow"` | 0.8 s | 2.0 s |
 | `"medium"` | 0.5 s | 1.5 s |
 | `"fast"` | 0.3 s | 1.0 s |
 
-Send this as a serial message so the arms can adjust their movement speed accordingly.
+### Punch codes
 
-`send_punch(punch: str)` — one call per punch, gaps handled by the GUI's background thread.
+`send_punch()` receives a single string code:
 
 | Code | Punch | Code | Punch |
 | --- | --- | --- | --- |
 | `"1"` | Jab | `"2"` | Cross |
 | `"3"` | Lead hook | `"4"` | Rear hook |
 | `"5"` | Lead uppercut | `"6"` | Rear uppercut |
-| `"3b"` | Lead hook to body | `"2b"` | Cross to body |
+| `"3b"` | Lead body hook | `"2b"` | Cross to body |
 
-**Serial port:** `/dev/ttyUSB0` on Jetson Nano. Baud rate: confirm with groupmate.
+### What to implement
 
-`send_round_start()` / `send_round_stop()` — signal the arms that a round has begun or ended. Use these to reset arm state between rounds.
+Open `sparring/robot_interface.py` and replace the `print` statement bodies with `pyserial` writes. **Do not change any function signatures or the `_speed` global logic.**
 
-### 1.5 How to test without the arms connected
+```python
+# Current placeholder:
+def send_punch(punch: str) -> None:
+    print(f"[ROBOT] Punch: {punch}")
 
-Run the GUI normally. All robot signals currently print to console. Start a sparring session or a combo drill session and watch the terminal — you should see the correct sequence of:
+# Replace with:
+import serial
+_port = serial.Serial('/dev/ttyUSB0', 115200)  # configure port/baud as needed
+
+def send_punch(punch: str) -> None:
+    _port.write(f"PUNCH:{punch}\n".encode())
+```
+
+Apply the same pattern to `set_speed()`, `send_round_start()`, and `send_round_stop()`.
+
+### Testing without robot hardware
+
+Run the GUI normally. Start a sparring or combo drill session and watch the terminal. You should see output matching this pattern:
 
 ```console
 [ROBOT] Speed: medium
@@ -714,32 +602,15 @@ Run the GUI normally. All robot signals currently print to console. Start a spar
 
 ---
 
-## 2. Computer Vision (CV)
+## 11. Integration Guide — Computer Vision (CV)
 
-### 2.1 What the GUI does
+### What the CV integration does
 
-After every sparring session, the GUI writes a trigger file and then waits for CV to return a punch detection result. The GUI uses that data to build a **weakness profile** per user — which punch types they land least — and biases the robot's next sparring session sequence to attack those weaknesses more. The profile improves with every session.
+After every sparring session, the GUI writes a trigger file and polls for a result. The returned data is parsed into a punch count dictionary, saved to the session record, and used to update a **weakness profile** — a rolling weighted average of which punch types the user lands least. The weakness profile biases the Markov chain for the next session, making the robot attack the user's weaker side more.
 
-### 2.2 GUI-side status
+### Trigger file — written by GUI
 
-Fully implemented. `SparProcessingPage` in `sparring/spar_pages.py` handles the trigger write, polling, and timeout. `sparring/sparring_database.py` handles parsing the result and updating the weakness profile.
-
-### 2.3 What you need to implement
-
-A watcher that monitors the `GUI/users/` directory for trigger files, runs the CV pipeline when one appears, and writes the result back. The GUI does not call any CV function directly — **all communication is file-based**.
-
-Suggested structure:
-
-```python
-# cv_watcher.py
-def start_watching(users_dir: str) -> None:
-    """Poll all subdirectories of users_dir every second for spar_trigger.json."""
-    ...
-```
-
-### 2.4 Interface contract
-
-GUI writes → `GUI/users/<username>/spar_trigger.json`
+Path: `GUI/users/<username>/spar_trigger.json`
 
 ```json
 {
@@ -749,143 +620,199 @@ GUI writes → `GUI/users/<username>/spar_trigger.json`
 }
 ```
 
-Written immediately when the final sparring round ends.
+Written immediately when the final sparring round ends, before navigating to `SPAR_PROCESSING`. If CV is disabled in the Others page, this file is never written.
 
-CV writes back → `GUI/users/<username>/spar_cv_output.txt`
+### Output file — written by CV
+
+Path: `GUI/users/<username>/spar_cv_output.txt`
 
 ```text
 jab,cross,jab,lead_hook,cross,rear_hook,jab,jab,cross
 ```
 
-Comma-separated punch labels in chronological order. Write only when processing is fully complete — the GUI reads the file the moment it appears.
+Comma-separated punch labels in chronological order. Write only when the full CV pipeline has finished — the GUI reads the file the moment it appears.
 
 Accepted labels: `jab`, `cross`, `lead_hook`, `rear_hook`, `lead_upper`, `rear_upper`
 
-Timing:
+The parser also accepts `hook` (mapped to `lead_hook`) and `uppercut` (mapped to `lead_upper`).
 
-- The GUI polls for `spar_cv_output.txt` every second with a **120-second timeout**
-- If the file does not appear in time, the GUI skips analysis and continues without CV data
-- The GUI deletes both files automatically after reading
+### Timeout behaviour
 
-CV toggle: If the user has CV disabled in the Others page, `spar_trigger.json` is never written. Your watcher will never trigger.
+The GUI polls for `spar_cv_output.txt` every second with a **120-second timeout**. If the file does not appear within 120 seconds, the GUI skips analysis, saves the session with empty punch counts, and continues to the result page. Both files are deleted automatically after a successful read.
 
-### 2.5 How to test without the full CV pipeline
+### Weakness profile
 
-While the GUI is on the Processing screen (spinning "Analysing..." state), manually write a `spar_cv_output.txt` file into `GUI/users/<username>/`:
+Stored in `sparring_weakness_profile` table in `users/<username>/performance_history.db`. One row per user, upserted after each session.
 
-```bash
-echo "jab,cross,jab,lead_hook,cross" > GUI/users/testuser/spar_cv_output.txt
+Update formula (in `sparring/sparring_database.py`, `update_weakness_profile()`):
+
+```text
+alpha    = min(0.4, sessions_count * 0.05)
+new_freq = (1 - alpha) * old_freq + alpha * current_session_freq
 ```
 
-The GUI should read it within one second and navigate to the results page showing the punch breakdown.
+On the first session, `sessions_count = 0`, so `alpha = 0` and the first session's frequencies are written directly. By session 8, alpha reaches its cap of 0.4 and the profile updates at full speed.
+
+Bias application (in `sparring/sequence_generator.py`, `_apply_weakness_bias()`): the weakness profile frequencies are blended into the Markov transition matrix before generating the session sequence. Left-side punches (`1`, `3`, `5`) are biased by the user's frequency of landing right-side punches and vice versa — meaning if the user rarely lands jabs, the robot will throw more left-side punches at them.
+
+To adjust bias strength, change either of these constants in `_apply_weakness_bias()`:
+
+- The alpha cap: `min(0.4, ...)` — increase to allow stronger long-term bias
+- The sessions multiplier: `sessions_count * 0.05` — increase to ramp up faster
+
+### CV toggle
+
+If the user disables CV in the Others page (`cv_enabled = False` on `AppState`), `spar_trigger.json` is never written and `SparProcessingPage` skips polling entirely, navigating directly to results.
+
+### Testing without the CV pipeline
+
+While the GUI is on the Processing screen, manually write the output file:
+
+```bash
+echo "jab,cross,jab,lead_hook,cross" > GUI/users/<username>/spar_cv_output.txt
+```
+
+The GUI reads it within one second and advances to the result page.
 
 ---
 
-## 3. Arduino (Performance Pages)
+## 12. Integration Guide — Arduino (Performance Pages)
 
-### 3.1 What the GUI does
+### What uses Arduino
 
-The Arduino powers three things:
-
-1. **Power test** — measures peak and average punch force across 10 punches (`PowerPunchPage`)
-2. **Stamina test** — counts punches over 2 minutes and calculates fatigue rate (`StaminaPage`)
-3. **Physical button navigation** — Up / Down / Enter buttons work throughout the entire app
-
-Reaction test uses the YOLO camera, not Arduino — already fully implemented and no action needed.
-
-### 3.2 GUI-side status
-
-- Power test: fully implemented in `power/power_runner.py`, wired into `PowerPunchPage`
-- Stamina test: implemented in `stamina/stamina_runner.py`, Arduino mode off by default
-- Button navigation: fully implemented, background thread runs automatically
-
-Both Power and Stamina read port and baud from `GUI/.env`.
-
-### 3.3 What you need to do
-
-1\. Set your port in `GUI/.env`:
-
-```env
-ARDUINO_BUTTON_PORT=COM3          # Windows
-# ARDUINO_BUTTON_PORT=/dev/ttyACM0  # Jetson Nano
-ARDUINO_BUTTON_BAUD=115200
-```
-
-2\. Enable stamina Arduino mode when firmware is ready:
-
-```env
-STAMINA_USE_ARDUINO=true
-```
-
-3\. Flash the correct firmware. The button navigation sketch is at `GUI/arduino/button_navigation/button_navigation.ino`.
-
-### 3.4 Interface contract
-
-Button navigation — Arduino sends these strings at 115200 baud:
-
-| Message | Button | GPIO pin |
+| Feature | Module | Default mode |
 | --- | --- | --- |
-| `BTN1_PRESS` | Up | 2 |
-| `BTN2_PRESS` | Enter | 4 |
-| `BTN3_PRESS` | Down | 7 |
+| Power punch test | `power/power_runner.py` | Requires Arduino |
+| Stamina test | `stamina/stamina_runner.py` | Simulated (no Arduino) |
+| Physical button navigation | `main_gui.py` background thread | Enabled if port is found |
 
-Wiring: INPUT_PULLUP to GND on each pin.
+Reaction test uses the YOLO webcam, not Arduino.
 
-Power test — Arduino sends after 10 punches:
+### Physical button navigation protocol
+
+Upload `arduino/button_navigation/button_navigation.ino`. Arduino sends at 115200 baud on button press (debounced at 40 ms):
+
+| Message | Button | GPIO pin | Action |
+| --- | --- | --- | --- |
+| `BTN1_PRESS` | UP | D2 | Move focus to previous button |
+| `BTN2_PRESS` | ENTER | D4 | Click the focused button |
+| `BTN3_PRESS` | DOWN | D7 | Move focus to next button |
+
+Wiring: `INPUT_PULLUP` with button to GND on each pin.
+
+### Power test serial protocol
+
+Arduino sends after 10 punches:
 
 ```text
 RESULT:PEAK:<value>,AVG:<value>,COUNT:<count>
 ```
 
-Supports command-based protocol (`MODE:CONTINUOUS` → `OK:...`) with streaming fallback. See `power/power_runner.py` for full protocol detail.
+The GUI first probes for command-based mode (`MODE:CONTINUOUS` → expects `OK:...`). If the firmware does not respond to commands, it falls back to legacy streaming mode. See `power/power_runner.py` for full detail.
 
-Stamina test — Arduino sends punch detection events during the 2-minute window. See `stamina/stamina_runner.py` → `_measure_with_arduino()` for the expected message format.
+### Stamina test serial protocol
 
-Port conflict handling: The GUI automatically suspends the button navigation listener when entering a Power or Stamina test page and resumes it when leaving — so the same Arduino and port can be shared across all three uses.
+Arduino sends punch detection events during the 2-minute window. Enable with `STAMINA_USE_ARDUINO=true` in `.env`. See `stamina/stamina_runner.py`, `_measure_with_arduino()`, for the expected message format.
 
-### 3.5 How to test without Arduino
+### Port conflict handling
 
-The GUI runs fully without Arduino connected:
+`ARDUINO_BUTTONS_SUSPEND_DURING_TESTS=true` in `.env` causes the button navigation listener to suspend automatically when the GUI enters a Power or Stamina test page, and resume automatically on exit. This allows the same physical Arduino and COM port to serve all three roles without conflicts.
+
+### Port configuration
+
+In `.env`:
+
+```ini
+ARDUINO_BUTTON_PORT=COM3          # Windows
+ARDUINO_BUTTON_PORT=/dev/ttyACM0  # Jetson Nano
+ARDUINO_BUTTON_BAUD=115200
+```
+
+Leave `ARDUINO_BUTTON_PORT` empty for auto-detection. The Others page also has a live COM port dropdown and Apply button; changing it there takes effect immediately without restarting.
+
+### Testing without Arduino
+
+The GUI runs fully without any Arduino:
 
 - Stamina defaults to simulated mode (`STAMINA_USE_ARDUINO=false`)
-- Power test will fail gracefully with an error message if the port is unavailable
-- Button navigation is silently skipped if no port is found
+- Power test fails gracefully with an error dialog if the port is unavailable
+- Button navigation is silently skipped if no port is detected
 
 ---
 
-## 4. AI Chat / LLM
+## 13. Integration Guide — AI Chat (LLM)
 
-### 4.1 What the GUI does
+### Where AI feedback appears
 
-Two places use AI coaching feedback, both gated behind the **AI Chat toggle** in the Others page:
+| Location | Condition |
+| --- | --- |
+| `ComboLLMChatPage` (27) | After a combo drill session, if AI Chat is enabled |
+| `SparResultPage` (39) | Inline coaching paragraph, if AI Chat is enabled |
 
-- **Combo drill result**: After a combo drill session with AI Chat enabled, the user lands on a chat page (`ComboLLMChatPage`) that sends an initial assessment of their performance score and combo and lets them ask follow-up questions.
-- **Sparring result**: After a sparring session with AI Chat enabled, the results page shows an AI-generated coaching paragraph based on the session's punch count, most-used punch, and fighting style.
+Both use `claude-haiku-4-5` with a boxing coach system prompt.
 
-Both calls use `claude-haiku-4-5` with a boxing coach system prompt.
+### Enabling AI features
 
-### 4.2 GUI-side status
+1. Toggle **AI Chat: On** in the Others page (sets `AppState.ai_chat_enabled = True`)
+2. Ensure `ANTHROPIC_API_KEY` is set in `GUI/.env`:
 
-Fully implemented. API calls are non-blocking (QThread workers). Falls back to hardcoded responses if `ANTHROPIC_API_KEY` is not set or is invalid — the app never crashes.
-
-### 4.3 What you need to do
-
-Add your API key to `GUI/.env`:
-
-```env
-ANTHROPIC_API_KEY=sk-ant-...
+```ini
+ANTHROPIC_API_KEY=sk-ant-api03-...
 ```
 
-No code changes needed. That's it.
+Restart the app after changing `.env`.
 
-### 4.4 Interface contract
+### Fallback behaviour
 
-None — this integration is entirely self-contained within the GUI. The GUI calls the Anthropic API directly.
+If `ANTHROPIC_API_KEY` is missing, empty, or returns an error, the GUI falls back to a hardcoded response string. The app never crashes. API calls run in QThread workers and do not block the UI.
 
-### 4.5 How to test
+### Testing AI features
 
-1. Toggle **AI Chat: On** in the Others page
-2. Complete a combo drill session (any difficulty) or a sparring session
-3. On the result page, the feedback area should briefly show "Thinking..." (combo chat) or "Analysing your session..." (sparring), then update with a real coaching response
+1. Set `ANTHROPIC_API_KEY` in `.env`
+2. Toggle AI Chat on in Others
+3. Complete a combo drill or sparring session
+4. The feedback area will briefly show "Thinking..." or "Analysing your session...", then update with a live Claude response
 
-If you see a generic hardcoded response instead, the API key is missing or invalid — check `GUI/.env` and restart the app.
+If you see a generic hardcoded response, the key is missing or invalid.
+
+---
+
+## 14. Troubleshooting
+
+### Camera fails to initialize
+
+- Check that no other application (Teams, OBS, etc.) holds the camera.
+- Verify camera permissions on the OS.
+- The reaction test defaults to camera index 0. If the system has multiple cameras, the wrong one may be selected — check `reaction_time/reaction_time_runner.py`.
+
+### Reaction model not found (yolo11s-pose.pt)
+
+- Place the model at `<repo_root>/models/yolo11s-pose.pt`.
+- The path is relative to the repository root, not the `GUI/` directory.
+
+### Serial / Arduino port issues
+
+- Set `ARDUINO_BUTTON_PORT` explicitly in `.env` if auto-detection picks the wrong device.
+- On Windows, check Device Manager for the correct COMx number.
+- On Jetson Nano, the port is typically `/dev/ttyACM0` or `/dev/ttyUSB0`.
+- If the button navigation listener shows `reconnecting` in the Others page status, the Arduino is connected but communication is failing — check the baud rate.
+- If Power or Stamina tests fail, ensure `ARDUINO_BUTTONS_SUSPEND_DURING_TESTS=true` so the navigation listener releases the port before the test takes it.
+
+### User data not appearing
+
+- Confirm the username in `users.csv` exactly matches the subdirectory name under `users/`.
+- Per-user databases are created on first login. If a user was added manually to `users.csv` without logging in, the databases will not exist yet.
+
+### App crashes on startup
+
+- Run `python scripts/verify_modules.py` to check all imports resolve.
+- Ensure all pip packages are installed in the active virtual environment.
+- If `.env` is missing, the app runs with defaults. If `.env` contains syntax errors, dotenv parsing may fail silently — check that key=value lines have no spaces around `=`.
+- Missing `data/combos.db` causes a crash at first login. Run `python setup/setup_combo_database.py --db-path data/combos.db` to create it.
+
+### CV pipeline timeout
+
+- The GUI waits up to 120 seconds for `spar_cv_output.txt` to appear.
+- If CV processing takes longer, the session is saved without punch breakdown data and the result page shows empty counts.
+- To test the GUI without CV, manually write the output file while the Processing screen is shown (see Section 11).
+- If CV is intentionally not running, disable it in the Others page so the trigger file is never written and the GUI skips polling entirely.
