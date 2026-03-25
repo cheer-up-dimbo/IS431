@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Robot Intelligence</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/team-member/team-member.css">
+  <script type="module" src="../components/team-member/team-member.js"></script>
+  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../components/table-component/table-component.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#conceptual-design" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+    <!-- 5.4 ROBOT INTELLIGENCE -->
+    <div id="robot-intelligence">
+    <h2>5.4. Robot Intelligence (Yogeeswaran)</h2>
+        <p>
+            The Robot Intelligence subsystem delivers Performance Analytics, Adaptive Fight Intelligence, 
+            and Realistic Training Partner by using computer vision and an action-recognition model to detect punches,
+            predict responses, and analyse performance in real time. These product needs map to three core functions: 
+            Reaction Time (system responsiveness), Human Tracking (accurate motion following), and Counter-punching (safe, reactive sparring without a partner).
+        </p>
+
+        <image-component
+            tag="image"
+            source="../assets/robot_intelligence/needs_to_features.png"
+            subtitle="">
+        </image-component>
+    </div>
+
+    <!-- 5.4.1 FUNCTION SPECIFICATIONS -->
+    <div id="robot-intelligence-specifications">
+    <h3>5.4.1. Function Specifications</h3>
+
+    <p>
+        The subsystem must process vision data and trigger motor responses with latency comparable to a 
+        human opponent. Based on reaction-time measurements from intermediate boxers, the system must meet 
+        the following performance targets:
+    </p>
+
+    <!-- FUNCTION SPECIFICATIONS TABLE -->
+    <table-component subtitle="Table 18: Robot Intelligence Performance Specifications">
+        <div id="table-robot-intelligence"></div>
+    </table-component>
+
+    <p>
+        A depth camera can be used to meet these requirements as it provides reliable detection, 
+        stable tracking, and accurate spatial awareness. Its wide field of view and high depth precision 
+        enable consistent 3D user tracking, making it the most effective option for maintaining smooth and
+        dynamic real-time interaction between the user and the robot.
+    </p>
+    </div>
+
+    <!-- 5.4.2 COMPUTER VISION -->
+    <div id="computer-vision">
+    <h3>5.4.2. Computer Vision</h3>
+    </div>
+
+    <!-- 5.4.2.1 REACTION TIME & HUMAN TRACKING -->
+    <div id="reaction-time-tracking">
+    <h4>5.4.2.1. Reaction Time and Human Tracking</h4>
+
+    <p>
+        Both functions use a pre-trained YOLO pose-estimation model, which provides continuous 3D keypoints
+        for real-time user tracking. The pose-estimation framework is based on the Ultralytics YOLO Pose model, 
+        documented at 
+        <a href="https://docs.ultralytics.com/tasks/pose/" target="_blank">Ultralytics Pose Documentation</a>.
+    </p>
+
+
+    <ul style="margin-left: 1.5rem;">
+    <li><strong>Human Tracking</strong>: Relies on stable frame-to-frame detection for accurate motion prediction and safe interaction.</li>
+    <li><strong>Reaction Time</strong>: Uses calibrated pose-change thresholds to detect punch initiation and trigger a response within the 150&nbsp;ms target.</li>
+    </ul>
+
+
+    <image-component
+        width="40%"
+        tag="image"
+        source="../assets/robot_intelligence/pose_estimation_model.jpg"
+        subtitle="Figure 20: Pose estimation model">
+    </image-component>
+    </div>
+
+    <!-- 5.4.2.2 COUNTER PUNCH -->
+    <div id="counter-punch">
+    <h4>5.4.2.2. Counter Punch</h4>
+    <p>
+        The counter-punch function uses a custom-trained action-recognition model, 
+        unlike reaction time and tracking, which rely on pre-trained YOLO pose estimation. 
+        The model classifies punch types from pose sequences and maps them to predefined counteractions,
+        enabling dynamic and adaptive sparring behaviour. Here is the link to our 
+        <a href="https://github.com/Yogee-s/boxing_ai_ws" target="_blank">full training and inference codebase</a>.
+    </p>
+    </div>
+
+    <!-- 5.4.2.3 MODEL PIPELINE -->
+    <div id="model-pipeline">
+    <h4>5.4.2.3. Model Pipeline</h4>
+
+    <p>
+        <strong>Training Pipeline:</strong> Pose estimation extracts keypoint sequences from labelled training videos. 
+        These sequences are used to train a custom temporal model to recognise punch patterns. Various architectures (LSTM, TCN, transformer-based) 
+        will be explored to balance accuracy and real-time latency.
+    </p>
+
+    <image-component
+        tag="image"
+        source="../assets/robot_intelligence/training_pipeline.jpg"
+        subtitle="Figure 21: Training pipeline">
+    </image-component>
+
+    <p>
+        <strong>Inference Pipeline:</strong>  In real time, the depth camera captures frames, pose estimation generates keypoints, 
+        and the trained model predicts the user’s punch. This predicted punch maps directly to a corresponding counteraction, allowing immediate robot response.
+    </p>
+
+    <image-component
+        tag="image"
+        source="../assets/robot_intelligence/inference_pipeline.jpg"
+        subtitle="Figure 22: Inference pipeline">
+    </image-component>
+    </div>
+
+    <!-- 5.4.2.4 TRAINED MODEL -->
+    <div id="trained-model">
+    <h4>5.4.2.4. Trained Model</h4>
+
+    <p>
+        An initial LSTM-based model (<a href="https://www.geeksforgeeks.org/deep-learning/deep-learning-introduction-to-long-short-term-memory/" target="_blank">Long Short-Term Memory</a>, 
+        a simple neural-network architecture designed to recognise patterns over time) 
+        was trained on a small 2D keypoint dataset and achieved high accuracy on unseen videos, validating the end-to-end pipeline 
+        from pose extraction to temporal classification. Next, a larger dataset will be collected using the robot’s depth camera to 
+        incorporate 3D keypoints (x, y, depth), which is expected to significantly improve accuracy. The final model will also be 
+        benchmarked for real-time inference speed to guide processor and hardware selection for meeting reaction-time constraints.
+    </p>
+
+
+    <div class="video-row">
+        <div class="video-box">
+        <video controls src="../assets/robot_intelligence/trained_model_jab.mp4"></video>
+        <sub>Jab Model</sub>
+        </div>
+
+        <div class="video-box">
+        <video controls src="../assets/robot_intelligence/trained_model_hook.mp4"></video>
+        <sub>Hook Model</sub>
+        </div>
+
+        <div class="video-box">
+        <video controls src="../assets/robot_intelligence/trained_model_uppercut.mp4"></video>
+        <sub>Uppercut Model</sub>
+        </div>
+    </div>
+    </div>
+
+    <!-- 5.4.2.5 CAMERA POSITION TESTING -->
+    <div id="camera-orientation">
+    <h4>5.4.2.5. Position & Orientation of Camera (Testing)</h4>
+
+    <p>
+        Testing showed that classification accuracy decreases when the camera viewpoint differs from the 
+        dataset’s original perspective, as the model fails to interpret unfamiliar pose patterns. This confirms 
+        that the camera position on the robot must remain fixed, and future datasets must be captured from the mounted viewpoint to ensure consistent performance.
+    </p>
+
+    <div class="video-row two-up">
+        <div class="video-box">
+        <video controls src="../assets/robot_intelligence/orientation_top.mp4"></video>
+        <sub>Top View</sub>
+        </div>
+
+        <div class="video-box">
+        <video controls src="../assets/robot_intelligence/orientation_bottom.mp4"></video>
+        <sub>Bottom View</sub>
+        </div>
+    </div>
+
+    <div class="video-row single">
+        <div class="video-box">
+        <video controls src="../assets/robot_intelligence/orientation_front.mp4"></video>
+        <sub>Front View</sub>
+        </div>
+    </div>
+    </div>
+  </div>
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../components/table-component/table-component.js"></script>
+  <script src="../components/table-component/tables.js"></script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Lower Mechanism</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/team-member/team-member.css">
+  <script type="module" src="../components/team-member/team-member.js"></script>
+  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../components/table-component/table-component.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#conceptual-design" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+    <div id="lower-mechanism">
+      <h3>5.3 Lower Mechanism (Jeanette)</h3>
+      <p>
+          The lower mechanism integrates three functions: Footwork Movement, Compact
+          Footprint, and a Height‑Adjustment Interface, to align the robot’s position
+          with the boxer’s stance and approach during training.
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/1lower mechanism first table.png"
+        subtitle="">
+      </image-component>
+      <p>
+          The design intent is to:
+      </p>
+      <ul type="disc">
+          <li>
+              Enable structured, realistic footwork movement in drills      that
+              develop ring generalship (control of distance, timing, and angles).
+          </li>
+          <li>
+              Maintain a compact, safe physical footprint that      minimises
+              collision and trip hazards within crowded gym environments.
+          </li>
+          <li>
+              Provide      sufficient vertical adaptability so that head and torso
+              targets can be      matched to different user physiques in a fail-safe
+              manner.
+          </li>
+      </ul>
+      <p>
+          This section presents the functional context and specifications of the lower
+          mechanism, the associated design considerations, the key outcomes from
+          concept evaluation (detailed in Appendix B), and the final selected concepts
+          for the footwork, base, and height-adjustment subsystems.
+      </p>
+    </div>
+    <div>
+      <h3><a>5.3.1. Footwork Movement</a></h3>
+      <p>
+          In live padwork between coach and boxer, the coach continuously manipulates
+          both range and angle to shape the rhythm and difficulty of drills. These
+          adjustments are central to what is referred to as ring generalship, the
+          boxer’s ability to control pace, distance, and the flow of a bout through
+          strategic footwork and positioning. A boxer with strong ring generalship can
+          dictate the terms of engagement, forcing the opponent to step into traps,
+          overreach, or drift into disadvantageous positions (Evolve MMA, 2021).
+      </p>
+      <p>
+          Padwork observations and self-experiments highlighted several recurring
+          patterns:
+      </p>
+      <ul type="disc">
+          <li>
+              <strong>Offensive drills</strong>: The coach steps back or      out as
+              the boxer steps in with jabs and combinations, forcing the boxer to
+              close distance in a controlled manner.
+          </li>
+          <li>
+              <strong>Defensive drills</strong>: The coach pivots or      re-angles to
+              present new attack lines, prompting the boxer to adjust      footwork,
+              guard, and counter-punch timing.
+          </li>
+          <li>
+              <strong>Counter      drills</strong>: After an initial exchange, the
+              coach rotates to open new      angles, and the boxer is expected to
+              respond with appropriate foot      placement and counters.
+          </li>
+      </ul>
+      <div class="video-row two-up">
+        <div class="video-box">
+          <video controls src="../assets/Lower_mechanism/2vidfootwork movement - step in jab.mp4"></video>
+          <sub>Footwork Movement - Step in Jab</sub>
+        </div>
+    
+        <div class="video-box">
+          <video controls src="../assets/Lower_mechanism/2vidfootwork movement - pivot counter.mp4"></video>
+          <sub>Footwork Movement - Pivot Counter</sub>
+        </div>
+      </div>
+      <p>
+          From a mechanical perspective, these behaviours can be decomposed into two
+          essential motions:
+      </p>
+      <ol start="1" type="1">
+          <li>
+              <strong>Linear translation</strong> (approach and retreat)      along a
+              primary training axis.
+          </li>
+          <li>
+              <strong>Yaw      rotation</strong> (on-the-spot turning) around a
+              vertical axis to re-present      different lines of attack and defence.
+          </li>
+      </ol>
+      <p>
+          To replicate this in BoxBunny, the lower mechanism must provide controlled
+          <strong>fore–aft translation</strong> and <strong>yaw rotation</strong>, at
+          speeds and ranges that are consistent with padwork, while remaining stable
+          under repeated punching impacts.
+      </p>
+    </div>
+    <div>
+      <h4>5.3.1.2. Function Specifications</h4>
+      <p>
+          Translating the padwork behaviour into engineering requirements, the
+          footwork subsystem is specified by the target metrics in Table 7. Key design
+          considerations used as constraints during concept selection are listed in
+          Table 8. These were derived from self-experiments and safety considerations,
+          ensuring that robot motion remains realistic and responsive but not
+          hazardous.
+      </p>
+      <div>
+        <table-component subtitle="Table 13: Target Metric Specifications for
+    Footwork Movement">
+        <div id="table-motion-specs"></div>
+      </table-component>
+      </div>
+      <div>
+      <table-component subtitle="Table 14: Design Considerations for Footwork Movement">
+        <div id="table-control-specs"></div>
+      </table-component>
+      </div>
+      <p>
+          These specifications and requirements were used as design constraints and
+          evaluation criteria for the concept generation and selection process
+          presented in Appendix B.
+      </p>
+    </div>
+
+    <div>
+      <h4>5.3.1.3. Motion Axis Selection</h4>
+      <p>
+          To implement the two required degrees of freedom (translation and yaw), two
+          main architectures were evaluated:
+      </p>
+      <ol start="1" type="1">
+          <li>
+              A <strong>single system</strong> based on
+              <strong>
+                  omnidirectional      wheels
+              </strong>
+              , where a common set of wheels provides X–Y translation and yaw
+              rotation.
+          </li>
+          <li>
+              A <strong>decoupled-axis architecture</strong>, where yaw      rotation
+              and linear translation are handled by two separate mechanisms: a
+              slewing base for yaw and a linear stage for range.
+          </li>
+      </ol>
+      <p>
+          The omnidirectional wheel concept is attractive in general mobile robotics
+          because it provides full planar mobility and compact actuation, and it
+          supports high-level commands such as “move forward”, or “rotate on the spot”
+          with a single hardware stack. However, as detailed in Appendix 2)a)i), it
+          presents several drawbacks for a punch‑receiving boxing robot due to its
+          dependence on floor conditions, limited positional stiffness, and coupled
+          motions. These issues are reflected in the decision matrices in Appendix B
+          (Tables A9 and A10), where a <strong>decoupled-axis</strong> architecture
+          using a <strong>slewing base</strong> at the bottom to provide yaw rotation
+          and an <strong>independent linear sliding stage</strong> above it to provide
+          forward–backward translation, is selected for BoxBunny’s footwork movement.
+      </p>
+      <p>
+          The evaluation confirms that the decoupled architecture outperforms
+          omnidirectional wheels in the high‑priority criteria of stiffness,
+          repeatability, and impact robustness. Accordingly, near the bottom of the
+          robot (Figure 12a), BoxBunny adopts
+          <strong>
+              separate Slewing-Base Yaw and Linear Slide Range axes
+          </strong>
+          (Figure 12b).
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/3footwork motion - cad overview.png"
+        subtitle="Figure 12: (a) (left) CAD overview of Footwork
+    Movement subsystem in BoxBunny; (b) (right) focused CAD of rotational and
+    linear motion stages.">
+      </image-component>
+      <p>
+          The key selection criteria for both axes are: (i) ability to hold position
+          under impact (angle and position rigidity), (ii) ability to carry combined
+          static and dynamic loads of the full robot and user strikes, and (iii)
+          provision of moderate speed with high torque for confident starts, stops,
+          and direction changes.
+      </p>
+    </div>
+
+    <div>
+      <h4>5.3.1.4. Linear Motion</h4>
+      <p>
+          For the translational axis, the final concept is a
+          <strong>
+              motorised sliding-table linear rail driven by a ball screw
+          </strong>
+          (Figure 13). This decision followed the evaluation of three power
+          transmission options (lead screw, ball screw, and belt drive), summarised in
+          Appendix (Power Transmission Drive Selection, Table A11).
+      </p>
+      <p>
+          The selected mechanism comprises:
+      </p>
+      <ul type="disc">
+          <li>
+              A <strong>sliding table</strong> that serves as the platform      for
+              the entire upper portion of the robot.
+          </li>
+          <li>
+              Two <strong>linear rails with preloaded blocks</strong>,      which
+              guide the table and carry longitudinal forces and overturning
+              moments arising from both motion and punching.
+          </li>
+          <li>
+              A <strong>ball      screw drive</strong>, which converts motor rotation
+              into linear motion of the      sliding table.
+          </li>
+      </ul>
+      <p>
+          The decision matrix in Appendix (Table A11) shows that the ball
+          screw–driven linear rail scores highest on the high-priority criteria of
+          <strong>load and thrust capacity</strong>,
+          <strong>
+              positional stiffness
+          </strong>
+          , and <strong>accuracy/repeatability</strong>, while remaining acceptable in
+          cost and maintenance. Therefore, a
+          <strong>
+              ball screw–driven sliding table on linear rails
+          </strong>
+          is adopted as the linear footwork mechanism.
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/4linear motion - cad.png"
+        subtitle="Figure 13: Focused CAD of selected linear motion
+    mechanism with sliding table, rails/blocks, and motor labelled.">
+      </image-component>
+    </div>
+    <div>
+      <h4>5.3.1.5. Rotation Motion</h4>
+      <p>
+          For yaw rotation, the selected concept is a
+          <strong>
+              slewing ring bearing with external gear teeth
+          </strong>
+          , driven by a <strong>pinion gear and BLDC servo motor</strong> (Figure 14).
+          This solution emerged from the bearing and motor selection processes
+          described in Appendix B (Bearing Selection, Table B13; Motor Selection,
+          Table B14).
+      </p>
+      <p>
+          A <strong>four-point contact ball slewing ring with external gear</strong>
+          was selected as the yaw bearing because it can handle combined axial, radial
+          and overturning loads with good stiffness, while being cheaper and more
+          available than cross-roller types. A
+          <strong>
+              BLDC servo motor with encoder
+          </strong>
+          was chosen to drive this stage, as it offers low backlash, smooth torque,
+          precise position control and strong disturbance rejection under punching.
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/5rotation motion - cad.png"
+        subtitle="Figure 14: Focused CAD of rotational
+    motion mechanism showing slewing bearing, pinion gear, and motor.">
+      </image-component>
+    </div>
+    <div>
+      <h3><a>5.3.2. Compact Footprint</a></h3>
+      <h4>5.3.2.1. Function Specifications</h4>
+      <p>
+          Having met the fundamental requirement of executing padwork-inspired
+          footwork motions, the next consideration is
+          <strong>
+              safety and spatial efficiency
+          </strong>. Boxing gyms are often space-constrained, with multiple users training in
+          parallel. It is therefore essential that BoxBunny’s base has requirements
+          summarised in Table 9.
+      </p>
+      <table-component subtitle="Table 15: Design Considerations for Compact
+    Footprint">
+        <div id="table-base-specs"></div>
+      </table-component>
+    </div>
+
+    <div>
+      <h4>5.3.2.2. Base Design</h4>
+      <p>
+          To satisfy these requirements, the base is designed as a
+          <strong>
+              trapezoidal platform
+          </strong>
+          rather than a large circular or rectangular footprint (Figure 15). This
+          geometry is chosen for the following reasons:
+      </p>
+      <ul type="disc">
+          <li>
+              The <strong>narrow front edge</strong> of the trapezoid      reduces
+              obstruction near the boxer’s lead foot, leaving space for pivots
+              and lateral adjustments.
+          </li>
+          <li>
+              The <strong>wider rear section</strong> provides more area      for
+              mounting the lower mechanisms and optional ballast (e.g. gym weights),
+              improving stability without encroaching on the boxer’s working zone.
+          </li>
+          <li>
+              The      support structure holding the entire robot, particularly the
+              slewing      bearing and linear stage, is
+              <strong>
+                  intentionally offset towards the rear
+              </strong>
+              of the base (Figure      16b).      This shifts the combined centre of
+              gravity backward, increasing resistance      to forward tipping under
+              frontal punches.
+          </li>
+      </ul>
+      <p>
+          Comparisons with alternative base shapes (Figure 16a) highlight that large
+          circular or rectangular bases tend to intrude into the boxer’s pivot space,
+          increasing the likelihood of the user stepping on or kicking the base during
+          movement. The trapezoidal layout, by contrast, maintains a compact yet
+          stable foundation, balancing usability, safety, and structural performance.
+      </p>
+      <p>
+          If subsequent weight estimates reveal that the base’s own mass is
+          insufficient to guarantee stability with an adequate safety factor, the rear
+          region of the base can be configured to accept
+          <strong>
+              standard gym weights
+          </strong>
+          as removable ballast. This approach keeps the design modular and adaptable
+          to different deployment environments.
+      </p>
+      <image-component
+        width="50%"
+        tag="image"
+        source="../assets/Lower_mechanism/6compact footprint - cad overview.png"
+        subtitle="Figure 15: CAD overview of trapezoidal base
+    component on BoxBunny.">
+      </image-component>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/7 compact footprint - pivot space.png"
+        subtitle="Figure 16: (a) Illustration of limited pivot
+    space for alternative base shapes; (b) off-centre placement of motion
+    mechanisms relative to base centre axis for improved stability.">
+      </image-component>
+    </div>
+    <div>
+      <h3><a>5.3.3. Height Adjustability</a></h3>
+      <h4>5.3.3.1. Function Specifications</h4>
+      <p>
+          Beyond executing realistic footwork drills, BoxBunny aims to remain
+          accessible to a broad demographic of users. To do so, the robot must allow
+          adjustment of the <strong>head and torso target heights</strong> to align
+          with different user statures. The height-adjustment system requirements are
+          summarised in the target metric specifications (Table 16) alongside key
+          selection criteria (Table 17).
+      </p>
+      <table-component subtitle="Table 16: Target Metric Specifications for Height
+    Adjustability">
+        <div id="table-stroke-length-specs"></div>
+      </table-component>
+      <table-component subtitle="Table 17: Design Considerations for Height
+    Adjustability">
+        <div id="table-vertical-lift-specs"></div>
+      </table-component>
+    </div>
+    <div>
+      <h4>5.3.3.2. Height Adjustment Mechanism Selection</h4>
+      <p>
+          Several concepts were generated to achieve the required stroke and load
+          capacity and were evaluated against the criteria above (Appendix B, Height
+          Adjustment section). The team evaluated three height-adjustment concepts. An
+          office-chair gas cylinder with guides was rejected because the gas lift
+          behaves like a spring–damper, causing vertical “bounce” and insufficient
+          stiffness under punches. An electric gas strut plus motorised guides allows
+          push-button adjustment but creates a complex, shared load path and is
+          unjustified for an adjustment that happens only occasionally.
+      </p>
+      <p>
+          The next concept consist of a manual screw jack with rear vertical linear
+          guides: the jack carries axial load and is self-locking, while the guides
+          take lateral and overturning forces. This concept offers high stiffness,
+          fail-safe behaviour, a simple load path, and acceptable manual effort,
+          making it the most suitable for BoxBunny. The main trade-off is that
+          adjustment is not as convenient or fast as a powered system. However, this
+          is acceptable given the low frequency of adjustment and the strong benefits
+          in stiffness, reliability, and simplicity. Consequently,
+          <strong>
+              Manual Screw Jack with Rear Vertical Linear Guides
+          </strong>
+          concept is selected as the height adjustment mechanism (Figure 17).
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/8height adjustment - cad overview.png"
+        subtitle="Figure 17: (a) (left) CAD overview of height
+    adjustment component; (b) (right) focused CAD of screw jack and vertical
+    linear guides.">
+      </image-component>
+    </div>
+    <div>
+      <h3><a>5.3.4. Bottom Integration</a></h3>
+      <p>
+          Having defined and selected the mechanisms for
+          <strong>
+              footwork movement
+          </strong>
+          , <strong>compact footprint</strong>, and
+          <strong>
+              height adjustability
+          </strong>
+          , the final step is to integrate these subsystems into a coherent lower
+          structure.
+      </p>
+      <p>
+          A key integration decision concerns the
+          <strong>
+              relative ordering of the linear and rotational axes
+          </strong>
+          . If <strong>rotation is placed above linear</strong> (Figure 18a), the
+          robot rotates about a point that is fixed along the linear axis. This
+          constrains the effective training area: rotation occurs around a single
+          longitudinal position, limiting variability in the spatial envelope of
+          targets. In contrast, if
+          <strong>
+              linear motion is placed above rotation
+          </strong>
+          (Figure 18b), the entire upper structure, including the height adjustment
+          and torso, can translate relative to the rotating base. This configuration
+          significantly
+          <strong>
+              increases the reachable footprint of target positions
+          </strong>
+          for the same base size, enhancing the richness of programmable drills.
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/9bottom integration - orientation movement.png"
+        subtitle="Figure 18: (a) (left) Area Capacity Coverage for
+    when rotation is placed above linear; (b) (right) Area Capacity Coverage for
+    when linear is placed above rotation.">
+      </image-component>
+      <p>
+          Given the importance of varied footwork and angle creation, BoxBunny adopts
+          the second configuration, with <strong>linear motion above rotation</strong>
+          .
+      </p>
+      <p>
+          The final integrated stack, from bottom to top in Figure 19, starts from the
+          <strong>trapezoidal base</strong> providing a compact, stable footprint,
+          with space at the rear for optional ballast and structural anchoring. The
+          <strong>Slewing-ring yaw stage</strong> is mounted within the base,
+          comprising a four-point contact ball slewing ring with external gear, driven
+          by a pinion attached to a BLDC servo motor. The
+          <strong>
+              Ball-screw-driven sliding table
+          </strong>
+          on linear rails, mounted above the slewing ring, providing forward–backward
+          motion. The <strong>Manual screw jack with vertical linear guides</strong>,
+          mounted on the sliding table, providing height adjustment while resisting
+          lateral and overturning loads, and lastly, the
+          <strong>
+              upper mechanisms
+          </strong>
+          (torso, head, striking arms) attached to the output plate of the screw jack.
+      </p>
+      <p>
+          This integrated arrangement ensures that the
+          <strong>
+              heaviest and most load-critical bearing
+          </strong>
+          (the slewing ring) is located closest to the base, where it can best resist
+          overturning moments. The <strong>linear stage</strong> carries only the
+          loads associated with forward–backward motion and the mass above it, not the
+          full reaction of the base.  The <strong>height-adjustment mechanism</strong>
+          is responsible primarily for axial support and is backed by rear linear
+          guides for lateral stiffness. Rotation and linear motion are fully
+          <strong>
+              motorised
+          </strong>
+          to allow programmable, repeatable training sequences, while height
+          adjustment remains a <strong>manual, self-locking</strong> operation for
+          safety and simplicity.
+      </p>
+      <p>
+          Overall, the integrated lower mechanism satisfies the key functional
+          requirements: it supports realistic, structured footwork drills; maintains a
+          compact and safe footprint; and offers adaptable target heights for a wide
+          range of users, forming a robust foundation for BoxBunny’s upper-body
+          interaction systems.
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/Lower_mechanism/10bottom integration - full overview.png"
+        subtitle="Figure 19: CAD Overview of Full Bottom Integrated
+    Structure of BoxBunny.">
+      </image-component>
+    </div>
+  </div>
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../components/table-component/table-component.js"></script>
+  <script src="../components/table-component/tables.js"></script>
+</body>
+</html>

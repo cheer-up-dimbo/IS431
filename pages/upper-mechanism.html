@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Upper Mechanism</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/team-member/team-member.css">
+  <script type="module" src="../components/team-member/team-member.js"></script>
+  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../components/table-component/table-component.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#conceptual-design" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+
+    <div id="upper-mechanism">
+      <h3>5.2 Upper Mechanism (Elgin)</h3>
+      <p>
+        The Upper Mechanism constitutes a primary subsystem of the robotic boxing
+        trainer. It is designed to simulate the upper-body actions of a training
+        partner, encompassing punch executions and the necessary contact points.
+        This mechanism is comprised of two key components: the "Punch Execution"
+        system, and the "Contact Points".
+      </p>
+      <image-component
+        tag="image"
+        source="../assets/upper_mechanism/5.2feature_mapping.png"
+        subtitle="">
+      </image-component>
+    </div>
+    <div>
+      <h4><a>5.2.1. Padwork Research</a></h4>
+      <p>
+        For the development of an effective training robot, an initial analysis of
+        traditional boxing training methods was conducted. The primary method,
+        "padwork," involves a coach or partner holding pads (or "mitts") for the
+        boxer. Padwork is highly effective for training accuracy, technique, and
+        combinations. Its effectiveness, however, is highly dependent on how the
+        pads are held. A skilled coach holds the mitts close together to simulate
+        the compact frame of an opponent's head or torso, compelling the boxer to
+        refine their technique and mechanics, focusing their power effectively.
+        However, should the training partner be inexperienced, they might fail to
+        provide sufficient resistance or catch the punch improperly. This can result
+        in over-extension injuries for the boxer, such as hyperextension of the
+        elbow or significant shoulder strain.
+      </p>
+      <iframe
+      width="703"
+      height="404"
+      src="https://www.youtube.com/embed/sosj4UnSeFU?start=131&end=191"
+      title="How to Hold Mitts for Boxing | Ultimate Mitt Work Training Guide for Beginners"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen>
+      </iframe>
+      <p>
+          Flexible training sticks are soft, flexible, lightweight, and a low-cost
+          alternative to traditional pads. This design almost entirely mitigates the
+          fear of injury from impact, both for the boxer and the coach. For defensive
+          drills, the coach swing the noodles to simulate punches. In
+          the absence of fear, the boxer can engage in more realistic scenarios,
+          practicing slips, bobs, and weaves against a moving, non-threatening object.
+          This is ideal for training reactions, speed, and technique. The minimal
+          profile of the sticks also maintains the accuracy-training benefit of pads.
+      </p>
+      <p>
+          From this foundational research, the general design criteria for the robotic
+          mechanism were established which leads into the specification for section.
+      </p>
+    </div>
+    <div>
+      <h4>5.2.1.1. Design Criteria</h4>
+      <p>
+          The robot must provide realistic, anatomically correct striking spots for
+          the boxer, specifically the head, celiac plexus, and liver.
+      </p>
+      <h5>Striking Zones</h5>
+      <image-component
+        width="40%"
+        tag="image"
+        source="../assets/upper_mechanism/5.2.1.1strike_zones.png"
+        subtitle="Figure 8: Strike Zones">
+      </image-component>
+      <h5>Target Motion</h5>
+      <p>
+          The following target motions, derived from coaching techniques, were used to
+          guide the robotic arm's design. The system must be able to replicate these
+          three distinct strikes.
+      </p>
+      <table-component subtitle="Table 7: Target Striking Motion">
+        <div id="table-strike-types"></div>
+      </table-component>
+    </div>
+    <div>
+      <h3>
+          <a>5.2.2. Punch Execution</a>
+      </h3>
+      <h4>5.2.2.1. Function Specifications</h4>
+      <p>
+          Based on the preceding research, the following performance metrics were
+          established through physical measurements and validations.
+      </p>
+      <table-component subtitle="Table 8: Robot Joint Specifications">
+        <div id="table-robot-arm-specs"></div>
+      </table-component>
+    </div>
+    <div>
+      <h4>5.2.2.2.Design Considerations</h4>
+      <table-component subtitle="Table 9: Design Considerations">
+        <div id="table-fidelity-specs"></div>
+      </table-component>
+    </div>
+    <div>
+      <h4>
+          5.2.2.3. Final Concept
+      </h4>
+      <image-component
+        width="80%"
+        tag="image"
+        source="../assets/upper_mechanism/5.2.2.3.final_concept.png"
+        subtitle="Figure 9: Final Concept">
+      </image-component>
+      <p>
+          The final design selection was a 2-Degrees-of-Freedom (2DOF) mechanism,
+          which was determined to offer the optimal balance of fidelity, complexity,
+          and cost by utilizing only two motors per arm. This 2DOF system is comprised
+          of two primary axes. The first is a pitch axis, which provides vertical
+          rotation and permits the execution of the standard downward jab. The
+          inclusion of a secondary yaw axis, providing horizontal rotation, enables
+          the system to execute both the horizontal hook and the diagonal uppercut.
+          Through the coordinated combination of these pitch and yaw axes, this single
+          compact mechanism can be programmed to create realistic, and fluid strike
+          patterns, successfully simulating all required training motions. To mitigate
+          inertia and motor load, the training sticks will be constructed from
+          polyethylene foam. This material is selected for its low density and high
+          resilience, a choice that substantially reduces the system's moment of
+          inertia. A functional prototype has been 3D printed and has been used to
+          demonstrate the various striking requirements.
+      </p>
+    </div>
+    <div class="video-row">
+        <image-component
+        width="60%"
+        tag="image"
+        source="../assets/upper_mechanism/arm_up.jpg"
+        subtitle="">
+      </image-component>
+      <image-component
+        width="60%"
+        tag="image"
+        source="../assets/upper_mechanism/arm_down.jpg"
+        subtitle="">
+      </image-component>
+
+    </div>
+    <div>
+      <h3>
+          <a>5.2.3. Contact Points – Padding</a>
+      </h3>
+    </div>
+    <div>
+      <h4>
+          5.2.3.1. Function Specifications
+      </h4>
+      <table-component subtitle="Table 10: Padding Specifications">
+        <div id="table-padding-specs"></div>
+      </table-component>
+      <image-component
+        tag="image"
+        source="../assets/upper_mechanism/5.2.3.1padding_design_consi.png"
+        subtitle="Figure 10: Padding">
+      </image-component>
+      <p>
+          A crucial function specification pertains to the user's physical safety
+          relative to the machine. To ensure a user does not get too close and
+          inadvertently trip over the robot's base, a key spatial metric was
+          established. This positional constraint dictates that the striking pads must
+          be positioned 40 cm from the centre of the robot.
+      </p>
+    </div>
+    <div>
+      <h4>
+          5.2.3.2.  Design Considerations
+      </h4>
+      <p>
+        The padding serves as the primary target for the user, and its design is
+        governed by three key considerations. First is fidelity; the padding must
+        represent the key striking areas of the head, liver, and celiac plexus.
+        Their placement must be anatomically correct to simulate a real opponent.
+        Second, the delimited size of these areas is a deliberate design choice to
+        foster accuracy, ensuring the boxer is training for technique by targeting
+        small, specific zones rather than a large, imprecise area. Finally, for the
+        safety of both the boxer and the robot's internal components, the padding
+        must possess a soft contact surface and be capable of absorbing the strike
+        energy from average users.
+      </p>
+      <table-component subtitle="Table 11: Padding Design Considerations">
+        <div id="table-opponent-body-specs"></div>
+      </table-component>
+    </div>
+    <div>
+      <h4>
+          5.2.3.3. Solution Principles
+      </h4>
+      <image-component
+        tag="image"
+        source="../assets/upper_mechanism/5.2.3.2padding_sol_princ.png"
+        subtitle="Figure 11: Padding for Striking Areas">
+      </image-component>
+      <p>
+          This implementation will be achieved by first utilizing a standard
+          multi-layer padding structure, consisting of a soft contact layer for user
+          comfort and a dense, energy-absorbing core for force dissipation. Second,
+          anti-vibration rubber mounts will be employed to attach the padding assembly
+          to the robot's main frame. This isolation is critical for protecting the
+          robot's sensitive internal electronics from the repeated impacts. Finally,
+          the integration of springs may be considered in addition to the mounts,
+          providing additional dampening.
+      </p>
+    </div>
+
+    <div>
+      <h3>
+          <a>5.2.4. Contact Points – User Input</a>
+      </h3>
+    </div>
+    <div>
+      <h4>5.2.4.1. Design Considerations</h4>
+      <p>
+          The primary objective of this component is to detect a successful punch
+          landed on a padding-integrated contact point. This provides immediate,
+          positive feedback, which is crucial for user motivation and the motivational
+          aspects of the training session. Furthermore, this data is slated for
+          integration into training analytics, which will provide a post-session
+          report to the user tracking metrics such as punch count, speed, and reaction
+          time. Therefore, the sensor data must demonstrate high consistency and
+          reliability, even during active robot use.
+      </p>
+      <table-component subtitle="Table 12: User Input Design Considerations">
+        <div id="table-reliability-specs"></div>
+      </table-component>
+      <p>
+          The principal design consideration for the user input system is sensor
+          durability. The selected sensors will be subjected to high impacts, which
+          represents the most critical potential failure point for this subsystem.
+          Consequently, the primary design challenge is the mitigation of wear and
+          tear, especially that which is caused by direct load or force.
+      </p>
+    </div>
+    <div>
+      <h4>5.2.4.2. Solution Principles</h4>
+      <p>
+          During concept generation, initial considerations focused on direct-load
+          sensors, such as integrated buttons or Force Sensitive Resistors (FSRs).
+          Although these components are low-cost and simple to implement, they suffer
+          from a critical flaw: they are placed directly in the line of force. This
+          positioning means they are subjected to the full, direct load during every
+          impact, which can lead to physical degradation.
+      </p>
+      <p>
+          An alternative involves indirect-load sensors, which are not positioned in
+          the direct line of force. One such approach is to use an accelerometer,
+          which can be mounted on to the padding assembly. This sensor would be
+          configured to detect the sharp vibrations characteristic of a punch. Another
+          indirect method is an Infrared (IR) proximity sensor, which could be
+          recessed within the pad holder and configured to detect the movement of the
+          pads during an impact. The primary advantage of both solutions is
+          significantly longer durability. However, these sensors introduce a new
+          challenge: signal noise. The data handling will therefore require robust
+          signal processing and filtering to accurately distinguish a punch.
+      </p>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../components/table-component/table-component.js"></script>
+  <script src="../components/table-component/tables.js"></script>
+</body>
+</html>

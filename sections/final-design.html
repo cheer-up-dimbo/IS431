@@ -1,0 +1,120 @@
+    <div id="final-design">
+      <h2>4. Final Design (Jeanette and Zakir)</h2>
+    </div>
+
+    <div id="system-overview">
+      <h3>4.1 System Overview (Jeanette)</h3>
+      <p>Building on the identified product needs, the BoxBunny robot is organised
+      into four key subsystems, each addressing a distinct set of functions
+      (Figure 5):</p>
+      <ul type="disc">
+          <li>
+              <strong>User Interface</strong> – touchscreen, visual      feedback, and
+              control logic for configuring and running training sessions.
+          </li>
+          <li>
+              <strong>Upper Mechanism</strong> – includes Punch Execution      (arms),
+              Contact Points (head/torso/arms), and Impact Sensors responsible
+              for safe, realistic striking interaction.
+          </li>
+          <li>
+              <strong>Lower Mechanism</strong> – comprises Footwork      Movement
+              (legs), Compact Footprint (base), and Height Adjustability, which
+              together position the robot correctly relative to the user.
+          </li>
+          <li>
+              <strong>Robot      Intelligence</strong> – primarily User Tracking,
+              enabling the robot to respond      to the boxer's movement and adapt
+              drills in real time.
+          </li>
+      </ul>
+      <p>
+          Each of these subsystems is detailed in the following sections.
+      </p>
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/Lower_mechanism/0-full robot product feature - cad overview.png"
+        subtitle="Figure 5: Product Features of BoxBunny">
+      </image-component>
+
+
+    </div>
+
+    <div id="user-journey">
+      <h3>4.2 User Journey (Zakir)</h3>
+      <h4 id="end-to-end-user-flow">4.2.1 End-to-End User Flow </h4>
+      <p>
+        The flowchart in Figure 6 illustrates the complete user journey when interacting with the robot,
+        from the start of a session to its conclusion. Each activity is color-coded according to its
+        corresponding product feature category, as indicated in the legend on the right. The session begins
+        with height adjustment and selecting the training parameters that match the user's goals. Once training
+        starts, the robot functions as an intelligent training partner. The robot enables users to strike designated
+        zones, defend against simulated punches through arm actuation, and move or orient itself in response to the
+        user. At the end of the session, the robot generates performance analytics displayed on the dashboard. From
+        there, users can choose to begin a new session or exit, depending on their needs.
+      </p>
+
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/user_journey/User_Journey_Counter_Punch.png"
+        subtitle="Figure 6: User Journey Flowchart">
+      </image-component>
+
+    </div>
+
+    <div id="training-modes-overview">
+      <h4>4.2.2 Training Modes Overview</h4>
+      <p>
+        The robot offers two primary training modes: Training and Performance.
+      </p>
+      <p>
+        Firstly, Training Mode includes Techniques and Spar.
+      </p>
+      <ul>
+        <li> Spar features five preset boxer types that simulate common opponent styles.</li>
+        <li> Techniques provides three categories: Punch Combination Library, Offensive Drills, and Defensive Drills.</li>
+        <ul>
+          <li> The Punch Combination Library includes multiple difficulty levels and also allows users to customise their own punch sequences.</li>
+          <li> o	Offensive and Defensive Drills focus on developing the user's specific attacking and defensive skills respectively.</li>
+        </ul>
+      </ul>
+      <p>
+        Performance Mode measures key physical attributes such as stamina, punch power, and reaction time.
+      </p>
+      <p>
+         Additionally, the Others menu on the homepage enables users to adjust system settings such as switching
+         between orthodox and southpaw, while the Insights feature provides a summary of training metrics and performance
+         trends.
+      </p>
+    </div>
+    <div id="movement-behavior">
+      <h4>4.2.3 Movement Behavior</h4>
+      <p>
+        When the user selects the training parameters, they are interacting with the Skill Progression component of the
+        product. This feature determines the appropriate motor actuations and software activations (such as computer vision)
+        required for the session. As shown in Figure 7, users can choose from several training categories such as Training,
+        Performance, and Others with each serving different purposes. For clarity, this report focuses only on the green pathway,
+        as detailing every iteration would be unnecessarily exhaustive.
+      </p>
+      <p>
+        The green pathway leads to the Counter Punch Mode, which is intentionally chosen because it engages the full range of the
+        robot's capabilities. This mode is for all skill levels, as it replicates one of the most common foundational sparring
+        opponents: a reactive boxer who waits for the user to initiate an attack and responds with precise, well-timed counters
+        (typically jabs and crosses). This style is characterized by low aggression, high timing sensitivity, and reactive movement.
+      </p>
+      <p>
+        Translated into robot behaviour, the system uses computer vision to detect the user's punches. For every punch thrown by the
+        user, the robot responds with a counter-punch by actuating its arm motors. Additionally, the robot adjusts its position by
+        moving linearly when the user steps forward or backward, and it maintains proper orientation by rotating to face the user.
+        This ensures a realistic and continuous sparring interaction.
+      </p>
+
+      <image-component
+        width="70%"
+        tag="image"
+        source="assets/user_journey/user_journey.png"
+        subtitle="Figure 7: Simplified User Journey to Counterpuncher Training">
+      </image-component>
+    </div>

@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(awk 'NR>=50 && NR<=120')",
-      "Bash(python3 -c \":*)",
-      "Bash(python -c \":*)"
-    ]
-  }
-}

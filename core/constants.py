@@ -1,3 +1,0 @@
-# Adding new pages to PageIndex
-PROFICIENCY_CHECKLIST = 40
-PROFICIENCY_RESULT = 41
