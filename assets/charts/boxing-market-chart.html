@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: transparent;
+    }
+    canvas {
+      max-width: 700px;
+      width: 100%;
+    }
+    .source-note {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="boxingMarketChart"></canvas>
+  <p class="source-note">Source: Mordor Intelligence, Boxing Equipment Market Size and Share Analysis (https://www.mordorintelligence.com/industry-reports/boxing-equipment-market)</p>
+  <script>
+    const labels = ['2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028'];
+    const data = [3.2, 3.6, 4.1, 4.6, 5.2, 5.8, 6.5, 7.2];
+    const colors = labels.map((_, i) => i >= 3 ? '#e67e22' : '#2c7bb6');
+
+    new Chart(document.getElementById('boxingMarketChart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Market Size (USD Billion)',
+          data: data,
+          backgroundColor: colors,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Global Boxing Equipment Market Size (USD Billion)',
+            font: { size: 14 }
+          },
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => '$' + ctx.parsed.y + 'B'
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            grid: { display: false },
+            beginAtZero: false,
+            ticks: { callback: val => '$' + val + 'B' }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
