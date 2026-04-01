@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.2 Rotation — Electrical &amp; Control</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../rotation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.2 Rotation
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>5.2.2 Rotation — Electrical &amp; Control</h2>
+
+    <sl-alert variant="warning" open>
+      <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+      <strong>Pending Implementation:</strong> The rotation electrical and
+      control subsystem is currently under development. This page provides a
+      structural outline of the planned documentation. Content will be
+      populated once the motor, driver, and control loop are fully
+      integrated and validated.
+    </sl-alert>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. REQUIREMENTS CASCADE                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Requirements Cascade</h3>
+      <p>
+        The rotation electrical subsystem responds to the following
+        system-level requirements defined in the
+        <a href="../../robot-mechanism.html">Robot Mechanism</a> section:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">System Req</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Subsystem Implication</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-4</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Yaw angular velocity ≥ 150°/s — motor and drive ratio must deliver sufficient speed under load</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-1</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Hold commanded angle under punch impact — closed-loop position control with disturbance rejection</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. PLANNED SECTIONS (OUTLINE)                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Planned Documentation Outline</h3>
+
+      <h4>1. Motor Selection &amp; Specification</h4>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        BLDC servo motor with integrated encoder. Selection rationale,
+        torque/speed requirements, comparison with DC gear motor alternatives.
+      </sl-alert>
+
+      <h4>2. Communication Interface</h4>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        CAN bus or RS485 integration with the main Teensy/Arduino controller.
+        Protocol details, frame structure, and bus topology.
+      </sl-alert>
+
+      <h4>3. PID Cascade Control</h4>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        Position → velocity → current cascade loops. Tuning methodology for
+        smooth re-angling and disturbance rejection under punch impact.
+        Reference to system-level PID cascade in
+        <a href="../../robot-mechanism.html">Robot Mechanism §Architecture</a>.
+      </sl-alert>
+
+      <h4>4. Power Integration</h4>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        Connection to the system-level dual-rail power architecture (24V motor
+        bus). Current draw profile during re-angling manoeuvres.
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. VERIFICATION TARGETS                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Verification Targets</h3>
+      <p>
+        The following tests are planned for the rotation electrical subsystem,
+        mapping to the right side of the V-Model:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Test</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Angular velocity</td>
+            <td style="padding:8px; border:1px solid #ddd;">Yaw speed under no-load</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 150°/s</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Position hold</td>
+            <td style="padding:8px; border:1px solid #ddd;">Angle deviation under 50 N lateral punch</td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 5° overshoot, return within 500 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Communication</td>
+            <td style="padding:8px; border:1px solid #ddd;">Command frame loss rate</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt; 1% over 1000 frames</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

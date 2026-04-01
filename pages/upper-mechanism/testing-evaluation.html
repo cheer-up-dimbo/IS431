@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Testing &amp; Evaluation — Upper Mechanism</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
+  <script type="module" src="../../components/video/video.js"></script>
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../robot-mechanism/arm-actuation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.5 Arm Actuation
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Testing &amp; Evaluation</h2>
+    <p>
+      This section presents the performance criteria, test procedures, results,
+      and limitations of the Upper Mechanism. Each test maps directly to a
+      design specification established in the Design &amp; Ideation phase.
+    </p>
+
+    <!-- ─── Performance Criteria ─── -->
+    <div>
+      <h3>Performance Criteria</h3>
+      <p>
+        The following measurable targets were established from the torque
+        calculations (<a href="../appendix-upper.html">Appendix 1</a>) and
+        padwork research:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">How Measured</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike speed (90° rotation)</td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 0.25 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">High-speed video + firmware timestamp delta</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Positional repeatability</td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 10 mm spread over 10 reps</td>
+            <td style="padding:8px; border:1px solid #ddd;">Laser pointer + target sheet</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
+            <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Sparring endurance</td>
+            <td style="padding:8px; border:1px solid #ddd;">10 min continuous, &lt;60°C motors</td>
+            <td style="padding:8px; border:1px solid #ddd;">Continuous sparring + temperature log</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Monotonic increase: light &lt; medium &lt; heavy</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm (3 users)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-6</td>
+            <td style="padding:8px; border:1px solid #ddd;">FSM multi-strike chain</td>
+            <td style="padding:8px; border:1px solid #ddd;">3-strike chain ≤ 5 s total</td>
+            <td style="padding:8px; border:1px solid #ddd;">Video + FSM console log</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-7</td>
+            <td style="padding:8px; border:1px solid #ddd;">Regenerative braking safety</td>
+            <td style="padding:8px; border:1px solid #ddd;">No PSU trip over 5 emergency stops</td>
+            <td style="padding:8px; border:1px solid #ddd;">Visual confirmation + voltmeter</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-8</td>
+            <td style="padding:8px; border:1px solid #ddd;">Micro-ROS auto-recovery</td>
+            <td style="padding:8px; border:1px solid #ddd;">Reconnect within 3 s of agent restart</td>
+            <td style="padding:8px; border:1px solid #ddd;">Kill agent + timer + GUI status bar</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-9</td>
+            <td style="padding:8px; border:1px solid #ddd;">Current-limit safety cutoff</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motors disable within 100 ms of breach</td>
+            <td style="padding:8px; border:1px solid #ddd;">Physical obstruction + Analytics trace</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-10</td>
+            <td style="padding:8px; border:1px solid #ddd;">ROS external command execution</td>
+            <td style="padding:8px; border:1px solid #ddd;">Correct strike on /robot/strike_command</td>
+            <td style="padding:8px; border:1px solid #ddd;">Terminal command + video + feedback echo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Test Results ─── -->
+    <div>
+      <h3>Test Results</h3>
+      <p>
+        Detailed test procedures are documented in the
+        <a href="../../documents/upper_mechanism_test_specification.md" target="_blank">
+        Test Specification Document</a>. Results will be populated here after
+        testing is conducted.
+      </p>
+
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+        <strong>Pending:</strong> The following results table will be completed
+        after physical test sessions are conducted according to the test
+        specification.
+      </sl-alert>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Measured</th>
+            <th style="padding:8px; border:1px solid #ddd;">Met?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-1</td><td style="padding:8px; border:1px solid #ddd;">Strike speed</td><td style="padding:8px; border:1px solid #ddd;">≤ 0.25 s</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-2</td><td style="padding:8px; border:1px solid #ddd;">Repeatability</td><td style="padding:8px; border:1px solid #ddd;">≤ 10 mm</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-3</td><td style="padding:8px; border:1px solid #ddd;">IMU detection</td><td style="padding:8px; border:1px solid #ddd;">≥ 95%</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-4</td><td style="padding:8px; border:1px solid #ddd;">Endurance</td><td style="padding:8px; border:1px solid #ddd;">10 min, &lt;60°C</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-5</td><td style="padding:8px; border:1px solid #ddd;">Impact force</td><td style="padding:8px; border:1px solid #ddd;">Monotonic</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-6</td><td style="padding:8px; border:1px solid #ddd;">FSM chain</td><td style="padding:8px; border:1px solid #ddd;">≤ 5 s</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-7</td><td style="padding:8px; border:1px solid #ddd;">Regen safety</td><td style="padding:8px; border:1px solid #ddd;">No OVP trip</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-8</td><td style="padding:8px; border:1px solid #ddd;">Agent recovery</td><td style="padding:8px; border:1px solid #ddd;">≤ 3 s</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-9</td><td style="padding:8px; border:1px solid #ddd;">Current cutoff</td><td style="padding:8px; border:1px solid #ddd;">≤ 100 ms</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">PC-10</td><td style="padding:8px; border:1px solid #ddd;">ROS command</td><td style="padding:8px; border:1px solid #ddd;">Correct strike</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Video Evidence Slots ─── -->
+    <div>
+      <h3>Video Evidence</h3>
+      <p>
+        The following video slots correspond to each test and should be
+        populated with recordings from the physical test sessions.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>How to add test videos:</strong>
+        <ol style="margin:8px 0; padding-left:20px;">
+          <li>Film the test according to the <a href="../../documents/upper_mechanism_test_specification.md" target="_blank">Test Specification</a>.</li>
+          <li>Save the video file (MP4 recommended) to <code>assets/upper_mechanism/videos/</code>.</li>
+          <li>Name it descriptively: <code>test1_strike_speed.mp4</code>, <code>test6_fsm_chain.mp4</code>, etc.</li>
+          <li>Add it to this page using this HTML pattern:</li>
+        </ol>
+        <pre style="background:#f5f5f5; padding:8px; border-radius:4px; font-size:0.85rem;">
+&lt;div class="video-row single"&gt;
+  &lt;div class="video-box"&gt;
+    &lt;video controls preload="metadata"&gt;
+      &lt;source src="../../assets/upper_mechanism/videos/test1_strike_speed.mp4" type="video/mp4"&gt;
+    &lt;/video&gt;
+    &lt;sub&gt;Test 1: Strike Speed — 90° rotation in ≤0.25s&lt;/sub&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+        </pre>
+        <p style="margin-top:8px;">For two side-by-side videos, use <code>class="video-row two-up"</code> with two <code>&lt;div class="video-box"&gt;</code> children.</p>
+      </sl-alert>
+
+      <!-- Test video placeholders — uncomment and update paths when media is available -->
+      <!--
+      <h4>Test 1: Strike Speed</h4>
+      <div class="video-row single">
+        <div class="video-box">
+          <video controls preload="metadata">
+            <source src="../../assets/upper_mechanism/videos/test1_strike_speed.mp4" type="video/mp4">
+          </video>
+          <sub>Test 1: Strike Speed — 90° rotation timing</sub>
+        </div>
+      </div>
+
+      <h4>Test 6: FSM Fluid Strike Chaining</h4>
+      <div class="video-row single">
+        <div class="video-box">
+          <video controls preload="metadata">
+            <source src="../../assets/upper_mechanism/videos/test6_fsm_chain.mp4" type="video/mp4">
+          </video>
+          <sub>Test 6: Jab → Cross → Uppercut fluid chain</sub>
+        </div>
+      </div>
+      -->
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Limitations ─── -->
+    <div>
+      <h3>Limitations</h3>
+      <ul>
+        <li>
+          <strong>Regenerative braking:</strong> Software PWM ramp-down
+          mitigates OVP trips but a hardware TVS clamp remains required for
+          full protection under extreme loads.
+        </li>
+        <li>
+          <strong>3D-printed durability:</strong> Key load-bearing gears are
+          polymer FDM prints. Long-term fatigue under repeated high-velocity
+          impacts has not been characterised.
+        </li>
+        <li>
+          <strong>IMU MEMS drift:</strong> Velocity integration was abandoned
+          due to thermal random-walk drift; the system relies on peak-vector
+          magnitude tracking only.
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

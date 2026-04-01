@@ -65,7 +65,7 @@
           <div class="team-contrib">
             <span class="contrib-label">Contributions:</span>
             <ul>
-              <li>Ch. 5.2 Upper Mechanism</li>
+              <li>Ch. 5.2 Robot Mechanism (Arm Actuation, Padding)</li>
               <li>Appendix 1</li>
             </ul>
           </div>
@@ -80,7 +80,7 @@
             <span class="contrib-label">Contributions:</span>
             <ul>
               <li>Ch. 4.1 System Overview</li>
-              <li>Ch. 5.3 Lower Mechanism</li>
+              <li>Ch. 5.2 Robot Mechanism (Base, Rotation, Height Adjustment)</li>
               <li>Appendix 2</li>
             </ul>
           </div>
@@ -94,8 +94,7 @@
           <div class="team-contrib">
             <span class="contrib-label">Contributions:</span>
             <ul>
-              <li>Ch. 5.4 Robotic Intelligence</li>
-              <li>Ch. 5.5 Control System</li>
+              <li>Ch. 5.3 Robotic Intelligence</li>
             </ul>
           </div>
         </div>
@@ -128,6 +127,7 @@
         <sl-tree-item>
           <a href="#design-methodology">3. Design Methodology</a>
           <sl-tree-item><a href="#clarification-of-task">3.1. Clarification of Task</a></sl-tree-item>
+          <sl-tree-item><a href="#v-model">3.2. Systems Engineering V-Model</a></sl-tree-item>
         </sl-tree-item>
 
         <sl-tree-item>
@@ -144,10 +144,16 @@
         <sl-tree-item expanded>
           <a href="#conceptual-design">5. Conceptual Design</a>
           <sl-tree-item><a href="pages/gui.html">5.1. User Interface (GUI)</a></sl-tree-item>
-          <sl-tree-item><a href="pages/upper-mechanism.html">5.2. Upper Mechanism</a></sl-tree-item>
-          <sl-tree-item><a href="pages/lower-mechanism.html">5.3. Lower Mechanism</a></sl-tree-item>
-          <sl-tree-item><a href="pages/robot-intelligence.html">5.4. Robot Intelligence</a></sl-tree-item>
-          <sl-tree-item><a href="pages/control-system.html">5.5. Control System</a></sl-tree-item>
+          <sl-tree-item>
+            <a href="pages/robot-mechanism.html">5.2. Robot Mechanism</a>
+            <sl-tree-item><a href="pages/robot-mechanism/base.html">5.2.1. Base</a></sl-tree-item>
+            <sl-tree-item><a href="pages/robot-mechanism/rotation.html">5.2.2. Rotation</a></sl-tree-item>
+            <sl-tree-item><a href="pages/robot-mechanism/height-adjustment.html">5.2.3. Height Adjustment</a></sl-tree-item>
+            <sl-tree-item><a href="pages/robot-mechanism/padding.html">5.2.4. Padding</a></sl-tree-item>
+            <sl-tree-item><a href="pages/robot-mechanism/arm-actuation.html">5.2.5. Arm Actuation</a></sl-tree-item>
+            <sl-tree-item><a href="pages/robot-mechanism/testing.html">Verification Results</a></sl-tree-item>
+          </sl-tree-item>
+          <sl-tree-item><a href="pages/robot-intelligence.html">5.3. Robot Intelligence</a></sl-tree-item>
         </sl-tree-item>
 
         <sl-tree-item>
@@ -221,24 +227,14 @@
           <h3>5.1 User Interface (GUI)</h3>
           <p>Zakir</p>
         </a>
-        <a href="pages/upper-mechanism.html" class="section-nav-card">
-          <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
-          <h3>5.2 Upper Mechanism</h3>
-          <p>Elgin</p>
-        </a>
-        <a href="pages/lower-mechanism.html" class="section-nav-card">
-          <sl-icon name="gear" style="font-size: 2rem;"></sl-icon>
-          <h3>5.3 Lower Mechanism</h3>
-          <p>Jeanette</p>
+        <a href="pages/robot-mechanism.html" class="section-nav-card">
+          <sl-icon name="gear-wide-connected" style="font-size: 2rem;"></sl-icon>
+          <h3>5.2 Robot Mechanism</h3>
+          <p>Elgin &amp; Jeanette</p>
         </a>
         <a href="pages/robot-intelligence.html" class="section-nav-card">
           <sl-icon name="cpu" style="font-size: 2rem;"></sl-icon>
-          <h3>5.4 Robot Intelligence</h3>
-          <p>Yogeeswaran</p>
-        </a>
-        <a href="pages/control-system.html" class="section-nav-card">
-          <sl-icon name="sliders" style="font-size: 2rem;"></sl-icon>
-          <h3>5.5 Control System</h3>
+          <h3>5.3 Robot Intelligence</h3>
           <p>Yogeeswaran</p>
         </a>
       </div>

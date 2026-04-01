@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.4 Padding — Electrical Integration</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../padding.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.4 Padding
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>5.2.4 Padding — Electrical Integration</h2>
+
+    <sl-alert variant="warning" open>
+      <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+      <strong>Content Pending:</strong> This page provides a structural
+      outline. Detailed content will be populated by the robotics agent.
+    </sl-alert>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. REQUIREMENTS CASCADE                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Requirements Cascade</h3>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">System Req</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Subsystem Implication</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-6</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Embedded IMU sensors must reliably detect impacts above threshold without false positives from arm motion</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. PLANNED CONTENT                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>MPU6050 Sensor Selection</h3>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        MPU6050 6-axis IMU selection rationale. 3-axis accelerometer +
+        3-axis gyroscope. Cost, availability, I²C interface, and suitability
+        for impact detection applications.
+      </sl-alert>
+
+      <h3>Quad-IMU I²C Topology</h3>
+      <p>
+        The MPU6050 supports only two I²C addresses (<code>0x68</code>
+        and <code>0x69</code>, selected by the AD0 pin). To accommodate
+        four sensors, the Teensy 4.0's two independent hardware I²C
+        buses are both utilised:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">I²C Bus</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Teensy Pins</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x68</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x69</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>Wire</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 18, SCL: Pin 19</td>
+            <td style="padding:10px; border:1px solid #ddd;">Centre Body</td>
+            <td style="padding:10px; border:1px solid #ddd;">Left Body</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>Wire1</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 17, SCL: Pin 16</td>
+            <td style="padding:10px; border:1px solid #ddd;">Right Body</td>
+            <td style="padding:10px; border:1px solid #ddd;">Reserved (Head)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Both buses operate at <strong>400 kHz</strong> (I²C Fast Mode).
+        Each MPU6050 read transaction requires approximately 14 bytes,
+        consuming ~280 µs per sensor at 400 kHz.
+      </p>
+
+      <h3>Wiring Considerations</h3>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        Long (30–40 cm) unshielded jumper wires to padding zones introduce
+        parasitic capacitance. Impact on signal integrity at 400 kHz, and
+        mitigation through Hard STOP I²C protocol. See
+        <a href="troubleshooting.html">Troubleshooting §7</a>.
+      </sl-alert>
+
+      <h3>Strike Detection Pipeline</h3>
+      <p>
+        The raw 3-axis acceleration from each IMU is included in the
+        expanded <code>/motor_feedback</code> payload (21 doubles)
+        published via micro-ROS at 200 Hz. On the application side
+        (GUI V3), the <strong>IMU Diagnostics Tab</strong> computes the
+        L2 norm:
+      </p>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
+        ||a|| = &radic;(a<sub>x</sub>&sup2; + a<sub>y</sub>&sup2; +
+        a<sub>z</sub>&sup2;)
+      </p>
+      <p>
+        When ||a|| exceeds a configurable threshold (default: 2.0 g),
+        the system registers a valid strike event and publishes data
+        (sensor ID, peak acceleration, timestamp) to the
+        <code>/strike_events</code> ROS 2 topic.
+      </p>
+
+      <h3>IMU Timing Budget</h3>
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Within 200 Hz Unified Loop</h4>
+        <table style="width:100%; border-collapse:collapse; margin:12px 0;">
+          <thead>
+            <tr style="background:#e8edf4;">
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Task</th>
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Allocation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">CAN Tx/Rx (4 motors)</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.8 ms</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;"><strong>I²C IMU reads (up to 4 sensors)</strong></td>
+              <td style="padding:8px; border:1px solid #c5cee0;"><strong>~1.1 ms</strong></td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">micro-ROS publish</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.5 ms</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">Safety checks + logic</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.4 ms</td>
+            </tr>
+            <tr style="background:#f0f4f8; font-weight:bold;">
+              <td style="padding:8px; border:1px solid #c5cee0;">Headroom</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~2.2 ms (44%)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.9rem; color: #555;">
+          Total worst-case utilisation: ~2.8 ms of the 5.0 ms budget (56%).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

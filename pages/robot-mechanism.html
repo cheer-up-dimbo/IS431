@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Robot Mechanism</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/team-member/team-member.css">
+  <script type="module" src="../components/team-member/team-member.js"></script>
+  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../components/table-component/table-component.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#conceptual-design" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. SYSTEM-LEVEL OVERVIEW                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="robot-mechanism">
+      <h2>5.2 Robot Mechanism</h2>
+      <p>
+        The robot mechanism encompasses all physical hardware — mechanical
+        structures, actuators, sensors, and supporting electrical and firmware
+        systems — that together enable BoxBunny to behave as a realistic,
+        interactive boxing training partner rather than a static target. At the
+        system level, the mechanism has five principal responsibilities:
+      </p>
+      <ol>
+        <li>
+          <strong>Stable and safe base</strong> — resist punching-induced
+          overturning moments, protect the user's footwork space, and remain
+          portable for transport and public demonstrations.
+        </li>
+        <li>
+          <strong>Rotation about the yaw axis</strong> — re-angle the robot to
+          present changing attack and defence lines during drills, replicating a
+          coach's pivoting footwork.
+        </li>
+        <li>
+          <strong>Height adjustability</strong> — match the robot's head and
+          torso targets to users of different statures so that striking zones
+          remain anatomically correct.
+        </li>
+        <li>
+          <strong>Impact-absorbing contact surfaces</strong> — provide
+          realistic, safe striking targets with embedded sensing for training
+          analytics.
+        </li>
+        <li>
+          <strong>Arm actuation</strong> — deliver targeted punches at
+          anatomically correct striking zones using a high-velocity 2-DOF
+          mechanism, enabling jabs, hooks, and uppercuts.
+        </li>
+      </ol>
+      <p>
+        These functions were decomposed from the broader project goals
+        established in the problem clarification and design methodology phases.
+        A key integration principle across all subsystems is that the mechanism
+        was designed <strong>from system-level behaviour downward</strong>,
+        rather than by combining isolated parts. The robot first had to remain
+        upright, safe, and spatially compact in a boxing environment. Only after
+        these high-level requirements were defined were they decomposed into
+        subsystem-level functions following the left side of the V-model.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. DESIGN REQUIREMENTS                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Design Requirements</h3>
+      <p>
+        The following system-level requirements govern the entire robot
+        mechanism. Each subsystem page describes how these system requirements
+        cascade into subsystem-specific design criteria.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">ID</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Requirement</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:10px; border:1px solid #ddd;">Remain upright under worst-credible punching loads with FoS ≥ 1.5</td>
+            <td style="padding:10px; border:1px solid #ddd;">User safety; conservative margin for uncertainty in punch intensity and direction</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:10px; border:1px solid #ddd;">Compact footprint that preserves user footwork space</td>
+            <td style="padding:10px; border:1px solid #ddd;">Boxing gyms are space-constrained; base must not obstruct pivots or stance changes</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-3</td>
+            <td style="padding:10px; border:1px solid #ddd;">Provide ≥ 400 mm vertical stroke for height adjustment</td>
+            <td style="padding:10px; border:1px solid #ddd;">Accommodate user height range for anatomically correct target alignment</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-4</td>
+            <td style="padding:10px; border:1px solid #ddd;">Yaw rotation for re-angling with target angular velocity ~150°/s</td>
+            <td style="padding:10px; border:1px solid #ddd;">Replicate coach pivoting behaviour for realistic defensive/counter drills</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5</td>
+            <td style="padding:10px; border:1px solid #ddd;">Execute jab, hook, and uppercut motions at human-competitive speeds (90° in ≤ 0.25 s)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Training fidelity requires realistic strike velocity</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-6</td>
+            <td style="padding:10px; border:1px solid #ddd;">Absorb repeated strikes without damage; provide impact detection</td>
+            <td style="padding:10px; border:1px solid #ddd;">Structural survivability and training analytics</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-7</td>
+            <td style="padding:10px; border:1px solid #ddd;">Portable: transportable by 1–2 persons between venues</td>
+            <td style="padding:10px; border:1px solid #ddd;">Demo and gym deployment flexibility</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. OVERALL SUBSYSTEM ARCHITECTURE                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Overall Subsystem Architecture</h3>
+
+      <h4>Mechanical Stack</h4>
+      <p>
+        The mechanism is organised as a vertical stack, ordered from the ground
+        up. This ordering principle ensures that the heaviest and most
+        load-critical components sit closest to the base, where they can best
+        resist overturning moments:
+      </p>
+      <ol>
+        <li><strong>Trapezoidal Base</strong> — welded steel platform providing stability and portability</li>
+        <li><strong>Slewing-Ring Yaw Stage</strong> — low-profile rotation module at the base of the stack</li>
+        <li><strong>Ball-Screw Linear Slide</strong> — forward–backward translation above the yaw stage, expanding the reachable target footprint</li>
+        <li><strong>Telescopic Height-Adjustment Column</strong> — motorised screw-jack column with structural guiding</li>
+        <li><strong>Upper Body</strong> — torso, head, and 2-DOF coaxial striking arms with multi-layer padding</li>
+      </ol>
+      <p>
+        The linear motion axis (ball-screw-driven sliding table on dual linear
+        rails) sits above the rotation stage. This configuration was chosen
+        because it significantly increases the reachable footprint of target
+        positions for the same base size, compared to placing rotation above
+        linear motion. All translational and rotational footwork axes are fully
+        motorised for programmable, repeatable training sequences, while height
+        adjustment uses a self-locking screw jack for safety.
+      </p>
+
+      <h4>Electrical &amp; Control Architecture</h4>
+      <p>
+        The robot mechanism employs a distributed control architecture where
+        parallel processing coordinates vision inference, sensor feedback, and
+        motor control in real time. The system adopts a layered approach:
+      </p>
+      <ul>
+        <li>
+          <strong>ROS 2</strong> provides the modular, message-based framework
+          for higher-level perception, decision making, and user-interface
+          components running on the Jetson compute module.
+        </li>
+        <li>
+          <strong>micro-ROS / FreeRTOS</strong> provides lightweight,
+          deterministic task scheduling on microcontrollers (Teensy 4.0) for
+          low-latency motor control and sensor acquisition loops.
+        </li>
+      </ul>
+
+      <image-component
+        tag="image"
+        source="../assets/control_system/component_overview.png"
+        subtitle="Figure: Component overview showing power, data, and serial connections across all subsystems.">
+      </image-component>
+
+      <p>
+        A closed-loop PID cascade controller ensures smooth, safe motion under
+        dynamic boxing loads. The cascade implements three nested loops —
+        position (outermost), velocity, and current (innermost) — each
+        operating at progressively higher update rates to match the response
+        speed of the physical variable it controls. This structure enables the
+        mechanism to:
+      </p>
+      <ul>
+        <li>Damp sudden impacts (user punches) and restore position smoothly</li>
+        <li>Limit torque when the user grabs or holds an arm</li>
+        <li>Prevent overcurrent and motor burnout during stall conditions</li>
+        <li>Compensate load spikes gradually without aggressive corrections</li>
+      </ul>
+      <p>
+        Individual subsystem pages detail their specific electrical interfaces,
+        power budgets, communication buses, and low-level control strategies.
+      </p>
+
+      <image-component
+        tag="image"
+        source="../assets/control_system/closed_loop.jpg"
+        subtitle="Figure: Closed-loop control block diagram for the robot mechanism.">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. VERIFICATION PLAN (V-Model Right Side)              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Verification Plan</h3>
+      <p>
+        Following the V-Model framework introduced in
+        <a href="../index.html#v-model">Section 3.2</a>, the verification
+        plan defines how each system-level requirement (RM-1 through RM-7)
+        will be verified at the subsystem and system levels. Verification
+        plans are established <em>during</em> the decomposition phase (left
+        side of the V) and executed during integration (right side).
+      </p>
+
+      <h4>Subsystem Verification Matrix</h4>
+      <p>
+        Each system-level requirement cascades into a specific subsystem
+        test. The table below defines the mapping, test method, and
+        acceptance criterion for each:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Req</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Subsystem</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Test</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Acceptance Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Base</td>
+            <td style="padding:8px; border:1px solid #ddd;">Tipping test: apply worst-credible punch load at max height extension</td>
+            <td style="padding:8px; border:1px solid #ddd;">No tipping; restoring moment / overturning moment ≥ 1.5</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Base</td>
+            <td style="padding:8px; border:1px solid #ddd;">Footwork clearance: user completes full stance cycle around robot</td>
+            <td style="padding:8px; border:1px solid #ddd;">No foot contact with base during orthodox and southpaw stances</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Height Adj.</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full-stroke actuation: command min → max height</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 400 mm travel; ≤ 32 s full stroke</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Rotation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Angular velocity measurement: 90° step command, measure time-to-target</td>
+            <td style="padding:8px; border:1px solid #ddd;">Sustained angular velocity ≥ 150°/s</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Arm Actuation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike speed timing: command 90° arc, measure completion time</td>
+            <td style="padding:8px; border:1px solid #ddd;">90° in ≤ 0.25 s (jab, hook, and uppercut)</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-6</td>
+            <td style="padding:8px; border:1px solid #ddd;">Padding</td>
+            <td style="padding:8px; border:1px solid #ddd;">60-punch impact detection test across 3 body zones (20 per zone)</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive rate; monotonic force differentiation</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
+            <td style="padding:8px; border:1px solid #ddd;">Base</td>
+            <td style="padding:8px; border:1px solid #ddd;">Transport test: 2-person tip-and-roll between two venues</td>
+            <td style="padding:8px; border:1px solid #ddd;">Successful transport without disassembly; ≤ 5 min setup</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>System Integration Test Plan</h4>
+      <p>
+        Beyond individual subsystem verification, the robot mechanism must be
+        tested as an <strong>integrated system</strong> — all five subsystems
+        operating together under realistic training conditions (without Robot
+        Intelligence). The system-level integration tests validate cross-
+        subsystem interactions that cannot be caught by isolated subsystem
+        tests:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Test</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Description</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Acceptance Criterion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Coordinated Motion</td>
+            <td style="padding:8px; border:1px solid #ddd;">Height adjustment + yaw rotation simultaneously under operator control</td>
+            <td style="padding:8px; border:1px solid #ddd;">No mechanical binding, smooth motion, no loss of position</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Loaded Sparring</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike delivery while user is actively punching the padding</td>
+            <td style="padding:8px; border:1px solid #ddd;">Arm maintains strike accuracy; IMU correctly detects user punches during robot strikes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Power Budget</td>
+            <td style="padding:8px; border:1px solid #ddd;">Measure total system current draw under worst-case concurrent actuator load</td>
+            <td style="padding:8px; border:1px solid #ddd;">Total draw within PSU capacity with ≥ 20% headroom</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Communication Reliability</td>
+            <td style="padding:8px; border:1px solid #ddd;">Run CAN + I²C buses concurrently at full rate for 30 min continuous sparring</td>
+            <td style="padding:8px; border:1px solid #ddd;">Zero bus hangs; ≤ 0.1% packet loss</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Safety E-Stop</td>
+            <td style="padding:8px; border:1px solid #ddd;">Trigger emergency stop during active strike motion</td>
+            <td style="padding:8px; border:1px solid #ddd;">All motors decelerate to zero within 100 ms; no uncontrolled motion</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        Detailed test results are documented on the testing page:
+      </p>
+      <div class="section-nav-grid">
+        <a href="robot-mechanism/testing.html" class="section-nav-card">
+          <sl-icon name="clipboard-check" style="font-size: 2rem;"></sl-icon>
+          <h3>Verification Results</h3>
+          <p>Subsystem test results, system integration results, performance assessment</p>
+        </a>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. NAVIGATION GRID TO SUBSYSTEM PAGES                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Subsystem Documentation</h3>
+      <p>
+        The robot mechanism is decomposed into five subsystems, ordered from the
+        base of the mechanical stack upward. Each subsystem page follows a
+        consistent structure: requirements recap (how system-level requirements
+        cascade down), design rationale and evolution, and validation against
+        subsystem criteria. Select a subsystem below to view its detailed
+        documentation.
+      </p>
+      <div class="section-nav-grid">
+        <a href="robot-mechanism/base.html" class="section-nav-card">
+          <sl-icon name="bounding-box" style="font-size: 2rem;"></sl-icon>
+          <h3>5.2.1 Base</h3>
+          <p>Trapezoidal platform, stability analysis, portability, corrosion mitigation</p>
+        </a>
+        <a href="robot-mechanism/rotation.html" class="section-nav-card">
+          <sl-icon name="arrow-repeat" style="font-size: 2rem;"></sl-icon>
+          <h3>5.2.2 Rotation</h3>
+          <p>Slewing-ring yaw module, timing-belt drive, cam-follower supports</p>
+        </a>
+        <a href="robot-mechanism/height-adjustment.html" class="section-nav-card">
+          <sl-icon name="arrows-expand" style="font-size: 2rem;"></sl-icon>
+          <h3>5.2.3 Height Adjustment</h3>
+          <p>Telescopic lift column, screw-jack actuation, structural separation</p>
+        </a>
+        <a href="robot-mechanism/padding.html" class="section-nav-card">
+          <sl-icon name="shield-check" style="font-size: 2rem;"></sl-icon>
+          <h3>5.2.4 Padding</h3>
+          <p>Multi-layer padding, anti-vibration isolation, IMU impact sensing</p>
+        </a>
+        <a href="robot-mechanism/arm-actuation.html" class="section-nav-card">
+          <sl-icon name="lightning-charge" style="font-size: 2rem;"></sl-icon>
+          <h3>5.2.5 Arm Actuation</h3>
+          <p>2-DOF coaxial differential joint, mass centralisation, strike delivery</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../components/table-component/table-component.js"></script>
+  <script src="../components/table-component/tables.js"></script>
+</body>
+</html>

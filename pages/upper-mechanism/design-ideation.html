@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Design &amp; Ideation — Upper Mechanism</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
+  <script type="module" src="../../components/video/video.js"></script>
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../robot-mechanism/arm-actuation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.5 Arm Actuation
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Design &amp; Ideation</h2>
+    <p>
+      This section traces the iterative design process that led to the final
+      Coaxial Differential 2-DOF joint mechanism. The narrative follows the
+      engineering methodology from initial motion requirements analysis,
+      through three concept iterations, to the motor selection journey that
+      culminated in the adoption of the Damiao DM-J4310-2EC integrated BLDC
+      actuator. Each design decision is justified against the performance
+      specifications established in the
+      <a href="../robot-mechanism/arm-actuation.html">Arm Actuation overview</a>.
+    </p>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. DEGREES OF MOTION ANALYSIS                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Degrees of Motion Analysis</h3>
+      <p>
+        Industrial robotic arms are typically engineered with six or more
+        degrees of freedom to achieve arbitrary end-effector positioning.
+        However, for a boxing training application, such complexity is
+        unnecessary and counter-productive: each additional actuator
+        increases cost, weight, control complexity, and the number of
+        potential failure points.
+      </p>
+      <p>
+        A systematic analysis of the required strike motions — derived from
+        the padwork research documented in the
+        <a href="../robot-mechanism/arm-actuation.html">Arm Actuation overview</a> —
+        identified that all target strikes (jab, hook, uppercut) can be
+        decomposed into combinations of exactly two rotational degrees of
+        freedom about the wrist joint:
+      </p>
+      <ul>
+        <li>
+          <strong>Pitch</strong> (vertical tilting): Produces the downward
+          jab motion and the upward component of the uppercut.
+        </li>
+        <li>
+          <strong>Roll</strong> (axial rotation): Produces the lateral
+          sweeping motion required for the hook and the horizontal component
+          of the uppercut.
+        </li>
+      </ul>
+      <p>
+        This finding established a fundamental design constraint: the
+        mechanism must provide precisely two motorised degrees of freedom.
+        Any solution requiring more than two motors per arm was eliminated
+        from further consideration.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. INTERIM JOINT DESIGN                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Interim Joint Design (Gear-Rail System)</h3>
+      <p>
+        Inspiration for the initial joint mechanism was drawn from a coaxial
+        gear-rail concept
+        (<a href="https://youtu.be/rP8Si_qXkzU" target="_blank">reference
+        video</a>). This approach offers a key advantage: both motors can
+        be mounted side-by-side at the base of the assembly, each driving
+        a pinion gear into a central coaxial gear stack, rather than
+        placing motors on the moving arm itself. This
+        <strong>centralises the motor mass at the pivot
+        point</strong> and reduces the arm's moment of inertia.
+        The trade-off is additional mechanical complexity introduced by the
+        bevel gear required to convert the gear stack output into the
+        pitch axis rotation.
+      </p>
+      <p>
+        Using SolidWorks, a parametric 3D model was created and iteratively
+        refined through multiple design revisions. Each iteration addressed
+        assembly constraints that became apparent only after physical
+        prototyping — demonstrating that geometric fit alone is
+        insufficient; the method of connection and assembly sequence must
+        be considered as a first-order design criterion for 3D-printed
+        mechanisms.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="image"></sl-icon>
+        <strong>Media Placeholder:</strong> SolidWorks iteration renders of
+        the gear-rail joint design. Each iteration should be labelled with
+        the key design change (e.g., "Iteration 2: widened gear mesh
+        clearance for assembly access").<br>
+        <em>To add: place image files in
+        <code>assets/upper_mechanism/design_iterations/</code> and use
+        <code>&lt;image-component&gt;</code> tags below.</em>
+      </sl-alert>
+      <!--
+        EXAMPLE — uncomment and update when media is available:
+        <image-component
+          tag="image"
+          source="../../assets/upper_mechanism/design_iterations/solidworks_v1.png"
+          subtitle="Figure: SolidWorks iteration 1 — initial gear-rail concept with single bevel gear coupling.">
+        </image-component>
+      -->
+
+      <h4>Interim Design Validation</h4>
+      <p>
+        To validate that the proposed mechanism was truly capable of
+        executing the required strike motions, the final SolidWorks
+        iteration was fabricated using PLA FDM printing. The physical
+        prototype confirmed that the two degrees of freedom — pitch and
+        roll — were sufficient to replicate all three target strike types
+        (jab, hook, uppercut) when operated manually.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. POST-INTERIM DESIGN REVIEW                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Post-Interim Design Review</h3>
+      <p>
+        During the interim presentation, the examining panel raised two
+        critical concerns regarding the gear-rail mechanism:
+        <strong>backlash</strong> and <strong>impact-induced damage</strong>.
+        Both were addressed through targeted design modifications before
+        proceeding to the final concept.
+      </p>
+
+      <h4>Backlash Mitigation</h4>
+      <p>
+        Backlash — the angular play between mating gear teeth — introduces
+        a dead zone during direction reversals, degrading positional
+        repeatability. For a high-velocity striking mechanism where rapid
+        bidirectional motion is fundamental, this represents a critical
+        performance limitation. Three mitigation strategies were evaluated:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Strategy</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Mechanism</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Trade-off</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Reduced tooth module</td>
+            <td style="padding:10px; border:1px solid #ddd;">Smaller teeth reduce inter-tooth clearance</td>
+            <td style="padding:10px; border:1px solid #ddd;">Reduced load capacity; finer teeth are more fragile in PLA</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Helical gears</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Angled tooth profile provides continuous meshing pressure</td>
+            <td style="padding:10px; border:1px solid #ddd;">Introduces axial thrust load requiring bearing support</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Timing belts</td>
+            <td style="padding:10px; border:1px solid #ddd;">Zero backlash by design; positive engagement</td>
+            <td style="padding:10px; border:1px solid #ddd;">Requires precise tensioning; larger physical envelope</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The helical gear approach was selected for the final design as it
+        offered the best balance of backlash reduction and structural
+        compatibility with the existing coaxial form factor.
+      </p>
+
+      <h4>Impact Damage &amp; the BLDC Motor Rationale</h4>
+      <p>
+        The predecessor <em>Box Bunny</em> prototype employed standard hobby
+        servo motors for joint actuation. During testing, repeated sparring
+        impacts transmitted directly through the drivetrain caused
+        progressive wear and eventual fracture of the servo motors' internal
+        reduction gears — rendering the prototype inoperable.
+      </p>
+      <p>
+        This failure mode established a critical requirement: the selected
+        motor must be capable of <strong>absorbing external torque without
+        mechanical damage</strong>. Brushless DC (BLDC) motors satisfy this
+        requirement because they do not rely on internal reduction gears and
+        can freely spin (back-drive) when external force is applied.
+        However, the application simultaneously demands precise rotational
+        position control with closed-loop feedback — capabilities that
+        standard ESC-controlled BLDC motors do not provide. This dual
+        requirement (impact resilience + position control) directly motivated
+        the motor selection journey described below.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. JOINT CONCEPT SELECTION                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Joint Concept Selection</h3>
+      <p>
+        Three candidate joint configurations were generated and evaluated
+        against four weighted criteria: training fidelity, mechanical
+        complexity, component cost, and user zone obstruction. The full
+        concept sketches and scored decision matrix are presented in
+        <a href="../appendix-upper.html">Appendix 1</a>.
+      </p>
+
+      <h4>Concept 1: Multi-Actuator Rig</h4>
+      <p>
+        The first concept allocated a dedicated actuator for each
+        individual strike type. Covering both left and right striking zones
+        would require a minimum of six motors. While this approach
+        theoretically maximises strike fidelity by permitting independent
+        optimisation of each motion, the solution was deemed prohibitively
+        complex, high-cost, and likely to physically obstruct the user's
+        striking targets.
+      </p>
+
+      <h4>Concept 2: Windmill Actuator</h4>
+      <p>
+        The second concept consolidated two strike motions into a single
+        motor by mounting training sticks on both ends of a rotating shaft
+        (a "windmill" configuration). However, analysis revealed a critical
+        fidelity failure: in the neutral position, the extended uppercut
+        component would directly obstruct the liver strike zone —
+        preventing the user from accessing a primary training target.
+      </p>
+
+      <h4>Concept 3: 2-DOF Coaxial Differential (Selected)</h4>
+      <p>
+        The selected concept employs a <strong>2-Degrees-of-Freedom
+        coaxial differential mechanism</strong> using only two motors per
+        arm. By combining coordinated pitch and roll rotations, this single
+        mechanism reproduces all required strike patterns from a compact
+        form factor. The concept scored highest across all four evaluation
+        criteria, offering the optimal balance of training fidelity,
+        mechanical simplicity, cost-effectiveness, and minimal zone
+        obstruction.
+      </p>
+
+      <h4>Moment of Inertia (MoI) — The Dynamics Rationale</h4>
+      <p>
+        The defining advantage of the coaxial configuration is
+        <strong>proximal motor mounting</strong> (mass centralisation).
+        Both Damiao motors are mounted <strong>side-by-side
+        horizontally</strong> at the base of the arm assembly — each
+        driving a pinion gear into the central coaxial gear stack —
+        rather than being distributed distally along the arm's length.
+        From a rotational
+        dynamics perspective, the <strong>Moment of Inertia (MoI)</strong>
+        of a rigid body scales with <em>mr&sup2;</em>, where <em>m</em>
+        is the component mass and <em>r</em> is the distance from the
+        rotation axis. By positioning the heaviest components
+        (motors: ~220 g each) at <em>r &asymp; 0</em>, their contribution
+        to the arm's total MoI becomes negligible.
+      </p>
+      <p>
+        This reduction in MoI has two critical consequences:
+      </p>
+      <ol>
+        <li>
+          <strong>Acceleration:</strong> A lower MoI demands proportionally
+          less torque to achieve a given angular acceleration
+          (&tau; = I&alpha;). This enables the mechanism to reach target
+          punch velocities of approximately <strong>80 rad/s</strong>
+          within the Damiao motor's torque envelope.
+        </li>
+        <li>
+          <strong>Deceleration survivability:</strong> When the arm
+          decelerates at the apex of a strike, the impulse torque
+          transmitted back through the drivetrain is directly proportional
+          to MoI. A lower MoI reduces the instantaneous forces experienced
+          by the 3D-printed gears during the high-G deceleration phase,
+          which is the primary reason the drivetrain survives repeated
+          sparring without catastrophic gear failure.
+        </li>
+      </ol>
+
+      <!-- ─── Technical Callout: Inverse Kinematics ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Technical Callout — Inverse Kinematic Equations</h4>
+        <p>
+          The coaxial differential coupling creates a non-trivial
+          relationship between the motor encoder space
+          (&theta;<sub>m1</sub>, &theta;<sub>m2</sub>) and the joint
+          output space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>).
+          The closed-form inverse kinematic equations that the firmware
+          evaluates on every control cycle are:
+        </p>
+        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 16px 0;">
+          &theta;<sub>m2</sub> = 3.0 &times; &theta;<sub>roll</sub>
+          &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
+          &theta;<sub>m1</sub> = 3.0 &times;
+          (&theta;<sub>pitch</sub> + &theta;<sub>roll</sub>)
+          &nbsp;&nbsp;&nbsp;(Eq. 2)
+        </p>
+        <p>
+          <strong>The factor of 3.0</strong> in both equations accounts for
+          the primary helical-spur gear reduction (3:1). The critical
+          insight is in <strong>Eq. 2</strong>: the addition of
+          &theta;<sub>roll</sub> inside the parentheses is the
+          <strong>software decoupling term</strong> that compensates for
+          the "walking bevel" effect. Because the bevel gear is housed
+          inside the roll-driven outer housing, any roll rotation carries
+          the pitch mechanism with it, producing an unwanted parasitic
+          pitch change. By commanding Motor 1 to advance by an amount
+          equal to the roll displacement (scaled by the gear ratio), the
+          firmware ensures that the bevel gear does not walk — cancelling
+          the parasitic coupling in real-time.
+        </p>
+        <p style="font-size: 0.9rem; color: #555;">
+          Full kinematic derivations and the forward kinematics
+          (Motor &rarr; Joint space) are presented in
+          <a href="mechanical-design.html">Mechanical Design</a>.
+        </p>
+      </div>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="image"></sl-icon>
+        <strong>Media Placeholder:</strong> Weighted decision matrix
+        comparing Concepts 1–3 across the four evaluation criteria.
+        Currently available in
+        <a href="../appendix-upper.html">Appendix 1</a>.<br>
+        <em>To add inline: export the matrix as an image to
+        <code>assets/upper_mechanism/concept_selection/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. MOTOR SELECTION JOURNEY                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Motor Selection Journey</h3>
+      <p>
+        With the 2-DOF coaxial concept selected, the next engineering
+        challenge was identifying a motor that satisfies the dual
+        requirement established in the post-interim review: impact
+        resilience (BLDC architecture) and precise closed-loop position
+        control (FOC with encoder feedback).
+      </p>
+
+      <h4>Field Oriented Control (FOC) Requirement</h4>
+      <p>
+        Standard BLDC motors used in drones and RC vehicles are optimised
+        for high-RPM propeller driving. Their Electronic Speed Controllers
+        (ESCs) employ trapezoidal commutation, which prioritises speed but
+        produces significant torque ripple and reduced torque at low speeds.
+        For a robotic joint that must deliver consistent, controllable
+        torque across its entire speed range — including holding position
+        at zero speed — <strong>Field Oriented Control (FOC)</strong> is
+        required. FOC achieves this by performing real-time vector control
+        of the motor's magnetic field, necessitating precise rotor position
+        feedback via an encoder.
+      </p>
+
+      <h4>Iteration 1: ODrive V3.6 + 360KV Motor (Abandoned)</h4>
+      <p>
+        The initial motor controller platform comprised an
+        <strong>ODrive V3.6 dual-axis FOC controller</strong> paired with a
+        <strong>360KV outrunner BLDC motor</strong> fitted with a hall-effect
+        encoder. While the ODrive provided the required FOC capability,
+        physical testing revealed three critical shortcomings:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Issue</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Root Cause</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Position jitter</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Hall-effect encoder's coarse resolution (6 states/revolution) introduced electrical noise into the FOC loop</td>
+            <td style="padding:10px; border:1px solid #ddd;">Unpredictable oscillation during position hold; unusable for precise strike positioning</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>No absolute position</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Single incremental encoder loses position reference on every power cycle</td>
+            <td style="padding:10px; border:1px solid #ddd;">Mandatory recalibration sequence before each session; unacceptable for operational use</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Physical bulk</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Separate controller board, motor, and encoder required individual mounting</td>
+            <td style="padding:10px; border:1px solid #ddd;">Assembly too large to fit within the coaxial arm housing; violated compactness requirement</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>Video Placeholder:</strong> ODrive V3.6 jitter footage
+        demonstrating the hall-effect encoder noise during position hold.
+        The video should show the motor oscillating around the target
+        position, with the ODrive GUI visible showing the position error
+        trace.<br>
+        <em>To add: place video in
+        <code>assets/upper_mechanism/videos/odrive_jitter.mp4</code> and
+        uncomment the video tag below.</em>
+      </sl-alert>
+      <!--
+        <div class="video-row single">
+          <div class="video-box">
+            <video controls preload="metadata">
+              <source src="../../assets/upper_mechanism/videos/odrive_jitter.mp4" type="video/mp4">
+            </video>
+            <sub>ODrive V3.6 + 360KV motor exhibiting position jitter caused by hall-effect encoder noise.</sub>
+          </div>
+        </div>
+      -->
+      <p>
+        These shortcomings collectively demonstrated that a discrete
+        motor-controller-encoder assembly was unsuitable for the application.
+        The search criteria were refined to specifically target
+        <strong>integrated BLDC actuators</strong> with built-in FOC
+        controllers, high-resolution encoders, and a standardised
+        communication interface.
+      </p>
+
+      <h4>Iteration 2: Damiao DM-J4310-2EC (Selected)</h4>
+      <p>
+        The <strong>Damiao DM-J4310-2EC</strong> integrated BLDC actuator
+        satisfied all refined selection criteria:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Feature</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Specification</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Benefit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Dual encoders (2EC)</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Incremental + absolute magnetic encoder</td>
+            <td style="padding:10px; border:1px solid #ddd;">Maintains absolute position across power cycles; eliminates recalibration</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Integrated FOC controller</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">On-board MCU with MIT mode (position-velocity-torque)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Direct CAN bus commands; no external controller board required</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Native torque output</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">10 N·m peak</td>
+            <td style="padding:10px; border:1px solid #ddd;">Permits a low 3:1 gear reduction, keeping the arm assembly compact</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>CAN bus interface</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">1 Mbps CAN 2.0B with configurable frame IDs</td>
+            <td style="padding:10px; border:1px solid #ddd;">Daisy-chain wiring; scalable to 4 motors on a single bus</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Compact form factor</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Motor, controller, and encoders in a single &empty;43 mm &times; 32 mm unit</td>
+            <td style="padding:10px; border:1px solid #ddd;">Fits within the arm housing alongside the coaxial gear stack; enables mass centralisation at the pivot</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Torque Verification</h4>
+      <p>
+        To verify that the DM-J4310-2EC provides sufficient torque for the
+        application, three component torque calculations were performed:
+      </p>
+      <ol>
+        <li>
+          <strong>Static torque:</strong> The gravitational load of the arm
+          assembly (training stick, padding, and mounting hardware) at the
+          maximum moment arm length.
+        </li>
+        <li>
+          <strong>Acceleration torque:</strong> The torque required to
+          achieve the target angular acceleration (90&deg; in &le; 0.25 s)
+          given the arm's moment of inertia.
+        </li>
+        <li>
+          <strong>Aerodynamic drag torque:</strong> The resistive torque
+          from air resistance on the training stick at peak angular
+          velocity.
+        </li>
+      </ol>
+      <p>
+        The sum of all three components, multiplied by a
+        <strong>1.5&times; safety factor</strong>, confirmed that the
+        DM-J4310-2EC's output torque (after the 3:1 gear reduction) exceeds
+        the application requirement. The complete derivations, numerical
+        values, and final safety margin are presented in
+        <a href="../appendix-upper.html">Appendix 1 — Torque
+        Calculations</a>.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5b. TACTICAL WALKING — CHOREOGRAPHY FEATURE            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Tactical Walking — Exploiting the Differential Coupling</h3>
+      <p>
+        The bevel gear "walking" effect described above is typically
+        characterised as a mechanical challenge requiring software
+        compensation. However, during motion planning development, this
+        same coupling was identified as an <strong>intentional
+        choreographic asset</strong> for specific strike patterns.
+      </p>
+
+      <h4>The Jab Windup — Intentional Rearing Motion</h4>
+      <p>
+        A realistic jab requires a preparatory "windup" phase where the
+        arm lifts before descending into the strike. In a conventional
+        decoupled mechanism, this would require sequential commands: first
+        raise (pitch up), then strike (pitch down). With the coaxial
+        differential, this compound motion emerges naturally from the
+        gear coupling.
+      </p>
+      <p>
+        By commanding Motor 1 and Motor 2 to rotate in
+        <strong>opposition</strong> — Motor 2 (Roll) advancing forward
+        while Motor 1 (Pitch) holds or advances at a slower rate — the
+        bevel gear walks intentionally, producing a <strong>"rearing"
+        motion</strong> that lifts the training stick vertically. This
+        rearing clears the user's defensive perimeter before the
+        subsequent downward strike, creating a more natural and
+        challenging training stimulus.
+      </p>
+      <p>
+        This reframing — from "compensating an error" to "exploiting a
+        mechanical property" — illustrates the design philosophy of the
+        Upper Mechanism: the differential coupling is not merely a
+        constraint to be overcome, but a <strong>4-quadrant actuation
+        space</strong> where same-direction rotation produces pure roll,
+        opposite-direction rotation produces amplified pitch, and
+        intermediate ratios blend both axes to create fluid, compound
+        strike trajectories.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Design Evolution Summary</h3>
+      <p>
+        The following table summarises the five major design iterations
+        and the engineering rationale for each transition — spanning
+        mechanical hardware, motor selection, structural revision, and
+        motion planning logic:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Iteration</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Configuration</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Outcome</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Transition Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">1. Interim</td>
+            <td style="padding:10px; border:1px solid #ddd;">Gear-rail coaxial joint + servo motors</td>
+            <td style="padding:10px; border:1px solid #ddd;">DOF validated; servos failed under impact</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; BLDC motors required for impact resilience</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">2. ODrive</td>
+            <td style="padding:10px; border:1px solid #ddd;">ODrive V3.6 + 360KV outrunner</td>
+            <td style="padding:10px; border:1px solid #ddd;">FOC validated; jitter, no absolute position, too bulky</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; Integrated actuator required</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">3. Damiao</td>
+            <td style="padding:10px; border:1px solid #ddd;">DM-J4310-2EC + helical-spur 3:1 gearbox</td>
+            <td style="padding:10px; border:1px solid #ddd;">All requirements met; fair demo successful</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; Structural failures exposed at fair</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">4. Post-Fair</td>
+            <td style="padding:10px; border:1px solid #ddd;">Stainless D-shaft + Delrin pin hybrid interface</td>
+            <td style="padding:10px; border:1px solid #ddd;">Structural integrity validated; sustained sparring achieved</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; Motion quality insufficient (jerky return-to-zero)</td>
+          </tr>
+          <tr style="background:#f9fafb;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>5. Combat Orbit</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Stateless &rarr; State-Aware FSM (Combat Orbit)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Fluid, continuous sparring; reduced mechanical wear from unnecessary return-to-zero cycles</td>
+            <td style="padding:10px; border:1px solid #ddd;">Current operational configuration: Euclidean skip-logic + proportional snap-back maintain kinetic fluidity</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The structural failures and post-fair material science revisions
+        are documented in
+        <a href="mechanical-design.html">Mechanical Design</a>. The
+        transition from stateless motion to the Combat Orbit FSM — driven
+        by both mechanical longevity and training fidelity requirements —
+        is documented in
+        <a href="firmware-software.html">Firmware &amp; Software</a>.
+      </p>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

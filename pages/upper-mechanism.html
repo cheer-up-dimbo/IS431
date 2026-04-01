@@ -27,263 +27,491 @@
     </a>
     <br>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. SUBSYSTEM OVERVIEW                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div id="upper-mechanism">
-      <h3>5.2 Upper Mechanism (Elgin)</h3>
+      <h2>5.2 Upper Mechanism</h2>
       <p>
-        The Upper Mechanism constitutes a primary subsystem of the robotic boxing
-        trainer. It is designed to simulate the upper-body actions of a training
-        partner, encompassing punch executions and the necessary contact points.
-        This mechanism is comprised of two key components: the "Punch Execution"
-        system, and the "Contact Points".
+        The Upper Mechanism is the primary strike-delivery subsystem of the
+        BoxBunny robotic boxing trainer. Its function is to replicate the
+        upper-body actions of a human training partner — executing targeted
+        punches at anatomically correct striking zones and providing real-time
+        impact detection for training analytics. This section provides an
+        overview of the subsystem's design rationale, scope of work, and
+        principal contributions. Detailed documentation for each engineering
+        domain is accessible through the sub-sections listed at the end of
+        this page.
       </p>
+
       <image-component
         tag="image"
         source="../assets/upper_mechanism/5.2feature_mapping.png"
-        subtitle="">
+        subtitle="Figure 8: Upper Mechanism feature mapping — the subsystem is decomposed into two functional domains: Punch Execution (2-DOF joint mechanism) and Contact Points (padding and impact sensing).">
       </image-component>
     </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. DESIGN RATIONALE (condensed from interim)           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h4><a>5.2.1. Padwork Research</a></h4>
+      <h3>Design Rationale</h3>
+
+      <h4>Padwork as the Design Basis</h4>
       <p>
-        For the development of an effective training robot, an initial analysis of
-        traditional boxing training methods was conducted. The primary method,
-        "padwork," involves a coach or partner holding pads (or "mitts") for the
-        boxer. Padwork is highly effective for training accuracy, technique, and
-        combinations. Its effectiveness, however, is highly dependent on how the
-        pads are held. A skilled coach holds the mitts close together to simulate
-        the compact frame of an opponent's head or torso, compelling the boxer to
-        refine their technique and mechanics, focusing their power effectively.
-        However, should the training partner be inexperienced, they might fail to
-        provide sufficient resistance or catch the punch improperly. This can result
-        in over-extension injuries for the boxer, such as hyperextension of the
-        elbow or significant shoulder strain.
+        The mechanism's specifications were derived from an analysis of
+        traditional boxing training methods. In padwork, a coach holds mitts
+        for the boxer to strike. The quality of the training is highly dependent
+        on the coach's skill: an inexperienced holder may fail to provide
+        sufficient resistance or catch the punch improperly, risking
+        over-extension injuries such as hyperextension of the elbow. This
+        dependency on human expertise establishes the core value proposition for
+        robotic automation of the pad-holding function.
       </p>
       <iframe
-      width="703"
-      height="404"
-      src="https://www.youtube.com/embed/sosj4UnSeFU?start=131&end=191"
-      title="How to Hold Mitts for Boxing | Ultimate Mitt Work Training Guide for Beginners"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen>
+        width="703" height="404"
+        src="https://www.youtube.com/embed/sosj4UnSeFU?start=131&end=191"
+        title="How to Hold Mitts for Boxing — Reference for strike motion analysis"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
       </iframe>
       <p>
-          Flexible training sticks are soft, flexible, lightweight, and a low-cost
-          alternative to traditional pads. This design almost entirely mitigates the
-          fear of injury from impact, both for the boxer and the coach. For defensive
-          drills, the coach swing the noodles to simulate punches. In
-          the absence of fear, the boxer can engage in more realistic scenarios,
-          practicing slips, bobs, and weaves against a moving, non-threatening object.
-          This is ideal for training reactions, speed, and technique. The minimal
-          profile of the sticks also maintains the accuracy-training benefit of pads.
+        Complementary research into flexible training sticks identified that a
+        lightweight, low-threat contact surface encourages more realistic
+        defensive engagement from the boxer. This finding directly informed the
+        selection of polyethylene foam for the training sticks, reducing the
+        system's moment of inertia while maintaining the accuracy-training
+        benefits of conventional mitts.
       </p>
+
+      <h4>Required Striking Motions</h4>
       <p>
-          From this foundational research, the general design criteria for the robotic
-          mechanism were established which leads into the specification for section.
+        Three distinct strike types were identified as essential for a
+        credible training experience. The mechanism must replicate each of these
+        motions at anatomically correct target zones.
       </p>
-    </div>
-    <div>
-      <h4>5.2.1.1. Design Criteria</h4>
-      <p>
-          The robot must provide realistic, anatomically correct striking spots for
-          the boxer, specifically the head, celiac plexus, and liver.
-      </p>
-      <h5>Striking Zones</h5>
       <image-component
         width="40%"
         tag="image"
         source="../assets/upper_mechanism/5.2.1.1strike_zones.png"
-        subtitle="Figure 8: Strike Zones">
+        subtitle="Figure 9: Anatomically derived striking zones — Head, Celiac Plexus, and Liver.">
       </image-component>
-      <h5>Target Motion</h5>
-      <p>
-          The following target motions, derived from coaching techniques, were used to
-          guide the robotic arm's design. The system must be able to replicate these
-          three distinct strikes.
-      </p>
-      <table-component subtitle="Table 7: Target Striking Motion">
+      <table-component subtitle="Table 7: Target striking motions derived from coaching padwork techniques.">
         <div id="table-strike-types"></div>
       </table-component>
-    </div>
-    <div>
-      <h3>
-          <a>5.2.2. Punch Execution</a>
-      </h3>
-      <h4>5.2.2.1. Function Specifications</h4>
+
+      <h4>Selected Concept: 2-DOF Coaxial Differential Joint</h4>
       <p>
-          Based on the preceding research, the following performance metrics were
-          established through physical measurements and validations.
+        Three joint concepts were evaluated against criteria of training
+        fidelity, mechanical complexity, cost, and zone obstruction. The
+        selected solution is a <strong>2-Degrees-of-Freedom (2-DOF)
+        mechanism</strong> employing a coaxial differential gear arrangement
+        with two Damiao DM-J4310-2EC brushless motors per arm. The pitch axis
+        delivers vertical rotation (jab), while the roll axis provides
+        horizontal rotation (hook, uppercut). Coordinated combination of both
+        axes enables all required strike patterns from a single compact joint.
+        The full concept selection analysis — including a decision matrix
+        comparing three candidate designs — is presented in
+        <a href="upper-mechanism/design-ideation.html">Design &amp; Ideation</a>.
       </p>
-      <table-component subtitle="Table 8: Robot Joint Specifications">
-        <div id="table-robot-arm-specs"></div>
-      </table-component>
-    </div>
-    <div>
-      <h4>5.2.2.2.Design Considerations</h4>
-      <table-component subtitle="Table 9: Design Considerations">
-        <div id="table-fidelity-specs"></div>
-      </table-component>
-    </div>
-    <div>
-      <h4>
-          5.2.2.3. Final Concept
-      </h4>
+
+      <h4>Mass Centralisation</h4>
+      <p>
+        A critical advantage of the coaxial configuration is
+        <strong>motor mass centralisation</strong>. Both Damiao motors are
+        mounted <strong>side-by-side at the base</strong> of the arm
+        assembly, each driving a pinion gear that meshes with the central
+        coaxial gear stack, rather than being distributed along the arm's
+        length. This concentrates the heaviest components at the pivot
+        point, thereby
+        drastically reducing the arm's <strong>moment of inertia</strong>. A
+        lower moment of inertia demands proportionally less torque to achieve
+        a given angular acceleration, which is the primary reason the system
+        can attain human-competitive punch velocities (target: 90&deg; in
+        &le; 0.25 s) without exceeding the mechanical stress limits of its
+        3D-printed drivetrain components.
+      </p>
+
+      <h4>The Differential Coupling Challenge</h4>
+      <p>
+        The coaxial arrangement introduces a non-trivial kinematic coupling
+        between axes. Because the pitch assembly is housed inside the
+        roll-driven outer housing, any rotation of the roll axis (Motor 2)
+        carries the pitch mechanism with it. The internal bevel gear
+        effectively "walks" around the drive gear, producing an unwanted
+        <strong>parasitic pitch change</strong> proportional to the roll
+        displacement. If left uncompensated, a pure roll command would cause
+        the training stick to tilt vertically — invalidating the intended
+        strike trajectory.
+      </p>
+      <p>
+        The firmware must therefore <strong>mathematically cancel this
+        parasitic coupling in real-time</strong>. When a pure roll motion is
+        commanded, both Motor 1 (Pitch) and Motor 2 (Roll) are driven at
+        identical speeds and displacements, preventing the bevel gear from
+        walking. The closed-form inverse kinematic equations that govern this
+        compensation are derived in the
+        <a href="upper-mechanism/mechanical-design.html">Mechanical Design</a>
+        sub-section.
+      </p>
+
       <image-component
         width="80%"
         tag="image"
         source="../assets/upper_mechanism/5.2.2.3.final_concept.png"
-        subtitle="Figure 9: Final Concept">
+        subtitle="Figure 10: Final 2-DOF coaxial differential joint concept — both motors are mounted side-by-side at the base, each driving a pinion gear into the central coaxial gear stack (mass centralisation). The bevel gear coupling creates a differential relationship between roll and pitch that the firmware must compensate in real-time.">
       </image-component>
-      <p>
-          The final design selection was a 2-Degrees-of-Freedom (2DOF) mechanism,
-          which was determined to offer the optimal balance of fidelity, complexity,
-          and cost by utilizing only two motors per arm. This 2DOF system is comprised
-          of two primary axes. The first is a pitch axis, which provides vertical
-          rotation and permits the execution of the standard downward jab. The
-          inclusion of a secondary yaw axis, providing horizontal rotation, enables
-          the system to execute both the horizontal hook and the diagonal uppercut.
-          Through the coordinated combination of these pitch and yaw axes, this single
-          compact mechanism can be programmed to create realistic, and fluid strike
-          patterns, successfully simulating all required training motions. To mitigate
-          inertia and motor load, the training sticks will be constructed from
-          polyethylene foam. This material is selected for its low density and high
-          resilience, a choice that substantially reduces the system's moment of
-          inertia. A functional prototype has been 3D printed and has been used to
-          demonstrate the various striking requirements.
-      </p>
-    </div>
-    <div class="video-row">
+      <div class="video-row">
         <image-component
-        width="60%"
-        tag="image"
-        source="../assets/upper_mechanism/arm_up.jpg"
-        subtitle="">
-      </image-component>
-      <image-component
-        width="60%"
-        tag="image"
-        source="../assets/upper_mechanism/arm_down.jpg"
-        subtitle="">
-      </image-component>
-
-    </div>
-    <div>
-      <h3>
-          <a>5.2.3. Contact Points – Padding</a>
-      </h3>
-    </div>
-    <div>
-      <h4>
-          5.2.3.1. Function Specifications
-      </h4>
-      <table-component subtitle="Table 10: Padding Specifications">
-        <div id="table-padding-specs"></div>
-      </table-component>
-      <image-component
-        tag="image"
-        source="../assets/upper_mechanism/5.2.3.1padding_design_consi.png"
-        subtitle="Figure 10: Padding">
-      </image-component>
-      <p>
-          A crucial function specification pertains to the user's physical safety
-          relative to the machine. To ensure a user does not get too close and
-          inadvertently trip over the robot's base, a key spatial metric was
-          established. This positional constraint dictates that the striking pads must
-          be positioned 40 cm from the centre of the robot.
-      </p>
-    </div>
-    <div>
-      <h4>
-          5.2.3.2.  Design Considerations
-      </h4>
-      <p>
-        The padding serves as the primary target for the user, and its design is
-        governed by three key considerations. First is fidelity; the padding must
-        represent the key striking areas of the head, liver, and celiac plexus.
-        Their placement must be anatomically correct to simulate a real opponent.
-        Second, the delimited size of these areas is a deliberate design choice to
-        foster accuracy, ensuring the boxer is training for technique by targeting
-        small, specific zones rather than a large, imprecise area. Finally, for the
-        safety of both the boxer and the robot's internal components, the padding
-        must possess a soft contact surface and be capable of absorbing the strike
-        energy from average users.
-      </p>
-      <table-component subtitle="Table 11: Padding Design Considerations">
-        <div id="table-opponent-body-specs"></div>
-      </table-component>
-    </div>
-    <div>
-      <h4>
-          5.2.3.3. Solution Principles
-      </h4>
-      <image-component
-        tag="image"
-        source="../assets/upper_mechanism/5.2.3.2padding_sol_princ.png"
-        subtitle="Figure 11: Padding for Striking Areas">
-      </image-component>
-      <p>
-          This implementation will be achieved by first utilizing a standard
-          multi-layer padding structure, consisting of a soft contact layer for user
-          comfort and a dense, energy-absorbing core for force dissipation. Second,
-          anti-vibration rubber mounts will be employed to attach the padding assembly
-          to the robot's main frame. This isolation is critical for protecting the
-          robot's sensitive internal electronics from the repeated impacts. Finally,
-          the integration of springs may be considered in addition to the mounts,
-          providing additional dampening.
-      </p>
+          width="60%" tag="image"
+          source="../assets/upper_mechanism/arm_up.jpg"
+          subtitle="Arm in raised (windup) position.">
+        </image-component>
+        <image-component
+          width="60%" tag="image"
+          source="../assets/upper_mechanism/arm_down.jpg"
+          subtitle="Arm in lowered (apex / strike) position.">
+        </image-component>
+      </div>
     </div>
 
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. SCOPE OF WORK                                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>
-          <a>5.2.4. Contact Points – User Input</a>
-      </h3>
+      <h3>Scope of Work Completed</h3>
+      <p>
+        Following the interim demonstration, the Upper Mechanism underwent
+        extensive development spanning mechanical redesign, electrical
+        integration, firmware engineering, and software architecture. The
+        following table summarises the principal deliverables and their
+        current status.
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Domain</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Deliverable</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;" rowspan="3"><strong>Mechanical</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Coaxial Differential Joint with 3:1 helical-spur gear reduction and bevel gear coupling</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Post-fair structural revision (6 mm stainless D-shaft, Delrin pin, M2 screw reinforcement)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Multi-layer padding with anti-vibration isolation mounts</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;" rowspan="3"><strong>Electrical</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">24V motor bus + isolated 12V logic rail (dual-supply architecture)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">CAN Bus daisy chain (4 motors, 1 Mbps, 120 &Omega; termination)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Quad-IMU I2C sensing (MPU6050 &times; 3, dual-bus 400 kHz)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;" rowspan="4"><strong>Firmware &amp; Software</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Teensy 4.0 Firmware V4 — 200 Hz unified loop (CAN + I2C + micro-ROS)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">GUI V3 (<code>unified_GUI_V3.py</code>, 2278 lines) — PyQt5/PyQtGraph, 8 operational tabs</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Dynamic Sparring FSM — vector alignment skip, perimeter transit routing, proportional snap-back</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">ROS 2 External Control Interface — 7 topics (4 subscribers, 3 publishers)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Integration</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">9 cross-layer defects root-caused and resolved (firmware, middleware, application, electrical)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">8 Resolved / 1 Mitigated</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. ENGINEERING HIGHLIGHTS                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h4>5.2.4.1. Design Considerations</h4>
+      <h3>Engineering Highlights</h3>
       <p>
-          The primary objective of this component is to detect a successful punch
-          landed on a padding-integrated contact point. This provides immediate,
-          positive feedback, which is crucial for user motivation and the motivational
-          aspects of the training session. Furthermore, this data is slated for
-          integration into training analytics, which will provide a post-session
-          report to the user tracking metrics such as punch count, speed, and reaction
-          time. Therefore, the sensor data must demonstrate high consistency and
-          reliability, even during active robot use.
+        The following subsections present the three most significant
+        engineering outcomes of the Upper Mechanism development. Each
+        represents a transition from initial naive implementation to a
+        validated, robust solution — demonstrating the iterative
+        problem-solving methodology central to this project.
       </p>
-      <table-component subtitle="Table 12: User Input Design Considerations">
-        <div id="table-reliability-specs"></div>
-      </table-component>
+
+      <!-- ─── 4A. Combat Orbit vs Stateless ─── -->
+      <h4>From Stateless Motion to a Dynamic Combat Orbit</h4>
       <p>
-          The principal design consideration for the user input system is sensor
-          durability. The selected sensors will be subjected to high impacts, which
-          represents the most critical potential failure point for this subsystem.
-          Consequently, the primary design challenge is the mitigation of wear and
-          tear, especially that which is caused by direct load or force.
+        Early motion testing employed a <strong>stateless command
+        model</strong>: each strike was executed as an independent
+        point-to-point movement, with the arm returning to a fixed neutral
+        ("zero") position between every action. This produced mechanically
+        correct but visually robotic behaviour: Punch &rarr; Return to Zero
+        &rarr; Pause &rarr; Punch. The resulting motion lacked the fluidity
+        and pressure of a real sparring partner.
+      </p>
+      <p>
+        This limitation motivated the development of the <strong>Combat
+        Orbit FSM</strong> (Dynamic Sparring engine). The Combat Orbit
+        treats the arm's position as a continuous state within a dynamic
+        guard envelope rather than resetting to a fixed origin. Three
+        algorithms work together to produce fluid, uninterrupted sparring:
+      </p>
+      <ol>
+        <li>
+          <strong>Vector Alignment Skip Logic:</strong> Before executing a
+          windup, the FSM computes the angular alignment between the arm's
+          current approach vector and the intended strike vector. If the
+          alignment angle falls below a configurable threshold (default:
+          30&deg;), the windup phase is skipped entirely — the arm proceeds
+          directly to the apex. This eliminates unnecessary retractions when
+          consecutive strikes share similar trajectories.
+        </li>
+        <li>
+          <strong>M1-Based Perimeter Transit Routing:</strong> When a windup
+          is required and the direct path would cross the robot's
+          centre-line (the user's body zone), the router inserts
+          intermediate via-points from the strike library, forcing the arm
+          to orbit along the perimeter of the workspace.
+        </li>
+        <li>
+          <strong>Proportional Snap-Back Recovery:</strong> After each
+          apex, the arm retracts to a dynamically computed recovery position
+          — a configurable fraction (&lambda; &isin; [0.1, 1.0]) of the
+          apex-to-windup vector — maintaining the guard without returning
+          to zero.
+        </li>
+      </ol>
+      <p>
+        The combined effect transforms the system from a coordinate-following
+        actuator into a reactive sparring partner that maintains spatial
+        pressure on the user. Full implementation details and the FSM decision
+        pipeline are documented in
+        <a href="upper-mechanism/firmware-software.html">Firmware &amp;
+        Software</a>.
+      </p>
+
+      <!-- ─── 4B. Multi-Layered Safety ─── -->
+      <h4>Multi-Layered Safety Architecture</h4>
+      <p>
+        Protecting 3D-printed drivetrain components and the user during
+        high-velocity sparring required safety measures distributed across
+        multiple system layers rather than relying on any single mechanism.
+        The following three-tier architecture was implemented:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Layer</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Mechanism</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Response Time</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>1. Hardware</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Damiao built-in current limiter</td>
+            <td style="padding:10px; border:1px solid #ddd;">&lt; 1 ms</td>
+            <td style="padding:10px; border:1px solid #ddd;">Absolute overcurrent protection at the motor controller level</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>2. Firmware</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Software dI/dt monitoring (Teensy 4.0)</td>
+            <td style="padding:10px; border:1px solid #ddd;">5 ms (one loop cycle)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Gear-corrected current threshold with configurable limits; detects mechanical obstruction before hardware limits are reached</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>3. Application</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Kinematic auto-retract (GUI V3)</td>
+            <td style="padding:10px; border:1px solid #ddd;">~50 ms</td>
+            <td style="padding:10px; border:1px solid #ddd;">Proportional snap-back from apex after each strike; prevents sustained contact force</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        This layered approach ensures that no single software bug or
+        communication failure can result in uncontrolled motor torque being
+        applied to the mechanism or the user. The firmware layer is
+        particularly significant: by monitoring the current derivative
+        (dI/dt) rather than absolute current alone, the system detects
+        mechanical obstructions — such as the arm striking an object or
+        reaching a mechanical endstop — within a single 5 ms loop cycle,
+        before the forces are large enough to damage the 3D-printed gears.
+      </p>
+
+      <!-- ─── 4C. Power Management Case Study ─── -->
+      <h4>Case Study: Regenerative Braking &amp; PSU Overvoltage</h4>
+      <p>
+        During integration testing, abrupt motor deceleration at the end of
+        a high-speed strike caused the Damiao motors to operate
+        momentarily as generators, injecting back-EMF onto the 24V bus.
+        When the transient voltage exceeded the PSU's overvoltage protection
+        (OVP) threshold (~28V), the supply tripped and all subsystems
+        — including the Teensy microcontroller and Jetson compute module —
+        lost power simultaneously.
+      </p>
+      <p>
+        Two mitigation strategies were implemented:
+      </p>
+      <ol>
+        <li>
+          <strong>Software PWM Ramp-Down:</strong> A
+          <code>_ramp_down()</code> method issues six progressively
+          decreasing PWM commands over 300 ms before the final STOP,
+          limiting the rate of magnetic flux collapse and preventing the
+          back-EMF spike from reaching the OVP threshold.
+        </li>
+        <li>
+          <strong>Dual-Rail Power Isolation:</strong> The 24V motor bus
+          and the 12V logic rail were separated onto independent power
+          supplies. This architectural change ensures that even if the
+          motor bus experiences a transient OVP trip, the Teensy and Jetson
+          remain powered — preventing mid-session firmware reboots and
+          loss of encoder state.
+        </li>
+      </ol>
+      <p>
+        A permanent hardware solution (TVS clamp or Active Shunt Regulator
+        on the 24V bus) is documented as a recommended future improvement.
+        The full defect analysis is presented in
+        <a href="upper-mechanism/troubleshooting.html">Troubleshooting &amp;
+        Iteration</a>.
       </p>
     </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. KEY CONTRIBUTIONS (summary)                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h4>5.2.4.2. Solution Principles</h4>
+      <h3>Summary of Key Contributions</h3>
       <p>
-          During concept generation, initial considerations focused on direct-load
-          sensors, such as integrated buttons or Force Sensitive Resistors (FSRs).
-          Although these components are low-cost and simple to implement, they suffer
-          from a critical flaw: they are placed directly in the line of force. This
-          positioning means they are subjected to the full, direct load during every
-          impact, which can lead to physical degradation.
+        The following list summarises the principal engineering contributions
+        of the Upper Mechanism development:
       </p>
+      <ol>
+        <li>
+          <strong>Coaxial Differential Kinematics with Mass
+          Centralisation:</strong> Closed-form forward and inverse
+          kinematic equations were derived for the coupled 2-DOF joint,
+          incorporating real-time parasitic pitch compensation. Motor
+          mass centralisation at the pivot reduces moment of inertia,
+          enabling human-competitive strike velocities.
+        </li>
+        <li>
+          <strong>Combat Orbit FSM:</strong> A continuous-state sparring
+          engine replaced stateless point-to-point motion, integrating
+          vector alignment skip logic, perimeter transit routing, and
+          proportional snap-back to produce fluid, uninterrupted combat
+          sequences.
+        </li>
+        <li>
+          <strong>Multi-Layered Safety Architecture:</strong> Three
+          independent protection tiers — hardware current limiting,
+          firmware dI/dt obstruction detection, and application-level
+          kinematic auto-retract — provide defence-in-depth for both
+          the drivetrain and the user.
+        </li>
+        <li>
+          <strong>IMU-Based Strike Analytics:</strong> A Quad-IMU data
+          acquisition pipeline — initially validated on an isolated rig
+          at 500 Hz — was merged into the unified firmware for real-time
+          punch detection via L2 acceleration vector norm thresholding.
+        </li>
+        <li>
+          <strong>Regenerative Braking Mitigation &amp; Dual-Rail
+          Isolation:</strong> Software ramp-down and power rail
+          separation resolved PSU OVP trips during high-speed sparring,
+          ensuring uninterrupted system operation.
+        </li>
+        <li>
+          <strong>Systematic Defect Resolution:</strong> Nine cross-layer
+          integration defects — spanning CAN protocol parsing, I2C bus
+          reliability, micro-ROS transport recovery, and regenerative
+          braking — were diagnosed and resolved through structured
+          root-cause analysis.
+        </li>
+      </ol>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. NAVIGATION GRID TO SUB-PAGES                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Detailed Documentation</h3>
       <p>
-          An alternative involves indirect-load sensors, which are not positioned in
-          the direct line of force. One such approach is to use an accelerometer,
-          which can be mounted on to the padding assembly. This sensor would be
-          configured to detect the sharp vibrations characteristic of a punch. Another
-          indirect method is an Infrared (IR) proximity sensor, which could be
-          recessed within the pad holder and configured to detect the movement of the
-          pads during an impact. The primary advantage of both solutions is
-          significantly longer durability. However, these sensors introduce a new
-          challenge: signal noise. The data handling will therefore require robust
-          signal processing and filtering to accurately distinguish a punch.
+        The complete technical documentation for the Upper Mechanism is
+        organised into six sections. Each section provides detailed design
+        rationale, implementation specifics, and evidence of validation. Select
+        a section below to view its contents.
       </p>
+      <div class="section-nav-grid">
+        <a href="upper-mechanism/design-ideation.html" class="section-nav-card">
+          <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
+          <h3>Design &amp; Ideation</h3>
+          <p>Motion analysis, concept selection, motor selection journey</p>
+        </a>
+        <a href="upper-mechanism/mechanical-design.html" class="section-nav-card">
+          <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
+          <h3>Mechanical Design</h3>
+          <p>Joint kinematics, gear reduction, structural revisions</p>
+        </a>
+        <a href="upper-mechanism/electrical-integration.html" class="section-nav-card">
+          <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
+          <h3>Electrical Integration</h3>
+          <p>Power architecture, CAN bus, MDDS10, IMU sensors</p>
+        </a>
+        <a href="upper-mechanism/firmware-software.html" class="section-nav-card">
+          <sl-icon name="code-slash" style="font-size: 2rem;"></sl-icon>
+          <h3>Firmware &amp; Software</h3>
+          <p>V4 firmware, GUI V3, Dynamic Sparring FSM, ROS 2 interface</p>
+        </a>
+        <a href="upper-mechanism/testing-evaluation.html" class="section-nav-card">
+          <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
+          <h3>Testing &amp; Evaluation</h3>
+          <p>Performance criteria, test results, video evidence</p>
+        </a>
+        <a href="upper-mechanism/troubleshooting.html" class="section-nav-card">
+          <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
+          <h3>Troubleshooting &amp; Iteration</h3>
+          <p>9 defects: root-cause analysis and engineering resolutions</p>
+        </a>
+      </div>
     </div>
   </div>
 

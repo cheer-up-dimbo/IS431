@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Firmware &amp; Software — Upper Mechanism</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
+  <script type="module" src="../../components/video/video.js"></script>
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../robot-mechanism/arm-actuation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.5 Arm Actuation
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Firmware &amp; Software Architecture</h2>
+    <p>
+      This section documents the two-tier control architecture, the Teensy 4.0
+      firmware evolution, the PyQt5 GUI, and the Dynamic Sparring FSM combat
+      engine.
+    </p>
+
+    <!-- ─── 1. Two-Tier Architecture ─── -->
+    <div>
+      <h3>Two-Tier Hierarchical Architecture</h3>
+      <p>
+        The control system follows a two-tier design with all FSM intelligence
+        on the PC/Jetson side:
+      </p>
+      <ul>
+        <li>
+          <strong>Tier 1 — Jetson Orin NX (ROS 2 Humble):</strong> Hosts the
+          GUI (<code>unified_GUI_V3.py</code>), publishes motor commands at
+          100 Hz, and performs all combat FSM decision-making, strike
+          sequencing, and impact detection.
+        </li>
+        <li>
+          <strong>Tier 2 — Teensy 4.0 (Micro-ROS):</strong> Executes a
+          deterministic <strong>200 Hz unified loop</strong> (5 ms). Each cycle
+          performs CAN motor control, I2C IMU polling, MDDS10 height PWM/DIR,
+          and publishes a 21-double feedback payload via micro-ROS.
+        </li>
+      </ul>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="image"></sl-icon>
+        <strong>Diagram Placeholder:</strong> Two-tier architecture diagram
+        showing Jetson (ROS 2 + FSM), micro-ROS bridge, Teensy 4.0 (CAN +
+        I2C + PWM), and peripheral topology.<br>
+        <em>To add: place in <code>assets/upper_mechanism/architecture/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── 2. Firmware V4 ─── -->
+    <div>
+      <h3>Firmware V4 — 200 Hz Unified Loop</h3>
+      <p>
+        The Teensy firmware evolved through four major versions:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Version</th>
+            <th style="padding:8px; border:1px solid #ddd;">Key Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">V3</td>
+            <td style="padding:8px; border:1px solid #ddd;">CAN motor control + MDDS10 height, sparse edge-trigger</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">V4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Merged IMU I2C polling into 200 Hz loop; 21-double feedback payload</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">V4.1</td>
+            <td style="padding:8px; border:1px solid #ddd;">I2C Hard STOP protocol fix for long-wire bus hang</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">V4.2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Micro-ROS disconnect recovery via <code>SCB_AIRCR</code> hardware reset</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Feedback Payload Structure (V4)</h4>
+      <p>
+        The <code>/motor_feedback</code> topic carries a <code>Float64MultiArray</code>
+        of <strong>21 doubles</strong>:
+      </p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto;">
+[pos×4, current×4, CAN_count, IMU_accel×12]
+ ─────  ────────   ─────────  ──────────────
+  0-3     4-7          8         9-20
+      </pre>
+      <p>
+        The 12 IMU fields carry raw 3-axis acceleration (X, Y, Z) from up to
+        4 MPU6050 sensors.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── 3. GUI V3 ─── -->
+    <div>
+      <h3>GUI V3 — PyQt5 / PyQtGraph</h3>
+      <p>
+        The GUI was completely rewritten from Python/Tkinter to
+        <strong>PyQt5/PyQtGraph</strong> to support high-frequency real-time
+        plotting. The validated version (2026-03-29, 2278 lines) comprises
+        <strong>8 operational tabs</strong>:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Tab</th>
+            <th style="padding:8px; border:1px solid #ddd;">Class</th>
+            <th style="padding:8px; border:1px solid #ddd;">Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;">1. Manual Control</td><td style="padding:8px; border:1px solid #ddd;"><code>ManualTab</code></td><td style="padding:8px; border:1px solid #ddd;">Slider-based 4-motor positioning + precision spinboxes</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">2. Calibration</td><td style="padding:8px; border:1px solid #ddd;"><code>CalibrationTab</code></td><td style="padding:8px; border:1px solid #ddd;">Per-motor jog, safety thresholds, offset editor</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">3. Strike Library</td><td style="padding:8px; border:1px solid #ddd;"><code>StrikeLibraryTab</code></td><td style="padding:8px; border:1px solid #ddd;">2-point Teach Pendant, JSON load/save, strike rename</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">4. Analytics</td><td style="padding:8px; border:1px solid #ddd;"><code>AnalyticsTab</code></td><td style="padding:8px; border:1px solid #ddd;">Power/position plotting, energy budget</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">5. Height</td><td style="padding:8px; border:1px solid #ddd;"><code>HeightTab</code></td><td style="padding:8px; border:1px solid #ddd;">MDDS10 hold-to-move with PWM ramp-down</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">6. IMU Diagnostics</td><td style="padding:8px; border:1px solid #ddd;"><code>IMUDiagnosticsTab</code></td><td style="padding:8px; border:1px solid #ddd;">Live accel plots, FFT, strike detection, calibration wizard</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">7. Dynamic Sparring</td><td style="padding:8px; border:1px solid #ddd;"><code>DynamicSparringTab</code></td><td style="padding:8px; border:1px solid #ddd;">FSM combat engine</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">8. ROS Control</td><td style="padding:8px; border:1px solid #ddd;"><code>RosControlTab</code></td><td style="padding:8px; border:1px solid #ddd;">External ROS 2 topic interface</td></tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>Video Placeholder:</strong> Screen recording of GUI V3 showing
+        tab navigation, manual motor control, and analytics display.<br>
+        <em>To add: record with screen capture, place in
+        <code>assets/upper_mechanism/videos/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── 4. Strike Library ─── -->
+    <div>
+      <h3>Strike Library &amp; Teach Pendant</h3>
+      <p>
+        Each strike in the library is defined by exactly <strong>two
+        motor-space nodes</strong>: a Windup position and an Apex (impact)
+        position. The operator records these using a live encoder
+        <strong>Teach Pendant</strong>:
+      </p>
+      <ol>
+        <li>Disarm the motors — the arm is freely movable by hand.</li>
+        <li>Position the arm at the desired windup position; click <strong>Record Windup</strong>. The raw encoder values are captured.</li>
+        <li>Position the arm at the apex; click <strong>Record Apex</strong>.</li>
+        <li>The GUI dynamically computes the recovery position using proportional snap-back.</li>
+      </ol>
+      <p>
+        Strike libraries are saved and loaded as JSON files containing both
+        left and right arm data:
+      </p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto;">
+{
+  "left":  { "Jab": {"windup": [...], "apex": [...]}, ... },
+  "right": { "Right Hook": {"windup": [...], "apex": [...]}, ... }
+}
+      </pre>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>Video Placeholder:</strong> Video of the Teach Pendant workflow:
+        disarm → physically position arm → record windup → record apex →
+        test strike.<br>
+        <em>To add: place in <code>assets/upper_mechanism/videos/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── 5. Dynamic Sparring FSM ─── -->
+    <div>
+      <h3>Dynamic Sparring Finite State Machine</h3>
+      <p>
+        The Dynamic Sparring FSM replaces the original discrete, return-to-zero
+        action queue with a continuous-state machine that chains strikes
+        fluidly from the arm's last physical position.
+      </p>
+
+      <h4>Vector Alignment Skip Logic</h4>
+      <p>
+        When a new strike is triggered, the FSM evaluates the angular alignment
+        between the intended strike vector and the actual approach vector:
+      </p>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
+        θ<sub>align</sub> = cos<sup>−1</sup>(V<sub>strike</sub> · V<sub>approach</sub> / |V<sub>strike</sub>| · |V<sub>approach</sub>|) &nbsp;&nbsp;&nbsp;(Eq. 15)
+      </p>
+      <ul>
+        <li>θ &lt; threshold (default 30°) → <strong>skip windup</strong> — approach is already aligned.</li>
+        <li>θ ≥ threshold → <strong>windup required</strong> — skipping would change the strike's character.</li>
+      </ul>
+
+      <h4>M1-Based Perimeter Transit Routing</h4>
+      <p>
+        When a windup is required, a direct path may cross the robot's
+        centre-line (user's body zone). The transit router inserts intermediate
+        via-points — library windups whose Motor 1 (Roll) position falls
+        between the current and target M1 — sorted in the direction of travel.
+        This forces the arm to orbit along the perimeter.
+      </p>
+
+      <h4>Synchronized Per-Motor Speed Scaling</h4>
+      <p>
+        To prevent curved trajectories when motors travel different distances,
+        the FSM computes individual speeds so both arrive simultaneously:
+      </p>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
+        spd<sub>m<sub>i</sub></sub> = v<sub>base</sub> × Δm<sub>i</sub> / max(Δm<sub>1</sub>, Δm<sub>2</sub>) &nbsp;&nbsp;&nbsp;(Eq. 16)
+      </p>
+      <p>
+        A 0.5 rad/s minimum floor prevents motor stalling when one axis barely
+        needs to move.
+      </p>
+
+      <h4>Proportional Snap-Back Recovery</h4>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
+        p<sub>recovery</sub> = p<sub>apex</sub> − λ · (p<sub>apex</sub> − p<sub>windup</sub>) &nbsp;&nbsp;&nbsp;(Eq. 14)
+      </p>
+      <p>
+        Where λ ∈ [0.1, 1.0] is the snap-back factor (operator slider). This
+        eliminates the need for a manually taught third point.
+      </p>
+
+      <h4>FSM Decision Pipeline</h4>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto;">
+Strike Triggered
+  │
+  ├─ Compute alignment angle θ
+  │
+  ├─ θ < threshold? ──→ YES: Skip Windup → Command Apex directly
+  │
+  └─ θ ≥ threshold? ──→ NO: Windup Required
+                              ├─ Compute M1-based transit waypoints
+                              ├─ Route through intermediate windups
+                              ├─ Command target Windup
+                              └─ Command Apex
+  │
+  └─ Calculate Dynamic Snap-Back → Command Recovery (synced speeds)
+      </pre>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>Video Placeholder:</strong> Side-view video of the robot chaining
+        Jab → Cross → Uppercut without pauses, with console overlay showing
+        FSM decision log (alignment angles, skip/windup decisions).<br>
+        <em>To add: place in <code>assets/upper_mechanism/videos/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── 6. ROS Control Interface ─── -->
+    <div>
+      <h3>ROS Control Interface</h3>
+      <p>
+        A dedicated ROS Control Tab enables external front-end integration
+        via 7 ROS 2 topics:
+      </p>
+
+      <h4>Subscriber Topics (Front-End → Robot)</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Topic</th>
+            <th style="padding:8px; border:1px solid #ddd;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/strike_command</code></td><td style="padding:8px; border:1px solid #ddd;">Execute strike by slot + duration</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/punch_slots</code></td><td style="padding:8px; border:1px solid #ddd;">Assign strikes to numbered slots</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/system_enable</code></td><td style="padding:8px; border:1px solid #ddd;">Arm or disarm motors</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/imu_calibration_cmd</code></td><td style="padding:8px; border:1px solid #ddd;">Trigger IMU calibration</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Publisher Topics (Robot → Front-End)</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Topic</th>
+            <th style="padding:8px; border:1px solid #ddd;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/strike_feedback</code></td><td style="padding:8px; border:1px solid #ddd;">Strike completion status + timing</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/imu_calibration_status</code></td><td style="padding:8px; border:1px solid #ddd;">Calibration progress + results</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;"><code>/robot/strike_detected</code></td><td style="padding:8px; border:1px solid #ddd;">Real-time pad strike events</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Dynamic Speed Adaptation</h4>
+      <p>
+        When enabled, the system estimates joint-space travel distance and
+        computes the required speed to complete the movement within the
+        allocated duration:
+      </p>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
+        v<sub>eff</sub> = min(max(v<sub>base</sub>, d<sub>total</sub>/(T − 0.3)), v<sub>max</sub>) &nbsp;&nbsp;&nbsp;(Eq. 17)
+      </p>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

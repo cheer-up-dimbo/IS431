@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.3 Height Adjustment</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../../components/team-member/team-member.css">
+  <script type="module" src="../../components/team-member/team-member.js"></script>
+  <link rel="stylesheet" href="../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../../components/table-component/table-component.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../robot-mechanism.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Mechanism
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. SUBSYSTEM OVERVIEW                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="height-adjustment-subsystem">
+      <h2>5.2.3 Height Adjustment</h2>
+      <p>
+        The height-adjustment subsystem enables BoxBunny to accommodate users
+        of different heights without compromising the robot's rigidity during
+        training. From the user's perspective, the workflow is straightforward:
+        select a suitable target height, the robot adjusts vertically, and it
+        must then remain stable throughout operation without visible wobble,
+        jamming, or misalignment.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. REQUIREMENTS RECAP                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Requirements &amp; Considerations</h3>
+      <p>
+        The user need for height adaptability was translated into three
+        subsystem-level requirements, cascading from the system-level
+        requirement <strong>RM-3</strong>:
+      </p>
+      <ol>
+        <li>
+          Provide a <strong>400 mm vertical stroke</strong> so head and torso
+          target zones can be repositioned across the intended user height
+          range.
+        </li>
+        <li>
+          Adjustment must be practically fast for setup use — the engineering
+          target is approximately <strong>32 seconds over the 400 mm
+          stroke</strong> (≈ 0.75 m/min), constrained by the selected
+          screw-jack architecture.
+        </li>
+        <li>
+          Preserve structural performance under boxing-related disturbances.
+          The height-adjustment system sits directly within a major load path
+          beneath the upper body, so vertical actuation and lateral load
+          resistance must be treated as <strong>separate functions</strong>.
+        </li>
+      </ol>
+
+      <image-component
+        tag="image"
+        source="../../assets/Lower_mechanism/8height adjustment - cad overview.png"
+        subtitle="Figure: (a) CAD overview of height adjustment component; (b) focused CAD of screw jack and vertical linear guides.">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. DESIGN                                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Design</h3>
+
+      <h4>Custom Telescopic Lift Column</h4>
+      <p>
+        The final height-adjustment solution is a <strong>custom telescopic
+        lift column actuated by a motorised travelling-nut screw jack</strong>.
+        This subsystem combines a structural guiding column with a dedicated
+        axial lifting mechanism:
+      </p>
+      <ul>
+        <li><strong>8080 aluminium extrusion</strong> — moving inner member</li>
+        <li><strong>Delrin wear pads</strong> — sacrificial low-friction guide surfaces</li>
+        <li><strong>Welded steel outer tube with integrated plate</strong> — fixed sleeve</li>
+        <li><strong>HK2T screw jack</strong> with travelling nut — axial lifting device</li>
+      </ul>
+
+      <h4>Separation of Lift from Structure</h4>
+      <p>
+        The key design decision is the <strong>separation of lift from
+        structure</strong>. The screw jack is treated purely as an axial
+        lifting device, operating mainly in compression. Lateral forces and
+        overturning moments — especially those from punching — are resisted by
+        the surrounding telescopic column. This prevents side-loading of the
+        screw jack, which would otherwise reduce efficiency, increase wear, and
+        create binding risk. The final concept therefore behaves less like an
+        exposed actuator and more like a <strong>guided structural
+        mast</strong>.
+      </p>
+
+      <h4>Design Evolution</h4>
+      <p>
+        An earlier concept used <strong>two vertical linear rails at the rear
+        with a lift carriage plate</strong>, with the screw jack near the
+        centreline and a compliant interface for misalignment tolerance. That
+        concept established the correct engineering principle but introduced
+        too many precision-mounted components and tolerance sensitivity.
+        Commercial off-the-shelf telescopic columns were also considered, but
+        their side-load capability under boxing disturbances was uncertain.
+        The project moved toward a custom telescopic column using SHS-based
+        steel structure, Delrin bearing interfaces, and a modular 8080 inner
+        member.
+      </p>
+
+      <h4>Fabrication Considerations</h4>
+      <p>
+        A <strong>light-shock service factor of approximately 1.5</strong> was
+        adopted because the robot may be adjusted in public demo environments
+        with minor bumps and start-stop transients. Large SHS members were
+        kept at <strong>≥ 6 mm wall thickness</strong>, welded plates were
+        sized to avoid distortion, and gusseted corner brackets were preferred
+        where aluminium extrusion met steel structure.
+      </p>
+
+      <h4>Low-Level Control</h4>
+      <p>
+        The height adjustment is currently a <strong>motorised screw-jack
+        system</strong>. The back-calculated motor speed requirement of
+        approximately <strong>800 rpm</strong> at the jack input drives the
+        motor-sizing logic. The self-locking nature of the screw jack provides
+        inherent fail-safe behaviour — the column holds its position even
+        without motor power, ensuring safety during training.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. VALIDATION                                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Validation</h3>
+      <p>
+        The final height-adjustment concept satisfies the main functional
+        requirements. The architecture provides the required
+        <strong>400 mm stroke</strong>, and the current motion target of
+        approximately <strong>32 seconds full stroke</strong> is consistent
+        with the screw-jack input speed and motor-sizing logic.
+      </p>
+      <p>
+        The most important subsystem requirement — decoupling vertical lifting
+        from lateral structural support — is satisfied by the final load path:
+        vertical load passes through the screw-jack drive chain, while lateral
+        punching loads are routed through the telescopic column into the outer
+        welded structure and then into the base.
+      </p>
+      <p>
+        Current validation is strongest at the level of <strong>CAD packaging,
+        stroke confirmation, concept selection logic, and load-path
+        integrity</strong>. Remaining verification work includes: quantitative
+        column deflection under lateral loading, repeated-cycle Delrin wear
+        testing, and motor-control validation against the aspirational
+        10-second user preference.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. DETAILED DOCUMENTATION NAVIGATION                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Detailed Documentation</h3>
+      <p>
+        The following sub-sections provide in-depth design documentation for
+        the height-adjustment subsystem. Select a section to view its contents.
+      </p>
+      <div class="section-nav-grid">
+        <a href="height-adjustment/concept-generation.html" class="section-nav-card">
+          <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
+          <h3>Concept Generation &amp; Selection</h3>
+          <p>From fixed-height to telescopic lift-column, decision rationale</p>
+        </a>
+        <a href="height-adjustment/lift-structure-separation.html" class="section-nav-card">
+          <sl-icon name="layers" style="font-size: 2rem;"></sl-icon>
+          <h3>Lift vs Structure Separation</h3>
+          <p>Load-path logic, evolution from linear-guide concept</p>
+        </a>
+        <a href="height-adjustment/structural-layout.html" class="section-nav-card">
+          <sl-icon name="rulers" style="font-size: 2rem;"></sl-icon>
+          <h3>Structural Layout &amp; Fabrication</h3>
+          <p>SHS wall thickness, Delrin interfaces, gusseted joints</p>
+        </a>
+        <a href="height-adjustment/calculations-sizing.html" class="section-nav-card">
+          <sl-icon name="calculator" style="font-size: 2rem;"></sl-icon>
+          <h3>Calculations &amp; Sizing</h3>
+          <p>Lifting load, service factor, speed calculations, motor assessment</p>
+        </a>
+        <a href="height-adjustment/electrical-control.html" class="section-nav-card">
+          <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
+          <h3>Electrical &amp; Control</h3>
+          <p>MDDS10 motor driver, PWM control, self-locking safety, back-EMF management</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../../components/table-component/table-component.js"></script>
+  <script src="../../components/table-component/tables.js"></script>
+</body>
+</html>

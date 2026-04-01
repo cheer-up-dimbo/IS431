@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.4 Padding — Mechanical Design</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../padding.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.4 Padding
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>5.2.4 Padding — Mechanical Design</h2>
+
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page addresses
+      <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
+      provide impact detection</em>) at the mechanical layer — padding
+      construction and IMU sensor mounting.
+    </sl-alert>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. REQUIREMENTS CASCADE                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Requirements Cascade</h3>
+      <p>
+        The padding mechanical design responds to system-level requirement
+        <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
+        provide impact detection</em>) defined in the
+        <a href="../../robot-mechanism.html">Robot Mechanism</a> section.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">System Req</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Subsystem Implication</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-6</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Padding must absorb high-velocity strikes without delamination or transmitting dangerous forces to internal drivetrain</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-2</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Padding form factor must not extend the robot's footprint beyond user-safe limits</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. PADDING CONSTRUCTION (PLACEHOLDER)                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Padding Construction</h3>
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+        <strong>Content Pending:</strong> Detailed padding construction
+        documentation to be populated once physical design data is
+        available. Expected content:
+        <ul style="margin:8px 0 0 0;">
+          <li>Material selection and properties (foam type, density, Shore hardness)</li>
+          <li>Layer construction and thickness rationale</li>
+          <li>Anti-vibration isolation interface specs</li>
+          <li>Attachment mechanism to arm housing</li>
+          <li>Annotated cross-section diagram</li>
+        </ul>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. IMU SENSOR MOUNTING                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>IMU Sensor Mounting</h3>
+      <p>
+        Four <strong>MPU6050</strong> 6-axis IMU modules are distributed
+        across three anatomical strike zones. Each sensor is positioned to
+        detect impact acceleration when a user punches the corresponding
+        zone of the padding.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">IMU ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Zone</th>
+            <th style="padding:8px; border:1px solid #ddd;">I²C Address</th>
+            <th style="padding:8px; border:1px solid #ddd;">Mounting Orientation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">IMU-0</td>
+            <td style="padding:8px; border:1px solid #ddd;">Head (top)</td>
+            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 0)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">IMU-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Head (side)</td>
+            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 1)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">IMU-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Celiac Plexus</td>
+            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 2)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">IMU-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Liver</td>
+            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 3)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Each IMU is mounted with the <strong>Z-axis perpendicular to the
+        local strike surface</strong>, ensuring maximum sensitivity along the
+        primary impact direction. Wiring from each MPU6050 breakout board
+        runs to the Teensy 4.1 via <strong>30–40&nbsp;cm 4-conductor
+        ribbon cable</strong> (VCC, GND, SDA, SCL). All connections use
+        JST-XH 2.54&nbsp;mm connectors for tool-free disconnect during
+        maintenance. The parasitic capacitance implications of these longer
+        wire runs are addressed in the
+        <a href="electrical-integration.html">Electrical Integration</a>
+        page.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="image"></sl-icon>
+        <strong>Media Placeholder:</strong> Photo or annotated diagram
+        showing IMU sensor positions within the padding assembly and
+        wiring routing to the Teensy 4.1.<br>
+        <em>Place image in
+        <code>assets/upper_mechanism/padding/</code> and use
+        <code>&lt;image-component&gt;</code>.</em>
+      </sl-alert>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

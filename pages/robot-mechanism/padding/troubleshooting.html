@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.4 Padding — Troubleshooting</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../padding.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.4 Padding
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>5.2.4 Padding — Troubleshooting &amp; Iteration</h2>
+
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> Both defects span the
+      Electrical → Firmware → Application boundary and directly affect
+      <strong>RM-6</strong> strike detection reliability. They are
+      cross-referenced on the
+      <a href="../../upper-mechanism/troubleshooting.html">Arm Actuation
+      Troubleshooting</a> page as Defects 7 and 8.
+    </sl-alert>
+
+    <p>
+      Two cross-layer defects directly affect the padding subsystem's
+      IMU sensing pipeline. Both were identified during integration
+      testing and resolved through firmware and application-level fixes.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- DEFECT 7                                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Defect 7: I²C Bus Hang</h3>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold; width:140px;">Layer</td>
+            <td style="padding:8px; border:1px solid #ddd;">Firmware (Electrical → Software boundary)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Symptom</td>
+            <td style="padding:8px; border:1px solid #ddd;">MPU6050 holds SDA permanently low, freezing the entire I²C bus</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Root Cause</td>
+            <td style="padding:8px; border:1px solid #ddd;">Long (30–40 cm) unshielded jumper wires introduce parasitic capacitance. At 400 kHz, the "Repeated Start" condition can lock the MPU6050's internal state machine</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Resolution</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hard STOP protocol — <code>endTransmission(true)</code> after every register write, forcing a full STOP + START sequence. Adds ~20 µs latency per read but eliminates the bus-hang failure mode</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Status</td>
+            <td style="padding:8px; border:1px solid #ddd;">✅ Resolved</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Root-Cause Analysis</h4>
+      <p>
+        The MPU6050 implements I²C with an internal state machine that
+        tracks bus conditions. When the master issues a
+        <strong>Repeated Start</strong> (SR) — pulling SDA low while SCL is
+        high without an intervening STOP — the sensor must detect the
+        transition within a narrow timing window (t<sub>HD;STA</sub> ≥
+        0.6&nbsp;µs per the I²C spec). On short PCB traces (&lt;&nbsp;5&nbsp;cm),
+        this timing is comfortably met.
+      </p>
+      <p>
+        However, the BoxBunny padding assembly routes
+        <strong>30–40&nbsp;cm 4-conductor jumper wires</strong> from each
+        IMU breakout to the Teensy 4.1. At this length, parasitic
+        capacitance (&approx;&nbsp;50–100&nbsp;pF per wire) introduces
+        RC rise-time delays on both SDA and SCL. At 400&nbsp;kHz Fast Mode,
+        these delays can cause the MPU6050's state machine to
+        <em>misinterpret</em> the Repeated Start as a data bit, latching
+        SDA low indefinitely. Because all four IMUs share the same I²C bus
+        (multiplexed via TCA9548A), a single latch freezes the entire
+        sensing pipeline.
+      </p>
+      <p>
+        The fix replaces all Repeated Start sequences with a
+        <strong>Hard STOP + full START</strong> sequence
+        (<code>endTransmission(true)</code>). The STOP condition
+        unambiguously resets the MPU6050's state machine regardless of
+        parasitic capacitance, because it only requires SDA to transition
+        <em>high</em> (pulled by the 4.7&nbsp;kΩ resistor) while SCL is
+        high — a condition that is reliably achieved even with slow edges.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="speedometer2"></sl-icon>
+        <strong>Performance penalty:</strong> The Hard STOP protocol adds
+        ~20&nbsp;µs per read cycle (one STOP + one START vs one SR). At
+        200&nbsp;Hz scan rate across 4 IMUs, this totals ~16&nbsp;ms
+        additional overhead per second (&lt; 2% of the 5&nbsp;ms loop
+        budget) — an acceptable trade-off for guaranteed bus stability.
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- DEFECT 8                                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Defect 8: Nyquist Blind-Spot in Strike Detection</h3>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold; width:140px;">Layer</td>
+            <td style="padding:8px; border:1px solid #ddd;">Application (GUI software)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Symptom</td>
+            <td style="padding:8px; border:1px solid #ddd;">Visible acceleration peaks in plot exceed threshold, but system fails to register strike events</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Root Cause</td>
+            <td style="padding:8px; border:1px solid #ddd;">GUI refreshes at 20 Hz (50 ms), but punch impulses last ~30 ms. Naïve "check latest sample" approach samples only 1 of ~10 accumulated data points per frame, missing inter-frame strikes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Resolution</td>
+            <td style="padding:8px; border:1px solid #ddd;">Scan-window peak detection: <code>np.max(mag_arr[-n_scan:])</code> scans all accumulated samples since last GUI tick (n_scan ≈ 10 at 200 Hz firmware / 20 Hz GUI)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Status</td>
+            <td style="padding:8px; border:1px solid #ddd;">✅ Resolved</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Root-Cause Analysis</h4>
+      <p>
+        The IMU firmware publishes accelerometer data at
+        <strong>200&nbsp;Hz</strong> (5&nbsp;ms sample period) via the
+        <code>/motor_feedback</code> ROS 2 topic. The GUI
+        (<code>unified_GUI_V3.py</code>) processes this data in its Qt
+        event loop, which runs at <strong>20&nbsp;Hz</strong>
+        (50&nbsp;ms tick period). Between each GUI tick, approximately
+        10 IMU samples accumulate in the subscription buffer.
+      </p>
+      <p>
+        The original strike detection logic checked only the
+        <em>most recent sample</em> at each GUI tick:
+      </p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">
+<span style="color:#999;"># BEFORE (broken): checks only 1 of ~10 samples</span>
+if mag_arr[-1] > threshold:
+    publish_strike_event()</pre>
+      <p>
+        A punch impulse lasts approximately 20–30&nbsp;ms. If the peak
+        occurs between two GUI ticks — at sample index 4 of 10, for
+        example — the latest sample (index 10) may already be below the
+        threshold. The peak is <em>visible</em> in the real-time plot
+        (which renders all buffered samples) but <em>invisible</em> to
+        the point-in-time threshold check.
+      </p>
+      <p>
+        The fix scans <em>all accumulated samples</em> since the last
+        tick:
+      </p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">
+<span style="color:#999;"># AFTER (fixed): scans all samples in the window</span>
+n_scan = max(1, int(firmware_hz / gui_hz))  <span style="color:#999;"># ≈ 10</span>
+peak = np.max(mag_arr[-n_scan:])
+if peak > threshold:
+    publish_strike_event(zone=np.argmax(...))</pre>
+      <p>
+        This guarantees that any impulse exceeding the threshold within
+        the 50&nbsp;ms window is detected, regardless of when within the
+        window it occurs.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="link-45deg"></sl-icon>
+        <strong>Cross-reference:</strong> This defect is also documented as
+        Defect 8 on the
+        <a href="../../upper-mechanism/troubleshooting.html">Arm Actuation
+        Troubleshooting</a> page, where the same fix is described from
+        the firmware integration perspective.
+      </sl-alert>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

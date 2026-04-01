@@ -38,6 +38,115 @@
 
     </div>
 
+    <div id="v-model">
+      <h3>3.2 Systems Engineering V-Model</h3>
+      <p>
+        While Pahl and Beitz provides the design-stage methodology for
+        generating and refining concepts, it does not prescribe how
+        <strong>verification and validation</strong> activities should be
+        structured across system levels. For this, the project adopted the
+        <strong>Systems Engineering V-Model</strong> — a lifecycle framework
+        that maps every decomposition step on the left side of the "V" to a
+        corresponding integration and verification step on the right side
+        (Forsberg, Mooz &amp; Cotterman, 2005).
+      </p>
+      <p>
+        The V-Model was originally introduced by Forsberg and Mooz (1991) to
+        address shortcomings of linear, waterfall-based system development by
+        emphasising the critical role of verification and validation (V&amp;V)
+        planning <em>concurrently with</em> requirements decomposition, rather
+        than as an afterthought. It has since been standardised for
+        mechatronic product development by VDI 2206 (2004), which positions
+        the V-Model as the macro-level process map for managing the
+        interdisciplinary integration of mechanical, electronic, and software
+        subsystems — precisely the challenge faced by BoxBunny.
+      </p>
+
+      <image-component
+        width="80%"
+        tag="image"
+        source="assets/design_methodology/v_model.png"
+        subtitle="Figure: The Systems Engineering V-Model (adapted from Forsberg, Mooz & Cotterman, 2005). The left side decomposes system-level requirements into subsystem and component specifications; the right side integrates and verifies at each corresponding level.">
+      </image-component>
+
+      <h4>Left Side — Decomposition and Definition</h4>
+      <p>
+        The left descending arm of the V represents the progressive
+        decomposition of the system from high-level concept of operations down
+        to detailed component design:
+      </p>
+      <ol>
+        <li><strong>Concept of Operations</strong> — establish the operational
+          context, user needs, and system-level goals (covered in Chapters 1–2
+          of this report).</li>
+        <li><strong>System Requirements</strong> — derive measurable,
+          testable requirements from the concept of operations (Section 3.1
+          and the performance criteria in Section 3).</li>
+        <li><strong>High-Level Design</strong> — decompose the system into
+          subsystems and define their interfaces (Section 4 — Final Design and
+          System Architecture).</li>
+        <li><strong>Detailed Design</strong> — design each subsystem's
+          mechanical, electrical, and firmware components in full detail
+          (Section 5 — Conceptual Design subsystem pages).</li>
+        <li><strong>Implementation</strong> — fabricate, assemble, and program
+          the physical prototype.</li>
+      </ol>
+
+      <h4>Right Side — Integration and Recomposition</h4>
+      <p>
+        The right ascending arm mirrors the left side, with each
+        verification level mapped to the corresponding decomposition level:
+      </p>
+      <ol>
+        <li><strong>Unit / Device Testing</strong> — verify individual
+          components (motors, sensors, firmware modules) against their
+          detailed design specifications.</li>
+        <li><strong>Subsystem Verification</strong> — verify each integrated
+          subsystem (e.g., the rotation module, height-adjustment column, arm
+          actuation) against the subsystem-level requirements derived from
+          the system requirements.</li>
+        <li><strong>System Verification &amp; Deployment</strong> — verify the
+          fully integrated robot mechanism as a whole against the system-level
+          requirements (RM-1 through RM-7).</li>
+        <li><strong>System Validation</strong> — validate the complete system
+          against the original concept of operations through user testing and
+          performance assessment.</li>
+      </ol>
+
+      <h4>Horizontal Traceability</h4>
+      <p>
+        The horizontal arrows connecting the left and right sides represent
+        <strong>verification plans</strong> that are defined during the
+        decomposition phase and executed during integration. For BoxBunny,
+        this means that every requirement established on the left side
+        (e.g., "remain upright under punching loads with FoS ≥ 1.5") has a
+        pre-defined test method on the right side (e.g., "tipping test with
+        applied load at maximum height extension").
+      </p>
+      <p>
+        This traceability is documented explicitly in the
+        <a href="pages/robot-mechanism.html">Robot Mechanism</a> section,
+        where each subsystem page links system requirements to subsystem
+        design criteria and verification methods.
+      </p>
+
+      <h4>References</h4>
+      <ul style="font-size: 0.95rem; line-height: 1.7;">
+        <li>Forsberg, K. &amp; Mooz, H. (1991). The Relationship of System
+          Engineering to the Project Cycle.
+          <em>Proceedings of the First Annual Symposium of the National
+          Council on Systems Engineering (NCOSE)</em>, pp. 57–65.</li>
+        <li>Forsberg, K., Mooz, H. &amp; Cotterman, H. (2005).
+          <em>Visualizing Project Management: Models and Frameworks for
+          Mastering Complex Systems</em>, 3rd ed. John Wiley &amp; Sons.</li>
+        <li>INCOSE (2015). <em>Systems Engineering Handbook: A Guide for
+          System Life Cycle Processes and Activities</em>, 4th ed.
+          (INCOSE-TP-2003-002-04). John Wiley &amp; Sons.</li>
+        <li>VDI 2206 (2004). <em>Design Methodology for Mechatronic
+          Systems</em>. Verein Deutscher Ingenieure (VDI).</li>
+      </ul>
+    </div>
+
     <div id="clarification-of-task">
       <h3>3.1 Clarification of Task</h3>
       <p>

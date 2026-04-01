@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.4 Padding — Testing &amp; Evaluation</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../padding.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.2.4 Padding
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>5.2.4 Padding — Testing &amp; Evaluation</h2>
+
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page validates
+      <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
+      provide impact detection</em>) through performance criteria PC-3 and
+      PC-5, plus additional subsystem-level tests designed to ensure
+      reliability under real sparring conditions.
+    </sl-alert>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. PERFORMANCE CRITERIA                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Performance Criteria</h3>
+      <p>
+        The padding subsystem is validated against the following
+        performance criteria, cascading from system-level requirement
+        <strong>RM-6</strong>:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Test Method</th>
+            <th style="padding:8px; border:1px solid #ddd;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
+            <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Monotonic: light &lt; medium &lt; heavy</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm comparison (3 users)</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-11</td>
+            <td style="padding:8px; border:1px solid #ddd;">False positive rate</td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 2 FP per 60 s of arm-only motion</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combat Orbit arm motion without user punches</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-12</td>
+            <td style="padding:8px; border:1px solid #ddd;">Spatial discrimination accuracy</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 80% correct zone ID</td>
+            <td style="padding:8px; border:1px solid #ddd;">40-punch zoned test (10 per IMU zone)</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-13</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike-to-response latency</td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 200 ms mean</td>
+            <td style="padding:8px; border:1px solid #ddd;">Timestamped /strike_events → motor command pair</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="link-45deg"></sl-icon>
+        <strong>Cross-reference:</strong> PC-3 and PC-5 also appear on the
+        <a href="../../upper-mechanism/testing-evaluation.html">Arm Actuation
+        Testing &amp; Evaluation</a> page, since they validate the
+        integration between the padding IMU pipeline and the arm's FSM
+        response.
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. TEST PROCEDURES                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Test Procedures</h3>
+
+      <h4>PC-3: Strike Detection Rate Test</h4>
+      <p>
+        <strong>Equipment:</strong> BoxBunny robot (arm stationary at nominal
+        height), padding assembly with 4× MPU6050 IMUs active, GUI V3 with
+        IMU Diagnostics Tab, video camera.<br>
+        <strong>Setup:</strong> IMU threshold set to 2.0&nbsp;g. Robot arm
+        stationary. All four I²C channels verified responsive.<br>
+        <strong>Procedure:</strong> Deliver 20 controlled punches per zone
+        (Head, Celiac Plexus, Liver) = 60 total. Wait 2&nbsp;seconds between
+        each punch. Record each punch event manually (tally) and compare
+        against the <code>/strike_events</code> topic log.<br>
+        <strong>Acceptance:</strong> ≥ 57 of 60 punches detected (TP rate
+        ≥ 95%).<br>
+        <strong>Evidence:</strong> GUI screenshot showing detection log,
+        confusion matrix (detected vs actual per zone), video recording of
+        test session.
+      </p>
+
+      <h4>PC-5: Force Differentiation Test</h4>
+      <p>
+        <strong>Equipment:</strong> Three users of different skill levels,
+        GUI V3 with L2 norm logging.<br>
+        <strong>Setup:</strong> Logging mode enabled in IMU Diagnostics Tab.
+        Centre Body zone selected for consistency.<br>
+        <strong>Procedure:</strong> Each user delivers 10 light, 10 medium,
+        10 heavy punches. Peak L2 norms recorded per strike via the
+        scan-window peak detection algorithm.<br>
+        <strong>Acceptance:</strong> Mean L2 norms satisfy
+        mean(Light) &lt; mean(Medium) &lt; mean(Heavy) for all users.
+        Statistical significance confirmed via one-way ANOVA (p &lt; 0.05).<br>
+        <strong>Evidence:</strong> Box plot of L2 norms by force category,
+        ANOVA summary table.
+      </p>
+
+      <h4>PC-11: False Positive Rate Test</h4>
+      <p>
+        <strong>Equipment:</strong> Robot arm in Combat Orbit mode (moving
+        without user interaction).<br>
+        <strong>Setup:</strong> Enable <code>/strike_events</code> logging.
+        No punches delivered during test.<br>
+        <strong>Procedure:</strong> Run Combat Orbit FSM for 60&nbsp;seconds
+        (3 trials). Count any spurious <code>/strike_events</code>
+        publications triggered by arm vibration alone.<br>
+        <strong>Acceptance:</strong> ≤ 2 false positives per 60&nbsp;s trial.<br>
+        <strong>Evidence:</strong> Strike event log, L2 norm trace
+        confirming no true peaks above threshold.
+      </p>
+
+      <h4>PC-12: Spatial Discrimination Test</h4>
+      <p>
+        <strong>Equipment:</strong> Boxing gloves, 4-zone padding assembly.<br>
+        <strong>Procedure:</strong> Deliver 10 punches to each of the 4 IMU
+        zones (40 total). Compare the detected zone from
+        <code>/strike_events</code> (peak-IMU index) against the actual
+        impact zone.<br>
+        <strong>Acceptance:</strong> Overall accuracy ≥ 80%.<br>
+        <strong>Evidence:</strong> 4×4 confusion matrix heatmap,
+        per-zone accuracy table.
+      </p>
+
+      <h4>PC-13: Strike-to-Response Latency Test</h4>
+      <p>
+        <strong>Equipment:</strong> Robot arm in reactive sparring mode,
+        ROS 2 timestamp logging.<br>
+        <strong>Procedure:</strong> Deliver 20 punches. Log
+        <code>/strike_events</code> publication timestamp and first
+        subsequent <code>/motor_command</code> timestamp.<br>
+        <strong>Acceptance:</strong> Mean latency ≤ 200&nbsp;ms, max
+        ≤ 500&nbsp;ms.<br>
+        <strong>Evidence:</strong> Latency histogram, min/mean/max table.
+      </p>
+
+      <h4>Mechanical Endurance</h4>
+      <p>
+        <strong>Criterion:</strong> Padding survives repeated high-velocity
+        strikes without delamination or permanent deformation.<br>
+        <strong>Procedure:</strong> 200-punch endurance session, visual
+        inspection after completion.<br>
+        <strong>Acceptance:</strong> No visible delamination, foam returns to
+        original shape within 5 seconds.
+      </p>
+
+      <h4>I²C Communication Reliability</h4>
+      <p>
+        <strong>Criterion:</strong> IMU communication stable during active
+        sparring with Hard STOP protocol.<br>
+        <strong>Procedure:</strong> 5-minute sparring session, monitor
+        for I²C bus hang events via Teensy debug log.<br>
+        <strong>Acceptance:</strong> Zero bus hang events.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. RESULTS                                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Results</h3>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        <strong>Pending:</strong> Test results will be added after
+        the controlled testing sessions are completed using the
+        <a href="#">Test Validation GUI</a>. This section will include:
+        <ul style="margin:8px 0 0 0;">
+          <li>Measured values and pass/fail verdicts for each criterion</li>
+          <li>GUI screenshots from the IMU Diagnostics Tab</li>
+          <li>L2 norm distribution plots and confusion matrices</li>
+          <li>Video evidence of sparring test sessions</li>
+          <li>Latency histogram from PC-13</li>
+        </ul>
+      </sl-alert>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

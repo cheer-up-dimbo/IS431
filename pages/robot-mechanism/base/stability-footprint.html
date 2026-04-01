@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Stability &amp; Footprint Selection — Base</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../base.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Base
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Stability &amp; Footprint Selection</h2>
+    <p>
+      BoxBunny's base must satisfy two competing system-level requirements
+      simultaneously:
+      <strong>RM-1 — structural stability under worst-credible punching
+      loads</strong> and
+      <strong>RM-2 — safe compactness for user footwork</strong>. This page
+      documents the geometry selection rationale, footwork clearance analysis,
+      and comparison with alternative base shapes.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. THE PROBLEM: COMPETING REQUIREMENTS                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>The Problem: Competing Requirements</h3>
+      <p>
+        A simple approach to stability would be to enlarge the base in all
+        directions, maximising the support polygon and restoring moment.
+        However, BoxBunny operates <strong>within arm's reach of a boxer</strong>,
+        so the base cannot extend significantly in front or to the sides without
+        creating trip hazards, obstructing pivots, and encroaching on the
+        boxer's working zone. Boxing gyms are often space-constrained, with
+        multiple users training in parallel, so the base must also minimise
+        its overall spatial footprint.
+      </p>
+      <p>
+        The design challenge is therefore to find a base geometry that:
+      </p>
+      <ul>
+        <li>Provides sufficient support width at the <strong>rear</strong> for stability and mechanism mounting</li>
+        <li>Remains <strong>narrow at the front</strong> to preserve the boxer's footwork envelope</li>
+        <li>Keeps the combined centre of gravity <strong>biased rearward</strong> to resist forward tipping under frontal punches</li>
+        <li>Accommodates rear-mounted <strong>transport features</strong> without compromising the planted operational stance</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. TRAPEZOIDAL GEOMETRY                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Trapezoidal Geometry Rationale</h3>
+      <p>
+        The final base solution is a <strong>welded trapezoidal steel-tube
+        platform</strong> with a <strong>narrower front</strong> and
+        <strong>wider rear</strong>. This shape was selected because it
+        directly addresses both the stability and compactness requirements
+        in a single geometric form:
+      </p>
+      <ul>
+        <li>
+          <strong>Narrow front edge:</strong> Reduces obstruction near the
+          boxer's lead foot, leaving space for pivots, lateral adjustments,
+          and stance changes. The boxer can position their lead foot close
+          to the robot without risk of stepping on or colliding with the
+          base during footwork drills.
+        </li>
+        <li>
+          <strong>Wide rear section:</strong> Provides more area for
+          mounting the lower mechanisms (slewing bearing, linear stage),
+          optional ballast (e.g. standard gym weights), and transport
+          features. The wider rear also extends the support polygon
+          rearward, directly increasing the restoring moment against
+          forward tipping.
+        </li>
+        <li>
+          <strong>Off-centre mechanism placement:</strong> The support
+          structure holding the robot — particularly the slewing bearing
+          and linear stage — is intentionally offset towards the rear of
+          the base. This shifts the combined centre of gravity backward,
+          further increasing resistance to forward tipping under frontal
+          punches.
+        </li>
+      </ul>
+
+      <image-component
+        width="50%"
+        tag="image"
+        source="../../../assets/Lower_mechanism/6compact footprint - cad overview.png"
+        subtitle="Figure: CAD overview of trapezoidal base component on BoxBunny.">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. COMPARISON WITH ALTERNATIVES                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Comparison with Alternative Shapes</h3>
+      <p>
+        Three alternative base geometries were considered before the
+        trapezoidal layout was selected:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Shape</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Stability</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Footwork Clearance</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Large circle</td>
+            <td style="padding:10px; border:1px solid #ddd;">Good — uniform support radius</td>
+            <td style="padding:10px; border:1px solid #ddd;">Poor — extends into front/side pivot zones</td>
+            <td style="padding:10px; border:1px solid #ddd;">Rejected — trip hazard during footwork</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Large rectangle</td>
+            <td style="padding:10px; border:1px solid #ddd;">Good — wide support polygon</td>
+            <td style="padding:10px; border:1px solid #ddd;">Poor — front corners extend into pivot arcs</td>
+            <td style="padding:10px; border:1px solid #ddd;">Rejected — obstructs lateral movement</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Small square</td>
+            <td style="padding:10px; border:1px solid #ddd;">Poor — limited restoring moment</td>
+            <td style="padding:10px; border:1px solid #ddd;">Good — compact footprint</td>
+            <td style="padding:10px; border:1px solid #ddd;">Rejected — insufficient stability margin</td>
+          </tr>
+          <tr style="background:#f9fafb;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Trapezoid</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Good</strong> — wide rear provides restoring moment</td>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Good</strong> — narrow front preserves working zone</td>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Selected</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <image-component
+        tag="image"
+        source="../../../assets/Lower_mechanism/7 compact footprint - pivot space.png"
+        subtitle="Figure: (a) Illustration of limited pivot space for alternative base shapes; (b) off-centre placement of motion mechanisms relative to base centre axis for improved stability.">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. FOOTWORK CLEARANCE ANALYSIS                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Footwork Clearance Analysis</h3>
+      <p>
+        In boxing, the lead foot is placed <strong>closest to the target</strong>,
+        approximately one shoulder-width forward of the rear foot. During
+        training, the boxer continuously adjusts their stance through:
+      </p>
+      <ul>
+        <li><strong>Forward steps</strong> (closing distance to deliver combinations)</li>
+        <li><strong>Lateral pivots</strong> (re-angling to create new attack/defence lines)</li>
+        <li><strong>Backward retreats</strong> (creating distance after exchanges)</li>
+      </ul>
+      <p>
+        The base must not interfere with any of these motions. The
+        trapezoidal geometry satisfies this by providing a
+        <strong>tapered clearance zone</strong> at the front and sides,
+        while the wider rear section lies behind the robot's torso and
+        out of the boxer's immediate working zone. If the robot is
+        positioned so that the boxer faces the narrow end, the majority
+        of the base structure remains behind the robot, safely removed
+        from the boxer's footwork envelope.
+      </p>
+
+      <image-component
+        tag="image"
+        source="../../../assets/Lower_mechanism/7a compact footprint - pivot space.png"
+        subtitle="Figure: Pivot clearance analysis — trapezoidal base preserves the boxer's lead-foot working zone.">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. BALLAST PROVISION                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Ballast Provision</h3>
+      <p>
+        If subsequent weight estimates reveal that the base's own mass is
+        insufficient to guarantee stability with an adequate safety factor
+        (FoS ≥ 1.5), the rear region of the base can be configured to accept
+        <strong>standard gym weights</strong> as removable ballast. This
+        approach keeps the design modular and adaptable to different
+        deployment environments — the ballast requirement may vary depending
+        on the specific floor surface (rubber mats vs concrete), the height
+        setting of the robot, and the expected user population.
+      </p>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

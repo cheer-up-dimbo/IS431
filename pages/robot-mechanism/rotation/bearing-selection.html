@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Bearing Selection &amp; Iteration — Rotation</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../rotation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Rotation
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Bearing Selection &amp; Iteration</h2>
+    <p>
+      The rotation subsystem passed through a major <strong>bearing-level
+      revision</strong>. This page documents the full evaluation of
+      bearing families, the original geared slewing ring concept, and
+      the design pivot to a smaller non-geared bearing that ultimately
+      enabled the timing-belt drive architecture.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. BEARING REQUIREMENTS                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Bearing Requirements</h3>
+      <p>
+        The yaw rotation bearing must support the full BoxBunny robot mass
+        (≈ 20–25 kg), plus dynamic punching loads and overturning moments
+        from the elevated torso and arms. Specific requirements:
+      </p>
+      <ul>
+        <li>Carry <strong>combined axial, radial and moment loads</strong> from punches and body weight</li>
+        <li>Provide <strong>high rotational stiffness</strong> so the robot does not "wobble" or twist when struck</li>
+        <li>Remain <strong>durable under repeated shock and vibration</strong></li>
+        <li>Allow <strong>reasonably precise positioning</strong> when driven by an external motor</li>
+        <li>Be <strong>cost-effective and readily available</strong> for a student prototype</li>
+        <li>Fit within the <strong>limited height</strong> of the lower structure</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. BEARING FAMILIES EVALUATED                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Bearing Families Evaluated</h3>
+
+      <h4>Lazy-Susan Bearing</h4>
+      <p>
+        Inexpensive, thin-section turntable bearings used in furniture and
+        light-duty applications. While <strong>very low cost</strong> and
+        compact, they are designed for light axial loads with
+        <strong>limited overturning-moment capacity</strong>. Minimal
+        preload results in noticeable play in tilt and rotation — unsuitable
+        for precise yaw positioning under punching loads.
+      </p>
+      <p><strong>Verdict:</strong> Rejected — insufficient stiffness and moment capacity.</p>
+
+      <h4>Four-Point Contact Ball Slewing Ring</h4>
+      <p>
+        Single-row ball bearings with specially profiled raceways allowing
+        each ball to carry load at up to four contact points. These
+        bearings are designed for <strong>combined axial, radial and
+        overturning moment loads</strong>, including shock loads. They can
+        be preloaded to reduce clearance, provide lower friction than
+        cross-roller designs, and are <strong>widely available at
+        reasonable cost</strong>.
+      </p>
+      <p><strong>Verdict:</strong> Selected — best balance of load capacity, stiffness, availability and cost.</p>
+
+      <h4>Cross-Roller Slewing Ring</h4>
+      <p>
+        Cylindrical rollers in alternating X-pattern orientations provide
+        the <strong>highest tilting and rotational stiffness</strong> of
+        all evaluated options. Commonly used in robot joints and precision
+        rotary stages. However, they are <strong>more expensive</strong>
+        and less available than four-point ball types, with performance
+        exceeding what is strictly required.
+      </p>
+      <p><strong>Verdict:</strong> Rejected — over-specified; cost and availability not justified.</p>
+
+      <h4>Thrust Ball Slewing Ring</h4>
+      <p>
+        Optimised mainly for <strong>axial loads</strong> with limited
+        radial and moment capacity. Not suited for the large overturning
+        moments generated by an elevated torso under punching impacts —
+        would require additional bearings, increasing complexity.
+      </p>
+      <p><strong>Verdict:</strong> Rejected — does not match combined-load demands.</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. DECISION MATRIX                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Decision Matrix</h3>
+      <image-component
+        tag="image"
+        source="../../../assets/report appendix b/14-matrix-Bearing Linear Rail.jpg"
+        subtitle="Table A13: Decision Matrix for Bearing in Yaw Rotation System.">
+      </image-component>
+      <p>
+        The four-point contact ball slewing ring bearing meets BoxBunny's
+        load and stiffness requirements with margin, while offering the
+        best cost-performance and procurement practicality.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. BEARING ITERATION                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Bearing Iteration: 011.25.400 → 010.10.120</h3>
+      <p>
+        The original design concept used a <strong>large geared slewing
+        ring bearing (011.25.400)</strong> with external gear teeth. This
+        would have combined structural support and gear drive in a single
+        component — an attractive integration concept.
+      </p>
+
+      <h4>011.25.400 — Rejection Rationale</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Issue</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Excessive weight</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Large ring diameter and integral gear teeth add significant mass to the lower structure</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>High shipping cost</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Overseas procurement of a large, heavy specialty bearing is expensive</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Integration difficulty</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Large bolt-circle diameter requires a correspondingly large mounting plate, expanding the base footprint</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Motor torque demand</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">The Module 5 external gear with small pinion requires high motor torque due to the large driven-gear inertia</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>010.10.120 — Selected Bearing</h4>
+      <p>
+        The design shifted to the smaller, more practical
+        <strong>010.10.120 non-geared slewing ring</strong>. This bearing
+        retains the four-point contact ball architecture (combined load
+        capability, preloadability, moderate cost) but eliminates the
+        integral gear teeth. The consequences of this change:
+      </p>
+      <ul>
+        <li>
+          <strong>Reduced weight and cost</strong> — smaller diameter,
+          no gear machining.
+        </li>
+        <li>
+          <strong>Simpler integration</strong> — smaller bolt circle
+          fits within the existing base structure.
+        </li>
+        <li>
+          <strong>Drive system redesign required</strong> — without
+          integral gear teeth, an <em>external drive mechanism</em>
+          must be introduced. This led directly to the
+          <a href="drive-architecture.html">timing-belt drive
+          architecture</a>.
+        </li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. LOAD ANALYSIS FRAMEWORK                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Load Analysis Framework</h3>
+      <p>
+        The main loads on the yaw bearing were identified as:
+      </p>
+
+      <image-component
+        tag="image"
+        source="../../../assets/report appendix b/15-matrix-FBD Loads acting on Bearing.jpg"
+        subtitle="Figure: Free-Body Diagram of loads acting on the slewing bearing.">
+      </image-component>
+
+      <ul>
+        <li>
+          <strong>F<sub>a</sub> (Axial Load):</strong> Total vertical
+          load — primarily the weight of all rotating components above
+          the bearing (torso frame, arms, padding, sensors).
+        </li>
+        <li>
+          <strong>F<sub>r</sub> (Radial Load):</strong> Horizontal
+          punching forces and off-centre loads due to asymmetric mass
+          distribution.
+        </li>
+        <li>
+          <strong>M<sub>k</sub> (Tilting Moment):</strong> The most
+          critical load — arises from the robot's weight at a vertical
+          offset and punching forces applied at the head/torso height.
+          Calculated as M<sub>k</sub> = F × d, where d is the
+          perpendicular distance from the bearing centre.
+        </li>
+        <li>
+          <strong>M<sub>r</sub> (Friction Torque):</strong> Internal
+          resistance to rotation, dependent on bearing diameter, preload
+          and lubricant. Contributes to the baseline motor torque
+          requirement.
+        </li>
+      </ul>
+      <p>
+        A <strong>service factor (SF)</strong> is applied to nominal
+        loads to account for dynamic impacts — peak punch forces of up
+        to ~1.5 kN for average users generate short-duration tilting moments.
+      </p>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.4 Padding</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../robot-mechanism.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Mechanism
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. SUBSYSTEM OVERVIEW                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="padding-subsystem">
+      <h2>5.2.4 Padding</h2>
+      <p>
+        The padding subsystem provides <strong>safe, realistic striking
+        targets</strong> and embeds <strong>impact sensing</strong> for
+        training analytics. It must absorb repeated high-velocity strikes
+        without transmitting dangerous forces to internal mechanisms or the
+        user, while allowing embedded IMU sensors to detect each impact.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. REQUIREMENTS                                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Requirements &amp; Considerations</h3>
+      <p>Responds to system-level requirement <strong>RM-6</strong>
+        (<em>Absorb repeated strikes without damage; provide impact
+        detection</em>) defined in the
+        <a href="../robot-mechanism.html">Robot Mechanism</a> landing page:
+      </p>
+      <ul>
+        <li><strong>User safety:</strong> Low-threat, lightweight contact surface preventing over-extension injuries.</li>
+        <li><strong>Structural protection:</strong> Isolate 3D-printed drivetrain and electronics from repeated impacts.</li>
+        <li><strong>Sensing fidelity:</strong> IMU sensors must detect impacts above threshold without motion contamination.</li>
+        <li><strong>Training realism:</strong> Polyethylene foam training sticks encourage realistic defensive engagement.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. MECHANICAL DESIGN                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Design</h3>
+
+      <h4>Multi-Layer Padding Architecture</h4>
+      <p>
+        A <strong>multi-layer construction</strong> with anti-vibration
+        isolation mounts separates impact absorption (outer foam) from
+        structural mounting (isolation interface to arm mechanism).
+      </p>
+      <ul>
+        <li><strong>Outer layer:</strong> Polyethylene foam — lightweight, sufficient energy absorption for repeated strikes</li>
+        <li><strong>Isolation mounts:</strong> Anti-vibration mounts decouple the padding from the 2-DOF arm mechanism, preventing impact vibration from propagating into 3D-printed drivetrain components</li>
+        <li><strong>Sensing layer:</strong> MPU6050 IMU sensors at Head, Celiac Plexus, and Liver zones — embedded between the foam surface and the isolation interface</li>
+      </ul>
+      <p>
+        The isolation mount is critical because the
+        <a href="arm-actuation.html">Arm Actuation</a> subsystem's
+        3D-printed gears and Delrin alignment pins are optimised for
+        torsional and compressive loads, not repeated transverse impacts.
+        Without mechanical decoupling, user punches to the padding would
+        transmit impulse forces directly into the gear mesh, accelerating
+        fatigue failure.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="image"></sl-icon>
+        <strong>Media Placeholder:</strong> Annotated cross-section showing
+        the three-layer stack: polyethylene foam → anti-vibration mount → arm
+        housing. Label each layer with its primary function (absorption,
+        isolation, structure).<br>
+        <em>To add: place image in
+        <code>assets/upper_mechanism/padding/</code> and use
+        <code>&lt;image-component&gt;</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. IMU-BASED IMPACT SENSING                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Low-Level Control — IMU Sensing Pipeline</h3>
+
+      <h4>Quad-IMU I²C Topology</h4>
+      <p>
+        Up to four <strong>MPU6050 6-axis IMUs</strong> (3-axis
+        accelerometer + 3-axis gyroscope) are distributed across the
+        padding zones to detect and classify physical strikes. The sensor
+        placement enables spatial discrimination — determining not only
+        <em>whether</em> a punch landed, but <em>where</em> on the
+        robot's body it connected.
+      </p>
+      <p>
+        The MPU6050 supports only two I²C addresses (<code>0x68</code>
+        and <code>0x69</code>, selected by the AD0 pin). To accommodate
+        four sensors, the Teensy 4.0's two independent hardware I²C
+        buses are both utilised:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">I²C Bus</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Teensy Pins</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x68</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x69</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>Wire</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 18, SCL: Pin 19</td>
+            <td style="padding:10px; border:1px solid #ddd;">Centre Body</td>
+            <td style="padding:10px; border:1px solid #ddd;">Left Body</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>Wire1</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 17, SCL: Pin 16</td>
+            <td style="padding:10px; border:1px solid #ddd;">Right Body</td>
+            <td style="padding:10px; border:1px solid #ddd;">Reserved (Head)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Both buses operate at <strong>400 kHz</strong> (I²C Fast Mode).
+        Each MPU6050 read transaction requires approximately 14 bytes,
+        consuming ~280 µs per sensor at 400 kHz.
+      </p>
+
+      <h4>Strike Detection Pipeline</h4>
+      <p>
+        The raw 3-axis acceleration from each IMU is included in the
+        expanded <code>/motor_feedback</code> payload (21 doubles)
+        published via micro-ROS at 200 Hz. On the application side
+        (GUI V3), the <strong>IMU Diagnostics Tab</strong> computes the
+        L2 norm of each sensor's acceleration vector:
+      </p>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
+        ||a|| = &radic;(a<sub>x</sub>&sup2; + a<sub>y</sub>&sup2; +
+        a<sub>z</sub>&sup2;)
+      </p>
+      <p>
+        When ||a|| exceeds a configurable threshold (default: 2.0 g),
+        the system registers a valid strike event and publishes the
+        event data (sensor ID, peak acceleration, timestamp) to the
+        <code>/strike_events</code> ROS 2 topic.
+      </p>
+
+      <h4>Noise Rejection &amp; Threshold Configuration</h4>
+      <p>
+        Two dedicated noise-rejection mechanisms ensure that only genuine
+        user punches trigger a strike event:
+      </p>
+      <ol>
+        <li>
+          <strong>Hard STOP I²C Protocol:</strong> Long (30–40 cm)
+          unshielded jumper wires to the padding zones introduce parasitic
+          capacitance. At 400 kHz, the "Repeated Start" condition can lock
+          the MPU6050's internal state machine, causing it to hold SDA
+          permanently low. The firmware uses a physical
+          <strong>Hard STOP</strong>
+          (<code>endTransmission(true)</code>) after every register write,
+          resetting the sensor state machine before each read. This adds
+          ~20 µs latency per read but eliminates the bus-hang failure mode.
+          See <a href="../upper-mechanism/troubleshooting.html">Troubleshooting
+          §7</a> for the full root-cause analysis.
+        </li>
+        <li>
+          <strong>Scan-Window Peak Detection:</strong> The GUI refreshes
+          at 20 Hz (50 ms), but punch impulses last ~30 ms. A naïve
+          "check the latest sample" approach creates a Nyquist blind-spot
+          where strikes occurring between GUI frames are missed. The
+          detection logic was refactored to
+          <code>np.max(mag_arr[-n_scan:])</code>, scanning all accumulated
+          samples since the last GUI tick (n_scan ≈ 10 samples at 200 Hz
+          firmware rate / 20 Hz GUI rate). See
+          <a href="../upper-mechanism/troubleshooting.html">Troubleshooting
+          §8</a> for details.
+        </li>
+      </ol>
+
+      <!-- ─── Technical Callout: Timing Budget ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">IMU Timing Budget within 200 Hz Unified Loop</h4>
+        <p>
+          The IMU subsystem was originally validated on a
+          <strong>dedicated Teensy</strong> as a standalone calibration rig,
+          achieving <strong>500 Hz sampling</strong> across four sensors
+          without packet loss. After merging into the main
+          <code>teensy_firmware_V4.ino</code>, the I²C reads share the
+          5 ms (200 Hz) loop budget with CAN motor commands and micro-ROS
+          publishing:
+        </p>
+        <table style="width:100%; border-collapse:collapse; margin:12px 0;">
+          <thead>
+            <tr style="background:#e8edf4;">
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Task</th>
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Allocation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">CAN Tx/Rx (4 motors)</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.8 ms</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;"><strong>I²C IMU reads (up to 4 sensors)</strong></td>
+              <td style="padding:8px; border:1px solid #c5cee0;"><strong>~1.1 ms</strong></td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">micro-ROS publish</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.5 ms</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">Safety checks + logic</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.4 ms</td>
+            </tr>
+            <tr style="background:#f0f4f8; font-weight:bold;">
+              <td style="padding:8px; border:1px solid #c5cee0;">Headroom</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~2.2 ms (44%)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.9rem; color: #555;">
+          Total worst-case utilisation: ~2.8 ms of the 5.0 ms budget
+          (56%). The 2.2 ms headroom ensures the loop does not overrun
+          even under I²C retry conditions.
+        </p>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. VALIDATION                                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Validation</h3>
+      <p>
+        The padding subsystem is validated against two system-level
+        performance criteria from the
+        <a href="../upper-mechanism/testing-evaluation.html">Testing
+        &amp; Evaluation</a> page:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Mapping</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
+            <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Monotonic increase: light &lt; medium &lt; heavy</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm (3 users)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Additional mechanical validation:</p>
+      <ul>
+        <li><strong>Mechanical:</strong> Padding survives repeated high-velocity strikes without delamination.</li>
+        <li><strong>Electrical:</strong> IMU I²C communication reliable during active sparring (Hard STOP protocol eliminates bus hang).</li>
+        <li><strong>Vibration isolation:</strong> Anti-vibration mounts reduce transmitted forces to drivetrain.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. RELATED TROUBLESHOOTING                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Related Troubleshooting</h3>
+      <p>
+        Two of the nine cross-layer defects documented in the
+        <a href="../upper-mechanism/troubleshooting.html">Troubleshooting
+        &amp; Iteration</a> page directly affect the padding subsystem:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">#</th>
+            <th style="padding:8px; border:1px solid #ddd;">Defect</th>
+            <th style="padding:8px; border:1px solid #ddd;">Layer</th>
+            <th style="padding:8px; border:1px solid #ddd;">Impact on Padding</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">7</td>
+            <td style="padding:8px; border:1px solid #ddd;">I²C Bus Hang</td>
+            <td style="padding:8px; border:1px solid #ddd;">Firmware</td>
+            <td style="padding:8px; border:1px solid #ddd;">Long wires to padding zones caused MPU6050 state machine lockup — resolved with Hard STOP protocol</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">8</td>
+            <td style="padding:8px; border:1px solid #ddd;">Nyquist Blind-Spot</td>
+            <td style="padding:8px; border:1px solid #ddd;">Application</td>
+            <td style="padding:8px; border:1px solid #ddd;">GUI sampled only 1 of ~10 accumulated samples per frame, missing inter-frame strikes — resolved with scan-window peak detection</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 7. DETAILED DOCUMENTATION NAV CARDS                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Detailed Documentation</h3>
+      <p>For in-depth technical details, refer to the padding-specific documentation:</p>
+      <div class="section-nav-grid">
+        <a href="padding/mechanical-design.html" class="section-nav-card">
+          <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
+          <h3>Mechanical Design</h3>
+          <p>Multi-layer architecture, foam construction, isolation mounts, IMU sensor mounting</p>
+        </a>
+        <a href="padding/electrical-integration.html" class="section-nav-card">
+          <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
+          <h3>Electrical Integration</h3>
+          <p>Quad-IMU I²C topology, strike detection pipeline, timing budget</p>
+        </a>
+        <a href="padding/testing-evaluation.html" class="section-nav-card">
+          <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
+          <h3>Testing &amp; Evaluation</h3>
+          <p>PC-3 detection rate, PC-5 force differentiation, endurance testing</p>
+        </a>
+        <a href="padding/troubleshooting.html" class="section-nav-card">
+          <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
+          <h3>Troubleshooting</h3>
+          <p>Defect 7: I²C bus hang, Defect 8: Nyquist blind-spot</p>
+        </a>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 8. CROSS-REFERENCE                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Cross-References</h3>
+      <ul>
+        <li>
+          <strong><a href="arm-actuation.html">5.2.5 Arm Actuation</a></strong>
+          — The padding is mechanically attached to the 2-DOF arm via
+          anti-vibration isolation mounts. The integration between padding
+          sensing and arm control is discussed at the
+          <a href="../robot-mechanism.html">Robot Mechanism</a> system
+          level. Coordinated strike validation using IMU feedback as input
+          is documented as a validation component under Arm Actuation.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

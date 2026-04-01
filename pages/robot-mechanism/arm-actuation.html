@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.2.5 Arm Actuation</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../robot-mechanism.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Mechanism
+      </sl-button>
+    </a>
+    <br>
+
+    <div id="arm-actuation-subsystem">
+      <h2>5.2.5 Arm Actuation</h2>
+      <p>
+        The arm actuation subsystem is the primary strike-delivery mechanism
+        of BoxBunny. Its function is to replicate the upper-body actions of a
+        human training partner — executing targeted punches at anatomically
+        correct striking zones and providing real-time impact detection for
+        training analytics.
+      </p>
+
+      <image-component
+        tag="image"
+        source="../../assets/upper_mechanism/5.2feature_mapping.png"
+        subtitle="Figure: Arm Actuation feature mapping — decomposed into Punch Execution (2-DOF joint) and Contact Points (padding and impact sensing).">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Requirements &amp; Considerations</h3>
+      <p>The arm actuation subsystem responds to system-level requirement <strong>RM-5</strong>:</p>
+      <ul>
+        <li><strong>Strike velocity:</strong> Execute 90° in ≤ 0.25 s for human-competitive punch speeds</li>
+        <li><strong>Strike types:</strong> Jab (pitch), Hook (roll), Uppercut (coordinated pitch+roll)</li>
+        <li><strong>Mass centralisation:</strong> Minimise moment of inertia to achieve target velocities within motor torque limits</li>
+        <li><strong>Safety:</strong> Multi-layered protection (hardware current limit, firmware dI/dt monitoring, application-level auto-retract)</li>
+      </ul>
+
+      <h4>Required Striking Motions</h4>
+      <image-component
+        width="40%"
+        tag="image"
+        source="../../assets/upper_mechanism/5.2.1.1strike_zones.png"
+        subtitle="Figure: Anatomically derived striking zones — Head, Celiac Plexus, and Liver.">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Design</h3>
+
+      <h4>2-DOF Coaxial Differential Joint</h4>
+      <p>
+        The selected solution is a <strong>2-Degrees-of-Freedom mechanism</strong>
+        employing a coaxial differential gear arrangement with two
+        <strong>Damiao DM-J4310-2EC brushless motors</strong> per arm. The
+        pitch axis delivers vertical rotation (jab), while the roll axis
+        provides horizontal rotation (hook, uppercut). Coordinated combination
+        enables all required strike patterns from a single compact joint.
+      </p>
+
+      <h4>Mass Centralisation</h4>
+      <p>
+        Both motors are mounted <strong>side-by-side at the base</strong> of
+        the arm assembly, each driving a pinion gear into the central coaxial
+        gear stack. This concentrates the heaviest components at the pivot
+        point, drastically reducing the arm's <strong>moment of
+        inertia</strong> — the primary reason the system achieves
+        human-competitive punch velocities without exceeding stress limits of
+        3D-printed drivetrain components.
+      </p>
+
+      <h4>Differential Coupling Challenge</h4>
+      <p>
+        The coaxial arrangement introduces kinematic coupling: any roll
+        rotation causes the internal bevel gear to "walk," producing
+        <strong>parasitic pitch change</strong>. The firmware must
+        mathematically cancel this coupling in real-time. When a pure roll
+        is commanded, both motors are driven at identical speeds to prevent
+        the bevel gear from walking.
+      </p>
+
+      <image-component
+        width="80%"
+        tag="image"
+        source="../../assets/upper_mechanism/5.2.2.3.final_concept.png"
+        subtitle="Figure: Final 2-DOF coaxial differential joint — motors side-by-side at base, bevel gear coupling creates differential relationship compensated in firmware.">
+      </image-component>
+
+      <h4>Combat Orbit FSM</h4>
+      <p>
+        The <strong>Dynamic Sparring engine</strong> transforms the system
+        from a coordinate-following actuator into a reactive sparring partner:
+      </p>
+      <ol>
+        <li><strong>Vector Alignment Skip:</strong> Skips windup when consecutive strikes share similar trajectories (threshold: 30°)</li>
+        <li><strong>Perimeter Transit Routing:</strong> Routes arm around workspace perimeter to avoid crossing the user's body zone</li>
+        <li><strong>Proportional Snap-Back:</strong> Dynamic recovery position maintains guard without returning to zero</li>
+      </ol>
+
+      <h4>Multi-Layered Safety</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd;">Layer</th>
+            <th style="padding:10px; border:1px solid #ddd;">Mechanism</th>
+            <th style="padding:10px; border:1px solid #ddd;">Response</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Hardware</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Damiao built-in current limiter</td>
+            <td style="padding:10px; border:1px solid #ddd;">&lt; 1 ms</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Firmware</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Software dI/dt monitoring (Teensy 4.0)</td>
+            <td style="padding:10px; border:1px solid #ddd;">5 ms</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Application</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Kinematic auto-retract (GUI V3)</td>
+            <td style="padding:10px; border:1px solid #ddd;">~50 ms</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Low-Level Control</h4>
+      <p>
+        The arm actuation uses a <strong>24V motor bus</strong> with
+        <strong>CAN bus daisy chain</strong> (4 motors, 1 Mbps, 120 Ω
+        termination) for motor communication, and an isolated
+        <strong>12V logic rail</strong> (dual-supply architecture) to prevent
+        regenerative braking OVP trips from disrupting the Teensy/Jetson.
+        The Teensy 4.0 runs a unified <strong>200 Hz control loop</strong>
+        integrating CAN motor commands, I²C sensor reads, and micro-ROS
+        publishing.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Validation</h3>
+      <p>All major deliverables have been validated:</p>
+      <ul>
+        <li>Coaxial differential joint with 3:1 helical-spur reduction — <strong>Validated</strong></li>
+        <li>Post-fair structural revision (6 mm stainless D-shaft, Delrin pin) — <strong>Validated</strong></li>
+        <li>CAN Bus daisy chain (4 motors) — <strong>Validated</strong></li>
+        <li>Dynamic Sparring FSM — <strong>Validated</strong></li>
+        <li>ROS 2 External Control Interface (7 topics) — <strong>Validated</strong></li>
+        <li>9 cross-layer defects resolved — <strong>8 Resolved / 1 Mitigated</strong></li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Detailed Documentation</h3>
+      <p>Complete technical documentation organised into six sections:</p>
+      <div class="section-nav-grid">
+        <a href="../upper-mechanism/design-ideation.html" class="section-nav-card">
+          <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
+          <h3>Design &amp; Ideation</h3>
+          <p>Motion analysis, concept selection, motor selection</p>
+        </a>
+        <a href="../upper-mechanism/mechanical-design.html" class="section-nav-card">
+          <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
+          <h3>Mechanical Design</h3>
+          <p>Joint kinematics, gear reduction, structural revisions</p>
+        </a>
+        <a href="../upper-mechanism/electrical-integration.html" class="section-nav-card">
+          <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
+          <h3>Electrical Integration</h3>
+          <p>Power architecture, CAN bus, dual-rail isolation</p>
+        </a>
+        <a href="../upper-mechanism/firmware-software.html" class="section-nav-card">
+          <sl-icon name="code-slash" style="font-size: 2rem;"></sl-icon>
+          <h3>Firmware &amp; Software</h3>
+          <p>V4 firmware, GUI V3, Dynamic Sparring FSM, ROS 2</p>
+        </a>
+        <a href="../upper-mechanism/testing-evaluation.html" class="section-nav-card">
+          <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
+          <h3>Testing &amp; Evaluation</h3>
+          <p>Performance criteria, test results, video evidence</p>
+        </a>
+        <a href="../upper-mechanism/troubleshooting.html" class="section-nav-card">
+          <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
+          <h3>Troubleshooting &amp; Iteration</h3>
+          <p>9 defects: root-cause analysis and resolutions</p>
+        </a>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- CROSS-REFERENCES                                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Cross-References</h3>
+      <ul>
+        <li>
+          <strong><a href="padding.html">5.2.4 Padding</a></strong>
+          — The padding subsystem provides the striking targets and
+          impact sensing layer that sits on top of the arm mechanism.
+          Padding-specific documentation (IMU I²C topology, strike
+          detection pipeline, troubleshooting) is maintained on the
+          <a href="padding.html">Padding page</a> and its sub-pages.
+          Coordinated strike validation using IMU feedback as input
+          is documented here under Arm Actuation as a validation
+          component.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>
