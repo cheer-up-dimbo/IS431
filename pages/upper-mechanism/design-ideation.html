@@ -300,48 +300,41 @@
         </li>
       </ol>
 
-      <!-- ─── Technical Callout: Inverse Kinematics (Validated 2026-04-02) ─── -->
+      <!-- ─── Technical Callout: Inverse Kinematics ─── -->
       <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Technical Callout — Inverse Kinematic Equations
-          <span style="font-weight:normal; font-size:0.85em; color:#059669;">(Validated 2026-04-02)</span>
-        </h4>
+        <h4 style="margin-top:0; color:#1e40af;">Technical Callout — Inverse Kinematic Equations</h4>
         <p>
           The coaxial differential coupling creates a non-trivial
-          relationship between the raw motor space
-          (m<sub>r</sub>&nbsp;=&nbsp;roll motor,
-          m<sub>p</sub>&nbsp;=&nbsp;pitch motor) and the joint
+          relationship between the motor encoder space
+          (&theta;<sub>m1</sub>, &theta;<sub>m2</sub>) and the joint
           output space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>).
-          The closed-form inverse conversion that the firmware evaluates
-          on every control cycle is:
+          The closed-form inverse kinematic equations that the firmware
+          evaluates on every control cycle are:
         </p>
         <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 16px 0;">
-          &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> /
-          s<sub>r</sub>) &middot; G, &nbsp;&nbsp;
-          m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
+          &theta;<sub>m2</sub> = 3.0 &times; &theta;<sub>roll</sub>
           &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
-          m<sub>p</sub> = [(&theta;<sub>pitch</sub> /
-          s<sub>p</sub>) &middot; G &minus; c &middot;
-          &Delta;<sub>r</sub>] + o<sub>p</sub>
+          &theta;<sub>m1</sub> = 3.0 &times;
+          (&theta;<sub>pitch</sub> + &theta;<sub>roll</sub>)
           &nbsp;&nbsp;&nbsp;(Eq. 2)
         </p>
         <p>
-          where G&nbsp;=&nbsp;3 (3:1 helical-spur reduction),
-          o<sub>r</sub>/o<sub>p</sub> are calibrated home offsets,
-          s<sub>r</sub>/s<sub>p</sub> are directional signs (&plusmn;1),
-          and <strong>c</strong> is the bevel gear coupling parameter
-          (&plusmn;1). The critical insight is in <strong>Eq. 2</strong>:
-          the subtraction of
-          <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em> is the
+          <strong>The factor of 3.0</strong> in both equations accounts for
+          the primary helical-spur gear reduction (3:1). The critical
+          insight is in <strong>Eq. 2</strong>: the addition of
+          &theta;<sub>roll</sub> inside the parentheses is the
           <strong>software decoupling term</strong> that compensates for
           the "walking bevel" effect. Because the bevel gear is housed
           inside the roll-driven outer housing, any roll rotation carries
-          the pitch mechanism with it. This term cancels that parasitic
-          coupling in real-time.
+          the pitch mechanism with it, producing an unwanted parasitic
+          pitch change. By commanding Motor 1 to advance by an amount
+          equal to the roll displacement (scaled by the gear ratio), the
+          firmware ensures that the bevel gear does not walk — cancelling
+          the parasitic coupling in real-time.
         </p>
         <p style="font-size: 0.9rem; color: #555;">
-          Full kinematic derivations, the forward kinematics
-          (Motor &rarr; Joint space), the rotation-around-arm-axis 3D FK
-          model, and the 4-test calibration probe are presented in
+          Full kinematic derivations and the forward kinematics
+          (Motor &rarr; Joint space) are presented in
           <a href="mechanical-design.html">Mechanical Design</a>.
         </p>
       </div>

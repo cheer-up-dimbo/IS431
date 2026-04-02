@@ -71,11 +71,11 @@
         microcontroller are powered from a <strong>dedicated 12V
         supply</strong>, electrically isolated from the 24V motor bus.
         This isolation addresses a specific failure mode: during
-        rapid height motor deceleration, the geared DC motor (driven by
-        the Cytron MDDS10) injects regenerative back-EMF onto the 24V
-        bus. When these transients exceed the PSU's overvoltage
-        protection (OVP) threshold (~28V), the supply trips and
-        <em>all</em> devices on that rail lose power simultaneously.
+        high-speed motor deceleration, regenerative back-EMF from the
+        Damiao motors injects transient voltages onto the 24V bus. When
+        these transients exceed the PSU's overvoltage protection (OVP)
+        threshold (~28V), the supply trips and <em>all</em> devices on
+        that rail lose power simultaneously.
       </p>
       <p>
         On a single-rail architecture, this OVP trip would reboot the
@@ -85,9 +85,7 @@
         exposed 3D-printed moving parts. The dual-rail isolation
         guarantees that motor bus disturbances cannot propagate to the
         compute and control subsystems. The full OVP failure analysis and
-        the software ramp-down mitigation are documented under
-        <a href="../robot-mechanism/height-adjustment.html">5.2.3 Height
-        Adjustment</a> and
+        the software ramp-down mitigation are documented in
         <a href="troubleshooting.html">Troubleshooting §6: PSU OVP
         Trip</a>.
       </p>
@@ -155,28 +153,28 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><code>0x01</code></td>
-            <td style="padding:10px; border:1px solid #ddd;">Motor 1 (M1)</td>
-            <td style="padding:10px; border:1px solid #ddd;">Left Arm</td>
-            <td style="padding:10px; border:1px solid #ddd;">Roll (outer housing rotation)</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><code>0x02</code></td>
-            <td style="padding:10px; border:1px solid #ddd;">Motor 2 (M2)</td>
-            <td style="padding:10px; border:1px solid #ddd;">Left Arm</td>
+            <td style="padding:10px; border:1px solid #ddd;"><code>0x101</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">Motor 1</td>
+            <td style="padding:10px; border:1px solid #ddd;">Left Arm, Motor A</td>
             <td style="padding:10px; border:1px solid #ddd;">Pitch (inner shaft via bevel gear)</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><code>0x03</code></td>
-            <td style="padding:10px; border:1px solid #ddd;">Motor 3 (M3)</td>
-            <td style="padding:10px; border:1px solid #ddd;">Right Arm</td>
-            <td style="padding:10px; border:1px solid #ddd;">Roll (outer housing rotation)</td>
+            <td style="padding:10px; border:1px solid #ddd;"><code>0x102</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">Motor 2</td>
+            <td style="padding:10px; border:1px solid #ddd;">Left Arm, Motor B</td>
+            <td style="padding:10px; border:1px solid #ddd;">Roll (outer housing)</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><code>0x04</code></td>
-            <td style="padding:10px; border:1px solid #ddd;">Motor 4 (M4)</td>
-            <td style="padding:10px; border:1px solid #ddd;">Right Arm</td>
+            <td style="padding:10px; border:1px solid #ddd;"><code>0x103</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">Motor 3</td>
+            <td style="padding:10px; border:1px solid #ddd;">Right Arm, Motor A</td>
             <td style="padding:10px; border:1px solid #ddd;">Pitch (inner shaft via bevel gear)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>0x104</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">Motor 4</td>
+            <td style="padding:10px; border:1px solid #ddd;">Right Arm, Motor B</td>
+            <td style="padding:10px; border:1px solid #ddd;">Roll (outer housing)</td>
           </tr>
         </tbody>
       </table>
@@ -218,26 +216,42 @@
         during rapid multi-motor strike sequences.
       </p>
 
-      <h4>CAN Frame Structure — Position-Velocity Command Mode</h4>
+      <h4>CAN Frame Structure — MIT Mode</h4>
       <p>
-        The Damiao DM-J4310-2EC motors operate in
-        <strong>position-velocity command mode</strong>, where each
-        8-byte CAN command frame encodes a target position and a maximum
-        velocity for the trajectory. The motor's internal controller
-        handles trajectory interpolation — the host (Teensy) only sends
-        the desired endpoint and speed constraint.
+        The Damiao motors operate in <strong>MIT mode</strong>
+        (position-velocity-torque), where each 8-byte CAN command frame
+        encodes three control parameters:
       </p>
-
-      <sl-alert variant="warning" open>
-        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-        <strong>Note:</strong> The CAN frame byte-level encoding follows
-        the Damiao DM-J4310-2EC datasheet. The specific bit packing is
-        documented in the firmware source and the motor manufacturer's
-        protocol reference. This is <em>not</em> the MIT impedance
-        control protocol — the motors are commanded in position-velocity
-        mode with the internal PID handling torque regulation.
-      </sl-alert>
-
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Byte Range</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Parameter</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Encoding</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Bytes 0–1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Position (&theta;)</td>
+            <td style="padding:8px; border:1px solid #ddd;">16-bit unsigned, mapped to [&minus;12.5, 12.5] rad</td>
+            <td style="padding:8px; border:1px solid #ddd;">Target angular position (motor-space)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Bytes 2–3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Velocity (&omega;)</td>
+            <td style="padding:8px; border:1px solid #ddd;">12-bit unsigned, mapped to [&minus;45, 45] rad/s</td>
+            <td style="padding:8px; border:1px solid #ddd;">Feed-forward velocity for trajectory tracking</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Bytes 4–7</td>
+            <td style="padding:8px; border:1px solid #ddd;">Kp, Kd, &tau;<sub>ff</sub></td>
+            <td style="padding:8px; border:1px solid #ddd;">12-bit packed gains + torque</td>
+            <td style="padding:8px; border:1px solid #ddd;">Impedance control parameters and feed-forward torque</td>
+          </tr>
+        </tbody>
+      </table>
       <p>
         The motor responds with a feedback frame containing actual
         position, velocity, and current — which the Teensy parses and
@@ -259,77 +273,283 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. HEIGHT MOTOR — CROSS-REFERENCE                      -->
+    <!-- 3. MDDS10 HEIGHT SUBSYSTEM                             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Height Motor Subsystem</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        The height motor driver (Cytron MDDS10), wiring topology,
-        corrected pin assignments, self-locking safety, and regenerative
-        braking / OVP protection are documented under the
-        <strong><a href="../robot-mechanism/height-adjustment/electrical-control.html">5.2.3
-        Height Adjustment — Electrical &amp; Control</a></strong>
-        subsystem page.
-      </sl-alert>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 4. REGENERATIVE BRAKING — CROSS-REFERENCE              -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Regenerative Braking &amp; OVP Protection</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        <strong>Cross-reference:</strong> The PSU OVP trip failure mode
-        was caused by the <strong>DC height motor</strong> (driven by
-        the Cytron MDDS10), not the Damiao arm motors. During rapid
-        height changes, the geared DC motor's back-EMF injected
-        transient voltages onto the shared 24V bus, exceeding the Mean
-        Well PSU's overvoltage protection threshold (~28V).
-        <br><br>
-        The full root-cause analysis, back-EMF physics, and the software
-        ramp-down mitigation are documented in the
-        <strong><a href="../robot-mechanism/height-adjustment.html">5.2.3
-        Height Adjustment</a></strong> subsystem.
-      </sl-alert>
+      <h3>MDDS10 Height Motor Subsystem</h3>
       <p>
-        The dual-rail power architecture described above was implemented
-        as a direct response to this failure. By isolating the 12V logic
-        rail (Jetson + Teensy) from the 24V motor bus, OVP trips on the
-        motor bus no longer cascade to the compute subsystem — the ROS 2
-        graph and encoder references survive the bus disturbance.
+        The vertical height adjustment axis uses a
+        <strong>Cytron MDDS10</strong> dual-channel motor driver in
+        Sign-Magnitude mode, controlling a <strong>LGYMSZSS 24V DC gear
+        motor</strong> connected to a lead-screw mechanism. This axis
+        allows the operator to raise or lower the entire arm assembly to
+        match the sparring partner's height.
       </p>
+
+      <h4>Corrected Wiring Topology</h4>
+      <p>
+        The MDDS10's Sign-Magnitude mode requires two control signals:
+        a PWM signal (speed) and a digital signal (direction). The
+        corrected pin assignments are:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Teensy Pin</th>
+            <th style="padding:8px; border:1px solid #ddd;">MDDS10 Terminal</th>
+            <th style="padding:8px; border:1px solid #ddd;">Signal Type</th>
+            <th style="padding:8px; border:1px solid #ddd;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Pin 3</td>
+            <td style="padding:8px; border:1px solid #ddd;">AN1</td>
+            <td style="padding:8px; border:1px solid #ddd;">PWM (0–255)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor speed — proportional to duty cycle</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Pin 2</td>
+            <td style="padding:8px; border:1px solid #ddd;">DIG1 / IN1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Digital (HIGH/LOW)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor direction — HIGH = up, LOW = down</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+        <strong>Pin Assignment Correction:</strong> The initial firmware
+        (V2) erroneously assigned Pin 2 to PWM and Pin 3 to DIR —
+        transposing the two signals. Because Pin 2 is not PWM-capable on
+        the Teensy 4.0, the motor received a constant-amplitude square
+        wave regardless of the commanded speed, resulting in uncontrolled
+        full-speed operation. The corrected assignment (above) was
+        validated in firmware V3. See
+        <a href="troubleshooting.html">Troubleshooting §5</a> for the
+        full root-cause analysis.
+      </sl-alert>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera"></sl-icon>
+        <strong>Photo Placeholder:</strong> Physical MDDS10 wiring showing
+        Pin 3 &rarr; AN1, Pin 2 &rarr; DIG1, power terminals, and motor
+        output connections.<br>
+        <em>To add: place in
+        <code>assets/upper_mechanism/electrical/</code>.</em>
+      </sl-alert>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 5. IMU INTEGRATION — CROSS-REFERENCE TO PADDING        -->
+    <!-- 4. REGENERATIVE BRAKING & BACK-EMF                     -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>IMU Sensor Integration</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        The Quad-IMU sensing pipeline (I²C bus topology, timing budget,
-        strike detection, noise rejection) is documented under the
-        <strong><a href="../robot-mechanism/padding.html">5.2.4 Padding</a></strong>
-        subsystem:
-        <ul style="margin:8px 0 0 0;">
-          <li><a href="../robot-mechanism/padding/electrical-integration.html">Electrical Integration</a> — I²C topology, timing budget, ROS 2 payload</li>
-          <li><a href="../robot-mechanism/padding/troubleshooting.html">Troubleshooting</a> — Defect 7 (I²C bus hang), Defect 8 (Nyquist blind-spot)</li>
-        </ul>
-      </sl-alert>
+      <h3>Regenerative Braking &amp; Back-EMF Management</h3>
       <p>
-        From the arm actuation perspective, the IMU pipeline provides the
-        <strong>coordinated strike validation</strong> input: when the
-        padding detects a user punch via <code>/strike_events</code>,
-        the Dynamic Sparring FSM can trigger a reactive counter-strike.
-        This integration is validated as part of the arm actuation
-        performance criteria (see
-        <a href="testing-evaluation.html">Testing &amp; Evaluation</a>).
+        Brushless DC motors operate as <strong>4-quadrant
+        actuators</strong>: they can motor (consume electrical energy to
+        produce torque) or generate (convert kinetic energy back into
+        electrical energy). During the deceleration phase of a
+        high-velocity strike, the Damiao motors momentarily transition
+        into generator mode, injecting <strong>back-EMF</strong> onto
+        the 24V bus.
+      </p>
+      <p>
+        If the rotor decelerates rapidly (e.g., an abrupt STOP command at
+        peak velocity), the rate of magnetic flux collapse produces a
+        transient voltage spike that can exceed the PSU's overvoltage
+        protection (OVP) threshold (~28V). Upon triggering OVP, the PSU
+        shuts down the 24V rail, and all motor bus devices lose power
+        simultaneously.
+      </p>
+
+      <h4>Software Mitigation — PWM Ramp-Down</h4>
+      <p>
+        A <code>_ramp_down()</code> method was implemented in the GUI
+        control layer (V3). Instead of issuing a single STOP command,
+        the method transmits <strong>six progressively decreasing
+        position commands</strong> over a 300 ms window, limiting the
+        rate of rotor deceleration and thereby capping the back-EMF
+        voltage below the OVP threshold.
+      </p>
+
+      <!-- ─── Technical Callout: Back-EMF ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Back-EMF Physics</h4>
+        <p>
+          The induced voltage (<em>V<sub>emf</sub></em>) is proportional
+          to the rate of change of magnetic flux:
+        </p>
+        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
+          V<sub>emf</sub> = &minus;N &middot;
+          d&Phi; / dt &nbsp;&asymp;&nbsp;
+          K<sub>e</sub> &middot; &omega;
+        </p>
+        <p>
+          Where K<sub>e</sub> is the motor's back-EMF constant and
+          &omega; is the angular velocity at the moment of deceleration.
+          By controlling d&omega;/dt through the ramp-down, the firmware
+          limits V<sub>emf</sub> to below the OVP threshold. The 300 ms
+          ramp window was empirically determined to be sufficient for
+          the maximum strike velocity (~80 rad/s motor-space) under
+          the current gear ratio.
+        </p>
+      </div>
+
+      <h4>Residual Risk &amp; Recommended Future Work</h4>
+      <p>
+        The software ramp-down addresses the common case but does not
+        protect against edge cases such as a user physically stopping the
+        arm mid-strike (instant deceleration from external force). A
+        hardware-level protection — either a <strong>TVS (Transient
+        Voltage Suppressor) clamp diode</strong> or an <strong>Active
+        Shunt Regulator</strong> on the 24V bus — is recommended as a
+        permanent solution. This is documented as a future improvement
+        in <a href="troubleshooting.html">Troubleshooting §6</a>.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>Video Placeholder:</strong> Split-screen demonstration
+        comparing (1) abrupt stop showing bus voltage spike on
+        oscilloscope/multimeter, vs (2) ramp-down stop showing stable
+        bus voltage. Annotate the OVP threshold (~28V) on the trace.<br>
+        <em>To add: place video in
+        <code>assets/upper_mechanism/videos/</code> and use
+        <code>&lt;video&gt;</code> tag.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. QUAD-IMU SENSOR INTEGRATION                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Quad-IMU Sensor Integration</h3>
+      <p>
+        Up to four <strong>MPU6050 6-axis IMUs</strong> (3-axis
+        accelerometer + 3-axis gyroscope) are distributed across the
+        padding zones to detect and classify physical strikes. The sensor
+        placement enables spatial discrimination — determining not only
+        <em>whether</em> a punch landed, but <em>where</em> on the
+        robot's body it connected.
+      </p>
+
+      <h4>I2C Bus Topology</h4>
+      <p>
+        The MPU6050 supports only two I2C addresses (<code>0x68</code>
+        and <code>0x69</code>, selected by the AD0 pin). To accommodate
+        four sensors, the Teensy 4.0's two independent hardware I2C
+        buses are both utilised:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">I2C Bus</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Teensy Pins</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x68</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x69</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>Wire</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 18, SCL: Pin 19</td>
+            <td style="padding:10px; border:1px solid #ddd;">Centre Body</td>
+            <td style="padding:10px; border:1px solid #ddd;">Left Body</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><code>Wire1</code></td>
+            <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 17, SCL: Pin 16</td>
+            <td style="padding:10px; border:1px solid #ddd;">Right Body</td>
+            <td style="padding:10px; border:1px solid #ddd;">Reserved (Head)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Both buses operate at <strong>400 kHz</strong> (I2C Fast Mode).
+        Each MPU6050 read transaction requires approximately 14 bytes
+        (6 acceleration registers + wakelength), consuming
+        ~280 &mu;s per sensor at 400 kHz.
+      </p>
+
+      <h4>Firmware Timing Budget — Integration into Motor Control Loop</h4>
+      <p>
+        The IMU subsystem was originally developed on a
+        <strong>dedicated Teensy</strong> as a standalone calibration rig,
+        isolating the I2C polling from the real-time motor control loop
+        to prevent timing jitter. After successful standalone validation
+        — achieving <strong>500 Hz sampling</strong> across all four
+        sensors without packet loss — the I2C code was merged into the
+        main <code>teensy_firmware_V4.ino</code>.
+      </p>
+
+      <!-- ─── Technical Callout: Timing Budget ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Loop Cycle Timing Budget (5 ms / 200 Hz)</h4>
+        <table style="width:100%; border-collapse:collapse; margin:12px 0;">
+          <thead>
+            <tr style="background:#e8edf4;">
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Task</th>
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Allocation</th>
+              <th style="padding:8px; border:1px solid #c5cee0; text-align:left;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">CAN Tx/Rx (4 motors)</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.8 ms</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">Sparse edge-trigger reduces average to ~0.3 ms</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">I2C IMU reads (up to 4 sensors)</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~1.1 ms</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">280 &mu;s &times; 4 sensors at 400 kHz</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">micro-ROS publish</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.5 ms</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">21-double feedback payload to /motor_feedback</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #c5cee0;">Safety checks + logic</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~0.4 ms</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">dI/dt monitoring, limit checks</td>
+            </tr>
+            <tr style="background:#f0f4f8; font-weight:bold;">
+              <td style="padding:8px; border:1px solid #c5cee0;">Headroom</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">~2.2 ms</td>
+              <td style="padding:8px; border:1px solid #c5cee0;">Buffer for I2C retries, bus contention, jitter</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.9rem; color: #555;">
+          Total worst-case utilisation: ~3.8 ms of the 5.0 ms budget
+          (76%). The 2.2 ms headroom ensures the loop does not overrun
+          even under I2C retry conditions.
+        </p>
+      </div>
+
+      <h4>Strike Detection Pipeline</h4>
+      <p>
+        The raw 3-axis acceleration from each IMU is included in the
+        expanded <code>/motor_feedback</code> payload published via
+        micro-ROS. On the application side (GUI V3), the
+        <strong>IMU Diagnostics Tab</strong> computes the L2 norm of each
+        sensor's acceleration vector:
+      </p>
+      <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
+        ||a|| = &radic;(a<sub>x</sub>&sup2; + a<sub>y</sub>&sup2; +
+        a<sub>z</sub>&sup2;)
+      </p>
+      <p>
+        When ||a|| exceeds a configurable threshold (default: 2.0 g),
+        the system registers a valid strike event and publishes the
+        event data (sensor ID, peak acceleration, timestamp) to the
+        <code>/strike_events</code> ROS 2 topic.
       </p>
     </div>
 

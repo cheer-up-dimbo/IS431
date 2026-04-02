@@ -144,191 +144,92 @@
         sparring cycles.
       </p>
 
-      <!-- ─── Technical Callout: Kinematics (Validated 2026-04-02) ─── -->
+      <!-- ─── Technical Callout: Kinematics ─── -->
       <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Closed-Form Kinematic Equations
-          <span style="font-weight:normal; font-size:0.85em; color:#059669;">(Validated 2026-04-02)</span>
-        </h4>
+        <h4 style="margin-top:0; color:#1e40af;">Closed-Form Kinematic Equations</h4>
         <p>
           The following equations define the relationship between the
-          raw motor encoder space (m<sub>r</sub>&nbsp;=&nbsp;roll motor,
-          m<sub>p</sub>&nbsp;=&nbsp;pitch motor) and the joint output
-          space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>). The
-          model uses three calibrated sign parameters:
-        </p>
-        <ul>
-          <li><strong>s<sub>r</sub></strong> — roll motor sign (&plusmn;1)</li>
-          <li><strong>s<sub>p</sub></strong> — pitch motor sign (&plusmn;1)</li>
-          <li><strong>c</strong> — bevel gear coupling direction (&plusmn;1)</li>
-        </ul>
-        <p>
-          These are determined by the
-          <a href="#calibration-probe">4-test calibration probe</a>
-          and account for mirror symmetry between left/right arms and
-          bevel gear mounting orientation.
+          motor encoder space (&theta;<sub>m1</sub>, &theta;<sub>m2</sub>)
+          and the joint output space (&theta;<sub>pitch</sub>,
+          &theta;<sub>roll</sub>). The factor of 3 accounts for the
+          helical-spur gear reduction; the coupling term in Eq. 2 accounts
+          for the bevel gear's differential walking effect.
         </p>
 
-        <h5>Motor &rarr; Joint (Forward Conversion)</h5>
+        <h5>Forward Kinematics (Motor &rarr; Joint Space)</h5>
         <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
-          &theta;<sub>roll</sub> = s<sub>r</sub> &middot;
-          (m<sub>r</sub> &minus; o<sub>r</sub>) / G
+          &theta;<sub>roll</sub> = &theta;<sub>m2</sub> / 3
           &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
-          &theta;<sub>pitch</sub> = s<sub>p</sub> &middot;
-          [(m<sub>p</sub> &minus; o<sub>p</sub>) + c &middot;
-          (m<sub>r</sub> &minus; o<sub>r</sub>)] / G
+          &theta;<sub>pitch</sub> =
+          (&theta;<sub>m1</sub> &minus; &theta;<sub>m2</sub>) / 3
           &nbsp;&nbsp;&nbsp;(Eq. 2)
         </p>
         <p>
-          where G&nbsp;=&nbsp;3 (helical-spur gear reduction) and
-          o<sub>r</sub>, o<sub>p</sub> are the calibrated home offsets.
-        </p>
-        <p>
           <strong>Eq. 2</strong> reveals the differential coupling: pitch
-          depends on the <em>sum</em> of the pitch motor displacement and
-          a coupling-weighted roll motor displacement. When both motors
-          rotate in the same direction, the coupling term cancels the
-          bevel walking — this is the
+          is a function of the <em>difference</em> between both motor
+          positions. When both motors rotate together
+          (&theta;<sub>m1</sub> = &theta;<sub>m2</sub>), the
+          differential is zero and pitch remains unchanged — this is the
           <strong>pure roll</strong> condition.
         </p>
 
-        <h5>Joint &rarr; Motor (Inverse Conversion)</h5>
+        <h5>Inverse Kinematics (Joint &rarr; Motor Space)</h5>
         <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
-          &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> / s<sub>r</sub>)
-          &middot; G, &nbsp;&nbsp;
-          m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
+          &theta;<sub>m2</sub> = 3 &middot; &theta;<sub>roll</sub>
           &nbsp;&nbsp;&nbsp;(Eq. 3)<br><br>
-          m<sub>p</sub> = [(&theta;<sub>pitch</sub> / s<sub>p</sub>)
-          &middot; G &minus; c &middot; &Delta;<sub>r</sub>]
-          + o<sub>p</sub>
+          &theta;<sub>m1</sub> = 3 &middot;
+          (&theta;<sub>pitch</sub> + &theta;<sub>roll</sub>)
           &nbsp;&nbsp;&nbsp;(Eq. 4)
         </p>
         <p>
           <strong>Eq. 4</strong> is the firmware's primary command
-          equation. The subtraction of <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em>
-          is the <strong>software decoupling term</strong>
-          that cancels the parasitic walking effect in real-time.
-        </p>
-
-        <h5>Forward Kinematics (Rotation-Around-Arm-Axis Model)</h5>
-        <p>
-          At &theta;<sub>pitch</sub>&nbsp;=&nbsp;0, the arm points
-          straight outward (perpendicular to the body). The arm body
-          rotates around this tube axis, so the <strong>pitch swing plane
-          rotates with the body</strong>. This produces:
-        </p>
-        <p style="font-family: serif; font-size: 1.10rem; text-align: center;">
-          d<sub>x</sub> = s<sub>x</sub> &middot; cos(&theta;<sub>pitch</sub>)<br>
-          d<sub>y</sub> = sin(&theta;<sub>pitch</sub>) &middot; cos(&theta;<sub>roll</sub>)<br>
-          d<sub>z</sub> = sin(&theta;<sub>pitch</sub>) &middot; sin(&theta;<sub>roll</sub>)
-        </p>
-        <p>
-          where s<sub>x</sub>&nbsp;=&nbsp;&minus;1 (left arm) or
-          +1 (right arm). The Z-component
-          sin(&theta;<sub>pitch</sub>)&middot;sin(&theta;<sub>roll</sub>)
-          correctly models the physical observation that <strong>both CW
-          and CCW body rotation with bevel walking cause the arm to tilt
-          upward</strong>.
-        </p>
-
-        <h5>Inverse Kinematics (3D Target &rarr; Joint Space)</h5>
-        <p>
-          Given a target position <strong>t</strong> and shoulder
-          position <strong>s</strong>:
-        </p>
-        <p style="font-family: serif; font-size: 1.10rem; text-align: center;">
-          d&#x20D7; = (t &minus; s) / |t &minus; s|<br><br>
-          &theta;<sub>pitch</sub> = arccos(d<sub>x</sub> &middot; s<sub>x</sub>)<br>
-          &theta;<sub>roll</sub> = atan2(d<sub>z</sub>,&nbsp;d<sub>y</sub>)
-          &nbsp;&nbsp;(if sin(&theta;<sub>pitch</sub>) &ne; 0)
+          equation. The addition of &theta;<sub>roll</sub> inside the
+          parentheses is the <strong>software decoupling term</strong>
+          that cancels the parasitic walking effect in real-time. Without
+          this compensation, any roll command would induce an unwanted
+          pitch change.
         </p>
       </div>
 
-      <h4 id="calibration-probe">Calibration Probe &amp; Validated Results</h4>
-      <p>
-        The motor diagnostic probe (<code>motor_probe.py</code>)
-        systematically determines all three sign parameters for each arm.
-        The operator stands <strong>in front of the robot</strong> for
-        all tests on both arms:
-      </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd;">Test</th>
-            <th style="padding:8px; border:1px solid #ddd;">Motor Command</th>
-            <th style="padding:8px; border:1px solid #ddd;">Observation</th>
-            <th style="padding:8px; border:1px solid #ddd;">Determines</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">1</td>
-            <td style="padding:8px; border:1px solid #ddd;">+pitch motor only</td>
-            <td style="padding:8px; border:1px solid #ddd;">Arm swings FORWARD or BACKWARD?</td>
-            <td style="padding:8px; border:1px solid #ddd;">s<sub>p</sub></td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">2</td>
-            <td style="padding:8px; border:1px solid #ddd;">+roll motor only</td>
-            <td style="padding:8px; border:1px solid #ddd;">Top tilts TOWARD ME or AWAY?</td>
-            <td style="padding:8px; border:1px solid #ddd;">s<sub>r</sub></td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">3</td>
-            <td style="padding:8px; border:1px solid #ddd;">+roll motor only (repeat)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Bevel walks FORWARD or BACKWARD?</td>
-            <td style="padding:8px; border:1px solid #ddd;">c</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">4</td>
-            <td style="padding:8px; border:1px solid #ddd;">Both motors same direction</td>
-            <td style="padding:8px; border:1px solid #ddd;">Verify: pure roll, no pitch?</td>
-            <td style="padding:8px; border:1px solid #ddd;">Confirmation</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <sl-alert variant="success" open>
-        <sl-icon slot="icon" name="check2-circle"></sl-icon>
-        <strong>Validated Calibration Results (2026-04-02):</strong><br>
-        Left arm: s<sub>p</sub>&nbsp;=&nbsp;&minus;1,
-        s<sub>r</sub>&nbsp;=&nbsp;+1,
-        c&nbsp;=&nbsp;&minus;1<br>
-        Right arm: s<sub>p</sub>&nbsp;=&nbsp;+1,
-        s<sub>r</sub>&nbsp;=&nbsp;&minus;1,
-        c&nbsp;=&nbsp;&minus;1<br>
-        Both arms share c&nbsp;=&nbsp;&minus;1 (same bevel arrangement).
-        Signs are mirrored between arms (symmetric geometry).
-      </sl-alert>
-
       <h4>The Differential Walking Effect</h4>
       <p>
-        When the roll motor rotates while the pitch motor is held
+        When Motor 2 (Housing) rotates while Motor 1 (Pitch) is held
         stationary, the bevel gear inside the housing "walks" around the
         driving gear. This produces an automatic pitch change proportional
-        to the housing's angular displacement — characterised by the
-        coupling parameter <strong>c</strong>.
+        to the housing's angular displacement — a direct consequence of
+        the 1:1 bevel gear coupling.
       </p>
       <p>
-        <strong>To achieve pure roll</strong>, the firmware commands both
-        motors to move in the <em>same direction</em> at identical
-        speeds. The coupling term in Eq.&nbsp;4 enforces this
-        automatically. Conversely, this walking effect is
-        <strong>intentionally exploited</strong> during jab windups,
-        where opposite-direction motor commands produce a "rearing"
-        motion that lifts the arm before the downward strike
+        <strong>To achieve pure roll</strong>, the firmware must command
+        both motors to move at identical speeds and displacements
+        (Eq. 3 and Eq. 4 enforce this automatically). Conversely, this
+        walking effect is <strong>intentionally exploited</strong> during
+        jab windups, where opposite-direction motor commands produce a
+        "rearing" motion that lifts the arm before the downward strike
         (see <a href="design-ideation.html">Tactical Walking</a>).
       </p>
 
-      <h4>Joint-Space Pitch Clamping (Decoupling Dilemma — Resolved)</h4>
+      <h4>Bevel Gear Assembly Configuration</h4>
       <p>
-        Due to the differential coupling, it is mathematically impossible
-        to enforce safe pitch limits using static independent motor
-        bounds. The resolution: the <code>homing_tab.py</code> firmware
-        converts motor targets to joint space, clamps pitch to the
-        calibrated structural limits
-        [pitch<sub>lower</sub>,&nbsp;pitch<sub>upper</sub>], then
-        converts back to motor positions via Eq.&nbsp;3–4 with full
-        coupling compensation. The roll motor remains unrestricted.
+        The direction of the walking-induced pitch change depends on
+        which side the driven bevel gear is mounted:
+      </p>
+      <ul>
+        <li>
+          <strong>Configuration A (Left Side):</strong> Rolling forward
+          causes the arm to pitch <em>down</em>. Used when the natural
+          jab requires a downward approach.
+        </li>
+        <li>
+          <strong>Configuration B (Right Side):</strong> Rolling forward
+          causes the arm to pitch <em>up</em>. Signs in Eq. 2 and Eq. 4
+          invert accordingly.
+        </li>
+      </ul>
+      <p>
+        The configuration is selected during physical assembly and cannot
+        be changed in software. The firmware's kinematic equations are
+        parameterised to account for either configuration.
       </p>
     </div>
 

@@ -201,11 +201,6 @@
         after every register write, resetting the sensor state machine before
         each read. ~20 µs additional latency, within the 5 ms loop budget.
       </p>
-      <p style="font-size:0.88rem; color:#666;">
-        <em>↳ Full root-cause analysis (signal-integrity, Hard STOP timing):
-        <a href="../robot-mechanism/padding/troubleshooting.html">Padding
-        Troubleshooting — Defect 7</a>.</em>
-      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -227,11 +222,6 @@
         <strong>Resolution:</strong> Refactored detection to
         <code>np.max(mag_arr[-n_scan:])</code>, searching all accumulated
         samples since the last GUI tick (n_scan = 50/5 = 10 samples).
-      </p>
-      <p style="font-size:0.88rem; color:#666;">
-        <em>↳ Full root-cause analysis (timing diagrams, code diff):
-        <a href="../robot-mechanism/padding/troubleshooting.html">Padding
-        Troubleshooting — Defect 8</a>.</em>
       </p>
     </div>
 
