@@ -24,13 +24,12 @@
 
     <h2>5.2.3 Height Adjustment — Electrical &amp; Control</h2>
 
-    <sl-alert variant="warning" open>
-      <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-      <strong>Pending Implementation:</strong> The height-adjustment electrical
-      and control subsystem is currently under development. This page provides
-      a structural outline of the planned documentation. Content will be
-      populated once the motor, driver, and control loop are fully
-      integrated and validated.
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page addresses
+      <strong>RM-3</strong> (<em>≥ 400 mm vertical stroke, ≤ 32 s full
+      travel</em>) and <strong>RM-1</strong> (<em>structural stability
+      under punching loads</em>) at the electrical and control layer.
     </sl-alert>
 
     <sl-divider></sl-divider>
@@ -42,7 +41,7 @@
       <h3>Requirements Cascade</h3>
       <p>
         The height-adjustment electrical subsystem responds to the following
-        system-level requirement defined in the
+        system-level requirements defined in the
         <a href="../../robot-mechanism.html">Robot Mechanism</a> section:
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
@@ -68,50 +67,216 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. PLANNED SECTIONS (OUTLINE)                          -->
+    <!-- 2. MOTOR SPECIFICATION                                 -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Planned Documentation Outline</h3>
-
-      <h4>1. Motor Specification &amp; Selection</h4>
+      <h3>Motor Specification &amp; Selection</h3>
+      <p>
+        The vertical axis uses a <strong>LGYMSZSS 24V DC gear motor</strong>
+        driving the HK2T screw-jack input shaft. The motor was selected
+        based on a back-calculated speed requirement of <strong>~800
+        rpm</strong> at the jack input to achieve the RM-3 travel-time
+        target.
+      </p>
       <sl-alert variant="neutral" open>
         <sl-icon slot="icon" name="info-circle"></sl-icon>
-        24V DC gear motor (LGYMSZSS) driving the HK2T screw-jack input.
-        Back-calculated 800 rpm speed requirement. Torque and current
-        requirements at the jack under full payload.
+        <strong>Content Pending:</strong> Full motor datasheet
+        specifications (rated torque, stall current, gear ratio), torque
+        calculation at the screw-jack under full payload, and motor
+        selection decision matrix to be added once validated.
       </sl-alert>
+    </div>
 
-      <h4>2. Motor Driver — Cytron MDDS10</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Sign-Magnitude mode operation. PWM (speed) and DIR (direction) pin
-        assignments. Corrected wiring topology (Pin 3 → AN1, Pin 2 → DIG1).
-        See <a href="../../upper-mechanism/troubleshooting.html">Troubleshooting
-        §5</a> for pin transposition defect history.
-      </sl-alert>
+    <sl-divider></sl-divider>
 
-      <h4>3. Self-Locking Safety</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Inherent fail-safe behaviour from the screw-jack's travelling-nut
-        design. Column holds position even without motor power, ensuring
-        safety during training.
-      </sl-alert>
-
-      <h4>4. Control Strategy</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Open-loop hold-to-move operation via GUI Height Tab. PWM ramp-down
-        for regenerative back-EMF management. See
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. MOTOR DRIVER — CYTRON MDDS10                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Motor Driver — Cytron MDDS10</h3>
+      <p>
+        The <strong>Cytron MDDS10</strong> dual-channel motor driver
+        operates in <strong>Sign-Magnitude mode</strong>, requiring two
+        control signals: a PWM signal (speed) and a digital signal
+        (direction). The corrected pin assignments are:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Teensy Pin</th>
+            <th style="padding:8px; border:1px solid #ddd;">MDDS10 Terminal</th>
+            <th style="padding:8px; border:1px solid #ddd;">Signal Type</th>
+            <th style="padding:8px; border:1px solid #ddd;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Pin 3</td>
+            <td style="padding:8px; border:1px solid #ddd;">AN1</td>
+            <td style="padding:8px; border:1px solid #ddd;">PWM (0–255)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor speed — proportional to duty cycle</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Pin 2</td>
+            <td style="padding:8px; border:1px solid #ddd;">DIG1 / IN1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Digital (HIGH/LOW)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor direction — HIGH = up, LOW = down</td>
+          </tr>
+        </tbody>
+      </table>
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+        <strong>Pin Assignment Correction:</strong> The initial firmware
+        (V2) erroneously assigned Pin 2 to PWM and Pin 3 to DIR —
+        transposing the two signals. Because Pin 2 is not PWM-capable on
+        the Teensy 4.0, the motor received a constant-amplitude square
+        wave regardless of the commanded speed, resulting in uncontrolled
+        full-speed operation. The corrected assignment (above) was
+        validated in firmware V3. See
         <a href="../../upper-mechanism/troubleshooting.html">Troubleshooting
-        §6</a> for PSU OVP trip mitigation.
+        §5</a> for the full root-cause analysis.
       </sl-alert>
 
-      <h4>5. Power Integration</h4>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera"></sl-icon>
+        <strong>Photo Placeholder:</strong> Physical MDDS10 wiring showing
+        Pin 3 &rarr; AN1, Pin 2 &rarr; DIG1, power terminals, and motor
+        output connections.<br>
+        <em>To add: place in
+        <code>assets/upper_mechanism/electrical/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. SELF-LOCKING SAFETY                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Self-Locking Safety</h3>
+      <p>
+        The HK2T screw-jack's travelling-nut design provides
+        <strong>inherent self-locking</strong>: the lead angle of the
+        screw thread is below the friction angle, meaning the column
+        holds position even when motor power is removed. This is a
+        critical safety feature — the robot must not descend
+        unexpectedly onto the user during training.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. REGENERATIVE BRAKING & BACK-EMF                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Regenerative Braking &amp; Back-EMF Management</h3>
+      <p>
+        The DC height motor operates as a <strong>generator</strong>
+        during the deceleration phase of height adjustment. When the
+        motor decelerates rapidly (e.g., an abrupt STOP command at
+        speed), the collapsing magnetic flux produces a
+        <strong>back-EMF</strong> voltage spike that is injected onto the
+        shared 24V bus.
+      </p>
+      <p>
+        If the rotor decelerates rapidly, the rate of magnetic flux
+        collapse produces a transient voltage spike that can exceed the
+        PSU's overvoltage protection (OVP) threshold (~28V). Upon
+        triggering OVP, the Mean Well PSU shuts down the entire 24V
+        rail, and all motor bus devices — including the four Damiao arm
+        motors — lose power simultaneously.
+      </p>
+
+      <sl-alert variant="danger" open>
+        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
+        <strong>Root Cause:</strong> This failure mode was discovered
+        during integration testing. The OVP trip was caused by the
+        <strong>DC height motor</strong> (via the Cytron MDDS10), not
+        the Damiao arm motors. The geared DC motor's higher rotor
+        inertia and the mechanical advantage of the screw jack produce
+        larger back-EMF transients than the smaller Damiao BLDC motors.
+      </sl-alert>
+
+      <h4>Software Mitigation — PWM Ramp-Down</h4>
+      <p>
+        A <code>_ramp_down()</code> method was implemented in the GUI
+        control layer (V3). Instead of issuing a single STOP command,
+        the method transmits <strong>six progressively decreasing
+        position commands</strong> over a 300 ms window, limiting the
+        rate of rotor deceleration and thereby capping the back-EMF
+        voltage below the OVP threshold.
+      </p>
+
+      <!-- ─── Technical Callout: Back-EMF ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Back-EMF Physics</h4>
+        <p>
+          The induced voltage (<em>V<sub>emf</sub></em>) is proportional
+          to the rate of change of magnetic flux:
+        </p>
+        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
+          V<sub>emf</sub> = &minus;N &middot;
+          d&Phi; / dt &nbsp;&asymp;&nbsp;
+          K<sub>e</sub> &middot; &omega;
+        </p>
+        <p>
+          Where K<sub>e</sub> is the motor's back-EMF constant and
+          &omega; is the angular velocity at the moment of deceleration.
+          By controlling d&omega;/dt through the ramp-down, the firmware
+          limits V<sub>emf</sub> to below the OVP threshold. The 300 ms
+          ramp window was empirically determined to be sufficient for
+          the height motor's maximum operating speed.
+        </p>
+      </div>
+
+      <h4>Residual Risk &amp; Recommended Future Work</h4>
+      <p>
+        The software ramp-down addresses the common case but does not
+        protect against edge cases such as a user physically stopping the
+        height column mid-travel (instant deceleration from external
+        force). A hardware-level protection — either a <strong>TVS
+        (Transient Voltage Suppressor) clamp diode</strong> or an
+        <strong>Active Shunt Regulator</strong> on the 24V bus — is
+        recommended as a permanent solution. This is documented as a
+        future improvement in
+        <a href="../../upper-mechanism/troubleshooting.html">Troubleshooting
+        §6</a>.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="camera-video"></sl-icon>
+        <strong>Video Placeholder:</strong> Split-screen demonstration
+        comparing (1) abrupt stop showing bus voltage spike on
+        oscilloscope/multimeter, vs (2) ramp-down stop showing stable
+        bus voltage. Annotate the OVP threshold (~28V) on the trace.<br>
+        <em>To add: place video in
+        <code>assets/upper_mechanism/videos/</code> and use
+        <code>&lt;video&gt;</code> tag.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. POWER INTEGRATION                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Power Integration</h3>
+      <p>
+        The height motor is connected to the <strong>24V motor
+        bus</strong> via the shared terminal block, alongside the four
+        Damiao arm motors. The dual-rail power architecture (documented
+        in <a href="../../upper-mechanism/electrical-integration.html">
+        Arm Actuation — Electrical Integration</a>) isolates the 12V
+        logic rail from the motor bus, ensuring that OVP trips caused by
+        height motor back-EMF do not propagate to the Jetson or Teensy.
+      </p>
       <sl-alert variant="neutral" open>
         <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Connected to the 24V motor bus via the shared terminal block. Current
-        draw profile during height adjustment operations.
+        <strong>Content Pending:</strong> Current draw profile during
+        height adjustment operations (steady-state, peak inrush, and
+        back-EMF transient measurements) to be added once instrumented.
       </sl-alert>
     </div>
 
