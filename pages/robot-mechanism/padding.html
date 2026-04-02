@@ -185,7 +185,7 @@
           (<code>endTransmission(true)</code>) after every register write,
           resetting the sensor state machine before each read. This adds
           ~20 µs latency per read but eliminates the bus-hang failure mode.
-          See <a href="../upper-mechanism/troubleshooting.html">Troubleshooting
+          See <a href="padding/troubleshooting.html">Troubleshooting
           §7</a> for the full root-cause analysis.
         </li>
         <li>
@@ -197,7 +197,7 @@
           <code>np.max(mag_arr[-n_scan:])</code>, scanning all accumulated
           samples since the last GUI tick (n_scan ≈ 10 samples at 200 Hz
           firmware rate / 20 Hz GUI rate). See
-          <a href="../upper-mechanism/troubleshooting.html">Troubleshooting
+          <a href="padding/troubleshooting.html">Troubleshooting
           §8</a> for details.
         </li>
       </ol>
@@ -262,7 +262,7 @@
       <p>
         The padding subsystem is validated against two system-level
         performance criteria from the
-        <a href="../upper-mechanism/testing-evaluation.html">Testing
+        <a href="padding/testing-evaluation.html">Testing
         &amp; Evaluation</a> page:
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
