@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IS-431: 5.2.4 Padding â Mechanical Design</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
-  <link rel="stylesheet" href="../../../index.css">
-  <script type="module" src="../../../components/image/image-component.js"></script>
-  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
-  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <!-- Three.js import map (required for explode-viewer) -->
   <script type="importmap">
   {
     "imports": {
@@ -19,6 +14,15 @@
     }
   }
   </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <script type="module" src="../../../components/video/video.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <!-- 3D Explode Viewer -->
   <script type="module" src="../../../components/explode-viewer/explode-viewer.js"></script>
   <style>
     .iteration-card {
@@ -121,10 +125,6 @@
         proportions still experience a hittable, anatomically reasonable target
         without requiring independent vertical adjustment of each pad.
       </p>
-      <p style="font-size:0.88rem; line-height:1.6;">
-        Pheasant, S. and Haslegrave, C.M. (2006). <em>Bodyspace: Anthropometry,
-        Ergonomics and the Design of Work</em>, 3rd ed. CRC Press.
-      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -170,11 +170,6 @@
           alt="Iteration 2: Front padding mount"
           height="350" explode-scale="1.5">
         </explode-viewer>
-        <explode-viewer
-          src="../../../assets/upper_mechanism/padding/iteration_2_side.glb"
-          alt="Iteration 2: Side padding mount (angled)"
-          height="350" explode-scale="1.5">
-        </explode-viewer>
       </div>
 
       <!-- ITERATION 3 -->
@@ -195,19 +190,12 @@
           <li><strong>Spring too stiff:</strong> Specified for an assumed 1 kg mass, but the foam is only 150 g (see calculations below).</li>
           <li><strong>Side angle still off:</strong> Side pads were positioned too far out, making hooks feel unnatural.</li>
         </ul>
+        <p style="font-size:0.88rem; line-height:1.6; color:#b45309;">
+          Note: the exported <code>iteration_3_front.glb</code> shown below does not match the SolidWorks assembly exactly. The left padding foam mount is flipped the wrong way from the user's point of view.
+        </p>
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_3_front.glb"
           alt="Iteration 3: Frame-side front mount (attaches to aluminium frame, holds spring)"
-          height="350" explode-scale="1.5">
-        </explode-viewer>
-        <explode-viewer
-          src="../../../assets/upper_mechanism/padding/iteration_3_side.glb"
-          alt="Iteration 3: Frame-side side mount (attaches to aluminium frame, holds spring)"
-          height="350" explode-scale="1.5">
-        </explode-viewer>
-        <explode-viewer
-          src="../../../assets/upper_mechanism/padding/iteration_3_foam_mount.glb"
-          alt="Iteration 3: Foam mount (shared for front and side, holds IMU sensor and foam)"
           height="350" explode-scale="1.5">
         </explode-viewer>
       </div>
@@ -227,11 +215,11 @@
           was relocated from the corner (iteration 3) to the bottom edge, centered
           horizontally, for more consistent impact readings.
         </p>
-        <explode-viewer
-          src="../../../assets/upper_mechanism/padding/iteration_4_final.glb"
-          alt="Iteration 4 (Final): Full assembly â frame mount, spring, foam mount, and foam"
-          height="450" explode-scale="2.0">
-        </explode-viewer>
+        <image-component
+          source="../../../assets/upper_mechanism/padding/iteration_4_final.png"
+          subtitle="Iteration 4 (Final): Full assembly â frame mount, spring, foam mount, and foam"
+          width="100%">
+        </image-component>
       </div>
     </div>
 
@@ -333,14 +321,24 @@
         2025). For a part of this size, a dry-box filament feed system would be
         necessary.
       </p>
+    </div>
 
-      <h4>References</h4>
-      <p style="font-size:0.88rem; line-height:1.6;">
-        Di Caprio, F., Franchitti, S., Borrelli, R., Ciminello, M., Morano, C.
-        and Greco, A. (2025). Design of Flexible TPU-Based Lattice Structures
-        for 3D Printing: A Comparative Analysis of Open-Cell Versus Closed-Cell
-        Topologies. <em>Polymers</em>, 17(10), 1299.
-      </p>
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>References</h3>
+      <ul style="font-size: 0.9rem; line-height: 1.7;">
+        <li>
+          Di Caprio, F., Franchitti, S., Borrelli, R., Ciminello, M., Morano, C.
+          and Greco, A. (2025). Design of Flexible TPU-Based Lattice Structures
+          for 3D Printing: A Comparative Analysis of Open-Cell Versus Closed-Cell
+          Topologies. <em>Polymers</em>, 17(10), 1299.
+        </li>
+        <li>
+          Pheasant, S. and Haslegrave, C.M. (2006). <em>Bodyspace: Anthropometry,
+          Ergonomics and the Design of Work</em>, 3rd ed. CRC Press.
+        </li>
+      </ul>
     </div>
 
     <!-- BOTTOM NAVIGATION -->
