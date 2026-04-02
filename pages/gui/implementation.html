@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Implementation — GUI</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../gui.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.1 User Interface (GUI)
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Implementation</h2>
+    <p>
+      The GUI was built over six iterations across 15 weeks (December 2024 to April 2025).
+      Each iteration had a defined objective, produced working software, and closed with a
+      review before the next iteration began. This section documents the development timeline,
+      the system architecture, and the key engineering decisions that shaped the final system.
+    </p>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- DEVELOPMENT ITERATIONS                                 -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Development Iterations</h3>
+
+      <table-component id="gui-iterations"></table-component>
+
+      <p>
+        Several issues only surfaced during testing rather than during design. A database
+        schema mismatch between two different score scales (0 to 1 versus 0 to 5) caused CHECK
+        constraint violations, requiring the database to be rebuilt with corrected constraints.
+        A back button that always returned to the same page regardless of entry path was resolved
+        by implementing the navigation stack in Iteration 5. A discrepancy between session counts
+        in a CSV file and combo attempt counts in the database was resolved by resetting the CSV
+        history during migration to the per-user database structure. Each of these was caught and
+        fixed within the iteration that introduced it.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- SYSTEM ARCHITECTURE                                    -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>System Architecture</h3>
+      <p>
+        The application follows a five-layer architecture. Each layer has a single
+        responsibility, so changes in one layer do not cascade into unrelated parts of the
+        codebase.
+      </p>
+
+      <sl-details summary="Layered Architecture Diagram">
+        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto; font-size:0.85rem;">
++----------------------------------------------------------+
+|        Presentation Layer (PySide6 Widgets)              |
+|  All pages, buttons, labels, input fields                |
+|  Event callbacks, visual feedback                        |
++----------------------------------------------------------+
+|              Application Layer                           |
+|  Navigation stack and page history                       |
+|  User session state, configuration                       |
++----------------------------------------------------------+
+|             Business Logic Layer                         |
+|  Combo Curriculum Engine (mastery algorithm)             |
+|  Performance Testing Logic                               |
+|  User Management, Proficiency Assessment                 |
++----------------------------------------------------------+
+|            Integration Layer                             |
+|  Arduino serial communication (multi-mode)               |
+|  Computer vision interface (file-based handshake)        |
+|  Robot arm control interface (ROS topics / serial)       |
++----------------------------------------------------------+
+|              Data Layer                                  |
+|  SQLite databases (per-user files)                       |
+|  Configuration file management                           |
++----------------------------------------------------------+
+        </pre>
+      </sl-details>
+
+      <p>
+        The Integration Layer is the critical enabler for parallel development. Rather than
+        calling hardware interfaces directly, all hardware communication is routed through
+        this layer. During development on a Windows laptop with no hardware connected, the
+        layer switches automatically to mock interfaces that simulate hardware responses.
+        This allowed the full GUI to be built and tested before any physical hardware was
+        available. When deployed on the Jetson Nano, the mock interfaces are replaced by
+        real implementations without any changes to the layers above.
+      </p>
+
+      <table-component id="gui-integration-specs"></table-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- KEY ENGINEERING DECISIONS                              -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Key Engineering Decisions</h3>
+
+      <h4>Navigation Stack</h4>
+      <p>
+        The application contains over 40 pages managed by a central <code>QStackedWidget</code>.
+        Rather than coding back button destinations manually on each page, a navigation stack
+        records the current page index before every transition. The <code>navigate_to()</code>
+        method pushes the current index onto the stack, and <code>navigate_back()</code> pops
+        from it. If the stack is empty, the system falls back to the main menu. This eliminated
+        an entire category of navigation bugs as the page count grew.
+      </p>
+
+      <h4>Proficiency Assessment</h4>
+      <p>
+        On signup, new users complete a six-question checklist covering boxing experience,
+        training frequency, familiarity with combinations, comfort with sparring, and fitness
+        level. Each answer maps to a numeric weight. The total score maps the user to Beginner,
+        Intermediate, or Advanced, with an option to override the suggestion. This classification
+        gates access to Sparring mode (Intermediate and Advanced only) and determines the default
+        combo difficulty tier shown on the training page.
+      </p>
+
+      <h4>Combo Curriculum and Mastery Algorithm</h4>
+      <p>
+        The curriculum contains 50 combinations: 15 Beginner, 20 Intermediate, and 15 Advanced.
+        Each combo uses a notation system where numbers 1 through 6 represent punch types (Jab,
+        Cross, Lead Hook, Rear Hook, Lead Uppercut, Rear Uppercut), with a "b" suffix for body
+        shots and text labels for defensive movements (slip, block, roll). A combo is considered
+        mastered when the user has completed at least five sessions with an average score of 3.0
+        or above. Progress is tracked per-user in the SQLite database and persists across sessions.
+      </p>
+
+      <table-component id="gui-combo-notation"></table-component>
+
+      <h4>Sparring Mode: Markov Chain Generation</h4>
+      <p>
+        Sparring mode generates punch sequences using a first-order Markov chain. Transition
+        probabilities are biased by the user's weakness profile, so the robot produces more of
+        the punch types and transitions that the user has historically scored lowest on. This
+        creates a training experience that adapts to the individual user without requiring
+        explicit difficulty settings. Access is restricted to Intermediate and Advanced users
+        through the proficiency classification.
+      </p>
+
+      <h4>AI Coaching Integration</h4>
+      <p>
+        The combo training flow includes a post-session chat page where users can ask for
+        feedback on their performance. The chat is powered by a local LLM (Qwen 2.5 3B GGUF
+        via llama-cpp-python). On hardware where the model cannot be loaded (insufficient memory
+        or missing model file), the system falls back to hardcoded template responses. This
+        fallback was implemented as a design decision rather than an error state, since the
+        Jetson Nano's 4 GB of RAM makes model availability uncertain.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- FEATURE SET                                            -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Feature Set</h3>
+      <p>
+        The complete feature set delivered across all six iterations is summarised below, mapped
+        to the training category each feature supports.
+      </p>
+
+      <table-component id="gui-feature-set"></table-component>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../../components/table-component/table-component.js"></script>
+  <script src="../../components/table-component/gui-iterations.js"></script>
+  <script src="../../components/table-component/gui-integration-specs.js"></script>
+  <script src="../../components/table-component/gui-combo-notation.js"></script>
+  <script src="../../components/table-component/gui-feature-set.js"></script>
+</body>
+</html>

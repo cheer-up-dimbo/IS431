@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Design &amp; Ideation — GUI</title>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="content">
+    <a href="../gui.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to 5.1 User Interface (GUI)
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Design and Ideation</h2>
+    <p>
+      Before any code was written, four design decisions had to be resolved. Each had direct
+      consequences for feasibility, usability, and maintainability. The options considered for
+      each decision are documented below, followed by the feature prioritisation that governed
+      the development sequence.
+    </p>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- FRAMEWORK SELECTION                                    -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Framework Selection</h3>
+      <p>
+        The project had a four-month development window from December 2024 to April 2025.
+        The chosen framework needed to run on the Jetson Nano without additional configuration,
+        support touchscreen interaction natively, and be learnable quickly enough to leave
+        adequate time for feature development. Four options were evaluated.
+      </p>
+
+      <table-component id="gui-framework-comparison"></table-component>
+
+      <p>
+        PySide6 was selected. It runs natively on the Jetson Nano, has mature touchscreen
+        layout support, and builds on existing Python knowledge. The extensive Qt documentation
+        reduced the risk of hitting unresolvable blockers within the compressed timeline.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- NAVIGATION ARCHITECTURE                                -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Navigation Architecture</h3>
+      <p>
+        Three navigation paradigms were evaluated against the core requirement that any feature
+        must be reachable within a small number of interactions from the main menu, and that the
+        interface must remain usable with boxing gloves on.
+      </p>
+
+      <table-component id="gui-nav-concepts"></table-component>
+
+      <p>
+        The hierarchical page stack was selected. This approach naturally models how a boxing
+        training session is structured: the user makes a series of sequential choices to
+        configure a session, trains, and then reviews results. The navigation stack
+        implementation meant that back button behaviour was handled centrally rather than
+        being manually coded per page, which kept the codebase manageable as the number of
+        pages grew past 40.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- DATA STORAGE                                           -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Data Storage</h3>
+      <p>
+        Multiple users share a single BoxBunny unit, so a data isolation strategy was needed
+        to keep each user's training history private. Three strategies were evaluated.
+      </p>
+
+      <table-component id="gui-data-isolation"></table-component>
+
+      <p>
+        A per-user database file approach was selected. Each user's data is stored under
+        <code>users/[username]/</code> in two SQLite files: one for combination training
+        progress and one for performance test results. Adding or removing an account is as
+        simple as creating or deleting a folder, which also eliminated the need for a
+        centralised account management database.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- FEATURE PRIORITISATION                                 -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Feature Prioritisation</h3>
+      <p>
+        With a fixed timeline and a broad feature set, MoSCoW prioritisation determined
+        what would be built first and what would be deferred. The goal was to have core
+        training functionality stable and tested before any enhanced features were attempted.
+      </p>
+
+      <table-component id="gui-moscow"></table-component>
+
+      <p>
+        Must Have features were targeted in the first three iterations. Should Have features
+        followed once the foundation was confirmed stable. Could Have features were built where
+        time permitted. Will Not Have items were recorded explicitly to prevent scope creep.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ————————————————————————————————————————————————————— -->
+    <!-- DISPLAY HARDWARE                                       -->
+    <!-- ————————————————————————————————————————————————————— -->
+    <div>
+      <h3>Display Hardware Selection</h3>
+      <p>
+        The original display was a 7-inch resistive touchscreen at 1024x600 resolution,
+        selected for its low cost and direct DSI compatibility with the Jetson Nano. All
+        six development iterations were built and tested against this display. The entire
+        layout, font sizing, and touch target geometry were designed for a 7-inch form factor
+        viewed at arm's length during training.
+      </p>
+      <p>
+        During user testing at the "Robotics and AI in Work and Play" public event, two
+        displays were available: the 7-inch screen mounted on the robot and a larger monitor
+        connected to the same system. Observers and participants consistently gravitated toward
+        the larger monitor for reading analytics and navigating the interface. Feedback indicated
+        that users preferred larger text, more visible statistics during training, and found the
+        smaller screen difficult to read during active sessions.
+      </p>
+      <p>
+        Based on these observations, the display was upgraded to a 10.1-inch IPS capacitive
+        touchscreen at 1280x800 resolution (DSI interface, Raspberry Pi compatible, also
+        confirmed working on the Jetson Nano). The timeline did not allow for a full redesign
+        cycle, so this is framed as a hardware revision informed by user observation rather
+        than an iterative software redesign. The existing layout scaled to the larger display
+        without breaking, as the GUI used proportional sizing rather than fixed pixel coordinates
+        for most layout elements.
+      </p>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script type="module" src="../../components/table-component/table-component.js"></script>
+  <script src="../../components/table-component/gui-framework-comparison.js"></script>
+  <script src="../../components/table-component/gui-nav-concepts.js"></script>
+  <script src="../../components/table-component/gui-data-isolation.js"></script>
+  <script src="../../components/table-component/gui-moscow.js"></script>
+</body>
+</html>
