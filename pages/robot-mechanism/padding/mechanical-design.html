@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: 5.2.4 Padding — Mechanical Design</title>
+  <title>IS-431: 5.2.4 Padding â Mechanical Design</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -65,7 +65,7 @@
     </a>
     <br>
 
-    <h2>5.2.4 Padding — Mechanical Design</h2>
+    <h2>5.2.4 Mechanical Design for Padding</h2>
 
     <sl-alert variant="primary" open>
       <sl-icon slot="icon" name="check-circle"></sl-icon>
@@ -88,6 +88,42 @@
         rather than the foam itself. Each pad weighs approximately 150 g. The faux
         leather outer layer protects the foam from sweat and surface wear during
         extended training sessions.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- STRIKE-ZONE PLACEMENT -->
+    <div>
+      <h3>Strike-Zone Placement</h3>
+      <p>
+        The robot must position its head and torso striking targets at anatomically
+        correct heights across a user range of 150 to 190 cm. Since the height
+        adjustment is a single-DOF screw jack, both targets move together with a
+        fixed vertical separation.
+      </p>
+      <p>
+        Standard anthropometric proportions place the chin at approximately 87 to 92%
+        of standing height and the solar plexus (xiphoid process) at approximately
+        70 to 75% of standing height (Pheasant and Haslegrave, 2006). For a 170 cm
+        adult, this gives a head-to-torso separation of roughly 29 to 37 cm. The
+        robot's head and torso pad centres were set to a fixed separation of
+        approximately 34 cm, which sits at the midpoint of this anatomical range.
+        Applying the mean anthropometric ratios across the operating range gives
+        predicted head strike heights of approximately 138 cm (at 150 cm user height)
+        to 175 cm (at 190 cm user height), consistent with the screw jack's 400 mm
+        stroke.
+      </p>
+      <p>
+        Because the fixed 34 cm separation cannot perfectly match every user's
+        individual proportions, the pads are designed as zones rather than single
+        points. Sizing the pads tall enough ensures that users of varying body
+        proportions still experience a hittable, anatomically reasonable target
+        without requiring independent vertical adjustment of each pad.
+      </p>
+      <p style="font-size:0.88rem; line-height:1.6;">
+        Pheasant, S. and Haslegrave, C.M. (2006). <em>Bodyspace: Anthropometry,
+        Ergonomics and the Design of Work</em>, 3rd ed. CRC Press.
       </p>
     </div>
 
@@ -193,7 +229,7 @@
         </p>
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_4_final.glb"
-          alt="Iteration 4 (Final): Full assembly — frame mount, spring, foam mount, and foam"
+          alt="Iteration 4 (Final): Full assembly â frame mount, spring, foam mount, and foam"
           height="450" explode-scale="2.0">
         </explode-viewer>
       </div>
@@ -210,7 +246,7 @@
       </p>
       <div class="calc-block">
         <code>Sag (x) = m * g / k</code><br>
-        where m = foam mass (kg), g = 9.81 m/s², k = spring rate (N/mm)
+        where m = foam mass (kg), g = 9.81 m/sÂ², k = spring rate (N/mm)
       </div>
 
       <h4>Iteration 3 (1 kg assumed)</h4>
