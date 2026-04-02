@@ -44,14 +44,8 @@
       font-size: 0.88rem;
       color: #666;
     }
-    sl-tab-group {
-      margin: 20px 0;
-    }
-    sl-tab-panel p {
-      margin: 8px 0;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
+    sl-tab-group { margin: 20px 0; }
+    sl-tab-panel p { margin: 8px 0; font-size: 0.95rem; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -64,33 +58,30 @@
     </a>
     <br>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- OVERVIEW                                               -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- OVERVIEW -->
     <div id="user-interface">
       <h2>5.1 User Interface (GUI)</h2>
       <p>
         The GUI is the primary control surface of BoxBunny. It handles user authentication,
         training mode selection, session execution, performance analytics, and all communication
-        between the user and the robot's hardware subsystems. Because users interact with the
-        interface while wearing boxing gloves, every design decision was filtered through a single
-        principle: the interface must never become the obstacle. If a user pauses mid-session to
-        figure out how to navigate, the design has failed.
+        between the user and the robot's hardware subsystems. Users interact with the interface
+        via the onboard touchscreen, and the system also supports physical button navigation
+        through the punching contact points and IMU sensors, allowing hands-free control during
+        active training. Every design decision was filtered through a single principle: the
+        interface must never become the obstacle. If a user pauses mid-session to figure out
+        how to navigate, the design has failed.
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- REQUIREMENTS & CONSIDERATIONS                          -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- REQUIREMENTS & CONSIDERATIONS -->
     <div>
       <h3>Requirements and Considerations</h3>
       <p>
         The GUI requirements were derived from the Function Analysis (Table 6, Section 3.1),
         the user journey defined in Section 4.2, and the practical constraint that the GUI
-        subsystem was developed in parallel with all hardware subsystems. Five subsystem-level
-        requirements govern the design.
+        subsystem was developed in parallel with all hardware subsystems.
       </p>
 
       <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
@@ -104,8 +95,8 @@
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-1</td>
-            <td style="padding:8px; border:1px solid #ddd;">Operable with boxing gloves: large touch targets (minimum 80x60 px), minimal text input</td>
-            <td style="padding:8px; border:1px solid #ddd;">User journey (4.2), Function Spec display latency ≤ 100 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and physical button operable: large touch targets, minimal text input, IMU-based button navigation</td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (4.2), Function Spec display latency</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-2</td>
@@ -119,8 +110,8 @@
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-4</td>
-            <td style="padding:8px; border:1px solid #ddd;">Real-time session data (combo prompts, round timers, performance metrics) with page transitions under 500 ms</td>
-            <td style="padding:8px; border:1px solid #ddd;">Function Spec: on-screen dashboard, brightness ≥ 300 nits</td>
+            <td style="padding:8px; border:1px solid #ddd;">Real-time session data display (combo prompts, round timers, performance metrics)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Function Spec: on-screen dashboard, brightness requirements</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-5</td>
@@ -133,9 +124,7 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- TRAINING MODES OVERVIEW (TABBED)                       -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- TRAINING MODES (TABBED) -->
     <div>
       <h3>Training Modes</h3>
       <p>
@@ -176,10 +165,9 @@
           <p>
             <strong>Markov chain combo generation.</strong> Sparring mode generates punch sequences
             procedurally, weighted by the user's weakness profile so that the robot targets areas
-            where the user needs the most practice. Access is restricted to Intermediate and
-            Advanced users through the proficiency assessment gate. This mode is designed for
-            users who have already built foundational technique through the combo curriculum and
-            are ready for less predictable, more reactive training.
+            where the user needs the most practice. This mode is available to all proficiency levels
+            and is designed for users who want less predictable, more reactive training compared to
+            the structured combo curriculum.
           </p>
         </sl-tab-panel>
 
@@ -196,9 +184,7 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- DESIGN SUMMARY                                         -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- DESIGN SUMMARY -->
     <div>
       <h3>Design Summary</h3>
       <p>
@@ -216,18 +202,15 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- VALIDATION SUMMARY                                     -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- VALIDATION SUMMARY -->
     <div>
       <h3>Validation Summary</h3>
       <p>
-        All five GUI requirements were verified through structured functional and performance
-        testing after the sixth iteration. Application startup completed in 2.1 seconds against
-        a 3-second target. Page transitions measured 180 to 250 ms against a 500 ms target.
-        Arduino sensor data latency averaged 320 ms, within the 500 ms bound. Memory usage
-        peaked at 180 MB against a 500 MB ceiling. Multi-user data isolation was confirmed
-        across five test accounts with zero observed cross-contamination. Full test results and
+        All five GUI requirements were verified through structured functional testing after the
+        sixth iteration. Multi-user data isolation was confirmed across five test accounts with
+        zero observed cross-contamination. The combo curriculum progression algorithm was validated
+        through multiple complete training cycles. The navigation stack was tested across arbitrary
+        navigation depths and confirmed correct reverse-order traversal. Full test results and
         user testing observations are documented in the
         <a href="gui/testing-evaluation.html">Testing and Evaluation</a> sub-page.
       </p>
@@ -235,9 +218,7 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- DETAILED DOCUMENTATION NAV CARDS                       -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- NAV CARDS -->
     <div>
       <h3>Detailed Documentation</h3>
       <div class="section-nav-grid">
@@ -254,16 +235,14 @@
         <a href="gui/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
           <h3>Testing and Evaluation</h3>
-          <p>Functional testing, performance metrics, user testing, limitations</p>
+          <p>Functional testing, user testing, limitations</p>
         </a>
       </div>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- CROSS-REFERENCES                                       -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- CROSS-REFERENCES -->
     <div>
       <h3>Cross-References</h3>
       <ul>

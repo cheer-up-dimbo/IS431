@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Implementation — GUI</title>
+  <title>IS-431: Implementation â GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -11,6 +11,58 @@
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <style>
+    .arch-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 680px;
+      margin: 24px auto;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .arch-layer {
+      padding: 16px 20px;
+      border: 1px solid #ccc;
+      text-align: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: default;
+    }
+    .arch-layer:hover {
+      transform: scale(1.015);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      z-index: 1;
+    }
+    .arch-layer h4 { margin: 0 0 6px; font-size: 0.95rem; }
+    .arch-layer p { margin: 0; font-size: 0.82rem; color: #555; line-height: 1.4; }
+    .arch-l1 { background: #e3f2fd; border-color: #90caf9; }
+    .arch-l2 { background: #e8f5e9; border-color: #a5d6a7; }
+    .arch-l3 { background: #fff8e1; border-color: #ffe082; }
+    .arch-l4 { background: #fce4ec; border-color: #f48fb1; }
+    .arch-l5 { background: #f3e5f5; border-color: #ce93d8; }
+    .defect-item {
+      background: #fafafa;
+      border-left: 4px solid #ff9800;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .defect-item h4 { margin: 0 0 6px; font-size: 0.95rem; color: #e65100; }
+    .defect-item p { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+    .page-nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+    }
+    .markov-example {
+      background: #f5f5f5;
+      padding: 16px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -30,31 +82,53 @@
       the system architecture, and the key engineering decisions that shaped the final system.
     </p>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- DEVELOPMENT ITERATIONS                                 -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- ITERATIONS -->
     <div>
       <h3>Development Iterations</h3>
-
       <table-component id="gui-iterations"></table-component>
 
       <p>
-        Several issues only surfaced during testing rather than during design. A database
-        schema mismatch between two different score scales (0 to 1 versus 0 to 5) caused CHECK
-        constraint violations, requiring the database to be rebuilt with corrected constraints.
-        A back button that always returned to the same page regardless of entry path was resolved
-        by implementing the navigation stack in Iteration 5. A discrepancy between session counts
-        in a CSV file and combo attempt counts in the database was resolved by resetting the CSV
-        history during migration to the per-user database structure. Each of these was caught and
-        fixed within the iteration that introduced it.
+        Several issues surfaced during testing rather than during design. Each was caught and
+        resolved within the iteration that introduced it.
       </p>
+
+      <div class="defect-item">
+        <h4>Score Scale Mismatch</h4>
+        <p>
+          The combo curriculum originally stored mastery scores on a 0 to 1 scale, but the
+          action recognition placeholder returned scores on a 0 to 5 scale. When a score of
+          3.5 was inserted into a column with a CHECK constraint of 0.0 to 1.0, the database
+          rejected the write. The fix was to rebuild the database schema with the correct 0 to 5
+          constraint range and update the mastery threshold to 3.0 out of 5.0.
+        </p>
+      </div>
+
+      <div class="defect-item">
+        <h4>Back Button Destination Bug</h4>
+        <p>
+          Before the navigation stack was implemented, each page had a hardcoded back button
+          destination. This meant that the Performance History page always returned to the
+          Settings page, even if the user had arrived from the Performance Test Results page.
+          The navigation stack, introduced in Iteration 5, resolved this by recording the actual
+          entry point before every page transition and popping from that history on back press.
+        </p>
+      </div>
+
+      <div class="defect-item">
+        <h4>CSV and Database Count Discrepancy</h4>
+        <p>
+          During the migration from a single shared CSV training log to the per-user SQLite
+          database structure, session counts in the legacy CSV file did not match the combo
+          attempt counts in the new database. This was caused by the CSV containing entries
+          from all users mixed together. The fix was to reset the CSV history during migration
+          and rely solely on the per-user database for session tracking going forward.
+        </p>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- SYSTEM ARCHITECTURE                                    -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- SYSTEM ARCHITECTURE -->
     <div>
       <h3>System Architecture</h3>
       <p>
@@ -63,42 +137,36 @@
         codebase.
       </p>
 
-      <sl-details summary="Layered Architecture Diagram">
-        <pre style="background-color:#f5f5f5; padding:15px; border-radius:5px; overflow-x:auto; font-size:0.85rem;">
-+----------------------------------------------------------+
-|        Presentation Layer (PySide6 Widgets)              |
-|  All pages, buttons, labels, input fields                |
-|  Event callbacks, visual feedback                        |
-+----------------------------------------------------------+
-|              Application Layer                           |
-|  Navigation stack and page history                       |
-|  User session state, configuration                       |
-+----------------------------------------------------------+
-|             Business Logic Layer                         |
-|  Combo Curriculum Engine (mastery algorithm)             |
-|  Performance Testing Logic                               |
-|  User Management, Proficiency Assessment                 |
-+----------------------------------------------------------+
-|            Integration Layer                             |
-|  Arduino serial communication (multi-mode)               |
-|  Computer vision interface (file-based handshake)        |
-|  Robot arm control interface (ROS topics / serial)       |
-+----------------------------------------------------------+
-|              Data Layer                                  |
-|  SQLite databases (per-user files)                       |
-|  Configuration file management                           |
-+----------------------------------------------------------+
-        </pre>
-      </sl-details>
+      <div class="arch-diagram">
+        <div class="arch-layer arch-l1">
+          <h4>Presentation Layer</h4>
+          <p>PySide6 widgets: all pages, buttons, labels, input fields, event callbacks, visual feedback</p>
+        </div>
+        <div class="arch-layer arch-l2">
+          <h4>Application Layer</h4>
+          <p>Navigation stack and page history, user session state, configuration management</p>
+        </div>
+        <div class="arch-layer arch-l3">
+          <h4>Business Logic Layer</h4>
+          <p>Combo Curriculum Engine (mastery algorithm), Performance Testing Logic, User Management, Proficiency Assessment</p>
+        </div>
+        <div class="arch-layer arch-l4">
+          <h4>Integration Layer</h4>
+          <p>Arduino serial communication (multi-mode), CV interface (file-based handshake), Robot arm control (ROS / serial)</p>
+        </div>
+        <div class="arch-layer arch-l5">
+          <h4>Data Layer</h4>
+          <p>SQLite databases (per-user files), configuration file management</p>
+        </div>
+      </div>
 
       <p>
         The Integration Layer is the critical enabler for parallel development. Rather than
         calling hardware interfaces directly, all hardware communication is routed through
         this layer. During development on a Windows laptop with no hardware connected, the
         layer switches automatically to mock interfaces that simulate hardware responses.
-        This allowed the full GUI to be built and tested before any physical hardware was
-        available. When deployed on the Jetson Nano, the mock interfaces are replaced by
-        real implementations without any changes to the layers above.
+        When deployed on the Jetson Nano, the mock interfaces are replaced by real
+        implementations without any changes to the layers above.
       </p>
 
       <table-component id="gui-integration-specs"></table-component>
@@ -106,32 +174,163 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- KEY ENGINEERING DECISIONS                              -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- KEY ENGINEERING DECISIONS -->
     <div>
       <h3>Key Engineering Decisions</h3>
 
+      <!-- NAVIGATION STACK -->
       <h4>Navigation Stack</h4>
       <p>
         The application contains over 40 pages managed by a central <code>QStackedWidget</code>.
         Rather than coding back button destinations manually on each page, a navigation stack
-        records the current page index before every transition. The <code>navigate_to()</code>
-        method pushes the current index onto the stack, and <code>navigate_back()</code> pops
-        from it. If the stack is empty, the system falls back to the main menu. This eliminated
-        an entire category of navigation bugs as the page count grew.
+        records the current page index before every transition. The diagram below illustrates
+        how the stack operates as a user navigates through a typical training flow.
       </p>
 
+      <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:700px; margin:20px auto; display:block;">
+        <!-- Title -->
+        <text x="350" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Navigation Stack: Push on Forward, Pop on Back</text>
+
+        <!-- Forward navigation -->
+        <text x="10" y="55" font-size="11" font-weight="bold" fill="#1b5e20">Forward Navigation (push)</text>
+
+        <!-- Step boxes -->
+        <rect x="10" y="65" width="120" height="36" rx="6" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+        <text x="70" y="88" text-anchor="middle" font-size="11" fill="#333">Login</text>
+
+        <text x="143" y="86" font-size="14" fill="#4caf50">&#8594;</text>
+
+        <rect x="160" y="65" width="120" height="36" rx="6" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+        <text x="220" y="88" text-anchor="middle" font-size="11" fill="#333">Main Menu</text>
+
+        <text x="293" y="86" font-size="14" fill="#4caf50">&#8594;</text>
+
+        <rect x="310" y="65" width="120" height="36" rx="6" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+        <text x="370" y="88" text-anchor="middle" font-size="11" fill="#333">Training</text>
+
+        <text x="443" y="86" font-size="14" fill="#4caf50">&#8594;</text>
+
+        <rect x="460" y="65" width="120" height="36" rx="6" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+        <text x="520" y="88" text-anchor="middle" font-size="11" fill="#333">Combo Select</text>
+
+        <text x="593" y="86" font-size="14" fill="#4caf50">&#8594;</text>
+
+        <rect x="610" y="65" width="80" height="36" rx="6" fill="#c8e6c9" stroke="#2e7d32" stroke-width="2"/>
+        <text x="650" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="#1b5e20">Session</text>
+
+        <!-- Stack state -->
+        <text x="10" y="130" font-size="11" font-weight="bold" fill="#555">Stack after arriving at Session:</text>
+
+        <rect x="10" y="140" width="680" height="32" rx="4" fill="#f5f5f5" stroke="#ccc"/>
+        <text x="20" y="161" font-size="11" fill="#333">Bottom &#8592; [ Login, Main Menu, Training, Combo Select ] &#8594; Top</text>
+
+        <!-- Back navigation -->
+        <text x="10" y="200" font-size="11" font-weight="bold" fill="#b71c1c">Back Navigation (pop)</text>
+
+        <rect x="610" y="210" width="80" height="36" rx="6" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+        <text x="650" y="233" text-anchor="middle" font-size="11" fill="#333">Session</text>
+
+        <text x="583" y="231" font-size="14" fill="#e53935">&#8592;</text>
+
+        <rect x="460" y="210" width="120" height="36" rx="6" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+        <text x="520" y="233" text-anchor="middle" font-size="11" fill="#333">Combo Select</text>
+        <text x="520" y="260" text-anchor="middle" font-size="9" fill="#999">pop: Combo Select</text>
+
+        <text x="433" y="231" font-size="14" fill="#e53935">&#8592;</text>
+
+        <rect x="310" y="210" width="120" height="36" rx="6" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+        <text x="370" y="233" text-anchor="middle" font-size="11" fill="#333">Training</text>
+        <text x="370" y="260" text-anchor="middle" font-size="9" fill="#999">pop: Training</text>
+
+        <text x="283" y="231" font-size="14" fill="#e53935">&#8592;</text>
+
+        <rect x="160" y="210" width="120" height="36" rx="6" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+        <text x="220" y="233" text-anchor="middle" font-size="11" fill="#333">Main Menu</text>
+        <text x="220" y="260" text-anchor="middle" font-size="9" fill="#999">pop: Main Menu</text>
+
+        <!-- Empty stack note -->
+        <text x="10" y="300" font-size="11" fill="#555">When the stack is empty, pressing Back falls back safely to the Main Menu.</text>
+        <text x="10" y="318" font-size="11" fill="#555">This eliminates manual per-page back button wiring across all 40+ pages.</text>
+      </svg>
+
+      <!-- PROFICIENCY ASSESSMENT -->
       <h4>Proficiency Assessment</h4>
       <p>
-        On signup, new users complete a six-question checklist covering boxing experience,
-        training frequency, familiarity with combinations, comfort with sparring, and fitness
-        level. Each answer maps to a numeric weight. The total score maps the user to Beginner,
-        Intermediate, or Advanced, with an option to override the suggestion. This classification
-        gates access to Sparring mode (Intermediate and Advanced only) and determines the default
-        combo difficulty tier shown on the training page.
+        On signup, new users complete a six-question checklist. Each question has three answer
+        options scored 0, 1, or 2. The total score (0 to 12) maps the user to a proficiency
+        level, with the option to override the suggestion before confirming.
       </p>
 
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Question</th>
+            <th style="padding:8px; border:1px solid #ddd;">Option 1 (0)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Option 2 (1)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Option 3 (2)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Have you trained boxing before?</td>
+            <td style="padding:8px; border:1px solid #ddd;">Never</td>
+            <td style="padding:8px; border:1px solid #ddd;">A few times</td>
+            <td style="padding:8px; border:1px solid #ddd;">Regularly</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Do you know the basic punches?</td>
+            <td style="padding:8px; border:1px solid #ddd;">No</td>
+            <td style="padding:8px; border:1px solid #ddd;">Somewhat</td>
+            <td style="padding:8px; border:1px solid #ddd;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Can you throw a basic 1-2-3 combo?</td>
+            <td style="padding:8px; border:1px solid #ddd;">No</td>
+            <td style="padding:8px; border:1px solid #ddd;">With help</td>
+            <td style="padding:8px; border:1px solid #ddd;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Have you done any sparring before?</td>
+            <td style="padding:8px; border:1px solid #ddd;">Never</td>
+            <td style="padding:8px; border:1px solid #ddd;">Once or twice</td>
+            <td style="padding:8px; border:1px solid #ddd;">Yes, regularly</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">How would you describe your fitness level?</td>
+            <td style="padding:8px; border:1px solid #ddd;">Low</td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate</td>
+            <td style="padding:8px; border:1px solid #ddd;">High</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Have you used boxing equipment before?</td>
+            <td style="padding:8px; border:1px solid #ddd;">Never</td>
+            <td style="padding:8px; border:1px solid #ddd;">A few times</td>
+            <td style="padding:8px; border:1px solid #ddd;">Regularly</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table style="width:60%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Total Score</th>
+            <th style="padding:8px; border:1px solid #ddd;">Suggested Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#e8f5e9;"><td style="padding:8px; border:1px solid #ddd;">0 to 4</td><td style="padding:8px; border:1px solid #ddd;">Beginner</td></tr>
+          <tr style="background:#fff8e1;"><td style="padding:8px; border:1px solid #ddd;">5 to 8</td><td style="padding:8px; border:1px solid #ddd;">Intermediate</td></tr>
+          <tr style="background:#ffebee;"><td style="padding:8px; border:1px solid #ddd;">9 to 12</td><td style="padding:8px; border:1px solid #ddd;">Advanced</td></tr>
+        </tbody>
+      </table>
+
+      <p>
+        The user can accept or override the suggestion on the result page before confirming.
+        This classification determines the default combo difficulty tier shown on the training
+        page.
+      </p>
+
+      <!-- COMBO CURRICULUM -->
       <h4>Combo Curriculum and Mastery Algorithm</h4>
       <p>
         The curriculum contains 50 combinations: 15 Beginner, 20 Intermediate, and 15 Advanced.
@@ -139,21 +338,69 @@
         Cross, Lead Hook, Rear Hook, Lead Uppercut, Rear Uppercut), with a "b" suffix for body
         shots and text labels for defensive movements (slip, block, roll). A combo is considered
         mastered when the user has completed at least five sessions with an average score of 3.0
-        or above. Progress is tracked per-user in the SQLite database and persists across sessions.
+        out of 5.0 or above. Progress is tracked per-user in the SQLite database and persists
+        across sessions.
       </p>
 
       <table-component id="gui-combo-notation"></table-component>
 
+      <!-- SPARRING MARKOV CHAIN -->
       <h4>Sparring Mode: Markov Chain Generation</h4>
       <p>
-        Sparring mode generates punch sequences using a first-order Markov chain. Transition
-        probabilities are biased by the user's weakness profile, so the robot produces more of
-        the punch types and transitions that the user has historically scored lowest on. This
-        creates a training experience that adapts to the individual user without requiring
-        explicit difficulty settings. Access is restricted to Intermediate and Advanced users
-        through the proficiency classification.
+        Sparring mode generates punch sequences using a first-order Markov chain. Each boxing
+        style (Pressure Fighter, Counter Puncher, Infighter, Out-Boxer, Random) defines a
+        transition probability matrix over punch types. Starting from a "start" state, the
+        system picks the next punch based on weighted probabilities, continuing until an "end"
+        state is reached or a safety limit of six punches per combo is hit. Sparring is
+        available to all proficiency levels.
       </p>
 
+      <p>
+        Below is the transition matrix for the <strong>Counter Puncher</strong> style as an example.
+        Each row shows the current state, and the columns show the probability of transitioning
+        to each next punch (or ending the combo).
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.85rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:6px; border:1px solid #ddd;">From State</th>
+            <th style="padding:6px; border:1px solid #ddd;">1 (Jab)</th>
+            <th style="padding:6px; border:1px solid #ddd;">2 (Cross)</th>
+            <th style="padding:6px; border:1px solid #ddd;">3 (L.Hook)</th>
+            <th style="padding:6px; border:1px solid #ddd;">4 (R.Hook)</th>
+            <th style="padding:6px; border:1px solid #ddd;">5 (L.Upper)</th>
+            <th style="padding:6px; border:1px solid #ddd;">6 (R.Upper)</th>
+            <th style="padding:6px; border:1px solid #ddd;">End</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>start</strong></td><td style="padding:6px; border:1px solid #ddd;">0.30</td><td style="padding:6px; border:1px solid #ddd;">0.30</td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.40</td></tr>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>1 (Jab)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.40</td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.60</td></tr>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>2 (Cross)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.30</td><td style="padding:6px; border:1px solid #ddd;">0.20</td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.50</td></tr>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>3 (L.Hook)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.30</td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.70</td></tr>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>4 (R.Hook)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.20</td><td style="padding:6px; border:1px solid #ddd;">0.80</td></tr>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>5 (L.Upper)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">0.10</td><td style="padding:6px; border:1px solid #ddd;">0.90</td></tr>
+          <tr><td style="padding:6px; border:1px solid #ddd;"><strong>6 (R.Upper)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">1.00</td></tr>
+        </tbody>
+      </table>
+
+      <div class="markov-example">
+        <strong>Worked example (Counter Puncher):</strong><br><br>
+        1. <strong>start</strong>: Roll probabilities. Jab (0.30), Cross (0.30), End (0.40). Suppose the roll picks <strong>Jab</strong>.<br>
+        2. <strong>After Jab</strong>: Cross (0.40), End (0.60). Suppose the roll picks <strong>Cross</strong>.<br>
+        3. <strong>After Cross</strong>: Lead Hook (0.30), Rear Hook (0.20), End (0.50). Suppose the roll picks <strong>End</strong>.<br><br>
+        Result: the generated combo is <strong>1-2</strong> (Jab, Cross). The Counter Puncher style has high "end" probabilities, so it naturally produces short, precise combinations. Contrast this with the Pressure Fighter, whose low "end" probabilities generate longer, more aggressive sequences.
+      </div>
+
+      <p>
+        When a user's weakness profile is available (from previous sparring sessions), the
+        transition weights are blended with a bias multiplier. The blending factor
+        <em>alpha</em> increases gradually with session count (capped at 0.4), so the
+        adaptation strengthens over time without fully overriding the style's character.
+      </p>
+
+      <!-- AI COACHING -->
       <h4>AI Coaching Integration</h4>
       <p>
         The combo training flow includes a post-session chat page where users can ask for
@@ -167,17 +414,29 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- FEATURE SET                                            -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- FEATURE SET -->
     <div>
       <h3>Feature Set</h3>
       <p>
-        The complete feature set delivered across all six iterations is summarised below, mapped
-        to the training category each feature supports.
+        The complete feature set delivered across all six iterations is summarised below.
       </p>
-
       <table-component id="gui-feature-set"></table-component>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="design-ideation.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: Design and Ideation
+        </sl-button>
+      </a>
+      <a href="testing-evaluation.html">
+        <sl-button variant="default" size="medium">
+          Next: Testing and Evaluation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
 
   </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Testing &amp; Evaluation — GUI</title>
+  <title>IS-431: Testing &amp; Evaluation â GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -11,6 +11,14 @@
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <style>
+    .page-nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -24,21 +32,18 @@
 
     <h2>Testing and Evaluation</h2>
     <p>
-      After completing all six iterations, a structured validation pass was conducted across
-      the full feature set. This section presents the functional testing results, performance
-      measurements, user testing observations, and the limitations that remain.
+      This section presents the functional testing conducted during development, user testing
+      observations from the public showcase event, and the limitations that remain.
     </p>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- FUNCTIONAL TESTING                                     -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- FUNCTIONAL TESTING -->
     <div>
       <h3>Functional Testing</h3>
       <p>
-        Functional testing verified that every feature behaved correctly under normal use
-        conditions. Test scenarios covered user authentication, combo curriculum progression,
-        performance test instrumentation, navigation stack correctness, and multi-user data
-        isolation.
+        Functional testing was conducted on the features available at the time of the
+        "Robotics Meets AI Showcase" event in late January 2025. The features tested were
+        the combo curriculum system, the reaction time test, and the navigation stack. Test
+        scenarios verified correct behaviour under normal use conditions.
       </p>
 
       <table-component id="gui-functional-testing"></table-component>
@@ -46,73 +51,44 @@
       <p>
         All functional tests passed. The navigation stack test is worth highlighting: the
         scenario traced a five-page deep navigation path and verified that pressing back four
-        times returned through each page in the correct reverse order. This confirmed that the
-        centralised stack implementation handled arbitrary navigation depth correctly.
+        times returned through each page in the correct reverse order, confirming that the
+        centralised stack handled arbitrary navigation depth correctly.
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- PERFORMANCE TESTING                                    -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- USER TESTING -->
     <div>
-      <h3>Performance Testing</h3>
+      <h3>User Testing: Robotics Meets AI Showcase</h3>
       <p>
-        Performance testing verified that the GUI remained responsive within the Jetson Nano's
-        hardware constraints. Quantitative targets were defined prior to implementation and
-        measured after the final iteration.
-      </p>
-
-      <table-component id="gui-performance-testing"></table-component>
-
-      <p>
-        All performance targets were met with significant margin. The most constrained metric
-        was Arduino sensor data latency at 320 ms average, which still sat 36% below the 500 ms
-        ceiling. Memory usage at 180 MB left substantial headroom on the Jetson Nano's 4 GB,
-        which is important because other subsystems (computer vision, robot control) also consume
-        memory when running concurrently.
-      </p>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- USER TESTING                                           -->
-    <!-- ————————————————————————————————————————————————————— -->
-    <div>
-      <h3>User Testing: Robotics and AI in Work and Play Event</h3>
-      <p>
-        Members of the public physically interacted with BoxBunny at the "Robotics and AI in
-        Work and Play" event. Two displays were available during the demonstration: the original
-        7-inch touchscreen mounted directly on the robot, and a larger external monitor connected
-        to the same Jetson Nano showing the same GUI output.
+        Members of the public physically interacted with BoxBunny at the "Robotics Meets AI
+        Showcase" event in late January 2025, specifically within the Robotics and AI in Work
+        and Play segment. Two displays were available during the demonstration: the original
+        7-inch touchscreen mounted directly on the robot, and a larger external monitor
+        connected to the same Jetson Nano showing the same GUI output.
       </p>
       <p>
         During the session, participants and observers consistently gravitated toward the larger
-        monitor when reading data analytics, reviewing training results, and navigating between
-        pages. Users who attempted to operate the 7-inch screen during active training reported
-        difficulty reading combo prompts and performance statistics at arm's length. Several
-        participants noted that the text was too small to follow comfortably while also focusing
-        on punching technique. Users who switched to the larger monitor did not report the same
-        issues.
+        monitor when reading training results and navigating between pages. Users who attempted
+        to operate the 7-inch screen during active training reported difficulty reading combo
+        prompts and statistics. Several participants noted that the text was too small to follow
+        comfortably while also focusing on technique. Users who switched to the larger monitor
+        did not report the same issues.
       </p>
       <p>
         These observations validated a hardware revision. The 7-inch display was replaced with
         a 10.1-inch IPS capacitive touchscreen (1280x800 resolution, DSI interface). The upgrade
-        improved text legibility and made the analytics pages significantly easier to read during
-        and after training. Because the GUI used proportional layout sizing rather than fixed
-        pixel coordinates, the existing interface scaled to the new resolution without requiring
-        a redesign cycle. The compressed timeline meant this change is framed as a hardware
-        revision informed by direct user observation, not a full iterative software redesign.
+        improved text legibility and made the analytics pages easier to read during and after
+        training. Because the GUI used proportional layout sizing rather than fixed pixel
+        coordinates, the existing interface scaled to the new resolution without requiring a
+        redesign cycle.
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- DELIVERABLES STATUS                                    -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- DELIVERABLES STATUS -->
     <div>
       <h3>Requirements Verification</h3>
       <p>
@@ -124,50 +100,54 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- KNOWN ISSUES                                           -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- KNOWN ISSUES -->
     <div>
       <h3>Known Issues</h3>
-
       <table-component id="gui-known-issues"></table-component>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ————————————————————————————————————————————————————— -->
-    <!-- LIMITATIONS                                            -->
-    <!-- ————————————————————————————————————————————————————— -->
+    <!-- LIMITATIONS -->
     <div>
       <h3>Limitations</h3>
+
+      <h4>Computer Vision Integration</h4>
       <p>
-        Two integration points were not fully resolved within the project timeline. The computer
-        vision subsystem communicates with the GUI through a file-based handshake rather than a
-        direct API call. This was a consequence of the CV and GUI subsystems being developed in
-        parallel without a stable shared interface being finalised before the submission deadline.
-        The mechanism works reliably but introduces unnecessary file I/O overhead that a direct
-        function call would avoid.
+        The computer vision subsystem communicates with the GUI through a file-based handshake
+        rather than a direct API call. This was a consequence of the CV and GUI subsystems being
+        developed in parallel without a stable shared interface being finalised before the
+        submission deadline. The mechanism works reliably but introduces unnecessary file I/O
+        overhead that a direct function call would avoid.
       </p>
+
+      <h4>AI Coaching Availability</h4>
       <p>
-        The AI coaching feature in the combo training mode falls back to hardcoded template
-        responses when the language model is unavailable. On the Jetson Nano's 4 GB RAM, loading
-        the Qwen 2.5 3B model alongside the GUI and other subsystems is not always feasible. The
-        fallback was designed as a graceful degradation rather than a failure, but it does limit
-        the personalisation of coaching feedback on memory-constrained hardware.
+        The AI coaching feature falls back to hardcoded template responses when the language
+        model is unavailable. On the Jetson Nano's 4 GB RAM, loading the Qwen 2.5 3B model
+        alongside the GUI and other subsystems is not always feasible. The fallback provides
+        functional feedback, but it limits the personalisation of coaching on memory-constrained
+        hardware.
       </p>
+
+      <h4>Display Upgrade Validation</h4>
       <p>
         The display upgrade to 10.1 inches occurred late in the project. While the interface
-        scaled correctly to the new resolution, there was no opportunity to conduct a second round
-        of structured user testing on the new hardware. The improvement in readability is based on
-        qualitative observation during the event rather than controlled measurement.
+        scaled correctly to the new resolution, there was no opportunity to conduct a second
+        round of structured user testing on the new hardware. The improvement in readability
+        is based on qualitative observation during the event rather than controlled measurement.
       </p>
-      <p>
-        Finally, the GUI was developed by a single team member. All design decisions, implementation,
-        and testing were conducted by one person over 15 weeks. This compressed timeline meant that
-        certain features classified as "Could Have" in the MoSCoW analysis (progress charts,
-        customisable training programs, data export) were either partially implemented or deferred
-        entirely.
-      </p>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="implementation.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: Implementation
+        </sl-button>
+      </a>
+      <div></div>
     </div>
 
   </div>
@@ -188,7 +168,6 @@
   </script>
   <script type="module" src="../../components/table-component/table-component.js"></script>
   <script src="../../components/table-component/gui-functional-testing.js"></script>
-  <script src="../../components/table-component/gui-performance-testing.js"></script>
   <script src="../../components/table-component/gui-deliverables-status.js"></script>
   <script src="../../components/table-component/gui-known-issues.js"></script>
 </body>
