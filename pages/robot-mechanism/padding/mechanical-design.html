@@ -11,6 +11,49 @@
   <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="../../../components/explode-viewer/explode-viewer.js"></script>
+  <style>
+    .iteration-card {
+      background: #fafafa;
+      border-left: 4px solid #1976d2;
+      padding: 14px 18px;
+      margin: 14px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .iteration-card.fail { border-left-color: #e53935; }
+    .iteration-card.pass { border-left-color: #4caf50; }
+    .iteration-card.partial { border-left-color: #ff9800; }
+    .iteration-card h4 { margin: 0 0 6px; font-size: 1rem; }
+    .iteration-card p, .iteration-card ul { font-size: 0.93rem; line-height: 1.55; }
+    .iteration-card ul { margin: 6px 0; padding-left: 20px; }
+    .calc-block {
+      background: #f5f5f5;
+      padding: 14px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .calc-block code { background: #e8e8e8; padding: 2px 5px; border-radius: 3px; }
+    .spec-table {
+      width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem;
+    }
+    .spec-table th, .spec-table td { padding: 7px; border: 1px solid #ddd; }
+    .spec-table thead tr { background: #f0f0f0; }
+    .spec-table .old { background: #ffebee; }
+    .spec-table .new { background: #e8f5e9; }
+    .page-nav-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -28,137 +71,253 @@
       <sl-icon slot="icon" name="check-circle"></sl-icon>
       <strong>V-Model Traceability:</strong> This page addresses
       <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
-      provide impact detection</em>) at the mechanical layer — padding
-      construction and IMU sensor mounting.
+      provide impact detection</em>) at the mechanical layer.
     </sl-alert>
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. REQUIREMENTS CASCADE                                -->
-    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- FOAM -->
     <div>
-      <h3>Requirements Cascade</h3>
+      <h3>Foam Construction</h3>
       <p>
-        The padding mechanical design responds to system-level requirement
-        <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
-        provide impact detection</em>) defined in the
-        <a href="../../robot-mechanism.html">Robot Mechanism</a> section.
+        The striking surface uses polyethylene foam wrapped in water-resistant
+        faux leather. The design draws from commercial boxing focus mitts, which
+        use multi-layer EVA and PU foam stacks to balance responsiveness with
+        cushioning. For BoxBunny, a simpler single-material foam was sufficient
+        because the spring return mechanism (described below) handles the rebound
+        rather than the foam itself. Each pad weighs approximately 150 g. The faux
+        leather outer layer protects the foam from sweat and surface wear during
+        extended training sessions.
       </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; text-align:left;">System Req</th>
-            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Subsystem Implication</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-6</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Padding must absorb high-velocity strikes without delamination or transmitting dangerous forces to internal drivetrain</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>RM-2</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Padding form factor must not extend the robot's footprint beyond user-safe limits</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. PADDING CONSTRUCTION (PLACEHOLDER)                  -->
-    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MOUNT ITERATIONS -->
     <div>
-      <h3>Padding Construction</h3>
-      <sl-alert variant="warning" open>
-        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-        <strong>Content Pending:</strong> Detailed padding construction
-        documentation to be populated once physical design data is
-        available. Expected content:
-        <ul style="margin:8px 0 0 0;">
-          <li>Material selection and properties (foam type, density, Shore hardness)</li>
-          <li>Layer construction and thickness rationale</li>
-          <li>Anti-vibration isolation interface specs</li>
-          <li>Attachment mechanism to arm housing</li>
-          <li>Annotated cross-section diagram</li>
+      <h3>Mount Design Evolution</h3>
+      <p>
+        The padding mount went through four iterations, all 3D-printed in PLA
+        and attached to the robot's 80x80 mm aluminium V-slot extrusion frame.
+      </p>
+
+      <!-- ITERATION 1 -->
+      <div class="iteration-card fail">
+        <h4>Iteration 1: Direct Foam-to-Frame Mount</h4>
+        <p>
+          A single PLA bracket design was used for both the front and side striking
+          zones. The mount fractured after one strong punch at its thinnest cross-section.
+          Using identical geometry for all three positions also produced unnatural
+          punching angles, as the flat bracket did not account for the angular
+          difference between a straight jab and a side hook.
+        </p>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_1.glb"
+          alt="Iteration 1: Direct foam-to-frame mount"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+      </div>
+
+      <!-- ITERATION 2 -->
+      <div class="iteration-card pass">
+        <h4>Iteration 2: Thicker Mount, Dedicated Front and Side Designs</h4>
+        <p>
+          The mount cross-section was made substantially thicker. A dedicated front
+          mount and an angled side mount (mirrorable for left/right) were created.
+          This design survived the "Robotics Meets AI Showcase" in late January 2025,
+          including full-power strikes from two professional boxers and a boxing promoter.
+          However, the rigid attachment transmitted the full impulse into the aluminium
+          frame, causing the entire robot to shake visibly after strong punches.
+        </p>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_2_front.glb"
+          alt="Iteration 2: Front padding mount"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_2_side.glb"
+          alt="Iteration 2: Side padding mount (angled)"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+      </div>
+
+      <!-- ITERATION 3 -->
+      <div class="iteration-card partial">
+        <h4>Iteration 3: Spring Return Mechanism (First Attempt)</h4>
+        <p>
+          A compression spring was introduced between the frame-side mount and a
+          separate foam-side mount. The assembly chain is: aluminium frame, frame-side
+          mount (holds one end of the spring), spring, foam mount (holds the other end
+          of the spring and the IMU sensor), foam. The frame-side mount has dedicated
+          front and side versions, while the foam mount is a shared design used for
+          both. Pyramid-shaped reinforcement walls were added to the frame-side housing.
+          The IMU was positioned near the corner of the foam mount in this iteration.
+        </p>
+        <p>Three problems were discovered:</p>
+        <ul>
+          <li><strong>Friction-fit failure:</strong> Spring OD varied between units, making some frame-side mounts too loose and others too tight.</li>
+          <li><strong>Spring too stiff:</strong> Specified for an assumed 1 kg mass, but the foam is only 150 g (see calculations below).</li>
+          <li><strong>Side angle still off:</strong> Side pads were positioned too far out, making hooks feel unnatural.</li>
         </ul>
-      </sl-alert>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_3_front.glb"
+          alt="Iteration 3: Frame-side front mount (attaches to aluminium frame, holds spring)"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_3_side.glb"
+          alt="Iteration 3: Frame-side side mount (attaches to aluminium frame, holds spring)"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_3_foam_mount.glb"
+          alt="Iteration 3: Foam mount (shared for front and side, holds IMU sensor and foam)"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+      </div>
+
+      <!-- ITERATION 4 -->
+      <div class="iteration-card pass">
+        <h4>Iteration 4: Spring-Loaded Box (Final Design)</h4>
+        <p>
+          Inspired by spring-loaded box mechanisms, the spring now sits inside a
+          box-shaped housing that constrains lateral movement. The exact spring OD
+          no longer matters for fit, eliminating the friction-fit problem. The spring
+          was re-specified for the actual 150 g foam mass. The free length was
+          shortened from 180 mm to 140 mm to keep the foam closer to the body during
+          rotation. The aluminium-frame mount is split into two halves and printed
+          sideways, orienting layer lines perpendicular to side impacts for
+          delamination resistance. The side padding angle was corrected. The IMU sensor
+          was relocated from the corner (iteration 3) to the bottom edge, centered
+          horizontally, for more consistent impact readings.
+        </p>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/iteration_4_final.glb"
+          alt="Iteration 4 (Final): Full assembly — frame mount, spring, foam mount, and foam"
+          height="450" explode-scale="2.0">
+        </explode-viewer>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. IMU SENSOR MOUNTING                                 -->
-    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SPRING CALCULATIONS -->
     <div>
-      <h3>IMU Sensor Mounting</h3>
+      <h3>Spring Calculations</h3>
       <p>
-        Four <strong>MPU6050</strong> 6-axis IMU modules are distributed
-        across three anatomical strike zones. Each sensor is positioned to
-        detect impact acceleration when a user punches the corresponding
-        zone of the padding.
+        The spring must support the foam horizontally with minimal static sag.
+        The governing formula is:
       </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+      <div class="calc-block">
+        <code>Sag (x) = m * g / k</code><br>
+        where m = foam mass (kg), g = 9.81 m/s², k = spring rate (N/mm)
+      </div>
+
+      <h4>Iteration 3 (1 kg assumed)</h4>
+      <div class="calc-block">
+        Target sag: 0.5 mm or less<br>
+        <code>k >= 1.0 * 9.81 / 0.5 = 19.6 N/mm</code><br>
+        Selected range: 25 to 35 N/mm. At k = 30: sag = 0.33 mm.
+      </div>
+
+      <h4>Iteration 4 (150 g actual)</h4>
+      <div class="calc-block">
+        <code>x = 0.15 * 9.81 / 8 = 0.18 mm</code> (well within 0.5 mm target)<br>
+        The softer spring (8 N/mm) provides noticeable compliance on impact while
+        maintaining negligible sag.
+      </div>
+
+      <table class="spec-table">
         <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd;">IMU ID</th>
-            <th style="padding:8px; border:1px solid #ddd;">Zone</th>
-            <th style="padding:8px; border:1px solid #ddd;">I²C Address</th>
-            <th style="padding:8px; border:1px solid #ddd;">Mounting Orientation</th>
-          </tr>
+          <tr><th>Parameter</th><th>Iteration 3 (rejected)</th><th>Iteration 4 (final)</th></tr>
         </thead>
         <tbody>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">IMU-0</td>
-            <td style="padding:8px; border:1px solid #ddd;">Head (top)</td>
-            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 0)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">IMU-1</td>
-            <td style="padding:8px; border:1px solid #ddd;">Head (side)</td>
-            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 1)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">IMU-2</td>
-            <td style="padding:8px; border:1px solid #ddd;">Celiac Plexus</td>
-            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 2)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">IMU-3</td>
-            <td style="padding:8px; border:1px solid #ddd;">Liver</td>
-            <td style="padding:8px; border:1px solid #ddd;">0x68 (MUX Ch 3)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Z-axis normal to strike surface</td>
-          </tr>
+          <tr class="old"><td>Free length</td><td>180 mm</td><td class="new">140 mm</td></tr>
+          <tr><td>Outer diameter</td><td>35 to 40 mm</td><td>35 mm</td></tr>
+          <tr class="old"><td>Wire diameter</td><td>5.5 to 6.5 mm</td><td class="new">4 mm</td></tr>
+          <tr class="old"><td>Spring rate</td><td>25 to 35 N/mm</td><td class="new">8 N/mm</td></tr>
+          <tr><td>Material</td><td>Music wire</td><td>Music wire (ASTM A228)</td></tr>
+          <tr><td>Type</td><td>Compression, heavy duty</td><td>Compression, closed and ground ends</td></tr>
+          <tr class="old"><td>Calculated sag</td><td>0.33 mm (at 1 kg)</td><td class="new">0.18 mm (at 150 g)</td></tr>
         </tbody>
       </table>
+
       <p>
-        Each IMU is mounted with the <strong>Z-axis perpendicular to the
-        local strike surface</strong>, ensuring maximum sensitivity along the
-        primary impact direction. Wiring from each MPU6050 breakout board
-        runs to the Teensy 4.1 via <strong>30–40&nbsp;cm 4-conductor
-        ribbon cable</strong> (VCC, GND, SDA, SCL). All connections use
-        JST-XH 2.54&nbsp;mm connectors for tool-free disconnect during
-        maintenance. The parasitic capacitance implications of these longer
-        wire runs are addressed in the
-        <a href="electrical-integration.html">Electrical Integration</a>
-        page.
+        The shorter free length (140 mm vs 180 mm) also reduces the moment arm
+        during robot rotation, keeping rotational inertia lower for faster
+        turning response during sparring.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- FUTURE WORK: TPU -->
+    <div>
+      <h3>Future Work: TPU Filament</h3>
+      <p>
+        A potential future improvement is to replace the separate foam, spring,
+        and PLA mount with a single-piece TPU (thermoplastic polyurethane) print.
+        TPU is a flexible elastomer that could act as the striking surface, the
+        return mechanism, and the structural mount simultaneously.
       </p>
 
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="image"></sl-icon>
-        <strong>Media Placeholder:</strong> Photo or annotated diagram
-        showing IMU sensor positions within the padding assembly and
-        wiring routing to the Teensy 4.1.<br>
-        <em>Place image in
-        <code>assets/upper_mechanism/padding/</code> and use
-        <code>&lt;image-component&gt;</code>.</em>
-      </sl-alert>
+      <h4>Horizontal Honeycomb Concept</h4>
+      <p>
+        A promising approach is a horizontally oriented honeycomb lattice printed
+        in TPU. When a honeycomb structure is rotated 90 degrees so the hexagonal
+        tubes run horizontally, it becomes very rigid along the tube axis (resisting
+        lateral sway) but compresses like an accordion when pushed from the striking
+        direction. This produces unidirectional dampening: high absorption in the
+        punch direction with zero lateral compliance. This property is well suited
+        to a padding mount that must absorb frontal impacts without swaying sideways.
+      </p>
+
+      <explode-viewer
+        src="../../../assets/upper_mechanism/padding/honeycomb_sample.glb"
+        alt="Concept: Horizontally oriented TPU honeycomb lattice for unidirectional dampening"
+        height="350" explode-scale="1.5">
+      </explode-viewer>
+
+      <h4>Manufacturing Considerations</h4>
+      <p>
+        TPU print speeds must be kept to 15 to 30 mm/s to avoid extrusion
+        inconsistencies, making large parts time-intensive. Manufacturing defects
+        such as stringing, bulging, and buckling become more pronounced with larger
+        unit cell sizes in open-cell topologies, while closed-cell designs such as
+        honeycombs produce significantly fewer defects and superior load resistance
+        (Di Caprio et al., 2025).
+      </p>
+
+      <h4>Moisture Sensitivity</h4>
+      <p>
+        TPU is hygroscopic, meaning it absorbs moisture from the environment
+        during printing. Extended print durations increase the exposure window,
+        and absorbed moisture causes polymer chains to break down during heating,
+        degrading both surface finish and mechanical strength (Di Caprio et al.,
+        2025). For a part of this size, a dry-box filament feed system would be
+        necessary.
+      </p>
+
+      <h4>References</h4>
+      <p style="font-size:0.88rem; line-height:1.6;">
+        Di Caprio, F., Franchitti, S., Borrelli, R., Ciminello, M., Morano, C.
+        and Greco, A. (2025). Design of Flexible TPU-Based Lattice Structures
+        for 3D Printing: A Comparative Analysis of Open-Cell Versus Closed-Cell
+        Topologies. <em>Polymers</em>, 17(10), 1299.
+      </p>
     </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <div></div>
+      <a href="electrical-integration.html">
+        <sl-button variant="default" size="medium">
+          Next: Electrical Integration
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
