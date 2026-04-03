@@ -24,13 +24,12 @@
 
     <h2>5.2.2 Rotation — Electrical &amp; Control</h2>
 
-    <sl-alert variant="warning" open>
-      <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-      <strong>Pending Implementation:</strong> The rotation electrical and
-      control subsystem is currently under development. This page provides a
-      structural outline of the planned documentation. Content will be
-      populated once the motor, driver, and control loop are fully
-      integrated and validated.
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page addresses
+      <strong>RM-4</strong> (<em>yaw angular velocity &ge; 150&deg;/s</em>)
+      and <strong>RM-1</strong> (<em>hold commanded angle under punch
+      impact</em>) at the electrical and control layer.
     </sl-alert>
 
     <sl-divider></sl-divider>
@@ -55,11 +54,11 @@
         <tbody>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;"><strong>RM-4</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Yaw angular velocity ≥ 150°/s — motor and drive ratio must deliver sufficient speed under load</td>
+            <td style="padding:10px; border:1px solid #ddd;">Yaw angular velocity &ge; 150&deg;/s &mdash; motor and drive ratio must deliver sufficient speed under load</td>
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;"><strong>RM-1</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Hold commanded angle under punch impact — closed-loop position control with disturbance rejection</td>
+            <td style="padding:10px; border:1px solid #ddd;">Hold commanded angle under punch impact &mdash; closed-loop position control with disturbance rejection</td>
           </tr>
         </tbody>
       </table>
@@ -68,39 +67,188 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. PLANNED SECTIONS (OUTLINE)                          -->
+    <!-- 2. MOTOR SPECIFICATION                                 -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Planned Documentation Outline</h3>
+      <h3>Motor Specification</h3>
+      <p>
+        The base rotation uses a <strong>Z55BLD400-24GU</strong> 400 W
+        BLDC motor with a 25:1 planetary gearbox, controlled via the
+        <strong>ZBLD C20-800LRC</strong> CAN motor driver. The motor
+        provides high torque at low speed &mdash; ideal for the
+        timing-belt-driven yaw stage, which requires smooth re-angling
+        under the inertia of the full upper structure.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+            <th style="padding:8px; border:1px solid #ddd;">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Motor model</td>
+            <td style="padding:8px; border:1px solid #ddd;">Z55BLD400-24GU (400 W BLDC)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Gearbox</td>
+            <td style="padding:8px; border:1px solid #ddd;">25:1 planetary</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Driver</td>
+            <td style="padding:8px; border:1px solid #ddd;">ZBLD C20-800LRC (CAN interface)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Nominal voltage</td>
+            <td style="padding:8px; border:1px solid #ddd;">24 V</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Peak current draw</td>
+            <td style="padding:8px; border:1px solid #ddd;">~16 A (stall)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Position feedback</td>
+            <td style="padding:8px; border:1px solid #ddd;">AS5047P 14-bit magnetic encoder (SPI)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <h4>1. Motor Selection &amp; Specification</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        BLDC servo motor with integrated encoder. Selection rationale,
-        torque/speed requirements, comparison with DC gear motor alternatives.
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. CONTROL ARCHITECTURE                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Control Architecture</h3>
+      <p>
+        The base rotation controller is an <strong>Arduino Uno R4
+        WiFi</strong>, operating as a <strong>separate controller</strong>
+        from the Teensy 4.0 that manages the arm motors. Communication
+        with the Jetson host uses <strong>WiFi UDP</strong> rather than
+        a physical cable.
+      </p>
+
+      <!-- ─── Architecture Diagram (ASCII) ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Signal Flow</h4>
+        <pre style="font-family: 'Courier New', monospace; font-size:0.9rem; line-height:1.6; margin:0;">
+Jetson Orin NX                    Arduino Uno R4 WiFi
+   V4 GUI  ─── WiFi (UDP) ───►  UDP listener
+                                      │
+                                 CAN (125 kbps)
+                                      │
+                                 Z55BLD400 Motor
+                                      │
+                                 AS5047P Encoder (SPI)
+        </pre>
+      </div>
+
+      <h4>Design Rationale</h4>
+      <ol>
+        <li>
+          <strong>CAN baud mismatch:</strong> The Z55BLD400 driver operates
+          at <strong>125 kbps</strong>; the Damiao arm motors use
+          <strong>1 Mbps</strong>. Placing both on the same CAN bus would
+          require firmware complexity for dual-baud switching. Separate
+          buses eliminate this entirely.
+        </li>
+        <li>
+          <strong>Wireless eliminates cable fatigue:</strong> A USB cable
+          routed through the rotating base joint would experience
+          continuous twist/flex and eventually fail. WiFi UDP removes this
+          failure mode.
+        </li>
+        <li>
+          <strong>Independent failure domain:</strong> Base rotation is
+          decoupled from arm control; either can fail without affecting the
+          other. The Arduino can be power-cycled without disturbing the
+          Teensy or the Damiao motor CAN bus.
+        </li>
+        <li>
+          <strong>Already validated:</strong> Encoder + CAN motor code was
+          validated on the Arduino R4 during isolated bench testing before
+          integration.
+        </li>
+      </ol>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. POWER INTEGRATION                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Power Integration</h3>
+      <p>
+        The Z55BLD400 motor is connected to the <strong>24V motor
+        bus</strong> via the distribution busbar, alongside the arm
+        motors and height motor. The Arduino controller is powered from
+        the <strong>isolated 12V logic rail</strong> through a
+        <strong>LM2596-based 12V&rarr;5V buck converter</strong>
+        (&ge;1 A), ensuring motor bus OVP events do not reset the
+        base rotation controller.
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Component</th>
+            <th style="padding:8px; border:1px solid #ddd;">Rail</th>
+            <th style="padding:8px; border:1px solid #ddd;">Current</th>
+            <th style="padding:8px; border:1px solid #ddd;">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Arduino R4 WiFi</td>
+            <td style="padding:8px; border:1px solid #ddd;">5V (from 12V buck)</td>
+            <td style="padding:8px; border:1px solid #ddd;">~300 mA</td>
+            <td style="padding:8px; border:1px solid #ddd;">WiFi active + logic</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">WCMCU-1051 CAN transceiver</td>
+            <td style="padding:8px; border:1px solid #ddd;">5V</td>
+            <td style="padding:8px; border:1px solid #ddd;">~50 mA</td>
+            <td style="padding:8px; border:1px solid #ddd;">From Arduino 5V rail</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">AS5047P encoder</td>
+            <td style="padding:8px; border:1px solid #ddd;">3.3V</td>
+            <td style="padding:8px; border:1px solid #ddd;">~15 mA</td>
+            <td style="padding:8px; border:1px solid #ddd;">From Arduino 3.3V regulator</td>
+          </tr>
+          <tr style="background:#f9fafb; font-weight:bold;">
+            <td style="padding:8px; border:1px solid #ddd;">Total from PSU</td>
+            <td style="padding:8px; border:1px solid #ddd;">5V</td>
+            <td style="padding:8px; border:1px solid #ddd;">~400 mA</td>
+            <td style="padding:8px; border:1px solid #ddd;">2 W nominal</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+        <strong>Wire routing:</strong> Power cable (2-wire, 5V + GND)
+        from the buck converter to the Arduino should route
+        <strong>along the rotation axis</strong> to minimise twist. A
+        slip ring is recommended for continuous rotation &gt;&plusmn;2 turns;
+        if software limits base rotation to &plusmn;360&deg;, a flexible
+        cable with strain relief is sufficient. Connector:
+        <strong>JST-XH 2-pin</strong> (field-removable, polarised,
+        rated &ge;2 A).
       </sl-alert>
 
-      <h4>2. Communication Interface</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        CAN bus or RS485 integration with the main Teensy/Arduino controller.
-        Protocol details, frame structure, and bus topology.
-      </sl-alert>
-
-      <h4>3. PID Cascade Control</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Position → velocity → current cascade loops. Tuning methodology for
-        smooth re-angling and disturbance rejection under punch impact.
-        Reference to system-level PID cascade in
-        <a href="../../robot-mechanism.html">Robot Mechanism §Architecture</a>.
-      </sl-alert>
-
-      <h4>4. Power Integration</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Connection to the system-level dual-rail power architecture (24V motor
-        bus). Current draw profile during re-angling manoeuvres.
+      <sl-alert variant="danger" open>
+        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
+        <strong>RegenClamp Required:</strong> The Z55BLD400 is a 400 W
+        BLDC motor with a 25:1 gearbox &mdash; back-EMF during rapid
+        deceleration will spike the 24V bus, potentially triggering the
+        same OVP failure documented for the
+        <a href="../height-adjustment/electrical-control.html">height
+        motor</a>. A third <strong>RegenClamp V0.3</strong> unit should
+        be installed between the busbar and the ZBLD driver.
       </sl-alert>
     </div>
 

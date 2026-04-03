@@ -65,6 +65,17 @@
         mitigated before reaching this hardware limit.
       </p>
 
+      <sl-alert variant="success" open>
+        <sl-icon slot="icon" name="check-circle"></sl-icon>
+        <strong>Measured Operating Power (N=43 speed tests):</strong>
+        The four arm motors draw <strong>~33 W peak / ~10 W average</strong>
+        per strike cycle at 24 V — well below the theoretical 384 W stall
+        maximum. Peak per-motor current never exceeds 0.69 A. Full
+        analysis in
+        <a href="testing-evaluation.html">Testing &amp; Evaluation §
+        Power Budget Validation</a>.
+      </sl-alert>
+
       <h4>Isolated 12V Logic Rail</h4>
       <p>
         The NVIDIA Jetson Orin NX compute module and the Teensy 4.0

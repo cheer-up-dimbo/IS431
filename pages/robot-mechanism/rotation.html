@@ -133,15 +133,25 @@
         perimeter rollers, increasing the effective support radius.
       </p>
 
-      <h4>Low-Level Control</h4>
+      <h4>Electrical &amp; Control Architecture</h4>
       <p>
-        The rotation axis is driven by a <strong>BLDC servo motor with
-        encoder</strong>, which provides low backlash, smooth torque, precise
-        position control, and strong disturbance rejection under punching. The
-        motor controller implements the closed-loop PID cascade described in
-        the system architecture (position → velocity → current loops),
-        enabling the yaw stage to hold commanded angles under impact and
-        execute smooth re-angling motions during drills.
+        The rotation axis is driven by a <strong>Z55BLD400-24GU</strong>
+        400 W BLDC motor with a 25:1 planetary gearbox, controlled via the
+        <strong>ZBLD C20-800LRC</strong> CAN motor driver. Position feedback
+        is provided by an <strong>AS5047P</strong> 14-bit magnetic encoder
+        (SPI).
+      </p>
+      <p>
+        The motor controller is an <strong>Arduino Uno R4 WiFi</strong>,
+        operating as a separate controller from the Teensy 4.0 that manages
+        the arm motors. Communication with the Jetson host uses
+        <strong>WiFi UDP</strong> — eliminating physical cable routing through
+        the rotating base joint, which would otherwise fatigue and fail.
+        The CAN bus operates at <strong>125 kbps</strong> (vs 1 Mbps for the
+        arm motors), necessitating a separate bus to avoid firmware
+        complexity. Full details are documented in the
+        <a href="rotation/electrical-control.html">Electrical &amp; Control</a>
+        sub-page.
       </p>
     </div>
 
