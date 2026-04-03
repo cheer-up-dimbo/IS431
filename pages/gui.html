@@ -153,7 +153,7 @@
         <sl-tab-panel name="performance">
           <p>
             <strong>Power, Stamina, and Reaction Time tests.</strong> The Power test reads
-            accelerometer data from the Arduino MPU6050 to measure peak and average punch force.
+            accelerometer data from the onboard IMU sensor to measure peak and average punch force.
             The Stamina test runs a two-minute session and tracks total punches, punch rate, and
             fatigue percentage. The Reaction test uses the computer vision subsystem to measure
             response time. All results are stored per-user in SQLite and viewable through a
@@ -225,7 +225,7 @@
         <a href="gui/design-ideation.html" class="section-nav-card">
           <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
           <h3>Design and Ideation</h3>
-          <p>Framework selection, navigation concepts, data strategy, MoSCoW prioritisation, display hardware</p>
+          <p>Framework selection, navigation concepts, data strategy, display hardware</p>
         </a>
         <a href="gui/implementation.html" class="section-nav-card">
           <sl-icon name="code-square" style="font-size: 2rem;"></sl-icon>
@@ -262,6 +262,18 @@
           GUI's Reaction Test and Sparring mode via a file-based handshake interface.
         </li>
       </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+      <a href="robot-mechanism.html">
+        <sl-button variant="default" size="medium">
+          Next: 5.2 Upper Mechanism
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
 
   </div>

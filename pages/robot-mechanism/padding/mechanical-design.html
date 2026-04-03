@@ -100,12 +100,14 @@
     <!-- STRIKE-ZONE PLACEMENT -->
     <div>
       <h3>Strike-Zone Placement</h3>
+      <h4>Anatomical Basis</h4>
       <p>
         The robot must position its head and torso striking targets at anatomically
         correct heights across a user range of 150 to 190 cm. Since the height
         adjustment is a single-DOF screw jack, both targets move together with a
         fixed vertical separation.
       </p>
+      <h4>Scaling Across User Range</h4>
       <p>
         Standard anthropometric proportions place the chin at approximately 87 to 92%
         of standing height and the solar plexus (xiphoid process) at approximately
@@ -118,6 +120,7 @@
         to 175 cm (at 190 cm user height), consistent with the screw jack's 400 mm
         stroke.
       </p>
+      <h4>Zone-Based Design</h4>
       <p>
         Because the fixed 34 cm separation cannot perfectly match every user's
         individual proportions, the pads are designed as zones rather than single
@@ -265,24 +268,24 @@
         The spring must support the foam horizontally with minimal static sag.
         The governing formula is:
       </p>
+      <p>
+        With the box housing introduced in Iteration 4, the spring no longer needs to support the padding assembly against gravity. Sag is eliminated by the rigid enclosure. This shifts the spring's primary role to shock absorption: the spring should be soft enough to compress meaningfully under a punch, absorbing impact energy before it reaches the robot's frame and internal electronics.
+      </p>
+      <p>
+        Pierce et al. (2006) measured punch forces during six professional boxing matches, reporting mean forces of 866 to 1149 N. For recreational users, who represent BoxBunny's target demographic, estimated punch forces are approximately 400 to 750 N. A design target of 500 N was adopted as a representative mid-range value for a recreational boxer.
+      </p>
+      <p>
+        Using Hooke's Law (F = k * x), the compression under a 500 N punch with the current spring rate of k = 8 N/mm is:
+      </p>
       <div class="calc-block">
-        <code>Sag (x) = m * g / k</code><br>
-        where m = foam mass (kg), g = 9.81 m/sÂ², k = spring rate (N/mm)
+        <code>x = F / k = 500 / 8 = 62.5 mm</code>
       </div>
-
-      <h4>Iteration 3 (1 kg assumed)</h4>
-      <div class="calc-block">
-        Target sag: 0.5 mm or less<br>
-        <code>k >= 1.0 * 9.81 / 0.5 = 19.6 N/mm</code><br>
-        Selected range: 25 to 35 N/mm. At k = 30: sag = 0.33 mm.
-      </div>
-
-      <h4>Iteration 4 (150 g actual)</h4>
-      <div class="calc-block">
-        <code>x = 0.15 * 9.81 / 8 = 0.18 mm</code> (well within 0.5 mm target)<br>
-        The softer spring (8 N/mm) provides noticeable compliance on impact while
-        maintaining negligible sag.
-      </div>
+      <p>
+        This compression is close to the spring's working range, providing meaningful energy absorption without bottoming out. The spring deflects enough to cushion the impact perceptibly, reducing the force transmitted to the robot frame.
+      </p>
+      <p>
+        For future iterations, now that sag is no longer a constraint, an even softer spring (k = 4 to 5 N/mm) could be considered. At k = 4 N/mm, a 500 N punch would produce 125 mm of compression, and at k = 5 N/mm, 100 mm. This would provide a softer, more forgiving feel, which may be preferable for extended training sessions. The box housing provides the structural support that previously required a stiffer spring, so softer options are now viable without risk of the padding assembly drooping under its own weight.
+      </p>
 
       <table class="spec-table">
         <thead>
@@ -380,6 +383,9 @@
         <li>
           Pheasant, S. and Haslegrave, C.M. (2006). <em>Bodyspace: Anthropometry,
           Ergonomics and the Design of Work</em>, 3rd ed. CRC Press.
+        </li>
+        <li>
+          Pierce, J.D., Reinbold, K.A., Lyngard, B.C., Goldman, R.J. and Pastore, C.M. (2006). Direct Measurement of Punch Force During Six Professional Boxing Matches. Journal of Quantitative Analysis in Sports, 2(2).
         </li>
       </ul>
     </div>

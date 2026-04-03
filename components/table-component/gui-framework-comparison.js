@@ -3,42 +3,42 @@ const guiFrameworkComparisonEl = document.getElementById('gui-framework-comparis
 if (guiFrameworkComparisonEl) {
   new gridjs.Grid({
     columns: [
-      { name: 'Framework', width: '22%' },
-      { name: 'Pros', width: '28%' },
-      { name: 'Cons', width: '28%' },
-      { name: 'Verdict', width: '22%' }
+      { name: 'Framework', width: '15%' },
+      { name: 'Pros', width: '30%' },
+      { name: 'Cons', width: '30%' },
+      { name: 'Decision', width: '25%' }
     ],
     data: [
-      ['React Native / Flutter\n(Cross-platform mobile frameworks using JavaScript or Dart)', 'Modern and popular\nCross-platform support\nGood documentation', 'Requires learning a new language\nInsufficient time to gain proficiency\nJetson Nano compatibility uncertain', 'Rejected: timeline too short for new language acquisition'],
-      ['Tkinter\n(Python built-in GUI library based on Tk)', 'Built into Python, no installation needed\nSimple to learn\nLightweight', 'Dated visual appearance\nLimited styling and theming options\nBasic widget set for complex layouts', 'Rejected: insufficient widget variety for a multi-page training application'],
-      ['Kivy\n(Python framework designed for multi-touch applications)', 'Purpose-built for touch interfaces\nModern UI capabilities\nPython-based', 'Smaller community and ecosystem\nUnconventional design paradigm (kv language)\nLess documentation available', 'Considered but not selected: community and documentation risk too high'],
-      ['PySide6\n(Qt for Python, official Python bindings for the Qt framework)', 'Professional widget library\nExtensive documentation and community\nPython-based, leveraging existing skills\nProven on ARM/Linux platforms\nNative touchscreen support', 'Steeper learning curve than Tkinter\nLarger deployment footprint', 'Selected: best balance of capability, documentation, and timeline feasibility']
+      [
+        'PySide6 (Qt for Python)',
+        'Native on Jetson Nano, mature touchscreen support, extensive Qt documentation, builds on existing Python knowledge',
+        'Large framework footprint, steeper learning curve than lightweight alternatives',
+        gridjs.html('<span style="color:#2e7d32; font-weight:bold;">Selected</span>')
+      ],
+      [
+        'Tkinter',
+        'Included with Python, minimal setup, simple API',
+        'Limited widget set, poor touchscreen support, dated visual appearance, limited layout control',
+        gridjs.html('<span style="color:#c62828; font-weight:bold;">Rejected</span>')
+      ],
+      [
+        'Kivy',
+        'Designed for touch interfaces, cross-platform, modern look',
+        'Not pre-installed on Jetson Nano, smaller community, unfamiliar API requiring additional learning time',
+        gridjs.html('<span style="color:#c62828; font-weight:bold;">Rejected</span>')
+      ],
+      [
+        'Web-based (Flask + Browser)',
+        'Flexible UI with HTML/CSS, responsive design, familiar web technologies',
+        'Requires running a local web server, adds browser dependency, latency concerns on resource-constrained hardware',
+        gridjs.html('<span style="color:#c62828; font-weight:bold;">Rejected</span>')
+      ]
     ],
     search: false,
     sort: false,
     pagination: false,
     style: {
-      table: {
-        'white-space': 'pre-wrap'
-      }
-    },
-    className: {
-      tr: (_, row) => {
-        if (!row) return '';
-        const verdict = row.cells[3]?.data || '';
-        if (verdict.startsWith('Selected')) return 'gridjs-tr-selected';
-        if (verdict.startsWith('Considered')) return 'gridjs-tr-considered';
-        return 'gridjs-tr-rejected';
-      }
+      table: { 'white-space': 'normal' }
     }
   }).render(guiFrameworkComparisonEl);
-
-  // Inject color-coding styles
-  const style = document.createElement('style');
-  style.textContent = `
-    .gridjs-tr-selected td { background-color: #e8f5e9 !important; }
-    .gridjs-tr-rejected td { background-color: #ffebee !important; }
-    .gridjs-tr-considered td { background-color: #fff8e1 !important; }
-  `;
-  document.head.appendChild(style);
 }

@@ -32,10 +32,9 @@
 
     <h2>Design and Ideation</h2>
     <p>
-      Before any code was written, four design decisions had to be resolved. Each had direct
+      Before any code was written, three design decisions had to be resolved. Each had direct
       consequences for feasibility, usability, and maintainability. The options considered for
-      each decision are documented below, followed by the feature prioritisation that governed
-      the development sequence.
+      each decision are documented below.
     </p>
 
     <!-- FRAMEWORK SELECTION -->
@@ -95,22 +94,140 @@
       </p>
     </div>
 
+    <!-- COMBO CURRICULUM LEARNING APPROACH -->
+    <div>
+      <h3>Combo Curriculum Learning Approach</h3>
+      <p>
+        The combo curriculum needed a learning model to govern how users progress through
+        the 50-combo library. Three approaches were evaluated against the requirements
+        that progression should feel structured, mastery should be measurable, and the
+        system should mirror how boxing coaches actually structure pad work.
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; width:20%;">Concept</th>
+            <th style="padding:10px; border:1px solid #ddd; width:40%;">Description</th>
+            <th style="padding:10px; border:1px solid #ddd; width:25%;">Reason for Decision</th>
+            <th style="padding:10px; border:1px solid #ddd; width:15%;">Decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#ffebee;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Spaced Repetition (Anki-style)</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Schedule combos based on forgetting curves, inspired by the Ebbinghaus spacing
+              effect. Each combo would reappear at increasing intervals after successful recall.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              While spaced practice benefits motor skill learning (Shea et al., 2000), the
+              Anki card-review model assumes discrete recall events. Boxing training is
+              session-based and continuous; users do not "recall" a combo in isolation but
+              execute it within a round. The scheduling model did not map to the session
+              structure.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd; color:#c62828; font-weight:bold;">Rejected</td>
+          </tr>
+          <tr style="background:#ffebee;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Random Rotation</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Present combos randomly from the current difficulty tier with no fixed order
+              or grouping.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              No structured progression path. Users could repeatedly encounter combos they
+              have already mastered while rarely seeing new ones. No mastery tracking or
+              unlock mechanism.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd; color:#c62828; font-weight:bold;">Rejected</td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Group-Based Sequential Progression</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Combos are grouped by technique family. The system rotates through the current
+              group until a mastery threshold is met (average score of 3.0 out of 5.0 over the
+              last 5 sessions), then unlocks the next group. This mirrors how boxing coaches
+              structure pad work: drill a technique family until the boxer is comfortable, then
+              layer on the next.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Provides clear progression, measurable mastery, and a structure that aligns with
+              real coaching practice. The threshold and window size are configurable.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd; color:#2e7d32; font-weight:bold;">Selected</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <sl-divider></sl-divider>
 
-    <!-- FEATURE PRIORITISATION -->
+    <!-- SPARRING SEQUENCE GENERATION -->
     <div>
-      <h3>Feature Prioritisation</h3>
+      <h3>Sparring Sequence Generation</h3>
       <p>
-        With a fixed timeline and a broad feature set, MoSCoW prioritisation determined
-        what would be built first and what would be deferred. The goal was to have core
-        training functionality stable and tested before any enhanced features were attempted.
+        Sparring mode requires the robot to generate punch sequences that feel
+        unpredictable and stylistically coherent. The Function Analysis (Section 3.1)
+        identified "Unpredictability in sparring" as a key function, with solution
+        principles including pose estimation, hardcoded random sequences, and wearable
+        sensors. Three software-side generation strategies were evaluated.
       </p>
-      <table-component id="gui-moscow"></table-component>
-      <p>
-        Must Have features were targeted in the first three iterations. Should Have features
-        followed once the foundation was confirmed stable. Could Have features were built where
-        time permitted. Will Not Have items were recorded explicitly to prevent scope creep.
-      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; width:20%;">Concept</th>
+            <th style="padding:10px; border:1px solid #ddd; width:40%;">Description</th>
+            <th style="padding:10px; border:1px solid #ddd; width:25%;">Reason for Decision</th>
+            <th style="padding:10px; border:1px solid #ddd; width:15%;">Decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#ffebee;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Hardcoded Sequences</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Pre-defined fixed combos stored in a list and cycled in order during sparring
+              rounds.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Predictable after a few sessions. Users memorise the pattern and the training
+              value diminishes. Does not adapt to user weaknesses.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd; color:#c62828; font-weight:bold;">Rejected</td>
+          </tr>
+          <tr style="background:#ffebee;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Uniform Random Generation</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Each punch is generated independently with equal probability across all punch
+              types. No state or memory between punches.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Produces sequences that lack natural boxing flow. A jab naturally leads to a
+              cross, not a random uppercut. The output feels mechanical rather than
+              stylistically coherent.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd; color:#c62828; font-weight:bold;">Rejected</td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Markov Chain with Style Matrices</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Each boxing style (Pressure Fighter, Counter Puncher, Infighter, Out-Boxer,
+              Random) defines a transition probability matrix over punch types. The next punch
+              depends on the current punch, producing naturalistic sequences. A weakness bias
+              parameter blends in the user's weakness profile over time, increasing the
+              probability of punches the user struggles with. A safety limit of six punches per
+              combo prevents excessively long sequences.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd;">
+              Produces stylistically coherent, unpredictable sequences that adapt to the user.
+              Each style plays differently, adding variety across sessions. The Markov property
+              keeps implementation simple while capturing realistic punch transitions.
+            </td>
+            <td style="padding:10px; border:1px solid #ddd; color:#2e7d32; font-weight:bold;">Selected</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <sl-divider></sl-divider>
@@ -118,12 +235,14 @@
     <!-- DISPLAY HARDWARE -->
     <div>
       <h3>Display Hardware Selection</h3>
+      <h4>Original Display</h4>
       <p>
         The original display was a 7-inch resistive touchscreen at 1024x600 resolution,
         selected for its low cost and direct DSI compatibility with the Jetson Nano. All
         six development iterations were built and tested against this display. The layout,
         font sizing, and touch target geometry were designed for a 7-inch form factor.
       </p>
+      <h4>User Observations at the Showcase</h4>
       <p>
         During user testing at the "Robotics Meets AI Showcase" event (within the Robotics
         and AI in Work and Play segment), two displays were available: the 7-inch screen
@@ -133,6 +252,7 @@
         larger text, more visible statistics during training, and found the smaller screen
         difficult to read during active sessions.
       </p>
+      <h4>Display Upgrade</h4>
       <p>
         Based on these observations, the display was upgraded to a 10.1-inch IPS capacitive
         touchscreen at 1280x800 resolution (DSI interface, Raspberry Pi compatible, also
@@ -142,6 +262,16 @@
         without breaking, as the GUI used proportional sizing rather than fixed pixel
         coordinates for most layout elements.
       </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- REFERENCES -->
+    <div>
+      <h3>References</h3>
+      <ul style="list-style:none; padding-left:0; font-size:0.92rem; line-height:1.7;">
+        <li>Shea, C.H., Lai, Q., Black, C. and Park, J.H. (2000). Spacing practice sessions across days benefits the learning of motor skills. <em>Human Movement Science</em>, 19(5), 737-760.</li>
+      </ul>
     </div>
 
     <!-- BOTTOM NAVIGATION -->
@@ -175,6 +305,5 @@
   <script src="../../components/table-component/gui-framework-comparison.js"></script>
   <script src="../../components/table-component/gui-nav-concepts.js"></script>
   <script src="../../components/table-component/gui-data-isolation.js"></script>
-  <script src="../../components/table-component/gui-moscow.js"></script>
 </body>
 </html>

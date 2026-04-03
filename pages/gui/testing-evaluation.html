@@ -32,8 +32,8 @@
 
     <h2>Testing and Evaluation</h2>
     <p>
-      This section presents the functional testing conducted during development, user testing
-      observations from the public showcase event, and the limitations that remain.
+      This section presents the functional testing conducted during development, and user testing
+      observations from the public showcase event.
     </p>
 
     <!-- FUNCTIONAL TESTING -->
@@ -61,6 +61,7 @@
     <!-- USER TESTING -->
     <div>
       <h3>User Testing: Robotics Meets AI Showcase</h3>
+      <h4>Setup</h4>
       <p>
         Members of the public physically interacted with BoxBunny at the "Robotics Meets AI
         Showcase" event in late January 2025, specifically within the Robotics and AI in Work
@@ -68,6 +69,7 @@
         7-inch touchscreen mounted directly on the robot, and a larger external monitor
         connected to the same Jetson Nano showing the same GUI output.
       </p>
+      <h4>Observations</h4>
       <p>
         During the session, participants and observers consistently gravitated toward the larger
         monitor when reading training results and navigating between pages. Users who attempted
@@ -76,6 +78,7 @@
         comfortably while also focusing on technique. Users who switched to the larger monitor
         did not report the same issues.
       </p>
+      <h4>Display Upgrade Decision</h4>
       <p>
         These observations validated a hardware revision. The 7-inch display was replaced with
         a 10.1-inch IPS capacitive touchscreen (1280x800 resolution, DSI interface). The upgrade
@@ -96,47 +99,6 @@
       </p>
 
       <table-component id="gui-deliverables-status"></table-component>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- KNOWN ISSUES -->
-    <div>
-      <h3>Known Issues</h3>
-      <table-component id="gui-known-issues"></table-component>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- LIMITATIONS -->
-    <div>
-      <h3>Limitations</h3>
-
-      <h4>Computer Vision Integration</h4>
-      <p>
-        The computer vision subsystem communicates with the GUI through a file-based handshake
-        rather than a direct API call. This was a consequence of the CV and GUI subsystems being
-        developed in parallel without a stable shared interface being finalised before the
-        submission deadline. The mechanism works reliably but introduces unnecessary file I/O
-        overhead that a direct function call would avoid.
-      </p>
-
-      <h4>AI Coaching Availability</h4>
-      <p>
-        The AI coaching feature falls back to hardcoded template responses when the language
-        model is unavailable. On the Jetson Nano's 4 GB RAM, loading the Qwen 2.5 3B model
-        alongside the GUI and other subsystems is not always feasible. The fallback provides
-        functional feedback, but it limits the personalisation of coaching on memory-constrained
-        hardware.
-      </p>
-
-      <h4>Display Upgrade Validation</h4>
-      <p>
-        The display upgrade to 10.1 inches occurred late in the project. While the interface
-        scaled correctly to the new resolution, there was no opportunity to conduct a second
-        round of structured user testing on the new hardware. The improvement in readability
-        is based on qualitative observation during the event rather than controlled measurement.
-      </p>
     </div>
 
     <!-- BOTTOM NAVIGATION -->
@@ -169,6 +131,5 @@
   <script type="module" src="../../components/table-component/table-component.js"></script>
   <script src="../../components/table-component/gui-functional-testing.js"></script>
   <script src="../../components/table-component/gui-deliverables-status.js"></script>
-  <script src="../../components/table-component/gui-known-issues.js"></script>
 </body>
 </html>
