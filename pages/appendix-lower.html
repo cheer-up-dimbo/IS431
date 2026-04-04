@@ -24,13 +24,13 @@
       </sl-button>
     </a>
     <br>
-    <h2>Appendix 2: Lower Mechanisms (Jeanette)</h2>
-<h4>
-    a)    Footwork Movement
-</h4>
-<h5>
-    i)      Motion Axis Selection
-</h5>
+    <h1>Appendix 2: Lower Mechanisms (Jeanette)</h1>
+<h2>
+    2.1. Footwork Movement
+</h2>
+<h3>
+    2.1.1. Motion Axis Selection
+</h3>
 <p>
     Having to accomplish two motions, decision has to be made to have both
     controlled within one mechanism or decouple those axes into separate
@@ -160,14 +160,13 @@
     forward–backward range, and slewing bearing with external gear and
     pinion-driven motor for yaw rotation. <br clear="all"/>
 </p>
-    </div>
-    <div>
-<h5>
-    ii)    Linear Motion Selection
-</h5>
-<h6>
-    (1)   Power Transmission Drive Selection
-</h6>
+
+<h3>
+    2.1.2. Linear Motion Selection
+</h3>
+<h4>
+    2.1.2.1. Power Transmission Drive Selection
+</h4>
 <p>
     The power transmission drive for the linear stage must reliably move the
     entire BoxBunny robot (≈ 20–25 kg including arms and torso) forward and
@@ -208,24 +207,20 @@
 </p>
 <p>
     Lead screws convert rotary motion to linear motion via a threaded rod and
-    nut. They are generally <strong>low cost</strong>, mechanically simple, and
+    nut. They are generally low cost, mechanically simple, and
     can use self-locking polymer or anti-backlash nuts, which reduces drift in
     vertical axes and improves repeatability for light loads. However, for
     BoxBunny’s application they present several drawbacks:
 </p>
 <ul type="disc">
     <li>
-        <strong>Lower      efficiency and higher friction</strong>,      leading
-        to more heating at higher speeds or duty cycles.
+        Lower efficiency and higher friction, leading to more heating at higher speeds or duty cycles.
     </li>
     <li>
-        <strong>Limited      load and speed capability</strong> with typical
-        polymer nuts; not ideal when combining moderate loads,      repeated
-        motion and dynamic impacts.
+        Limited load and speed capability with typical polymer nuts; not ideal when combining moderate loads, repeated motion and dynamic impacts.
     </li>
     <li>
-        <strong>Moderate accuracy</strong> and life compared to ball
-        screws, especially under higher thrust and duty.
+        Moderate accuracy and life compared to ball screws, especially under higher thrust and duty.
     </li>
 </ul>
 <p>
@@ -238,25 +233,24 @@
 </p>
 <p>
     Ball screws use recirculating balls between the screw and nut, providing
-    <strong>rolling contact</strong> instead of sliding. For BoxBunny, they
-    offer several key advantages:
+    rolling contact instead of sliding. For BoxBunny, they offer several key advantages:
 </p>
 <ul type="disc">
     <li>
-        <strong>High      thrust and load capacity</strong> appropriate for
+        High thrust and load capacity appropriate for
         moving a ~20–25 kg robot and resisting horizontal reaction      forces.
     </li>
     <li>
-        <strong>High      stiffness, accuracy and repeatability</strong>, due to
+        High stiffness, accuracy and repeatability, due to
         low backlash and well-controlled      preload, which supports repeatable
         stance positions.
     </li>
     <li>
-        <strong>High      mechanical efficiency</strong>,      reducing motor
+        High      mechanical efficiency, reducing motor
         torque requirements and heat build-up under frequent moves.
     </li>
     <li>
-        <strong>Good durability under repeated      duty</strong>, making
+        Good durability under repeated duty, making
         them suitable for regular training sessions with many cycles.
     </li>
 </ul>
@@ -344,9 +338,9 @@
     This makes a <strong>ball screw–driven linear rail</strong> the most
     appropriate power transmission solution for the BoxBunny footwork axis.
 </p>
-<h6>
-    (2)   Motor Selection
-</h6>
+<h4>
+    2.1.2.2. Motor Selection
+</h4>
 <p>
     The motor driving the ball-screw linear stage must translate the full
     BoxBunny mass (~20–25 kg) over a short stroke (≈200–300 mm) while
@@ -373,11 +367,9 @@
 </ul>
 <p>
     Three motor families were evaluated:
-    <strong>
-        Open-Loop Stepper Motor (NEMA-Frame)
-    </strong>
-    , <strong>Closed-Loop Stepper / Hybrid Servo (Stepper + Encoder)</strong>,
-    and <strong>Industrial AC/BLDC Servo Motor (Servo Pack)</strong>.
+        Open-Loop Stepper Motor (NEMA-Frame), 
+        Closed-Loop Stepper / Hybrid Servo (Stepper + Encoder), and 
+        Industrial AC/BLDC Servo Motor (Servo Pack).
 </p>
 <p>
     <strong><u>Open-Loop Stepper Motor</u></strong>
@@ -408,12 +400,12 @@
 </p>
 <ul type="disc">
     <li>
-        <strong>Open-loop      control:</strong> missed steps under sudden loads
+        <strong>Open-loop control:</strong> missed steps under sudden loads
         or aggressive acceleration are not      detected.
     </li>
     <li>
-        Loss      of steps leads to <strong>silent position drift</strong>,
-        which directly undermines      stance repeatability.
+        Loss of steps leads to <strong>silent position drift</strong>,
+        which directly undermines stance repeatability.
     </li>
     <li>
         Resonance and <strong>vibration</strong> can occur if not carefully
@@ -549,14 +541,13 @@
     improvement in robustness over an open-loop stepper without the full cost
     and integration burden of an industrial servo pack.
 </p>
-    </div>
-    <div>
-      <h5>
-    iii)  Rotational Motion Selection
-</h5>
-<h6>
-    (1)   Bearing Selection
-</h6>
+
+<h3>
+    2.1.3. Rotational Motion Selection  
+</h3>
+<h4>
+    2.1.3.1. Bearing Selection
+</h4>
 <p>
     The yaw rotation system must support the full BoxBunny robot mass (≈ 20–25
     kg), plus dynamic punching loads and overturning moments from the elevated
@@ -810,9 +801,9 @@
     </strong>
     , it is selected as the yaw bearing for the system.
 </p>
-<h6>
-    (2)   Gear Reduction Selection (Baseline)
-</h6>
+<h4>
+    2.1.3.2. Gear Reduction Selection (Baseline)
+</h4>
 <p>
     The gear reduction for the yaw axis is largely dictated by the choice of
     <strong>slewing ring bearing with external gear teeth</strong>. Once the
@@ -969,6 +960,7 @@
     of loads acting on the bearing.
 </p>
 <image-component
+        width="70%"
         tag="image"
         source="../assets/report appendix b/15-matrix-FBD Loads acting on Bearing.jpg"
         subtitle="Figure A1: Free-Body Diagram of Loads acting on Bearing.">
@@ -1102,11 +1094,10 @@
         and efficiency relations described earlier.
     </li>
 </ol>      
-    </div>
-    <div>
-<h6>
-    (3)   Motor Selection
-</h6>
+
+<h4>
+    2.1.3.3. Motor Selection
+</h4>
 <p align="left">
     The yaw motor, together with the pinion and slewing ring, must rotate the
     full BoxBunny upper body about the vertical axis while resisting
@@ -1343,11 +1334,10 @@
     impact-induced disturbances, all of which align well with the BoxBunny
     design goals.
 </p>
-    </div>
-    <div>
-<h4>
-    b)    Height Adjustment
-</h4>
+
+<h2>
+    2.2. Height Adjustment
+</h2>
 <p>
     The height adjustment system must vary the BoxBunny torso/head height by
     approximately <strong>300–400 mm</strong> to accommodate different user
@@ -1390,6 +1380,7 @@
     lateral punching forces.
 </p>
 <image-component
+        width="70%"
         tag="image"
         source="../assets/report appendix b/17-height-concept1.png"
         subtitle="Figure B2: Required Components + Drawing of Integration for Concept #1">
@@ -1399,17 +1390,14 @@
 </p>
 <ul type="disc">
     <li>
-        Gas      lifts are <strong>readily available and compact</strong>.
+        Gas lifts are <strong>readily available and compact</strong>.
     </li>
     <li>
-        Can      carry the <strong>static axial load</strong> of the robot mass.
+        Can carry the <strong>static axial load</strong> of the robot mass.
     </li>
     <li>
         Vertical linear guides at the      back can be sized to take
-        <strong>
-            lateral loads and overturning moments
-        </strong>
-        .
+        <strong> lateral loads and overturning moments</strong>.
     </li>
 </ul>
 <p>
@@ -1417,10 +1405,10 @@
 </p>
 <ul type="disc">
     <li>
-        Gas      cylinders are inherently <strong>compliant</strong> – they
-        behave like a      spring/damper. Under repeated punches, this leads to
-        <strong>vertical      “bouncing”</strong> of the torso, which feels
-        unrealistic and reduces strike      rigidity.
+        Gas cylinders are inherently <strong>compliant</strong> – they
+        behave like a spring/damper. Under repeated punches, this leads to
+        <strong>vertical “bouncing”</strong> of the torso, which feels
+        unrealistic and reduces strike rigidity.
     </li>
     <li>
         The      internal gas spring force varies with stroke; stiffness is
@@ -1464,6 +1452,7 @@
     </li>
 </ul>
 <image-component
+        width="70%"
         tag="image"
         source="../assets/report appendix b/18-height-concept2.png"
         subtitle="Figure B3: Required Components + Drawing of Integration for Concept #2">
