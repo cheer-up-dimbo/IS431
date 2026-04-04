@@ -11,6 +11,11 @@
   <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .page-nav-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -169,6 +174,22 @@
           Total worst-case utilisation: ~2.8 ms of the 5.0 ms budget (56%).
         </p>
       </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Mechanical Design
+        </sl-button>
+      </a>
+      <a href="testing-evaluation.html">
+        <sl-button variant="default" size="medium">
+          Next: Testing & Evaluation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
   </div>
 

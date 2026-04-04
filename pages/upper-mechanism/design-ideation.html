@@ -13,6 +13,11 @@
   <script type="module" src="../../components/video/video.js"></script>
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .page-nav-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -79,22 +84,147 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. INTERIM JOINT DESIGN                                -->
+    <!-- 2. JOINT CONCEPT SELECTION                             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Interim Joint Design (Gear-Rail System)</h3>
+      <h3>Joint Concept Selection</h3>
       <p>
-        Inspiration for the initial joint mechanism was drawn from a coaxial
-        gear-rail concept
+        Three candidate joint configurations were generated and evaluated
+        against four weighted criteria: training fidelity, mechanical
+        complexity, component cost, and user zone obstruction. The full
+        concept sketches and scored decision matrix are presented in
+        <a href="../appendix-upper.html">Appendix 1</a>.
+      </p>
+
+      <h4>Concept 1: Multi-Actuator Rig</h4>
+      <p>
+        The first concept allocated a dedicated actuator for each
+        individual strike type. Covering both left and right striking zones
+        would require a minimum of six motors. While this approach
+        theoretically maximises strike fidelity by permitting independent
+        optimisation of each motion, the solution was deemed prohibitively
+        complex, high-cost, and likely to physically obstruct the user's
+        striking targets.
+      </p>
+
+      <h4>Concept 2: Windmill Actuator</h4>
+      <p>
+        The second concept consolidated two strike motions into a single
+        motor by mounting training sticks on both ends of a rotating shaft
+        (a "windmill" configuration). However, analysis revealed a critical
+        fidelity failure: in the neutral position, the extended uppercut
+        component would directly obstruct the liver strike zone —
+        preventing the user from accessing a primary training target.
+      </p>
+
+      <h4>Concept 3: 2-DOF Coaxial Differential (Selected)</h4>
+      <p>
+        The selected concept employs a <strong>2-Degrees-of-Freedom
+        coaxial differential mechanism</strong> using only two motors per
+        arm. By combining coordinated pitch and roll rotations, this single
+        mechanism reproduces all required strike patterns from a compact
+        form factor. The concept scored highest across all four evaluation
+        criteria, offering the optimal balance of training fidelity,
+        mechanical simplicity, cost-effectiveness, and minimal zone
+        obstruction.
+      </p>
+
+      <h4>Proximal Motor Mounting — Avoiding Weight on Moving Parts</h4>
+      <p>
+        A critical design constraint for the coaxial configuration is that
+        <strong>no motors or heavy components may be mounted on the moving
+        arm itself</strong>. In a high-velocity striking mechanism, any
+        additional mass on the rotating arm directly increases the torque
+        required to achieve target punch speeds and amplifies the impact
+        forces transmitted back through the 3D-printed drivetrain during
+        deceleration.
+      </p>
+      <p>
+        The coaxial gear-rail architecture solves this by mounting both
+        motors <strong>side-by-side at the stationary base</strong> of the
+        arm assembly. Each motor drives a pinion gear into the central
+        coaxial gear stack, transmitting torque to the arm without adding
+        any weight to the moving structure. The result is an arm assembly
+        composed only of lightweight 3D-printed gears, a training stick,
+        and padding — keeping the rotating mass to a minimum and ensuring
+        the mechanism can achieve the required strike velocities within
+        the motor's torque envelope.
+      </p>
+
+      <!-- ─── Technical Callout: Inverse Kinematics (Validated 2026-04-02) ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Technical Callout — Inverse Kinematic Equations
+          <span style="font-weight:normal; font-size:0.85em; color:#059669;">(Validated 2026-04-02)</span>
+        </h4>
+        <p>
+          The coaxial differential coupling creates a non-trivial
+          relationship between the raw motor space
+          (m<sub>r</sub>&nbsp;=&nbsp;roll motor,
+          m<sub>p</sub>&nbsp;=&nbsp;pitch motor) and the joint
+          output space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>).
+          The closed-form inverse conversion that the firmware evaluates
+          on every control cycle is:
+        </p>
+        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 16px 0;">
+          &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> /
+          s<sub>r</sub>) &middot; G, &nbsp;&nbsp;
+          m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
+          &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
+          m<sub>p</sub> = [(&theta;<sub>pitch</sub> /
+          s<sub>p</sub>) &middot; G &minus; c &middot;
+          &Delta;<sub>r</sub>] + o<sub>p</sub>
+          &nbsp;&nbsp;&nbsp;(Eq. 2)
+        </p>
+        <p>
+          where G&nbsp;=&nbsp;3 (3:1 helical-spur reduction),
+          o<sub>r</sub>/o<sub>p</sub> are calibrated home offsets,
+          s<sub>r</sub>/s<sub>p</sub> are directional signs (&plusmn;1),
+          and <strong>c</strong> is the bevel gear coupling parameter
+          (&plusmn;1). The critical insight is in <strong>Eq. 2</strong>:
+          the subtraction of
+          <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em> is the
+          <strong>software decoupling term</strong> that compensates for
+          the "walking bevel" effect. Because the bevel gear is housed
+          inside the roll-driven outer housing, any roll rotation carries
+          the pitch mechanism with it. This term cancels that parasitic
+          coupling in real-time.
+        </p>
+        <p style="font-size: 0.9rem; color: #555;">
+          Full kinematic derivations, the forward kinematics
+          (Motor &rarr; Joint space), the rotation-around-arm-axis 3D FK
+          model, and the 4-test calibration probe are presented in
+          <a href="mechanical-design.html">Mechanical Design</a>.
+        </p>
+      </div>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="image"></sl-icon>
+        <strong>Media Placeholder:</strong> Weighted decision matrix
+        comparing Concepts 1–3 across the four evaluation criteria.
+        Currently available in
+        <a href="../appendix-upper.html">Appendix 1</a>.<br>
+        <em>To add inline: export the matrix as an image to
+        <code>assets/upper_mechanism/concept_selection/</code>.</em>
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. INTERIM JOINT DESIGN — 2-DOF VALIDATION             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Interim Joint Design — 2-DOF Concept Validation</h3>
+      <p>
+        With the 2-DOF coaxial differential selected, the next step was to
+        validate the concept through physical prototyping. Inspiration for
+        the gear-rail implementation was drawn from a coaxial gear-rail
+        concept
         (<a href="https://youtu.be/rP8Si_qXkzU" target="_blank">reference
-        video</a>). This approach offers a key advantage: both motors can
-        be mounted side-by-side at the base of the assembly, each driving
-        a pinion gear into a central coaxial gear stack, rather than
-        placing motors on the moving arm itself. This
-        <strong>centralises the motor mass at the pivot
-        point</strong> and reduces the arm's moment of inertia.
-        The trade-off is additional mechanical complexity introduced by the
-        bevel gear required to convert the gear stack output into the
+        video</a>). This approach implements the proximal motor mounting
+        strategy: both motors are mounted side-by-side at the base of the
+        assembly, each driving a pinion gear into a central coaxial gear
+        stack, with a bevel gear converting the gear stack output into
         pitch axis rotation.
       </p>
       <p>
@@ -107,40 +237,43 @@
         mechanisms.
       </p>
 
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="image"></sl-icon>
-        <strong>Media Placeholder:</strong> SolidWorks iteration renders of
-        the gear-rail joint design. Each iteration should be labelled with
-        the key design change (e.g., "Iteration 2: widened gear mesh
-        clearance for assembly access").<br>
-        <em>To add: place image files in
-        <code>assets/upper_mechanism/design_iterations/</code> and use
-        <code>&lt;image-component&gt;</code> tags below.</em>
-      </sl-alert>
-      <!--
-        EXAMPLE — uncomment and update when media is available:
+      <div style="display: flex; gap: 12px; align-items: flex-start; margin: 16px 0;">
         <image-component
+          width="100%"
           tag="image"
-          source="../../assets/upper_mechanism/design_iterations/solidworks_v1.png"
-          subtitle="Figure: SolidWorks iteration 1 — initial gear-rail concept with single bevel gear coupling.">
+          source="../../assets/upper_mechanism/design_iterations/FIrst_Gear_Rail_Design.png"
+          subtitle="Iteration 1 — Initial gear-rail concept with vertical bracket mount and coaxial gear-rail arc sector.">
         </image-component>
-      -->
 
-      <h4>Interim Design Validation</h4>
+        <image-component
+          width="100%"
+          tag="image"
+          source="../../assets/upper_mechanism/design_iterations/Second_Gear_Rail_Design.png"
+          subtitle="Iteration 2 — Refined bevel-spur gear coupling with arm tube integrated and compact enclosed housing.">
+        </image-component>
+
+        <image-component
+          width="100%"
+          tag="image"
+          source="../../assets/upper_mechanism/design_iterations/Third_Gear_Rail_Design.png"
+          subtitle="Iteration 3 — Final interim design with full coaxial assembly, bevel gear crown, and rack-and-pinion base.">
+        </image-component>
+      </div>
+
+      <h4>Physical Validation</h4>
       <p>
-        To validate that the proposed mechanism was truly capable of
-        executing the required strike motions, the final SolidWorks
-        iteration was fabricated using PLA FDM printing. The physical
-        prototype confirmed that the two degrees of freedom — pitch and
-        roll — were sufficient to replicate all three target strike types
-        (jab, hook, uppercut) when operated manually.
+        The final SolidWorks iteration was fabricated using PLA FDM
+        printing. The physical prototype confirmed that the two degrees
+        of freedom — pitch and roll — were sufficient to replicate all
+        three target strike types (jab, hook, uppercut) when operated
+        manually, validating the 2-DOF concept selection.
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. POST-INTERIM DESIGN REVIEW                          -->
+    <!-- 4. POST-INTERIM DESIGN REVIEW                          -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Post-Interim Design Review</h3>
@@ -217,149 +350,6 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 4. JOINT CONCEPT SELECTION                             -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Joint Concept Selection</h3>
-      <p>
-        Three candidate joint configurations were generated and evaluated
-        against four weighted criteria: training fidelity, mechanical
-        complexity, component cost, and user zone obstruction. The full
-        concept sketches and scored decision matrix are presented in
-        <a href="../appendix-upper.html">Appendix 1</a>.
-      </p>
-
-      <h4>Concept 1: Multi-Actuator Rig</h4>
-      <p>
-        The first concept allocated a dedicated actuator for each
-        individual strike type. Covering both left and right striking zones
-        would require a minimum of six motors. While this approach
-        theoretically maximises strike fidelity by permitting independent
-        optimisation of each motion, the solution was deemed prohibitively
-        complex, high-cost, and likely to physically obstruct the user's
-        striking targets.
-      </p>
-
-      <h4>Concept 2: Windmill Actuator</h4>
-      <p>
-        The second concept consolidated two strike motions into a single
-        motor by mounting training sticks on both ends of a rotating shaft
-        (a "windmill" configuration). However, analysis revealed a critical
-        fidelity failure: in the neutral position, the extended uppercut
-        component would directly obstruct the liver strike zone —
-        preventing the user from accessing a primary training target.
-      </p>
-
-      <h4>Concept 3: 2-DOF Coaxial Differential (Selected)</h4>
-      <p>
-        The selected concept employs a <strong>2-Degrees-of-Freedom
-        coaxial differential mechanism</strong> using only two motors per
-        arm. By combining coordinated pitch and roll rotations, this single
-        mechanism reproduces all required strike patterns from a compact
-        form factor. The concept scored highest across all four evaluation
-        criteria, offering the optimal balance of training fidelity,
-        mechanical simplicity, cost-effectiveness, and minimal zone
-        obstruction.
-      </p>
-
-      <h4>Moment of Inertia (MoI) — The Dynamics Rationale</h4>
-      <p>
-        The defining advantage of the coaxial configuration is
-        <strong>proximal motor mounting</strong> (mass centralisation).
-        Both Damiao motors are mounted <strong>side-by-side
-        horizontally</strong> at the base of the arm assembly — each
-        driving a pinion gear into the central coaxial gear stack —
-        rather than being distributed distally along the arm's length.
-        From a rotational
-        dynamics perspective, the <strong>Moment of Inertia (MoI)</strong>
-        of a rigid body scales with <em>mr&sup2;</em>, where <em>m</em>
-        is the component mass and <em>r</em> is the distance from the
-        rotation axis. By positioning the heaviest components
-        (motors: ~220 g each) at <em>r &asymp; 0</em>, their contribution
-        to the arm's total MoI becomes negligible.
-      </p>
-      <p>
-        This reduction in MoI has two critical consequences:
-      </p>
-      <ol>
-        <li>
-          <strong>Acceleration:</strong> A lower MoI demands proportionally
-          less torque to achieve a given angular acceleration
-          (&tau; = I&alpha;). This enables the mechanism to reach target
-          punch velocities of approximately <strong>80 rad/s</strong>
-          within the Damiao motor's torque envelope.
-        </li>
-        <li>
-          <strong>Deceleration survivability:</strong> When the arm
-          decelerates at the apex of a strike, the impulse torque
-          transmitted back through the drivetrain is directly proportional
-          to MoI. A lower MoI reduces the instantaneous forces experienced
-          by the 3D-printed gears during the high-G deceleration phase,
-          which is the primary reason the drivetrain survives repeated
-          sparring without catastrophic gear failure.
-        </li>
-      </ol>
-
-      <!-- ─── Technical Callout: Inverse Kinematics (Validated 2026-04-02) ─── -->
-      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Technical Callout — Inverse Kinematic Equations
-          <span style="font-weight:normal; font-size:0.85em; color:#059669;">(Validated 2026-04-02)</span>
-        </h4>
-        <p>
-          The coaxial differential coupling creates a non-trivial
-          relationship between the raw motor space
-          (m<sub>r</sub>&nbsp;=&nbsp;roll motor,
-          m<sub>p</sub>&nbsp;=&nbsp;pitch motor) and the joint
-          output space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>).
-          The closed-form inverse conversion that the firmware evaluates
-          on every control cycle is:
-        </p>
-        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 16px 0;">
-          &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> /
-          s<sub>r</sub>) &middot; G, &nbsp;&nbsp;
-          m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
-          &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
-          m<sub>p</sub> = [(&theta;<sub>pitch</sub> /
-          s<sub>p</sub>) &middot; G &minus; c &middot;
-          &Delta;<sub>r</sub>] + o<sub>p</sub>
-          &nbsp;&nbsp;&nbsp;(Eq. 2)
-        </p>
-        <p>
-          where G&nbsp;=&nbsp;3 (3:1 helical-spur reduction),
-          o<sub>r</sub>/o<sub>p</sub> are calibrated home offsets,
-          s<sub>r</sub>/s<sub>p</sub> are directional signs (&plusmn;1),
-          and <strong>c</strong> is the bevel gear coupling parameter
-          (&plusmn;1). The critical insight is in <strong>Eq. 2</strong>:
-          the subtraction of
-          <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em> is the
-          <strong>software decoupling term</strong> that compensates for
-          the "walking bevel" effect. Because the bevel gear is housed
-          inside the roll-driven outer housing, any roll rotation carries
-          the pitch mechanism with it. This term cancels that parasitic
-          coupling in real-time.
-        </p>
-        <p style="font-size: 0.9rem; color: #555;">
-          Full kinematic derivations, the forward kinematics
-          (Motor &rarr; Joint space), the rotation-around-arm-axis 3D FK
-          model, and the 4-test calibration probe are presented in
-          <a href="mechanical-design.html">Mechanical Design</a>.
-        </p>
-      </div>
-
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="image"></sl-icon>
-        <strong>Media Placeholder:</strong> Weighted decision matrix
-        comparing Concepts 1–3 across the four evaluation criteria.
-        Currently available in
-        <a href="../appendix-upper.html">Appendix 1</a>.<br>
-        <em>To add inline: export the matrix as an image to
-        <code>assets/upper_mechanism/concept_selection/</code>.</em>
-      </sl-alert>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 5. MOTOR SELECTION JOURNEY                             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
@@ -421,27 +411,14 @@
         </tbody>
       </table>
 
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="camera-video"></sl-icon>
-        <strong>Video Placeholder:</strong> ODrive V3.6 jitter footage
-        demonstrating the hall-effect encoder noise during position hold.
-        The video should show the motor oscillating around the target
-        position, with the ODrive GUI visible showing the position error
-        trace.<br>
-        <em>To add: place video in
-        <code>assets/upper_mechanism/videos/odrive_jitter.mp4</code> and
-        uncomment the video tag below.</em>
-      </sl-alert>
-      <!--
-        <div class="video-row single">
-          <div class="video-box">
-            <video controls preload="metadata">
-              <source src="../../assets/upper_mechanism/videos/odrive_jitter.mp4" type="video/mp4">
-            </video>
-            <sub>ODrive V3.6 + 360KV motor exhibiting position jitter caused by hall-effect encoder noise.</sub>
-          </div>
+      <div class="video-row single">
+        <div class="video-box">
+          <video controls preload="metadata">
+            <source src="../../assets/upper_mechanism/design_iterations/odrive_2dof_demo.mp4" type="video/mp4">
+          </video>
+          <sub>ODrive V3.6 + 360KV drone motor driving the 2-DOF gear-rail prototype — demonstrating position control and the hall-effect encoder jitter that motivated the switch to integrated actuators.</sub>
         </div>
-      -->
+      </div>
       <p>
         These shortcomings collectively demonstrated that a discrete
         motor-controller-encoder assembly was unsuitable for the application.
@@ -634,6 +611,17 @@
       </p>
     </div>
 
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+<div></div>
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          Next: Mechanical Design
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
