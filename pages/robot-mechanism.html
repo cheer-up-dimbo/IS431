@@ -16,6 +16,7 @@
   <script src="../components/scroll-to-top/scroll-to-top.js"></script>
   <script src="../components/table-component/table-component.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </head>
 <body>
   <div class="content">
@@ -46,7 +47,7 @@
           portable for transport and public demonstrations.
         </li>
         <li>
-          <strong>Rotation about the yaw axis</strong> — re-angle the robot to
+          <strong>Rotation about yaw axis</strong> — re-angle the robot to
           present changing attack and defence lines during drills, replicating a
           coach's pivoting footwork.
         </li>
@@ -131,7 +132,7 @@
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-7</td>
-            <td style="padding:10px; border:1px solid #ddd;">Portable: transportable by 1–2 persons between venues</td>
+            <td style="padding:10px; border:1px solid #ddd;">Portable: transportable by 1 person between venues</td>
             <td style="padding:10px; border:1px solid #ddd;">Demo and gym deployment flexibility</td>
           </tr>
         </tbody>
@@ -153,9 +154,26 @@
         load-critical components sit closest to the base, where they can best
         resist overturning moments:
       </p>
+
+      <div class="model-viewer-container" style="margin: 24px 0;">
+        <model-viewer
+          src="../assets/3d_models/FINAL_ASSEM.glb"
+          alt="BoxBunny Full Assembly 3D Model"
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          shadow-intensity="1"
+          exposure="0.8"
+          style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
+        ></model-viewer>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Interactive 3D Model: BoxBunny Mechanical Stack
+        </sub>
+      </div>
+
       <ol>
         <li><strong>Trapezoidal Base</strong> — welded steel platform providing stability and portability</li>
-        <li><strong>Slewing-Ring Yaw Stage</strong> — low-profile rotation module at the base of the stack</li>
+        <li><strong>Slewing-Ring Yaw Stage</strong> — low-profile rotation module at the stack base</li>
         <li><strong>Ball-Screw Linear Slide</strong> — forward–backward translation above the yaw stage, expanding the reachable target footprint</li>
         <li><strong>Telescopic Height-Adjustment Column</strong> — motorised screw-jack column with structural guiding</li>
         <li><strong>Upper Body</strong> — torso, head, and 2-DOF coaxial striking arms with multi-layer padding</li>
@@ -299,7 +317,7 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
             <td style="padding:8px; border:1px solid #ddd;">Base</td>
-            <td style="padding:8px; border:1px solid #ddd;">Transport test: 2-person tip-and-roll between two venues</td>
+            <td style="padding:8px; border:1px solid #ddd;">Transport test: 1-person tip-and-roll between two venues</td>
             <td style="padding:8px; border:1px solid #ddd;">Successful transport without disassembly; ≤ 5 min setup</td>
             <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
           </tr>

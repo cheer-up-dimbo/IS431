@@ -11,6 +11,11 @@
   <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .page-nav-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -90,9 +95,10 @@
         RC rise-time delays on both SDA and SCL. At 400&nbsp;kHz Fast Mode,
         these delays can cause the MPU6050's state machine to
         <em>misinterpret</em> the Repeated Start as a data bit, latching
-        SDA low indefinitely. Because all four IMUs share the same I²C bus
-        (multiplexed via TCA9548A), a single latch freezes the entire
-        sensing pipeline.
+        SDA low indefinitely. Because the four IMUs are distributed across
+        the Teensy 4.0's two hardware I²C buses
+        (<code>Wire</code> / <code>Wire1</code>), a latch on either bus
+        freezes that bus's sensing pipeline.
       </p>
       <p>
         The fix replaces all Repeated Start sequences with a
@@ -196,6 +202,17 @@ if peak > threshold:
         Troubleshooting</a> page, where the same fix is described from
         the firmware integration perspective.
       </sl-alert>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="testing-evaluation.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Testing & Evaluation
+        </sl-button>
+      </a>
+<div></div>
     </div>
   </div>
 
