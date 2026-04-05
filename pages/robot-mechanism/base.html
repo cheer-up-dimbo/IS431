@@ -16,6 +16,8 @@
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
   <script src="../../components/table-component/table-component.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <!-- Google Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </head>
 <body>
   <div class="content">
@@ -28,56 +30,38 @@
     <br>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. SUBSYSTEM OVERVIEW                                  -->
+    <!-- 1. OVERVIEW                                            -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div id="base-subsystem">
       <h2>5.2.1 Base</h2>
       <p>
-        The base subsystem forms the foundation of the entire BoxBunny robot.
-        It was developed to satisfy two high-level requirements simultaneously:
-        <strong>stability under punching loads</strong> (RM-1) and
-        <strong>safe compactness for user footwork</strong> (RM-2). BoxBunny
-        operates close to a boxer, so the base cannot simply be enlarged in all
-        directions for brute-force stability. It must remain compact and
-        non-obstructive near the user's lead foot while still resisting forward
-        tipping when the upper body is struck.
+        The base subsystem forms the physical foundation of BoxBunny and is responsible for supporting the full robot structure, maintaining stability under punching loads, preserving the boxer’s working space, and enabling practical handling during deployment. Unlike a conventional static machine base, BoxBunny’s base must operate near a moving user. It therefore cannot be designed purely for maximum footprint or maximum mass. Instead, it must balance stability, compactness, safety, manufacturability, and portability within a single structural assembly. 
+      </p>
+      <p>
+        The development of the base progressed through two main phases. The first phase took place during a robotics fair showcase in first half, where the robot was mounted on a <strong>long wooden board</strong> because this was the most practical material available at the time. The second phase was the transition toward a purpose-built <strong>welded steel base-feet assembly</strong>, developed to better satisfy the long-term engineering needs of the project. The final design direction now consists of a <strong>welded trapezoidal base-feet frame</strong> fabricated from <strong>rectangular steel tubes</strong>, a <strong>flat and rigid mounted steel plate</strong>, and <strong>rear wheels</strong> intended for tip-and-roll transport.
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. REQUIREMENTS RECAP                                  -->
+    <!-- 2. REQUIREMENTS & CONSIDERATIONS                       -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Requirements &amp; Considerations</h3>
       <p>
-        The following system-level requirements directly govern the base
-        subsystem design:
+        The base subsystem responds to system-level requirements <strong>RM-1</strong>
+        (<em>Stability</em>), <strong>RM-2</strong> (<em>Compact footprint</em>), and
+        <strong>RM-7</strong> (<em>Portability</em>) defined in the
+        <a href="../robot-mechanism.html">Robot Mechanism</a> landing page:
       </p>
       <ul>
-        <li>
-          <strong>RM-1 (Stability)</strong>: The base must prevent toppling
-          under worst-credible punching loads with a factor of safety ≥ 1.5.
-          Tipping is treated as the governing failure mode, not sliding.
-        </li>
-        <li>
-          <strong>RM-2 (Compact Footprint)</strong>: The footprint must
-          preserve footwork space and reduce injury risk. Boxing gyms are
-          space-constrained with multiple users training in parallel.
-        </li>
-        <li>
-          <strong>RM-7 (Portability)</strong>: The base must allow transport
-          by 1–2 persons between venues. Transport features must not
-          compromise the planted operational stance.
-        </li>
+        <li><strong>Stability under punching loads:</strong> Remain upright against forward tipping under worst-credible strikes, with a factor of safety (FoS) &ge; 1.5.</li>
+        <li><strong>Compact footprint:</strong> Preserve the user's footwork space, allowing the boxer to approach, pivot, and shift stances without obstruction.</li>
+        <li><strong>Rigid mounting foundation:</strong> Provide a flat, stiff structural interface to prevent misalignment and ensure clear load transfer from the mechanisms above.</li>
+        <li><strong>Practical portability:</strong> Support tip-and-roll transport and deployment between workshop and exhibition environments without requiring full manual lifting.</li>
+        <li><strong>Environmental durability:</strong> Withstand repeated exposure to humid gym conditions with a realistic corrosion-protection strategy for the hollow steel sections.</li>
       </ul>
-      <p>
-        These requirements led directly to the need for a geometry that
-        protects footwork space, keeps the robot upright under worst-credible
-        punches, and allows the entire machine to be moved conveniently
-        between use locations.
-      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -87,73 +71,64 @@
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Design</h3>
-
-      <h4>Trapezoidal Platform Geometry</h4>
+      
       <p>
-        The final base solution is a <strong>welded trapezoidal steel-tube
-        platform</strong> with a <strong>narrower front</strong> and
-        <strong>wider rear</strong>, inspired partly by the geometry and
-        portability logic of commercial gym equipment such as benches. The
-        trapezoidal shape was chosen because it gives the boxer more clearance
-        at the front and sides, reducing the chance of stepping on or colliding
-        with the base during pivots and footwork. At the same time, the wider
-        rear region provides more area for structural support, lower-mechanism
-        mounting, optional ballast, and transport features.
+        The final base design is a <strong>welded trapezoidal base-feet assembly</strong> built from <strong>70 &times; 50 mm rectangular steel tubes (RHS) with 3 mm wall thickness</strong>, combined with a <strong>flat, rigid mounted steel plate</strong> and rear wheels intended for the transport system.
       </p>
 
-      <image-component
-        width="50%"
-        tag="image"
-        source="../../assets/Lower_mechanism/6compact footprint - cad overview.png"
-        subtitle="Figure: CAD overview of trapezoidal base component on BoxBunny.">
-      </image-component>
+      <div class="model-viewer-container" style="margin: 24px 0;">
+        <model-viewer
+          src="../../assets/3d_models/weld_assem_base_feet.glb"
+          alt="Interactive 3D Model: Welded Trapezoidal Base-Feet Assembly"
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          shadow-intensity="1"
+          exposure="0.8"
+          style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
+        ></model-viewer>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Interactive 3D Model: Welded Trapezoidal Base-Feet Assembly
+        </sub>
+      </div>
 
-      <image-component
-        tag="image"
-        source="../../assets/Lower_mechanism/7 compact footprint - pivot space.png"
-        subtitle="Figure: (a) Limited pivot space for alternative base shapes; (b) off-centre placement of motion mechanisms for improved stability.">
-      </image-component>
-
-      <h4>Tipping as the Governing Failure Mode</h4>
+      <h4>Trapezoidal Footprint</h4>
+      <p><em>Stability + User Clearance</em></p>
       <p>
-        A major design consideration was the decision to treat
-        <strong>tipping as the governing failure mode</strong>, not sliding.
-        The stability requirement was established using overturning mechanics:
-        the punch was converted into an overturning moment about the front edge
-        of the base, while the self-weight of the robot created a restoring
-        moment through the centre of gravity. A moderate
-        <strong>factor of safety of approximately 1.5</strong> was selected to
-        account for uncertainty in punch intensity, strike height, impact
-        direction, modelling simplifications, and fabrication tolerances. Floor
-        friction was recognised as helpful in practice, but intentionally
-        excluded from the primary stability criterion so that the base would
-        remain inherently stable through geometry and mass distribution alone.
+        The most important geometric feature of the final design is that the base is <strong>narrower at the front and wider at the rear</strong>. This trapezoidal strategy reduces the amount of structure intruding into the boxer's immediate working zone (especially around the lead foot and pivot region), while increasing restoring leverage against forward tipping. The wider rear also creates integration space for lower-mechanism hardware and supports the later addition of rear wheel brackets and transport features.
       </p>
 
-      <h4>Portability and Deployment</h4>
+      <h4>Low-profile Frame</h4>
+      <p><em>Lower CG + Reduced Obstruction</em></p>
       <p>
-        Because the robot must be moved between storage, fabrication, and
-        public demonstration settings, the base was developed with
-        <strong>guided transport wheels and handle logic</strong>, drawing
-        inspiration from movable gym benches. The rear-mounted
-        <strong>RMNA100, 100 mm wheels</strong> mounted using
-        <strong>KCLSBF12-62 pins</strong> complement the wider rear footprint and allow the
-        system to be tipped and rolled without disturbing the compact
-        operational stance.
+        The base is intentionally <strong>low profile</strong>. Keeping the main welded frame close to floor level reduces obstruction and helps keep the centre of mass of the full system low. The low coordinate of the current centre of mass is favourable, indicating that mass is concentrated close to the floor and supporting passive anti-tipping behaviour. While the exact support margin still depends on the final support polygon and coordinate reference, the low vertical mass placement is clearly beneficial.
       </p>
 
-      <h4>Steel Fabrication and Corrosion Mitigation</h4>
+      <h4>Rigid Mounted Plate</h4>
+      <p><em>Datum + Subsystem Alignment</em></p>
       <p>
-        The base uses <strong>welded SHS/RHS steel members</strong> arranged in
-        the trapezoidal footprint. Rust was treated as a real design issue, not
-        a cosmetic one. Interior and exterior steel surfaces use different
-        protection strategies because enclosed SHS interiors cannot be fully
-        cleaned after assembly. Interior surfaces rely on penetrating,
-        non-drying protective coatings, while exterior surfaces use mechanical
-        rust removal, anticorrosion primer, and paint topcoats. Full
-        galvanising was considered but rejected as impractical at prototype
-        scale.
+        The mounted plate in the current design is <strong>flat and rigid</strong>, providing a reliable geometric datum for the mechanism stack above. In mechanical terms, the base is therefore not only carrying load but also defining alignment for lower subsystems. This is especially important for the rotation mechanism and other components that depend on a consistent plate interface.
       </p>
+
+      <h4>Rear-wheel Transport</h4>
+      <p><em>Tip-and-Roll Portability</em></p>
+      <p>
+        The final design also incorporates <strong>rear transport interfaces</strong> as part of the base-feet assembly, consistent with the intended <strong>tip-and-roll handling concept</strong>. Within the wider lower-mechanism architecture, these rear interfaces are designed to accommodate the wheel hardware and provide the structural connection points needed for the robot to be tilted and rolled during movement between locations. This is an important design feature because it means portability was considered from the base-design stage itself, rather than being treated later as an external add-on or temporary workaround.
+      </p>
+      <p>
+        Locating the transport interfaces at the rear is sensible because the rear of the base already provides the larger footprint region, greater structural support, and more separation from the user’s immediate footwork zone. It also aligns well with the expected handling method, where the robot would be tilted about the rear side and guided in a controlled manner, similar to the movement logic used in portable gym equipment.
+      </p>
+
+      <p>
+        Overall, the final base is not just a support platform. It is a <strong>purpose-built welded structural subsystem</strong> that combines:
+      </p>
+      <ul>
+        <li>a trapezoidal support footprint for stability and user clearance,</li>
+        <li>a low-profile steel frame for efficient load transfer,</li>
+        <li>a rigid mounted plate for subsystem integration,</li>
+        <li>and rear transport intent for future operational portability.</li>
+      </ul>
+
     </div>
 
     <sl-divider></sl-divider>
@@ -164,33 +139,166 @@
     <div>
       <h3>Validation</h3>
       <p>
-        At the subsystem level, the base concept satisfies the most important
-        requirements through geometry-driven design and transparent hand
-        calculations. The selected trapezoidal geometry addresses the
-        user-space requirement by reducing front obstruction and preserving
-        room for pivots and stance changes. The structural choice of welded
-        SHS/RHS members provides a rigid foundation for the rotating and
-        height-adjustment mechanisms.
+        At the current stage, the base subsystem has been validated partly through <strong>analysis and realised geometry</strong>, and partly through <strong>direct observation of the fabricated assembly</strong>. It has not yet been fully validated through all planned physical tests.
       </p>
       <p>
-        Most importantly, the stability criterion was validated using
-        <strong>overturning-moment versus restoring-moment comparisons</strong>
-        about the front edge pivot, rather than relying solely on simulation
-        or optimistic floor friction assumptions.
+        The primary validation method for the base was the <strong>overturning-moment check</strong>. The design punch force was converted into a forward tipping moment about the front edge of the support region, while the self-weight of the assembly provided a restoring moment through the centre of mass. The design requirement was that the restoring moment exceed the overturning moment with a factor of safety of at least <strong>1.5</strong>. This method was intentionally chosen because it is transparent, conservative, and directly tied to geometry and mass distribution. It avoids overreliance on favourable floor conditions or simulation assumptions. Floor friction was treated as a secondary benefit only, not as the main stabilising mechanism.
       </p>
+
+      <div style="display: flex; flex-direction: column; align-items: center; margin: 24px 0;">
+        <div style="width: 80%; max-width: 600px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fff;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+            <defs>
+              <!-- Red Arrow for Overturning Forces/Moments -->
+              <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#d32f2f" />
+              </marker>
+              <!-- Blue Arrow for Restoring Forces/Moments -->
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#1976d2" />
+              </marker>
+              <!-- Dimension Line Arrows -->
+              <marker id="dim-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 10 0 L 0 5 L 10 10 z" fill="#757575" />
+              </marker>
+              <marker id="dim-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#757575" />
+              </marker>
+            </defs>
+
+            <rect width="100%" height="100%" fill="#ffffff" />
+            
+            <!-- Ground Line & Hatching -->
+            <line x1="50" y1="320" x2="550" y2="320" stroke="#9e9e9e" stroke-width="3" />
+            <path d="M 70 320 L 60 330 M 110 320 L 100 330 M 150 320 L 140 330 M 190 320 L 180 330 M 230 320 L 220 330 M 270 320 L 260 330 M 310 320 L 300 330 M 350 320 L 340 330 M 390 320 L 380 330 M 430 320 L 420 330 M 470 320 L 460 330 M 510 320 L 500 330 M 550 320 L 540 330" stroke="#9e9e9e" stroke-width="1.5" />
+
+            <!-- Simplified Robot Profile -->
+            <rect x="200" y="280" width="200" height="40" fill="#eceff1" stroke="#424242" stroke-width="2" rx="4"/>
+            <rect x="250" y="80" width="60" height="200" fill="#ffcc80" stroke="#f57c00" stroke-width="2" rx="6"/>
+            
+            <!-- CG Indicator -->
+            <g transform="translate(280, 160)">
+              <circle cx="0" cy="0" r="8" fill="none" stroke="#212121" stroke-width="1.5"/>
+              <path d="M -8 0 A 8 8 0 0 1 0 -8 L 0 0 Z" fill="#212121"/>
+              <path d="M 0 0 L 8 0 A 8 8 0 0 1 0 8 Z" fill="#212121"/>
+            </g>
+
+            <!-- Punch Force (F_punch) -->
+            <line x1="60" y1="100" x2="180" y2="100" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
+            <text x="80" y="90" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">punch</tspan></text>
+
+            <!-- Weight (W) -->
+            <line x1="280" y1="160" x2="280" y2="260" stroke="#1976d2" stroke-width="4" marker-end="url(#arrow-blue)" />
+            <text x="255" y="220" font-family="sans-serif" font-size="18" fill="#1976d2" font-weight="bold">W</text>
+
+            <!-- Dimensions -->
+            <!-- Height (h) -->
+            <line x1="120" y1="100" x2="120" y2="320" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
+            <text x="100" y="215" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">h</text>
+            <line x1="120" y1="100" x2="250" y2="100" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+            
+            <!-- Distance (b) -->
+            <line x1="280" y1="355" x2="400" y2="355" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
+            <text x="335" y="375" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">b</text>
+            <line x1="280" y1="260" x2="280" y2="365" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="400" y1="320" x2="400" y2="365" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+
+            <!-- Pivot Point Highlight -->
+            <circle cx="400" cy="320" r="6" fill="#fbc02d" stroke="#f57f17" stroke-width="2"/>
+            <text x="415" y="335" font-family="sans-serif" font-size="14" fill="#f57f17" font-weight="bold">Pivot</text>
+            
+            <!-- Moments -->
+            <!-- Overturning Moment M_o (Clockwise) -->
+            <path d="M 330 250 A 100 100 0 0 1 470 250" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-red)" />
+            <text x="440" y="215" font-family="sans-serif" font-size="20" fill="#d32f2f" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">o</tspan></text>
+
+            <!-- Restoring Moment M_r (Anti-clockwise) -->
+            <path d="M 442 278 A 60 60 0 0 0 358 278" fill="none" stroke="#1976d2" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-blue)" />
+            <text x="375" y="245" font-family="sans-serif" font-size="20" fill="#1976d2" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">r</tspan></text>
+          </svg>
+        </div>
+        <sub style="display: block; margin-top: 12px; font-style: italic; color: #555; text-align: center;">
+          Figure: Free-Body Diagram for Base Stability Analysis (Overturning Moment vs. Restoring Moment).
+        </sub>
+      </div>
+
       <p>
-        Current validation is strongest in terms of <strong>stability logic,
-        footprint selection, and packaging intent</strong>. Physical
-        verification should continue through prototype tipping tests,
-        centre-of-gravity confirmation, and practical transport assessment
-        with the final assembled mass.
+        At subsystem level, the following aspects are currently successful:
+      </p>
+      <ul>
+        <li>the shift from a temporary wooden support to a proper welded steel base,</li>
+        <li>the use of a trapezoidal footprint to improve rearward stability while preserving front footwork space,</li>
+        <li>the low-profile geometry and low centre-of-mass strategy,</li>
+        <li>and the flat, rigid mounted plate that provides a suitable datum for the mechanism stack.</li>
+      </ul>
+
+      <p>The main items that remain incomplete are:</p>
+      <ul>
+        <li>physical <strong>tip-and-roll transport testing</strong>,</li>
+        <li>final <strong>full-system tipping verification</strong> using the realised support polygon and complete mass distribution,</li>
+        <li>and long-term durability verification under repeated use and environmental exposure.</li>
+      </ul>
+
+      <p>A concise subsystem validation summary is given below.</p>
+      
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+        <thead>
+          <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left;">Aspect</th>
+            <th style="padding: 12px; text-align: left;">Current status</th>
+            <th style="padding: 12px; text-align: left;">Basis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Stability logic</td>
+            <td style="padding: 12px;">Pass (analysis)</td>
+            <td style="padding: 12px;">Overturning-moment vs restoring-moment method established and used as primary design check</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Trapezoidal footprint concept</td>
+            <td style="padding: 12px;">Pass (design intent)</td>
+            <td style="padding: 12px;">Narrow-front / wide-rear geometry directly addresses footwork clearance and rearward stability margin</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Low centre-of-mass strategy</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">CAD mass properties indicate low vertical mass concentration</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Mounted plate rigidity</td>
+            <td style="padding: 12px;">Pass (observed)</td>
+            <td style="padding: 12px;">Mounted plate is flat and rigid</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Structural load-path clarity</td>
+            <td style="padding: 12px;">Pass (design intent)</td>
+            <td style="padding: 12px;">Welded frame provides clearer load path than the original wooden board</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Fabrication suitability</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">70 &times; 50 &times; 3 mm steel tube choice is appropriate for welded prototype construction</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Tip-and-roll portability</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Hardware intent present, but physical testing not yet performed</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Long-term corrosion robustness</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Protection strategy defined, but long-term field validation ongoing</td>
+          </tr>
+        </tbody>
+      </table>
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 5. DETAILED DOCUMENTATION NAVIGATION                   -->
+    <!-- 6. DETAILED DOCUMENTATION NAVIGATION                   -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Detailed Documentation</h3>
@@ -199,27 +307,36 @@
         the base subsystem. Select a section to view its contents.
       </p>
       <div class="section-nav-grid">
-        <a href="base/stability-footprint.html" class="section-nav-card">
-          <sl-icon name="geo-alt" style="font-size: 2rem;"></sl-icon>
-          <h3>Stability &amp; Footprint Selection</h3>
-          <p>Trapezoidal geometry rationale, footwork clearance analysis</p>
+        <a href="base/design-ideation.html" class="section-nav-card">
+          <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
+          <h3>Design Ideation</h3>
+          <p>Selection matrix for component selection</p>
         </a>
-        <a href="base/overturning-calculation.html" class="section-nav-card">
-          <sl-icon name="calculator" style="font-size: 2rem;"></sl-icon>
-          <h3>Overturning Calculation</h3>
-          <p>Moment analysis, governing failure mode, safety factor justification</p>
+        <a href="base/mechanical-design.html" class="section-nav-card">
+          <sl-icon name="gear" style="font-size: 2rem;"></sl-icon>
+          <h3>Mechanical Design</h3>
+          <p>Iterations, problems, and final design details</p>
         </a>
-        <a href="base/portability-deployment.html" class="section-nav-card">
-          <sl-icon name="truck" style="font-size: 2rem;"></sl-icon>
-          <h3>Portability &amp; Deployment</h3>
-          <p>Transport wheels, handling strategy, gym-bench inspiration</p>
-        </a>
-        <a href="base/fabrication-corrosion.html" class="section-nav-card">
-          <sl-icon name="shield" style="font-size: 2rem;"></sl-icon>
-          <h3>Fabrication &amp; Corrosion</h3>
-          <p>Steel fabrication, SHS wall thickness, corrosion mitigation strategy</p>
+        <a href="base/testing-evaluation.html" class="section-nav-card">
+          <sl-icon name="clipboard-check" style="font-size: 2rem;"></sl-icon>
+          <h3>Testing &amp; Evaluation</h3>
+          <p>Clear tables showing all tests conducted and requirement success</p>
         </a>
       </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 7. NEXT SECTION NAVIGATION                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+      <a href="rotation.html">
+        <sl-button variant="default" size="medium">
+          Next: 5.2.2 Rotation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
   </div>
 

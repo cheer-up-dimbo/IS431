@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Base Mechanical Design</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .is431-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+    .is431-table td, .is431-table th {
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../base.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Base Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Mechanical Design</h2>
+    <p>
+      This page documents the physical realization of the base subsystem, detailing the structural material choices, fabrication methods, corrosion-protection strategy, and the integration of transport hardware for deployment.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. STEEL STRUCTURE & FABRICATION                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Frame Structure &amp; Fabrication</h3>
+      <p>
+        The base frame is constructed from <strong>70 &times; 50 mm Rectangular Hollow Section (RHS)</strong> mild steel tubing, joined by MIG welding. RHS was selected over solid bar, angle iron, or channel for several mechanical and practical reasons:
+      </p>
+      <ul>
+        <li>
+          <strong>High second moment of area per unit weight:</strong> Hollow sections resist bending and torsion more efficiently than equivalent-weight solid sections, which is crucial for resisting overturning moments from punches.
+        </li>
+        <li>
+          <strong>Flat external faces:</strong> Enable straightforward mounting of the rigid top plate, brackets, and lower mechanisms without requiring extensive machining.
+        </li>
+        <li>
+          <strong>Weldability:</strong> Mild steel RHS is straightforward to MIG-weld, providing strong, reliable joints for the trapezoidal geometry.
+        </li>
+        <li>
+          <strong>Availability:</strong> SHS/RHS is readily available in standard sizes from local steel suppliers.
+        </li>
+      </ul>
+
+      <h4>Wall Thickness Rationale</h4>
+      <p>
+        The RHS members are specified with a <strong>wall thickness of 3 mm</strong>. This sizing provides an optimal balance between total mass and structural integrity:
+      </p>
+      <ul>
+        <li><strong>Weld penetration:</strong> Ensures adequate fusion depth at butt and fillet welds, avoiding the risk of burn-through or cold welds common on thinner-walled sections.</li>
+        <li><strong>Mounting loads:</strong> Safely supports bolted connections for the flat mounted plate and mechanisms above without localized buckling or tearing at the bolt holes.</li>
+        <li><strong>Impact resistance:</strong> The tubular sections must resist transmitted punching loads without permanent deformation at connection points.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. PORTABILITY & DEPLOYMENT                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Portability &amp; Deployment</h3>
+      <p>
+        BoxBunny must be moved between storage areas, fabrication workshops, and public demonstration venues. The transport strategy was driven by requirement <strong>RM-7 (Portability)</strong>: the base must allow transport by 1–2 persons between venues without compromising the planted operational stance.
+        The transport solution must not require disassembly of the robot and must function effectively on typical gym and corridor surfaces (e.g., rubber mats, concrete).
+      </p>
+
+      <h4>Gym-Bench Inspiration</h4>
+      <p>
+        The transport strategy was inspired by <strong>commercial gym benches</strong>, which face a similar design challenge: they must be heavy and stable during use, yet easily moved by one person. Gym benches achieve this through rear-mounted wheels and a front handle, allowing the operator to tilt the bench backward and roll it. This tip-and-roll approach was adopted for BoxBunny because the wheels do not touch the floor during normal use, meaning they introduce no compliance when the robot is under load.
+      </p>
+
+      <h4>Transport Hardware</h4>
+      <p>
+        The base features two rear-mounted wheels located at the widest rear edge of the trapezoidal footprint:
+      </p>
+      <table class="is431-table" style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Component</th>
+            <th style="width: 25%;">Specification</th>
+            <th style="width: 50%;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transport wheels</td>
+            <td><strong>RMNA100</strong> (100 mm diameter)</td>
+            <td>Smooth rolling on gym and corridor surfaces when tilted backward.</td>
+          </tr>
+          <tr>
+            <td>Wheel mounting pins</td>
+            <td><strong>KCLSBF12-62</strong></td>
+            <td>Secure axle retention; standard clevis-pin format for easy replacement.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Planted vs Transport Stance</h4>
+      <p>
+        A key design principle is that transport features must <strong>not compromise the planted operational stance</strong>.
+      </p>
+      <ul>
+        <li>
+          <strong>Planted:</strong> During training, the base rests flat on the floor with its full trapezoidal footprint in contact with the surface, maximising friction and stability.
+        </li>
+        <li>
+          <strong>Passive Wheels:</strong> The transport wheels are positioned slightly elevated relative to the base feet. They do not contribute to the support polygon or introduce rolling compliance while flat.
+        </li>
+        <li>
+          <strong>No Locks Required:</strong> This dual-mode behaviour eliminates the need for brake locks, deployment levers, or other complex mechanisms that could fail under punching impacts.
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

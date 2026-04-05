@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Base Design Ideation</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .is431-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+    .is431-table td, .is431-table th {
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      vertical-align: top;
+    }
+    .highlight-row {
+      background-color: #e8f5e9 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../base.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Base Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Design Ideation</h2>
+    <p>
+      BoxBunny's base must satisfy two competing system-level requirements simultaneously: <strong>RM-1 — structural stability under worst-credible punching loads</strong> and <strong>RM-2 — safe compactness for user footwork</strong>. This page documents the geometry selection rationale, footwork clearance analysis, and comparison with alternative base shapes.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <h3>The Problem: Competing Requirements</h3>
+    <p>
+      A simple approach to stability would be to enlarge the base in all directions, maximising the support polygon and restoring moment. However, BoxBunny operates <strong>within arm's reach of a boxer</strong>, so the base cannot extend significantly in front or to the sides without creating trip hazards, obstructing pivots, and encroaching on the boxer's working zone. Boxing gyms are often space-constrained, with multiple users training in parallel, so the base must also minimise its overall spatial footprint.
+    </p>
+    <p>The design challenge is therefore to find a base geometry that:</p>
+    <ul>
+      <li>Provides sufficient support width at the <strong>rear</strong> for stability and mechanism mounting</li>
+      <li>Remains <strong>narrow at the front</strong> to preserve the boxer's footwork envelope</li>
+      <li>Keeps the combined centre of gravity <strong>biased rearward</strong> to resist forward tipping under frontal punches</li>
+      <li>Accommodates rear-mounted <strong>transport features</strong> without compromising the planted operational stance</li>
+    </ul>
+
+    <h3>Trapezoidal Geometry Rationale</h3>
+    <p>
+      The final base solution is a <strong>welded trapezoidal steel-tube platform</strong> with a <strong>narrower front</strong> and <strong>wider rear</strong>. This shape was selected because it directly addresses both the stability and compactness requirements in a single geometric form:
+    </p>
+    <ul>
+      <li><strong>Narrow front edge:</strong> Reduces obstruction near the boxer's lead foot, leaving space for pivots, lateral adjustments, and stance changes. The boxer can position their lead foot close to the robot without risk of stepping on or colliding with the base during footwork drills.</li>
+      <li><strong>Wide rear section:</strong> Provides more area for mounting the lower mechanisms (slewing bearing, linear stage), optional ballast (e.g. standard gym weights), and transport features. The wider rear also extends the support polygon rearward, directly increasing the restoring moment against forward tipping.</li>
+      <li><strong>Off-centre mechanism placement:</strong> The support structure holding the robot — particularly the rotation and height adjustment — is intentionally offset towards the rear of the base. This shifts the combined centre of gravity backward, further increasing resistance to forward tipping under frontal punches.</li>
+    </ul>
+
+    <image-component
+      width="50%"
+      tag="image"
+      source="../../../assets/robot_mechanism/6compact footprint - cad overview.png"
+      subtitle="Figure: Initial CAD overview of trapezoidal base component on BoxBunny.">
+    </image-component>
+
+    <h3>Comparison with Alternative Shapes</h3>
+    <p>Three alternative base geometries were considered before the trapezoidal layout was selected:</p>
+    <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem;">
+      <thead>
+        <tr>
+          <th style="width: 20%;">Shape</th>
+          <th style="width: 25%;">Stability</th>
+          <th style="width: 25%;">Footwork Clearance</th>
+          <th style="width: 30%;">Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Large circle</strong></td>
+          <td>Good — uniform support radius</td>
+          <td>Poor — extends into front/side pivot zones</td>
+          <td>Rejected — trip hazard during footwork</td>
+        </tr>
+        <tr>
+          <td><strong>Large rectangle</strong></td>
+          <td>Good — wide support polygon</td>
+          <td>Poor — front corners extend into pivot arcs</td>
+          <td>Rejected — obstructs lateral movement</td>
+        </tr>
+        <tr>
+          <td><strong>Small square</strong></td>
+          <td>Poor — limited restoring moment</td>
+          <td>Good — compact footprint</td>
+          <td>Rejected — insufficient stability margin</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><strong>Trapezoid</strong></td>
+          <td><strong>Good</strong> — wide rear provides restoring moment</td>
+          <td><strong>Good</strong> — narrow front preserves working zone</td>
+          <td><strong>Selected</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Footwork Clearance Analysis</h3>
+    <p>
+      In boxing, the lead foot is placed <strong>closest to the target</strong>, approximately one shoulder-width forward of the rear foot. During training, the boxer continuously adjusts their stance through:
+    </p>
+    <ul>
+      <li><strong>Forward steps</strong> (closing distance to deliver combinations)</li>
+      <li><strong>Lateral pivots</strong> (re-angling to create new attack/defence lines)</li>
+      <li><strong>Backward retreats</strong> (creating distance after exchanges)</li>
+    </ul>
+    <p>
+      The base must not interfere with any of these motions. The trapezoidal geometry satisfies this by providing a <strong>tapered clearance zone</strong> at the front and sides as <strong>pivot space</strong>, while the wider rear section lies behind the robot's torso and out of the boxer's immediate working zone. If the robot is positioned so that the boxer faces the narrow end, the majority of the base structure remains behind the robot, safely removed from the boxer's footwork envelope.
+    </p>
+
+    <image-component
+      width="50%"
+      tag="image"
+      source="../../../assets/robot_mechanism/7a compact footprint - pivot space.png"
+      subtitle="Figure: Pivot clearance analysis — trapezoidal base preserves the boxer's lead-foot working zone.">
+    </image-component>
+
+    <h3>Ballast Provision</h3>
+    <p>
+      If subsequent weight estimates reveal that the base's own mass is insufficient to guarantee stability with an adequate safety factor (FoS &ge; 1.5), the rear region of the base can be configured to accept <strong>standard gym weights</strong> as removable ballast. This approach keeps the design modular and adaptable to different deployment environments — the ballast requirement may vary depending on the specific floor surface (rubber mats vs concrete), the height setting of the robot, and the expected user population.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <h3>Ideation Process &amp; Concept Selection</h3>
+    <p>
+      The ideation process for the base was not carried out as a single one-time decision. Instead, it developed through a sequence of design questions, where each stage of the base concept was compared against the project's most important needs: stability under punching loads, preservation of user footwork space, manufacturability at prototype scale, subsystem integration, and eventual portability. To make these choices systematic, selection matrices were used as a decision-support tool.
+    </p>
+    <p>
+      The role of the selection matrix was used to structure the design conversation and make trade-offs explicit. The base subsystem had to satisfy several competing requirements at the same time. A concept that scored well in stability might perform poorly in footwork clearance. A concept that was easy to fabricate might be poor in long-term subsystem integration. The matrices therefore helped to compare options against the criteria that mattered most to BoxBunny, and to justify why certain concepts were progressed while others were rejected.
+    </p>
+    <p>
+      The ideation journey can be divided into three linked selection stages. The first addressed the <strong>overall base-platform architecture</strong>, the second addressed the <strong>material and structural concept</strong>, and the third addressed the <strong>portability approach</strong>. Each matrix narrowed the solution space and informed the next level of design refinement.
+    </p>
+
+    <h4>Concept Selection Matrix: Base-platform Architecture</h4>
+    <p>This first matrix was used to decide the overall shape and platform strategy of the base. At this stage, the main design problem was not yet detailed tube sizing or bracket design, but the more fundamental question of what kind of base geometry best matched the way BoxBunny would be used.</p>
+    <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem;">
+      <thead>
+        <tr>
+          <th>Concept</th><th>Stability</th><th>User footwork clearance</th><th>Manufacturability</th><th>Integration with mechanisms</th><th>Portability potential</th><th>Final decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Flat wooden board</td><td>Moderate</td><td>Poor to moderate</td><td>Excellent</td><td>Poor</td><td>Moderate</td><td>Used only in early phase due to material availability in tight time constraint of the fair</td></tr>
+        <tr><td>Large rectangular steel platform</td><td>High</td><td>Poor</td><td>Moderate</td><td>Moderate</td><td>Poor</td><td>Rejected due to footwork obstruction and excess footprint</td></tr>
+        <tr><td>Circular / uniform footprint base</td><td>Moderate to high</td><td>Poor</td><td>Moderate</td><td>Moderate</td><td>Poor</td><td>Rejected; wastes space near user zone</td></tr>
+        <tr class="highlight-row"><td><strong>Welded trapezoidal steel frame</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>Selected</strong></td></tr>
+      </tbody>
+    </table>
+    <p>The flat wooden board scored well only in terms of immediate manufacturability, which explains why it was suitable for the early Robotics Fair implementation. However, it was not a good long-term architecture because it did not provide a deliberate structural load path, occupied too much uniform floor area, and integrated poorly with the rest of the mechanism stack. A large rectangular steel base would have improved structural confidence, but it would also have obstructed the boxer's movement and introduced unnecessary footprint. A circular or uniform footprint suffered from a similar problem: although it could provide support area, it used space inefficiently in the user's working zone.</p>
+    <p>The welded trapezoidal steel frame was selected because it was the only concept that addressed all the major requirements together. Its narrower front preserved user footwork space, while its wider rear improved structural support, restoring leverage, and subsystem integration. This made it the most balanced concept and the most appropriate direction for further development.</p>
+
+    <h4>Concept Selection Matrix: Material / Structural</h4>
+    <p>Once the overall base architecture had been narrowed toward a trapezoidal form, the next selection matrix was used to decide <strong>how that form should be physically realised</strong>.</p>
+    <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem;">
+      <thead>
+        <tr>
+          <th>Concept</th><th>Structural stiffness</th><th>Repeatability of geometry</th><th>Fabrication practicality</th><th>Weight efficiency</th><th>Durability</th><th>Final decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Wooden board</td><td>Low to moderate</td><td>Moderate</td><td>Excellent</td><td>Moderate</td><td>Poor to moderate</td><td>Used only as temporary prototype base</td></tr>
+        <tr><td>Thick single steel plate</td><td>Moderate</td><td>High</td><td>Moderate</td><td>Poor</td><td>High</td><td>Not preferred; inefficient mass distribution</td></tr>
+        <tr class="highlight-row"><td><strong>Welded RHS/SHS steel frame with plate</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>Selected</strong></td></tr>
+      </tbody>
+    </table>
+    <p>The wooden board again remained useful only as a temporary prototype solution. It offered speed and availability, but it did not provide the repeatable stiffness, durability, or geometric reliability expected from a permanent structural subsystem. A thick single steel plate was mechanically feasible, but it was not efficient. Much of its mass would contribute only to bulk rather than to well-distributed structural stiffness, and it would be less flexible for integrating welded brackets and subsystem interfaces.</p>
+    <p>The welded RHS/SHS steel frame with plate was selected because it offered the best overall structural behaviour for the intended prototype. It provides higher stiffness for the amount of material used, clearer load paths into the floor, better compatibility with welded fabrication, and better integration with mounting features. It also aligns with the design language of gym-equipment-style structures, which was relevant to the project's intended function and portability logic. This matrix therefore confirmed that the base should evolve from a simple support platform into a proper framed steel structural subsystem.</p>
+
+    <h4>Concept Selection Matrix: Portability</h4>
+    <p>After the footprint and structural concept had been selected, the final matrix was used to consider <strong>how portability should be incorporated into the base design</strong>.</p>
+    <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem;">
+      <thead>
+        <tr>
+          <th>Concept</th><th>Simplicity</th><th>Operational stability</th><th>Ease of movement</th><th>Integration with base</th><th>Final decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Manual lifting only</td><td>High</td><td>High</td><td>Poor</td><td>High</td><td>Rejected as long-term approach</td></tr>
+        <tr><td>Separate external trolley</td><td>Moderate</td><td>High</td><td>High</td><td>Poor</td><td>Not preferred</td></tr>
+        <tr class="highlight-row"><td><strong>Integrated rear wheels + handle / tip-roll</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>Selected in concept</strong>, pending physical test</td></tr>
+      </tbody>
+    </table>
+    <p>Manual lifting was rejected as a long-term solution because, although simple, it becomes impractical and potentially unsafe as the robot grows in mass and complexity. A separate external trolley would solve movement, but it would do so outside the base subsystem, meaning portability would remain disconnected from the main design and would depend on extra equipment being available.</p>
+    <p>The integrated rear-wheel plus handle tip-and-roll concept was selected because it allowed portability to become part of the base design itself. From a mechanical perspective, this was the most elegant solution. The wider rear portion of the trapezoidal base already provides the best location for transport-related hardware, and the tip-and-roll handling method is consistent with portable gym equipment and workshop machinery. This concept was therefore selected in principle because it preserves operational stability while improving deployment practicality.</p>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>
