@@ -34,6 +34,7 @@ class ExplodeViewer extends HTMLElement {
     const explodeScale = parseFloat(this.getAttribute('explode-scale') || '2.0');
     const src = this.getAttribute('src') || '';
     const alt = this.getAttribute('alt') || '3D Model';
+    const noControls = this.hasAttribute('no-controls');
 
     // Parse explode axis: 'x', 'y', 'z', or custom 'x,y,z' vector
     const axisAttr = (this.getAttribute('explode-axis') || 'z').trim().toLowerCase();
@@ -190,6 +191,7 @@ class ExplodeViewer extends HTMLElement {
           font-style: italic;
           background: #f0f0f0;
         }
+        ${noControls ? '.controls-bar, .part-count { display: none !important; }' : ''}
       </style>
 
       <div class="loading-overlay" id="loader">

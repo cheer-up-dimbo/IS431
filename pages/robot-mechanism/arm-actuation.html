@@ -96,12 +96,18 @@
         the bevel gear from walking.
       </p>
 
-      <image-component
-        width="80%"
-        tag="image"
-        source="../../assets/upper_mechanism/5.2.2.3.final_concept.png"
-        subtitle="Figure: Final 2-DOF coaxial differential joint — motors side-by-side at base, bevel gear coupling creates differential relationship compensated in firmware.">
-      </image-component>
+      <div class="video-row">
+        <image-component
+          width="60%" tag="image"
+          source="../../assets/upper_mechanism/arm_up.jpg"
+          subtitle="Arm in raised (windup) position.">
+        </image-component>
+        <image-component
+          width="60%" tag="image"
+          source="../../assets/upper_mechanism/arm_down.jpg"
+          subtitle="Arm in lowered (apex / strike) position.">
+        </image-component>
+      </div>
 
       <h4>Combat Orbit FSM</h4>
       <p>
@@ -145,7 +151,7 @@
       <h4>Low-Level Control</h4>
       <p>
         The arm actuation uses a <strong>24V motor bus</strong> with
-        <strong>CAN bus daisy chain</strong> (4 motors, 1 Mbps, 120 Ω
+        <strong>CAN bus parallel connection</strong> (4 motors, 1 Mbps, 120 Ω
         termination) for motor communication, and an isolated
         <strong>12V logic rail</strong> (dual-supply architecture) to prevent
         regenerative braking OVP trips from disrupting the Teensy/Jetson.
@@ -157,17 +163,189 @@
 
     <sl-divider></sl-divider>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- DESIGN EVOLUTION SUMMARY                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Validation</h3>
-      <p>All major deliverables have been validated:</p>
-      <ul>
-        <li>Coaxial differential joint with 3:1 helical-spur reduction — <strong>Validated</strong></li>
-        <li>Post-fair structural revision (6 mm stainless D-shaft, Delrin pin) — <strong>Validated</strong></li>
-        <li>CAN Bus daisy chain (4 motors) — <strong>Validated</strong></li>
-        <li>Dynamic Sparring FSM — <strong>Validated</strong></li>
-        <li>ROS 2 External Control Interface (7 topics) — <strong>Validated</strong></li>
-        <li>9 cross-layer defects resolved — <strong>8 Resolved / 1 Mitigated</strong></li>
-      </ul>
+      <h3>Design Evolution Summary</h3>
+      <p>
+        The following table summarises the five major design iterations
+        and the engineering rationale for each transition — spanning
+        mechanical hardware, motor selection, structural revision, and
+        motion planning logic:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Iteration</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Configuration</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Outcome</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Transition Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">1. Interim</td>
+            <td style="padding:10px; border:1px solid #ddd;">Gear-rail coaxial joint + servo motors</td>
+            <td style="padding:10px; border:1px solid #ddd;">DOF validated; servos failed under impact</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; BLDC motors required for impact resilience</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">2. ODrive</td>
+            <td style="padding:10px; border:1px solid #ddd;">ODrive V3.6 + 360KV outrunner</td>
+            <td style="padding:10px; border:1px solid #ddd;">FOC validated; jitter, no absolute position, too bulky</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; Integrated actuator required</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">3. Damiao</td>
+            <td style="padding:10px; border:1px solid #ddd;">DM-J4310-2EC + helical-spur 3:1 gearbox</td>
+            <td style="padding:10px; border:1px solid #ddd;">All requirements met; fair demo successful</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; Structural failures exposed at fair</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">4. Post-Fair</td>
+            <td style="padding:10px; border:1px solid #ddd;">Stainless D-shaft + Delrin pin hybrid interface</td>
+            <td style="padding:10px; border:1px solid #ddd;">Structural integrity validated; sustained sparring achieved</td>
+            <td style="padding:10px; border:1px solid #ddd;">&rarr; Motion quality insufficient (jerky return-to-zero)</td>
+          </tr>
+          <tr style="background:#f9fafb;">
+            <td style="padding:10px; border:1px solid #ddd;"><strong>5. Combat Orbit</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Stateless &rarr; State-Aware FSM (Combat Orbit)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Fluid, continuous sparring; reduced mechanical wear from unnecessary return-to-zero cycles</td>
+            <td style="padding:10px; border:1px solid #ddd;">Current operational configuration: Euclidean skip-logic + proportional snap-back maintain kinetic fluidity</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The structural failures and post-fair material science revisions
+        are documented in
+        <a href="arm-actuation/mechanical-design.html">Mechanical Design</a>. The
+        transition from stateless motion to the Combat Orbit FSM — driven
+        by both mechanical longevity and training fidelity requirements —
+        is documented in
+        <a href="arm-actuation/firmware-software.html">Firmware &amp; Software</a>.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Scope of Work Completed</h3>
+      <p>
+        Following the interim demonstration, the Upper Mechanism underwent
+        extensive development spanning mechanical redesign, electrical
+        integration, firmware engineering, and software architecture. The
+        following table summarises the principal deliverables and their
+        current status.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Domain</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Deliverable</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;" rowspan="3"><strong>Mechanical</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Coaxial Differential Joint with 3:1 helical-spur gear reduction and bevel gear coupling</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Post-fair structural revision (6 mm stainless D-shaft, Delrin pin, M2 screw reinforcement)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Multi-layer padding with anti-vibration isolation mounts</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;" rowspan="3"><strong>Electrical</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">24V motor bus + isolated 12V logic rail (dual-supply architecture)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">CAN Bus parallel connection (4 motors, 1 Mbps, 120 &Omega; termination)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Quad-IMU I2C sensing (MPU6050 &times; 3, dual-bus 400 kHz)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;" rowspan="4"><strong>Firmware &amp; Software</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">Teensy 4.0 Firmware V4 — 200 Hz unified loop (CAN + I2C + micro-ROS)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">GUI V3 (<code>unified_GUI_V3.py</code>, 2278 lines) — PyQt5/PyQtGraph, 8 operational tabs</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Dynamic Sparring FSM — vector alignment skip, perimeter transit routing, proportional snap-back</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">ROS 2 External Control Interface — 7 topics (4 subscribers, 3 publishers)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;"><strong>Integration</strong></td>
+            <td style="padding:10px; border:1px solid #ddd;">9 cross-layer defects root-caused and resolved (firmware, middleware, application, electrical)</td>
+            <td style="padding:10px; border:1px solid #ddd; color:green;">8 Resolved / 1 Mitigated</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Summary of Key Contributions</h3>
+      <ol>
+        <li>
+          <strong>Coaxial Differential Kinematics with Mass
+          Centralisation:</strong> Closed-form forward and inverse
+          kinematic equations were derived for the coupled 2-DOF joint,
+          incorporating real-time parasitic pitch compensation. Motor
+          mass centralisation at the pivot reduces moment of inertia,
+          enabling human-competitive strike velocities.
+        </li>
+        <li>
+          <strong>Combat Orbit FSM:</strong> A continuous-state sparring
+          engine replaced stateless point-to-point motion, integrating
+          vector alignment skip logic, perimeter transit routing, and
+          proportional snap-back to produce fluid, uninterrupted combat
+          sequences.
+        </li>
+        <li>
+          <strong>Multi-Layered Safety Architecture:</strong> Three
+          independent protection tiers — hardware current limiting,
+          firmware dI/dt obstruction detection, and application-level
+          kinematic auto-retract — provide defence-in-depth for both
+          the drivetrain and the user.
+        </li>
+        <li>
+          <strong>IMU-Based Strike Analytics:</strong> A Quad-IMU data
+          acquisition pipeline — initially validated on an isolated rig
+          at 500 Hz — was merged into the unified firmware for real-time
+          punch detection via L2 acceleration vector norm thresholding.
+        </li>
+        <li>
+          <strong>Regenerative Braking Mitigation &amp; Dual-Rail
+          Isolation:</strong> Software ramp-down and power rail
+          separation resolved PSU OVP trips during high-speed sparring,
+          ensuring uninterrupted system operation.
+        </li>
+        <li>
+          <strong>Systematic Defect Resolution:</strong> Nine cross-layer
+          integration defects — spanning CAN protocol parsing, I2C bus
+          reliability, micro-ROS transport recovery, and regenerative
+          braking — were diagnosed and resolved through structured
+          root-cause analysis.
+        </li>
+      </ol>
     </div>
 
     <sl-divider></sl-divider>
@@ -176,32 +354,32 @@
       <h3>Detailed Documentation</h3>
       <p>Complete technical documentation organised into six sections:</p>
       <div class="section-nav-grid">
-        <a href="../upper-mechanism/design-ideation.html" class="section-nav-card">
+        <a href="arm-actuation/design-ideation.html" class="section-nav-card">
           <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
           <h3>Design &amp; Ideation</h3>
           <p>Motion analysis, concept selection, motor selection</p>
         </a>
-        <a href="../upper-mechanism/mechanical-design.html" class="section-nav-card">
+        <a href="arm-actuation/mechanical-design.html" class="section-nav-card">
           <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
           <h3>Mechanical Design</h3>
           <p>Joint kinematics, gear reduction, structural revisions</p>
         </a>
-        <a href="../upper-mechanism/electrical-integration.html" class="section-nav-card">
+        <a href="arm-actuation/electrical-integration.html" class="section-nav-card">
           <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
           <h3>Electrical Integration</h3>
           <p>Power architecture, CAN bus, dual-rail isolation</p>
         </a>
-        <a href="../upper-mechanism/firmware-software.html" class="section-nav-card">
+        <a href="arm-actuation/firmware-software.html" class="section-nav-card">
           <sl-icon name="code-slash" style="font-size: 2rem;"></sl-icon>
           <h3>Firmware &amp; Software</h3>
           <p>V4 firmware, GUI V3, Dynamic Sparring FSM, ROS 2</p>
         </a>
-        <a href="../upper-mechanism/testing-evaluation.html" class="section-nav-card">
+        <a href="arm-actuation/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
           <h3>Testing &amp; Evaluation</h3>
           <p>Performance criteria, test results, video evidence</p>
         </a>
-        <a href="../upper-mechanism/troubleshooting.html" class="section-nav-card">
+        <a href="arm-actuation/troubleshooting.html" class="section-nav-card">
           <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
           <h3>Troubleshooting &amp; Iteration</h3>
           <p>9 defects: root-cause analysis and resolutions</p>
@@ -209,27 +387,6 @@
       </div>
     </div>
 
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- CROSS-REFERENCES                                       -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Cross-References</h3>
-      <ul>
-        <li>
-          <strong><a href="padding.html">5.2.4 Padding</a></strong>
-          — The padding subsystem provides the striking targets and
-          impact sensing layer that sits on top of the arm mechanism.
-          Padding-specific documentation (IMU I²C topology, strike
-          detection pipeline, troubleshooting) is maintained on the
-          <a href="padding.html">Padding page</a> and its sub-pages.
-          Coordinated strike validation using IMU feedback as input
-          is documented here under Arm Actuation as a validation
-          component.
-        </li>
-      </ul>
-    </div>
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
