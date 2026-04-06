@@ -1,14 +1,13 @@
-document.addEventListener("DOMContentLoaded", () => {
-  new gridjs.Grid({
-    columns: [
-    { name: "Proposed Product/Service", width: "25%" },
-    { name: "Existing Features & Feedback of Competitor’s Offerings", width: "35%" },
-    { name: "Design Improvement", width: "40%" }
-    ],
+new gridjs.Grid({
+  columns: [
+  { name: "Proposed Product/Service", width: "25%" },
+  { name: "Existing Features & Feedback of Competitor's Offerings", width: "35%" },
+  { name: "Design Improvement", width: "40%" }
+  ],
 
-    data: [
-      [
-        "Performance Analytics",
+  data: [
+    [
+      "Performance Analytics",
         `
 1. Progress tracking  
 2. Strike pads with impact sensors  
@@ -21,8 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
         `
       ],
 
-      [
-        "Intelligent Training System",
+    [
+      "Intelligent Training System",
         `
 1. Complaints of “no haptic feedback” and “stationary base limits realism”  
 2. Negative review: “Cannot replace a real partner”
@@ -33,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
         `
       ],
 
-      [
-        "Skill Progression Studio",
+    [
+      "Skill Progression Studio",
         `
 1. On-screen live and 3D animated coaching  
 2. Variety of training modes (Cardio, Mitts, Sparring, Core, Combo)
@@ -45,8 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
         `
       ],
 
-      [
-        "Adaptive Fight Intelligence",
+    [
+      "Adaptive Fight Intelligence",
         `
 1. Evading target that dodges punches in real time  
 2. Voice coaching & real-time cues
@@ -57,8 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
         `
       ],
 
-      [
-        "Modular Boxing Platform",
+    [
+      "Modular Boxing Platform",
         `
 1. Height-adjustable frame, multiple strike zones, stance selection  
 2. Commercial-grade materials and glide wheels for portability  
@@ -70,9 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
 3. Simplified into a cost-efficient design suitable for both gym and home environments.
         `
       ]
-    ],
-    style: {
-      table: { "white-space": "pre-wrap" }
-    }
-  }).render(document.getElementById("design-improvement"));
-});
+  ],
+  style: {
+    table: { "white-space": "pre-wrap" }
+  }
+}).render(document.getElementById("design-improvement"));

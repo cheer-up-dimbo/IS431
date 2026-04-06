@@ -1,21 +1,20 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const mdToHtml = (text) => 
-    text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+const mdToHtml = (text) => 
+  text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-  new gridjs.Grid({
-    columns: [
-      "Competitor",
-      "Product Features",
-      { 
-        name: "Reviews",
-        formatter: cell => gridjs.html(mdToHtml(cell))
-      }
-    ],
+new gridjs.Grid({
+  columns: [
+    "Competitor",
+    "Product Features",
+    { 
+      name: "Reviews",
+      formatter: cell => gridjs.html(mdToHtml(cell))
+    }
+  ],
 
-    data: [
-      [
-        "Nexersys",
-        `
+  data: [
+    [
+      "Nexersys",
+      `
 On-Screen Live & 3D animated coaching
 - To coach users
 Bilateral Head Pad Movement
@@ -34,8 +33,8 @@ Commercial-grade frame
 - Durability
 Glide wheels
 - Portability
-        `,
-        mdToHtml(`
+      `,
+      mdToHtml(`
 **Positive**
 Multi-user leaderboard  
 - Boosts motivation
@@ -47,12 +46,12 @@ No haptic feedback
 - Lacks sparring realism  
 Strike pads unrealistic angles
 - Poor simulation
-        `)
-      ],
+      `)
+    ],
 
-      [
-        "STRYK RXT-1",
-        `
+    [
+      "STRYK RXT-1",
+      `
 Practice / Spar / Combo modes  
 - Variety  
 Adjustable intensity / speed  
@@ -63,8 +62,8 @@ Stance selection
 - Many strike targets  
 Wall-mounted 12" height adjust  
 - Fits all heights
-        `,
-        mdToHtml(`
+      `,
+      mdToHtml(`
 **Positive**
 Great for conditioning  
 - Improves reaction time  
@@ -77,12 +76,12 @@ Builds defensive habits
 Cannot replace real partner  
 Stationary  
 - No footwork
-        `)
-      ],
+      `)
+    ],
 
-      [
-        "BotBoxer",
-        `
+    [
+      "BotBoxer",
+      `
 AI punch tracking  
 - Predicts punches  
 Evading target  
@@ -95,8 +94,8 @@ Voice coaching
 - Extreme realism  
 Cloud progress app  
 - Tracks improvement
-        `,
-        mdToHtml(`
+      `,
+      mdToHtml(`
 **Positive**
 True interactive sparring
 
@@ -109,12 +108,11 @@ No robotic arms
 - Low sparring realism  
 No punchable surface  
 - Reduces stress-relief
-        `)
-      ]
-    ],
+      `)
+    ]
+  ],
 
-    style: {
-      table: { "white-space": "pre-wrap" }
-    }
-  }).render(document.getElementById("competitor-table"));
-});
+  style: {
+    table: { "white-space": "pre-wrap" }
+  }
+}).render(document.getElementById("competitor-table"));
