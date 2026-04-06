@@ -43,6 +43,31 @@
       font-size: 0.88rem;
       color: #666;
     }
+    .section-nav-full {
+      display: block;
+      margin-top: 16px;
+    }
+    .section-nav-full .section-nav-card {
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 28px;
+      text-align: left;
+    }
+    .section-nav-full .section-nav-card sl-icon { flex-shrink: 0; }
+    .section-nav-full .section-nav-card h3 { margin: 0 0 4px 0; }
+    .section-nav-full .section-nav-card p { margin: 0; }
+    .node-tag {
+      display: inline-block;
+      background: #f0f4f8;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.88em;
+      color: #1a7f37;
+      font-weight: 500;
+    }
   </style>
   <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
@@ -60,28 +85,33 @@
     <div id="robot-intelligence">
       <h2>5.3 Robot Intelligence (Yogeeswaran)</h2>
       <p>
-        The Robot Intelligence subsystem encompasses two tightly integrated components:
-        (1) a real-time boxing action recognition model that classifies 8 punch types using
-        depth-based 3D voxel motion features fused with 2D pose estimation, and (2) a ROS 2
-        system workspace that orchestrates computer vision inference, IMU sensing, AI coaching
-        via a local LLM, and adaptive sparring behaviour. Together, these deliver the product
-        needs of Performance Analytics, Adaptive Fight Intelligence, and Realistic Training
-        Partner — mapping to three core functions: Reaction Time (system responsiveness),
-        Human Tracking (accurate motion following), and Counter-Punching (safe, reactive
-        sparring without a partner).
+        The Robot Intelligence subsystem delivers real-time boxing action recognition
+        and adaptive robot behaviour. At its core is a computer vision pipeline that
+        classifies 8 punch types using depth-based 3D voxel motion features fused with
+        2D pose estimation. Reaction time detection and human tracking build on
+        processed frames from this action prediction pipeline.
       </p>
       <p>
-        Repositories:
-        <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank">Boxing Action Recognition</a>
-        &nbsp;|&nbsp;
-        <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank">Boxing Robot Workspace</a>
+        A ROS 2 workspace orchestrates these CV outputs alongside IMU sensing,
+        AI sparring logic, and local LLM coaching to fulfil three product needs:
+        Performance Analytics, Adaptive Fight Intelligence, and Realistic Training Partner.
       </p>
 
-      <image-component
-          tag="image"
-          source="../assets/robot_intelligence/needs_to_features.png"
-          subtitle="">
-      </image-component>
+      <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
+        <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
+        <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
+          <sl-button variant="default" size="small">
+            <sl-icon slot="prefix" name="github"></sl-icon>
+            Action Recognition
+          </sl-button>
+        </a>
+        <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none;">
+          <sl-button variant="default" size="small">
+            <sl-icon slot="prefix" name="github"></sl-icon>
+            Robot Workspace
+          </sl-button>
+        </a>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -90,54 +120,54 @@
     <div id="requirements">
       <h3>5.3.1 Requirements and Design Considerations</h3>
       <p>
-        The following requirements were derived from the Function Analysis, user journey,
-        and the physical constraints of deploying real-time computer vision on an embedded
-        platform during live boxing training.
+        These requirements were derived from the Function Analysis, user journey,
+        and the physical constraints of deploying real-time computer vision on an
+        embedded platform during live boxing training.
       </p>
 
       <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd;">ID</th>
-            <th style="padding:8px; border:1px solid #ddd;">Requirement</th>
-            <th style="padding:8px; border:1px solid #ddd;">Rationale</th>
+            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Rationale</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-1</td>
-            <td style="padding:8px; border:1px solid #ddd;">Classify 8 boxing actions in real-time at &gt;=30 FPS</td>
-            <td style="padding:8px; border:1px solid #ddd;">Match human defensive reaction speed; voxel temporal features depend on consistent 30fps frame intervals</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-1</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classify 8 boxing actions in real-time at &gt;=30 FPS</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Match human defensive reaction speed; voxel temporal features depend on consistent 30fps frame intervals</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-2</td>
-            <td style="padding:8px; border:1px solid #ddd;">End-to-end latency (camera to motor command) &lt;=150ms</td>
-            <td style="padding:8px; border:1px solid #ddd;">Matches average intermediate boxer defensive reaction time</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-2</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">End-to-end latency (camera to motor command) &lt;=150ms</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Matches average intermediate boxer defensive reaction time</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-3</td>
-            <td style="padding:8px; border:1px solid #ddd;">Classification accuracy &gt;=90% on unseen person validation set</td>
-            <td style="padding:8px; border:1px solid #ddd;">Reduce false triggers and incorrect counter-punches during live sparring</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-3</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &gt;=90% on unseen person validation set</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Reduce false triggers and incorrect counter-punches during live sparring</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-4</td>
-            <td style="padding:8px; border:1px solid #ddd;">CV + IMU sensor fusion for confirmed punch events</td>
-            <td style="padding:8px; border:1px solid #ddd;">Single-source detection unreliable; fusion eliminates false positives from camera noise and accidental pad contacts</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-4</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">CV + IMU sensor fusion for confirmed punch events</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Single-source detection unreliable; fusion eliminates false positives from camera noise and accidental pad contacts</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-5</td>
-            <td style="padding:8px; border:1px solid #ddd;">All inference on-device (NVIDIA Jetson Orin Nano), no cloud</td>
-            <td style="padding:8px; border:1px solid #ddd;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-5</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin Nano), no cloud</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-6</td>
-            <td style="padding:8px; border:1px solid #ddd;">Multiple adaptive AI sparring styles with weakness tracking</td>
-            <td style="padding:8px; border:1px solid #ddd;">Prevent user habituation; support varied training objectives</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-6</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Multiple adaptive AI sparring styles with weakness tracking</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Prevent user habituation; support varied training objectives</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RI-7</td>
-            <td style="padding:8px; border:1px solid #ddd;">Real-time coaching feedback via local LLM</td>
-            <td style="padding:8px; border:1px solid #ddd;">Personalized technique guidance without cloud dependency</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-7</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time coaching feedback via local LLM</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Personalized technique guidance without cloud dependency</td>
           </tr>
         </tbody>
       </table>
@@ -152,35 +182,39 @@
     <div id="system-architecture">
       <h3>5.3.2 System Architecture</h3>
       <p>
-        The system runs on an NVIDIA Jetson Orin NX with 8 GB shared LPDDR5 memory,
-        hosting 12 ROS 2 Humble nodes that communicate via 21 custom message types and
-        6 services. The primary data flow begins at the Intel RealSense D435i depth camera,
-        where the <code>cv_node</code> performs YOLO pose estimation and 3D voxel extraction
-        in parallel threads, feeding a transformer-based action classifier. Predictions flow
-        to the <code>punch_processor</code> node, which fuses CV detections with IMU pad
-        impacts using temporal matching and pad-constraint filtering to produce confirmed
-        punch events. These confirmed punches propagate to downstream nodes:
-        <code>session_manager</code> (session lifecycle), <code>drill_manager</code>
-        (50 combo drills), <code>sparring_engine</code> (5 AI opponent styles),
-        <code>analytics_node</code> (real-time statistics), and <code>llm_node</code>
-        (local AI coach). A 5-state session machine
-        (IDLE &rarr; COUNTDOWN &rarr; ACTIVE &rarr; REST &rarr; COMPLETE) coordinates
-        per-state side effects across all nodes — the CV frame rate adapts between 30 fps
-        during active training and ~6 fps when idle, the IMU switches between navigation
-        and training modes, and data collection activates only during active rounds.
+        The system runs on an NVIDIA Jetson Orin NX, hosting 12 ROS 2 Humble nodes
+        that communicate via 21 custom message types and 6 services.
       </p>
-      <p>
-        All system parameters are managed through YAML configuration files
-        (<code>boxbunny.yaml</code>, <code>ros_topics.yaml</code>, <code>drills.yaml</code>,
-        <code>sparring.yaml</code>) with topic names loaded at startup via
-        <code>constants.py</code>, ensuring no magic numbers in code.
-      </p>
+
+      <p>The primary data flow follows four stages:</p>
+      <ul style="margin:8px 0 16px; line-height:1.7;">
+        <li><strong>Capture</strong> &mdash; Intel RealSense D435i streams depth + RGB frames</li>
+        <li><strong>Perception</strong> &mdash; <span class="node-tag">cv_node</span> runs YOLO pose estimation and 3D voxel extraction in parallel, feeding a transformer-based action classifier</li>
+        <li><strong>Fusion</strong> &mdash; <span class="node-tag">punch_processor</span> matches CV detections with IMU pad impacts using temporal and pad-constraint filtering</li>
+        <li><strong>Downstream</strong> &mdash; Confirmed punches propagate to <span class="node-tag">session_manager</span>, <span class="node-tag">drill_manager</span>, <span class="node-tag">sparring_engine</span>, <span class="node-tag">analytics_node</span>, and <span class="node-tag">llm_node</span></li>
+      </ul>
 
       <image-component
           tag="image"
-          source="../assets/robot_intelligence/ros/node_graph.png"
+          source="../assets/robot_intelligence/ros/node_graph.svg"
           subtitle="Figure: BoxBunny ROS 2 System Node Graph — 12 nodes, 40+ topics, 6 services">
       </image-component>
+
+      <h4 style="margin-top:28px;">Session State Machine</h4>
+
+      <image-component
+          tag="image"
+          source="../assets/robot_intelligence/ros/session_state_machine.svg"
+          subtitle="Figure: BoxBunny Session State Machine — 5 states coordinating all node behaviour">
+      </image-component>
+
+      <p style="margin-top:12px;">
+        The session lifecycle is managed by a 5-state machine. Each state transition triggers
+        coordinated side effects across all nodes — for example, the CV frame rate scales from
+        ~6 fps (idle) to 30 fps (active), and data collection only runs during active rounds.
+        The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
+        (techniques, sparring, free, performance tests) sharing this same state machine.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -191,30 +225,38 @@
       <div class="section-nav-grid">
         <a class="section-nav-card" href="robot-intelligence-cv.html">
           <sl-icon name="camera-video" style="font-size:1.6rem;"></sl-icon>
-          <h3>Computer Vision &amp; Action Recognition</h3>
-          <p>FusionVoxelPoseTransformer model, 9-iteration development journey, 96.8% accuracy</p>
+          <h3>CV &amp; Action Recognition</h3>
+          <p>96.8% fusion model, 9-iteration journey</p>
         </a>
         <a class="section-nav-card" href="robot-intelligence-integration.html">
           <sl-icon name="cpu" style="font-size:1.6rem;"></sl-icon>
           <h3>Intelligent Behaviour &amp; Control</h3>
-          <p>Sensor fusion, real-time inference, AI sparring, LLM coaching</p>
+          <p>Sensor fusion, sparring AI, LLM coaching</p>
         </a>
         <a class="section-nav-card" href="robot-intelligence-software.html">
           <sl-icon name="bar-chart-line" style="font-size:1.6rem;"></sl-icon>
           <h3>Dashboard &amp; Analytics</h3>
-          <p>Phone dashboard, analytics, database, gamification</p>
+          <p>Phone dashboard, performance insights</p>
         </a>
+      </div>
+      <div class="section-nav-full">
         <a class="section-nav-card" href="robot-intelligence-testing.html">
           <sl-icon name="clipboard-check" style="font-size:1.6rem;"></sl-icon>
-          <h3>Testing &amp; Validation</h3>
-          <p>CDE Fair deployment, 146 tests, model interpretability</p>
+          <div>
+            <h3>Testing &amp; Validation</h3>
+            <p>CDE Fair deployment, 146 automated tests, model interpretability analysis</p>
+          </div>
         </a>
       </div>
 
-      <p style="margin-top:16px;">
-        See <a href="appendix-robot-intelligence.html">Appendix: Robot Intelligence</a>
-        for full test breakdown and additional analysis.
-      </p>
+      <div style="margin-top:20px; text-align:center;">
+        <a href="appendix-robot-intelligence.html" style="text-decoration:none;">
+          <sl-button variant="default" size="medium">
+            <sl-icon slot="prefix" name="journal-text"></sl-icon>
+            Appendix: Robot Intelligence
+          </sl-button>
+        </a>
+      </div>
     </div>
 
   </div>

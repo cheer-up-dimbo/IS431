@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 820" width="1500" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M2 1.5L8 5L2 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="820" fill="#FAFAF8"/>
+
+  <!-- TITLE -->
+  <text x="750" y="42" text-anchor="middle" font-size="34" font-weight="700" fill="#111">Session State Machine</text>
+  <text x="750" y="68" text-anchor="middle" font-size="14" fill="#555">BoxBunny · session_manager · 5 states · published at 2 Hz to all nodes</text>
+
+
+  <!-- ═══════════ STATE: IDLE ═══════════ -->
+  <rect x="60" y="160" width="220" height="220" rx="16" fill="#fff" stroke="#888" stroke-width="1.2"/>
+  <rect x="60" y="160" width="220" height="48" rx="16" fill="#888"/>
+  <rect x="60" y="188" width="220" height="20" fill="#888"/>
+  <text x="170" y="190" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">IDLE</text>
+
+  <text x="80" y="232" font-size="13" font-weight="600" fill="#333">Waiting for session</text>
+  <line x1="80" y1="242" x2="260" y2="242" stroke="#eee" stroke-width="0.5"/>
+  <text x="80" y="264" font-size="12" fill="#555">IMU: <tspan font-weight="600" fill="#333">navigation mode</tspan></text>
+  <text x="80" y="284" font-size="12" fill="#555">Robot: <tspan font-weight="600" fill="#333">disabled</tspan></text>
+  <text x="80" y="304" font-size="12" fill="#555">CV: <tspan font-weight="600" fill="#333">idle</tspan></text>
+  <text x="80" y="324" font-size="12" fill="#555">GUI: <tspan font-weight="600" fill="#333">home / menu</tspan></text>
+  <text x="80" y="352" font-size="11" fill="#aaa">No data collection</text>
+
+
+  <!-- ═══════════ STATE: COUNTDOWN ═══════════ -->
+  <rect x="380" y="160" width="220" height="220" rx="16" fill="#fff" stroke="#BA7517" stroke-width="1.2"/>
+  <rect x="380" y="160" width="220" height="48" rx="16" fill="#BA7517"/>
+  <rect x="380" y="188" width="220" height="20" fill="#BA7517"/>
+  <text x="490" y="190" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">COUNTDOWN</text>
+
+  <text x="400" y="232" font-size="13" font-weight="600" fill="#333">Preparing (3 s default)</text>
+  <line x1="400" y1="242" x2="580" y2="242" stroke="#f5e8d0" stroke-width="0.5"/>
+  <text x="400" y="264" font-size="12" fill="#555">IMU: <tspan font-weight="600" fill="#333">switches to training</tspan></text>
+  <text x="400" y="284" font-size="12" fill="#555">Robot: <tspan font-weight="600" fill="#333">receives "start"</tspan></text>
+  <text x="400" y="304" font-size="12" fill="#555">CV: <tspan font-weight="600" fill="#333">warming up</tspan></text>
+  <text x="400" y="324" font-size="12" fill="#555">GUI: <tspan font-weight="600" fill="#333">3... 2... 1... overlay</tspan></text>
+  <text x="400" y="352" font-size="11" fill="#BA7517">Auto height-adjust (once)</text>
+
+
+  <!-- ═══════════ STATE: ACTIVE ═══════════ -->
+  <rect x="700" y="160" width="260" height="220" rx="16" fill="#fff" stroke="#1D9E75" stroke-width="1.4"/>
+  <rect x="700" y="160" width="260" height="48" rx="16" fill="#1D9E75"/>
+  <rect x="700" y="188" width="260" height="20" fill="#1D9E75"/>
+  <text x="830" y="190" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">ACTIVE</text>
+
+  <text x="720" y="232" font-size="13" font-weight="600" fill="#333">Round in progress (180 s)</text>
+  <line x1="720" y1="242" x2="940" y2="242" stroke="#d6f5e8" stroke-width="0.5"/>
+  <text x="720" y="264" font-size="12" fill="#555">IMU: <tspan font-weight="600" fill="#333">training (punches)</tspan></text>
+  <text x="720" y="284" font-size="12" fill="#555">Robot: <tspan font-weight="600" fill="#333">attacks (sparring/free)</tspan></text>
+  <text x="720" y="304" font-size="12" fill="#555">CV: <tspan font-weight="600" fill="#333">full 30 fps processing</tspan></text>
+  <text x="720" y="324" font-size="12" fill="#555">GUI: <tspan font-weight="600" fill="#333">live session page</tspan></text>
+  <text x="720" y="348" font-size="11" fill="#1D9E75">All data collected · autosave 10 s</text>
+  <text x="720" y="366" font-size="11" fill="#1D9E75">Coach tips every ~18 s</text>
+
+
+  <!-- ═══════════ STATE: REST ═══════════ -->
+  <rect x="1060" y="160" width="220" height="220" rx="16" fill="#fff" stroke="#378ADD" stroke-width="1.2"/>
+  <rect x="1060" y="160" width="220" height="48" rx="16" fill="#378ADD"/>
+  <rect x="1060" y="188" width="220" height="20" fill="#378ADD"/>
+  <text x="1170" y="190" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">REST</text>
+
+  <text x="1080" y="232" font-size="13" font-weight="600" fill="#333">Between rounds (60 s)</text>
+  <line x1="1080" y1="242" x2="1260" y2="242" stroke="#d8e8f8" stroke-width="0.5"/>
+  <text x="1080" y="264" font-size="12" fill="#555">IMU: <tspan font-weight="600" fill="#333">stays training</tspan></text>
+  <text x="1080" y="284" font-size="12" fill="#555">Robot: <tspan font-weight="600" fill="#333">idle</tspan></text>
+  <text x="1080" y="304" font-size="12" fill="#555">CV: <tspan font-weight="600" fill="#333">reduced load</tspan></text>
+  <text x="1080" y="324" font-size="12" fill="#555">GUI: <tspan font-weight="600" fill="#333">rest countdown</tspan></text>
+  <text x="1080" y="352" font-size="11" fill="#aaa">No data collection</text>
+
+
+  <!-- ═══════════ STATE: COMPLETE ═══════════ -->
+  <rect x="700" y="510" width="260" height="200" rx="16" fill="#fff" stroke="#7F77DD" stroke-width="1.2"/>
+  <rect x="700" y="510" width="260" height="48" rx="16" fill="#7F77DD"/>
+  <rect x="700" y="538" width="260" height="20" fill="#7F77DD"/>
+  <text x="830" y="540" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">COMPLETE</text>
+
+  <text x="720" y="582" font-size="13" font-weight="600" fill="#333">Session finished</text>
+  <line x1="720" y1="592" x2="940" y2="592" stroke="#e0ddf8" stroke-width="0.5"/>
+  <text x="720" y="614" font-size="12" fill="#555">IMU: <tspan font-weight="600" fill="#333">back to navigation</tspan></text>
+  <text x="720" y="634" font-size="12" fill="#555">Robot: <tspan font-weight="600" fill="#333">disabled</tspan></text>
+  <text x="720" y="654" font-size="12" fill="#555">GUI: <tspan font-weight="600" fill="#333">results page</tspan></text>
+  <text x="720" y="678" font-size="11" fill="#7F77DD">Publish SessionPunchSummary</text>
+  <text x="720" y="696" font-size="11" fill="#7F77DD">Save session to user DB</text>
+
+
+  <!-- ═══════════ TRANSITION ARROWS ═══════════ -->
+
+  <!-- IDLE → COUNTDOWN -->
+  <line x1="280" y1="270" x2="378" y2="270" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="296" y="244" width="68" height="22" rx="6" fill="#333"/>
+  <text x="330" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Start</text>
+  <text x="330" y="290" text-anchor="middle" font-size="10.5" fill="#666">StartSession svc</text>
+
+  <!-- COUNTDOWN → ACTIVE -->
+  <line x1="600" y1="270" x2="698" y2="270" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="620" y="244" width="56" height="22" rx="6" fill="#BA7517"/>
+  <text x="648" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3 sec</text>
+
+  <!-- ACTIVE → REST -->
+  <line x1="960" y1="270" x2="1058" y2="270" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="968" y="244" width="76" height="22" rx="6" fill="#1D9E75"/>
+  <text x="1006" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Round end</text>
+  <text x="1006" y="290" text-anchor="middle" font-size="10.5" fill="#666">not final round</text>
+
+  <!-- REST → COUNTDOWN (loop back, curved arrow above) -->
+  <path d="M1170 160 L1170 120 Q1170 108 1158 108 L502 108 Q490 108 490 120 L490 158"
+        fill="none" stroke="#378ADD" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="770" y="94" width="120" height="24" rx="6" fill="#378ADD"/>
+  <text x="830" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Next round</text>
+
+  <!-- ACTIVE → COMPLETE (down) -->
+  <line x1="830" y1="380" x2="830" y2="508" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="848" y="416" width="118" height="22" rx="6" fill="#1D9E75"/>
+  <text x="907" y="432" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Final round</text>
+  <text x="907" y="454" text-anchor="middle" font-size="10.5" fill="#666">or EndSession</text>
+
+  <!-- COMPLETE → IDLE (simple L-shape left then up) -->
+  <path d="M700 620 L170 620 L170 382"
+        fill="none" stroke="#7F77DD" stroke-width="1.8" marker-end="url(#a)"/>
+  <rect x="370" y="606" width="120" height="24" rx="6" fill="#7F77DD"/>
+  <text x="430" y="624" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Auto-reset 3 s</text>
+
+
+  <!-- ═══════════ ROUND PATTERN (right side info) ═══════════ -->
+  <g transform="translate(1320,160)">
+    <rect width="160" height="220" rx="10" fill="#fff" stroke="#ddd" stroke-width="0.6"/>
+    <text x="80" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#555">DEFAULT CYCLE</text>
+    <line x1="10" y1="30" x2="150" y2="30" stroke="#eee" stroke-width="0.5"/>
+
+    <text x="16" y="52" font-size="11" font-weight="700" fill="#333">3 rounds</text>
+
+    <text x="16" y="78" font-size="11" font-weight="600" fill="#BA7517">Countdown</text>
+    <text x="140" y="78" text-anchor="end" font-size="11" fill="#666">3 s</text>
+
+    <text x="16" y="100" font-size="11" font-weight="600" fill="#1D9E75">Work</text>
+    <text x="140" y="100" text-anchor="end" font-size="11" fill="#666">180 s</text>
+
+    <text x="16" y="122" font-size="11" font-weight="600" fill="#378ADD">Rest</text>
+    <text x="140" y="122" text-anchor="end" font-size="11" fill="#666">60 s</text>
+
+    <line x1="10" y1="136" x2="150" y2="136" stroke="#eee" stroke-width="0.5"/>
+
+    <text x="16" y="158" font-size="11" font-weight="600" fill="#555">Autosave</text>
+    <text x="140" y="158" text-anchor="end" font-size="11" fill="#666">10 s</text>
+
+    <text x="16" y="180" font-size="11" font-weight="600" fill="#555">State pub</text>
+    <text x="140" y="180" text-anchor="end" font-size="11" fill="#666">2 Hz</text>
+
+    <text x="16" y="202" font-size="11" font-weight="600" fill="#555">Coach tips</text>
+    <text x="140" y="202" text-anchor="end" font-size="11" fill="#666">~18 s</text>
+  </g>
+
+
+  <!-- ═══════════ MODES (bottom panel) ═══════════ -->
+  <g transform="translate(100,740)">
+    <text x="650" y="0" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Training modes</text>
+
+    <rect x="0" y="14" width="100" height="26" rx="6" fill="#1D9E75"/>
+    <text x="50" y="32" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">training</text>
+    <text x="114" y="32" font-size="12" fill="#555">Combo drill sequences · no robot attacks</text>
+
+    <rect x="440" y="14" width="100" height="26" rx="6" fill="#1D9E75"/>
+    <text x="490" y="32" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">sparring</text>
+    <text x="554" y="32" font-size="12" fill="#555">AI opponent · Markov-chain attacks</text>
+
+    <rect x="880" y="14" width="100" height="26" rx="6" fill="#1D9E75"/>
+    <text x="930" y="32" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">free</text>
+    <text x="994" y="32" font-size="12" fill="#555">Reactive counter-punches</text>
+
+    <rect x="0" y="48" width="100" height="26" rx="6" fill="#888"/>
+    <text x="50" y="66" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">power</text>
+    <text x="114" y="66" font-size="12" fill="#555">Max punch force test</text>
+
+    <rect x="440" y="48" width="100" height="26" rx="6" fill="#888"/>
+    <text x="490" y="66" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">stamina</text>
+    <text x="554" y="66" font-size="12" fill="#555">Endurance / fatigue test</text>
+
+    <rect x="880" y="48" width="100" height="26" rx="6" fill="#888"/>
+    <text x="930" y="66" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">reaction</text>
+    <text x="994" y="66" font-size="12" fill="#555">Defense reaction time</text>
+  </g>
+
+</svg>

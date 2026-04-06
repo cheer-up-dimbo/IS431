@@ -1,0 +1,95 @@
+<svg width="900" height="860" viewBox="0 0 900 860" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;">
+  <rect width="900" height="860" fill="white" rx="8"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Camera -->
+  <rect x="290" y="28" width="320" height="48" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="450" y="46" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#2C2C2A">Intel RealSense D435i</text>
+  <text x="450" y="64" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#5F5E5A">RGB + depth at 60 fps, sampled to 30</text>
+
+  <!-- Split lines -->
+  <line x1="450" y1="76" x2="450" y2="88" stroke="#888780" stroke-width="1"/>
+  <line x1="230" y1="88" x2="670" y2="88" stroke="#888780" stroke-width="1"/>
+  <line x1="230" y1="88" x2="230" y2="120" stroke="#0F6E56" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="670" y1="88" x2="670" y2="120" stroke="#185FA5" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Branch labels on outer side of arrows -->
+  <text x="216" y="108" text-anchor="end" font-size="13" font-weight="700" fill="#0F6E56">Depth</text>
+  <text x="684" y="108" text-anchor="start" font-size="13" font-weight="700" fill="#185FA5">RGB</text>
+
+  <!-- Voxel features -->
+  <rect x="80" y="124" width="300" height="90" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="230" y="142" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#04342C">3D voxel features</text>
+  <text x="230" y="162" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#04342C">12x12x12 person-centered grid</text>
+  <text x="230" y="178" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#04342C">Ch 1: short-term motion (67ms lookback)</text>
+  <text x="230" y="194" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#04342C">Ch 2: trajectory shape (267ms lookback)</text>
+
+  <!-- Pose features -->
+  <rect x="520" y="124" width="300" height="90" rx="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="670" y="142" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#042C53">YOLO pose features</text>
+  <text x="670" y="162" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#042C53">7 upper-body joints (wrists to nose)</text>
+  <text x="670" y="178" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#042C53">Positions, arm extension, elbow angles</text>
+  <text x="670" y="194" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#042C53">Joint velocities and extension rates</text>
+
+  <!-- Dim annotations -->
+  <text x="230" y="226" text-anchor="middle" font-size="11" fill="#0F6E56" font-style="italic">3,456 dims / frame</text>
+  <text x="670" y="226" text-anchor="middle" font-size="11" fill="#185FA5" font-style="italic">42 dims / frame</text>
+
+  <!-- Arrows to encoders -->
+  <line x1="230" y1="236" x2="230" y2="258" stroke="#0F6E56" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="670" y1="236" x2="670" y2="258" stroke="#185FA5" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Conv3D stem -->
+  <rect x="80" y="262" width="300" height="70" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="230" y="280" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#04342C">Conv3D stem</text>
+  <text x="230" y="300" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#04342C">3 conv layers (stride 2), BatchNorm, GELU</text>
+  <text x="230" y="316" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#04342C">Compresses 12x12x12 voxels to 192-dim</text>
+
+  <!-- Pose encoder -->
+  <rect x="520" y="262" width="300" height="70" rx="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="670" y="280" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#042C53">Pose encoder</text>
+  <text x="670" y="300" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#042C53">2-layer MLP, encodes 42 to 64-dim</text>
+  <text x="670" y="316" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#042C53">Output suppressed when YOLO uncertain</text>
+
+  <!-- Merge lines -->
+  <line x1="230" y1="332" x2="230" y2="378" stroke="#888780" stroke-width="1"/>
+  <line x1="670" y1="332" x2="670" y2="378" stroke="#888780" stroke-width="1"/>
+  <line x1="230" y1="378" x2="670" y2="378" stroke="#888780" stroke-width="1"/>
+  <line x1="450" y1="378" x2="450" y2="402" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="450" y="370" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">Concatenate [192-dim + 64-dim]</text>
+
+  <!-- Fusion projection -->
+  <rect x="240" y="406" width="420" height="56" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="450" y="424" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#26215C">Fusion projection</text>
+  <text x="450" y="444" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#3C3489">Projects combined 256 to 192-dim + LayerNorm</text>
+
+  <line x1="450" y1="462" x2="450" y2="492" stroke="#534AB7" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Transformer -->
+  <rect x="200" y="496" width="500" height="82" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="450" y="516" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#26215C">Transformer encoder</text>
+  <text x="450" y="538" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#3C3489">4 layers, 8 attention heads, d=192, FFN=576, pre-norm</text>
+  <text x="450" y="556" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#3C3489">Causal mask (streaming), 12 frames at 30 fps = 0.4s window</text>
+
+  <line x1="450" y1="578" x2="450" y2="608" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Classifier -->
+  <rect x="240" y="612" width="420" height="56" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="450" y="630" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#2C2C2A">Classifier head</text>
+  <text x="450" y="650" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#5F5E5A">Mean + Max pooling to 384-dim, then Linear to 8</text>
+
+  <line x1="450" y1="668" x2="450" y2="698" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Output -->
+  <rect x="200" y="702" width="500" height="82" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="450" y="722" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#26215C">Action prediction (8 classes)</text>
+  <text x="450" y="744" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#3C3489">Jab, cross, left hook, right hook,</text>
+  <text x="450" y="760" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#3C3489">left uppercut, right uppercut, block, idle</text>
+
+  <!-- Stats -->
+  <text x="450" y="816" text-anchor="middle" font-size="13" font-weight="700" fill="#444441">~730K parameters  |  97.3% validation accuracy (unseen person)</text>
+</svg>

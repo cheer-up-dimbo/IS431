@@ -34,9 +34,8 @@
     <h1>5.3.5 Dashboard & Analytics</h1>
 
     <p>
-      Beyond the core intelligence systems, BoxBunny provides a comprehensive software layer that transforms raw
-      training data into actionable insights, delivers AI-powered coaching analysis, and enables convenient remote
-      control &mdash; all designed to make the training experience as seamless as possible.
+      Beyond core intelligence, <strong>BoxBunny</strong> provides a software layer that transforms raw training data
+      into actionable insights, delivers AI coaching analysis, and enables convenient remote control.
     </p>
 
     <sl-divider></sl-divider>
@@ -48,31 +47,40 @@
       The system uses a 3-layer communication architecture connecting the desktop GUI, phone dashboard, and ROS 2 backend:
     </p>
 
-    <ul>
-      <li>
-        <strong>GUI &harr; ROS Core</strong>: A GuiBridge running as a background QThread in the PySide6 application,
-        subscribing to 10+ ROS topics and emitting Qt signals for thread-safe UI updates. Three async service clients
-        handle session start/stop and LLM generation.
-      </li>
-      <li>
-        <strong>Dashboard &harr; GUI</strong>: IPC files in <code>/tmp/</code> with 100ms polling &mdash; the phone
-        dashboard writes JSON command files that the GUI reads and executes, enabling remote control without direct
-        network coupling.
-      </li>
-      <li>
-        <strong>Dashboard Frontend &harr; Backend</strong>: Standard REST API calls for data operations, plus WebSocket
-        for real-time session updates during active training.
-      </li>
-    </ul>
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Layer</th>
+          <th style="padding:8px; border:1px solid #ddd;">From &rarr; To</th>
+          <th style="padding:8px; border:1px solid #ddd;">Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">ROS Bridge</td>
+          <td style="padding:8px; border:1px solid #ddd;">GUI &harr; ROS Core</td>
+          <td style="padding:8px; border:1px solid #ddd;">QThread, Qt signals, async services</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">IPC Files</td>
+          <td style="padding:8px; border:1px solid #ddd;">Dashboard &harr; GUI</td>
+          <td style="padding:8px; border:1px solid #ddd;">JSON files in <code>/tmp/</code>, 100ms polling</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">REST + WS</td>
+          <td style="padding:8px; border:1px solid #ddd;">Dashboard &harr; Backend</td>
+          <td style="padding:8px; border:1px solid #ddd;">HTTP API + WebSocket real-time</td>
+        </tr>
+      </tbody>
+    </table>
 
     <p>
-      The phone dashboard is accessible over the robot's WiFi access point, meaning users can control BoxBunny from
-      their phone while standing at the robot. It was specifically designed for convenience: no typing on the 7-inch
-      touchscreen with boxing gloves on, no bending down to interact with a small display, and natural mobile
-      interaction for chatting with the AI coach.
+      The phone dashboard is accessible over the robot's WiFi access point. Users control
+      <strong>BoxBunny</strong> from their phone &mdash; no typing on a 7-inch touchscreen with boxing gloves,
+      no bending down, and natural mobile interaction for chatting with the AI coach.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.png" subtitle="Figure: GUI & Dashboard Communication Architecture"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.svg" subtitle="Figure: GUI & Dashboard Communication Architecture"></image-component>
 
     <sl-divider></sl-divider>
 
@@ -80,69 +88,59 @@
     <h2>5.3.5.2 Analytics & Performance Insights</h2>
 
     <p>
-      All training data flows through the system and is aggregated into meaningful insights for the user:
+      All training data flows through the system into meaningful user insights:
     </p>
 
-    <p>
-      <strong>Session-Level Analytics</strong>: After each training session, a SessionPunchSummary with 20+ fields is
-      published, capturing punch distribution by type, force distribution across light/medium/hard, pad distribution,
-      rounds completed, punches per minute, maximum power, and movement metrics (depth range and lateral displacement).
-      This data is stored in the per-user SQLite database for long-term tracking.
-    </p>
-
-    <p>
-      <strong>Trend Analysis</strong>: The phone dashboard provides time-series analytics across four selectable periods
-      (7 days, 30 days, 90 days, all time) for five key metrics: training volume (total punches), reaction time, punch
-      power, defence rate, and stamina. Users can track their improvement over time and identify areas that need work.
-    </p>
-
-    <p>
-      <strong>Peer Comparison</strong>: Population benchmarks compare the user's performance against demographic norms
-      segmented by age group, gender, and skill level across 6 metrics. Percentile tiers range from "Getting Started"
-      (below 10th percentile) through "Average", "Above Average", "Advanced", to "Elite" (above 90th percentile).
-    </p>
-
-    <p>
-      <strong>Personal Records</strong>: All-time bests for power, stamina, and reaction time are automatically tracked
-      in a dedicated <code>personal_records</code> table and surfaced on the dashboard with the date achieved.
-    </p>
-
-    <p>
-      <strong>Sparring-Specific</strong>: Defence breakdown showing blocks, slips, dodges, and hits received. The
-      weakness profile reveals which punch types the user struggles to defend against &mdash; the same data that drives
-      the AI sparring engine's targeting behaviour.
-    </p>
+    <ul>
+      <li>
+        <strong>Session-Level Analytics</strong>: Each session publishes a <strong>SessionPunchSummary</strong>
+        with 20+ fields &mdash; punch distribution by type, force levels, pad distribution, rounds completed,
+        punches per minute, max power, and movement metrics. Stored in per-user SQLite for long-term tracking.
+      </li>
+      <li>
+        <strong>Trend Analysis</strong>: Time-series analytics across four periods (7/30/90 days, all time) for
+        five metrics: volume, reaction time, power, defence rate, and stamina.
+      </li>
+      <li>
+        <strong>Peer Comparison</strong>: Population benchmarks by age, gender, and skill level across 6 metrics.
+        Tiers range from "Getting Started" (&lt;10th percentile) to "Elite" (&gt;90th).
+      </li>
+      <li>
+        <strong>Personal Records</strong>: All-time bests for power, stamina, and reaction time tracked in a
+        dedicated <strong>personal_records</strong> table and surfaced with the date achieved.
+      </li>
+      <li>
+        <strong>Sparring-Specific</strong>: Defence breakdown (blocks, slips, dodges, hits received) and weakness
+        profile revealing which punches the user struggles to defend &mdash; the same data driving the AI
+        sparring engine's targeting.
+      </li>
+    </ul>
 
     <sl-divider></sl-divider>
 
     <!-- 5.3.5.3 AI COACH ANALYSIS & TRAINING SUGGESTIONS -->
     <h2>5.3.5.3 AI Coach Analysis & Training Suggestions</h2>
 
-    <p>
-      <strong>Post-Session Analysis</strong>: After each session, the LLM receives the full SessionPunchSummary as
-      context and generates a 2-3 paragraph analysis referencing specific metrics &mdash; punch count, power trends,
-      weak areas, and improvement compared to previous sessions.
-    </p>
-
-    <p>
-      <strong>Actionable Drill Suggestions</strong>: The LLM can output structured tags in the format
-      <code>[DRILL:Name|combo=1-2|rounds=2|work=60s|speed=Medium]</code>. The phone dashboard parses these into
-      clickable action cards that can launch the suggested training configuration directly on the robot with one tap.
-    </p>
-
-    <p>
-      <strong>Interactive AI Chat</strong>: A full-screen chat interface with word-by-word streaming (20ms per word)
-      lets users ask technique questions, request custom training plans, get explanations of their statistics, or have
-      a general conversation about boxing. Conversation history is persisted and follow-up suggestions are provided
-      after each response.
-    </p>
-
-    <p>
-      <strong>Convenience Design</strong>: The phone dashboard means users chat with the AI coach from their phone
-      instead of typing on a 7-inch touchscreen &mdash; much more natural, especially with boxing gloves on. This
-      design was directly motivated by user feedback during the CDE AI Fair, where touchscreen typing was identified
-      as a friction point.
-    </p>
+    <ul>
+      <li>
+        <strong>Post-Session Analysis</strong>: The LLM receives the full <strong>SessionPunchSummary</strong>
+        and generates a 2&ndash;3 paragraph analysis referencing specific metrics, weak areas, and improvement trends.
+      </li>
+      <li>
+        <strong>Actionable Drill Suggestions</strong>: The LLM outputs structured tags
+        (<code>[DRILL:Name|combo=1-2|rounds=2|work=60s|speed=Medium]</code>) parsed into clickable cards
+        that launch the suggested configuration with one tap.
+      </li>
+      <li>
+        <strong>Interactive AI Chat</strong>: Full-screen chat with word-by-word streaming (20ms/word).
+        Users ask technique questions, request training plans, or get stat explanations.
+        History is persisted with follow-up suggestions after each response.
+      </li>
+      <li>
+        <strong>Convenience Design</strong>: Users chat from their phone instead of the 7-inch touchscreen.
+        This was directly motivated by CDE AI Fair feedback where touchscreen typing was a friction point.
+      </li>
+    </ul>
 
     <sl-divider></sl-divider>
 
@@ -150,28 +148,28 @@
     <h2>5.3.5.4 Phone Dashboard Features</h2>
 
     <p>
-      The phone dashboard is a Vue 3 Single Page Application (Composition API, Pinia state management, Tailwind CSS,
-      Chart.js) served by a FastAPI backend. Key views include:
+      The phone dashboard is a <strong>Vue 3</strong> SPA (Composition API, Pinia, Tailwind CSS, Chart.js)
+      served by a <strong>FastAPI</strong> backend. Key views:
     </p>
 
     <ul>
       <li>
-        <strong>Dashboard Home</strong>: XP progress ring towards next rank, weekly training goal with streak counter,
-        training heat map (activity by day of week), quick stats with trend arrows showing week-over-week change, peer
-        comparison percentile bars, recent session summary card, and an AI coach quote of the day.
+        <strong>Dashboard Home</strong>: XP progress ring, weekly goal with streak counter,
+        training heat map, quick stats with trend arrows, peer comparison bars,
+        recent session card, and AI coach quote of the day.
       </li>
       <li>
-        <strong>Performance</strong>: Trend charts across selectable time periods for all 5 key metrics with personal
-        best callouts.
+        <strong>Performance</strong>: Trend charts across selectable periods for all 5 key metrics
+        with personal best callouts.
       </li>
       <li>
-        <strong>Training Remote</strong>: Quick preset grid for one-tap session start, navigation buttons to remotely
-        control the GUI on the touchscreen from the phone, and a press-and-hold height adjustment control. Users can
-        configure their entire training session from their phone and walk to the robot ready to go.
+        <strong>Training Remote</strong>: Quick preset grid for one-tap session start, navigation buttons
+        to remotely control the GUI, and press-and-hold height adjustment. Users configure their
+        session from their phone and walk to the robot ready to go.
       </li>
       <li>
-        <strong>Coach View</strong> (coach accounts only): Dashboard for group circuit training &mdash; manage
-        participant rotation, view live stats per participant, load training presets, and review past coaching sessions.
+        <strong>Coach View</strong> (coach accounts only): Group circuit training dashboard &mdash;
+        manage participant rotation, view live stats, load presets, and review past sessions.
       </li>
     </ul>
 
@@ -231,28 +229,27 @@
 
     <h3>Two-Tier SQLite Database</h3>
 
-    <p>
-      <strong>Main DB</strong> (<code>boxbunny_main.db</code>): shared tables for users (with password hash and pattern
-      lock), auth sessions, training presets, and coaching sessions.
-    </p>
-
-    <p>
-      <strong>Per-User DB</strong> (<code>users/{username}/boxbunny.db</code>): isolated tables for training sessions,
-      session events, combo progress, performance test results (power, stamina, reaction), sparring sessions, weakness
-      profiles, gamification (XP, achievements, streaks, personal records).
-    </p>
-
-    <p>
-      <strong>Design rationale</strong>: Per-user databases provide complete data isolation, enable concurrent writes
-      without lock contention, and simplify per-user backup and data export.
-    </p>
+    <ul>
+      <li>
+        <strong>Main DB</strong> (<code>boxbunny_main.db</code>): Shared tables for users (password hash + pattern lock),
+        auth sessions, training presets, and coaching sessions.
+      </li>
+      <li>
+        <strong>Per-User DB</strong> (<code>users/{username}/boxbunny.db</code>): Isolated tables for training sessions,
+        events, combo progress, performance tests, sparring, weakness profiles, and gamification (XP, achievements, streaks, records).
+      </li>
+      <li>
+        <strong>Design rationale</strong>: Per-user databases provide data isolation, enable concurrent writes
+        without lock contention, and simplify backup and export.
+      </li>
+    </ul>
 
     <h3>WebSocket</h3>
 
     <p>
-      Real-time session updates via <code>ws://&lt;host&gt;:8080/ws</code>, supporting events for session
-      started/stats/completed, with 30-second keepalive ping/pong and automatic reconnection using exponential backoff
-      (max 10 attempts) with state sync on reconnect.
+      Real-time session updates via <code>ws://&lt;host&gt;:8080/ws</code> with events for session
+      started/stats/completed. Uses 30-second keepalive ping/pong and automatic reconnection with
+      exponential backoff (max 10 attempts) plus state sync on reconnect.
     </p>
 
     <sl-divider></sl-divider>
@@ -300,24 +297,23 @@
     <h3>XP Calculation</h3>
 
     <p>
-      Base XP varies by mode (Training 50, Sparring 80, Free 30, Performance Tests 40), with bonuses for session
-      completion and score performance. Difficulty multipliers scale from 1.0&times; (Beginner) through 1.3&times;
-      (Intermediate) and 1.6&times; (Advanced) to 2.0&times; (Elite). Minimum 10 XP per session.
+      Base XP varies by mode (Training 50, Sparring 80, Free 30, Performance Tests 40) with bonuses for
+      completion and score. Difficulty multipliers: 1.0&times; Beginner, 1.3&times; Intermediate,
+      1.6&times; Advanced, 2.0&times; Elite. Minimum 10 XP per session.
     </p>
 
     <h3>12+ Achievements</h3>
 
     <p>
-      Including "First Blood" (first session), "Century" (100 punches), "Speed Demon" (lightning reaction time),
-      "Weekly Warrior" (7-day streak), and "Perfect Round" (100% accuracy). Duplicate unlock prevention ensures each
-      badge is awarded only once.
+      Including "First Blood" (first session), "Century" (100 punches), "Speed Demon" (lightning reaction),
+      "Weekly Warrior" (7-day streak), and "Perfect Round" (100% accuracy). Each badge awarded only once.
     </p>
 
     <h3>Streaks & Goals</h3>
 
     <p>
-      Daily training streak tracking with longest streak records. Configurable weekly training goal (default 3
-      sessions/week) with progress tracking.
+      Daily training streak tracking with longest streak records. Configurable weekly goal
+      (default 3 sessions/week) with progress tracking.
     </p>
 
     <sl-divider></sl-divider>
