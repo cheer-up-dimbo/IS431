@@ -84,62 +84,89 @@
     <h2>5.3.3.1 Model Architecture</h2>
     <h3>FusionVoxelPoseTransformerModel (~1.75M parameters)</h3>
 
+    <p>
+      The model combines two complementary ways of understanding a punch, then uses a
+      Transformer to reason about how the motion unfolds over time.
+    </p>
+
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Component</th>
           <th style="padding:8px; border:1px solid #ddd;">Input</th>
           <th style="padding:8px; border:1px solid #ddd;">Output</th>
-          <th style="padding:8px; border:1px solid #ddd;">Key Detail</th>
+          <th style="padding:8px; border:1px solid #ddd;">Role</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Voxel Branch</td>
-          <td style="padding:8px; border:1px solid #ddd;">12&sup3; grid &times; 2 channels</td>
+          <td style="padding:8px; border:1px solid #ddd;">12&sup3; 3D grid &times; 2 motion channels</td>
           <td style="padding:8px; border:1px solid #ddd;">192-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">Conv3D stem, delta@2 (67ms) + delta@8 (267ms)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Captures <em>where</em> the body moved in 3D space</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Pose Branch</td>
-          <td style="padding:8px; border:1px solid #ddd;">42-dim (7 keypoints)</td>
+          <td style="padding:8px; border:1px solid #ddd;">42 features from 7 body joints</td>
           <td style="padding:8px; border:1px solid #ddd;">64-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">Confidence-gated, same YOLO for train/inference</td>
+          <td style="padding:8px; border:1px solid #ddd;">Captures <em>which</em> body part moved and how</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Fusion</td>
-          <td style="padding:8px; border:1px solid #ddd;">256-dim concat</td>
+          <td style="padding:8px; border:1px solid #ddd;">256-dim (both branches combined)</td>
           <td style="padding:8px; border:1px solid #ddd;">192-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">Linear projection + LayerNorm</td>
+          <td style="padding:8px; border:1px solid #ddd;">Merges the two perspectives into a unified representation</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Transformer</td>
-          <td style="padding:8px; border:1px solid #ddd;">12-frame window</td>
+          <td style="padding:8px; border:1px solid #ddd;">12 consecutive frames (0.4 seconds)</td>
           <td style="padding:8px; border:1px solid #ddd;">384-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">4 layers, 8 heads, causal masking</td>
+          <td style="padding:8px; border:1px solid #ddd;">Reasons over how the motion unfolds across time</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Classifier</td>
-          <td style="padding:8px; border:1px solid #ddd;">384-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">8 classes</td>
-          <td style="padding:8px; border:1px solid #ddd;">Mean+max pool &rarr; MLP</td>
+          <td style="padding:8px; border:1px solid #ddd;">384-dim summary</td>
+          <td style="padding:8px; border:1px solid #ddd;">8 action classes</td>
+          <td style="padding:8px; border:1px solid #ddd;">Final prediction: jab, cross, hooks, uppercuts, block, or idle</td>
         </tr>
       </tbody>
     </table>
 
+    <h3>Voxel Branch &mdash; 3D Motion Sensing</h3>
     <p>
-      The <strong>voxel branch</strong> uses a person-centred 12&sup3; occupancy grid (~13cm per voxel) with two
-      temporal delta channels capturing short-term punch onset (delta@2, 67ms) and full arc trajectory (delta@8, 267ms).
-      The <strong>pose branch</strong> extracts 7 upper-body keypoints via <code>yolo26n-pose.pt</code>, encoding
-      normalised coordinates, confidence scores, arm extension ratios, shoulder rotation, elbow angles, and velocities
-      into a 42-dim feature vector.
+      The depth camera sees the user in 3D. This branch divides the space around the user into
+      a 12&times;12&times;12 grid of small cubes (each roughly 13cm), creating a 3D snapshot of
+      where the body is at each moment. To detect motion, the model compares these snapshots
+      across time using two channels:
+    </p>
+    <ul>
+      <li><strong>Fast channel</strong> (2-frame difference, ~67ms) &mdash; detects the sudden onset of a punch</li>
+      <li><strong>Slow channel</strong> (8-frame difference, ~267ms) &mdash; captures the full arc of the punch trajectory</li>
+    </ul>
+    <p>
+      Together, these two channels tell the model both <em>when</em> a punch started and <em>what shape</em>
+      the motion followed &mdash; a hook sweeps horizontally while an uppercut rises vertically.
+      A 3D convolutional neural network (Conv3D) compresses this spatial information into a compact
+      192-dimensional vector per frame.
     </p>
 
+    <h3>Pose Branch &mdash; Body Joint Tracking</h3>
     <p>
-      <strong>Confidence gating</strong> is a key design decision: the pose output is scaled by mean YOLO joint
-      confidence. When YOLO is uncertain (e.g., glove occlusion at punch extension), pose is suppressed and the model
-      falls back to voxel-only classification. This graceful degradation is reinforced during training through
-      clip-level pose dropout (15%) and per-joint dropout (10%, simulating wrist occlusion by gloves).
+      A YOLO pose estimation model (<code>yolo26n-pose.pt</code>) detects 7 upper-body joints
+      (nose, shoulders, elbows, wrists) from the RGB camera image. From these joint positions,
+      42 features are computed: normalised coordinates, confidence scores, arm extension ratios,
+      shoulder rotation, elbow bend angles, and joint velocities. The same YOLO model is used
+      during both training and live inference to prevent any mismatch between the two.
+    </p>
+
+    <h3>Confidence Gating &mdash; Graceful Degradation</h3>
+    <p>
+      Boxing gloves frequently hide the wrist joints at the exact moment of punch extension
+      &mdash; precisely when detection matters most. To handle this, the pose output is scaled
+      by how confident YOLO is in its detections. When confidence is low, the pose signal is
+      automatically suppressed and the model relies on the voxel branch alone. This fallback
+      behaviour is reinforced during training by randomly dropping the pose input entirely for
+      15% of clips and zeroing individual joints 10% of the time, simulating real-world occlusion.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/model_architecture.svg" subtitle="Figure: FusionVoxelPoseTransformer Architecture -- dual-branch fusion with transformer temporal encoding"></image-component>
@@ -261,10 +288,6 @@
 
     <p>Each video shows the same boxing footage processed through the corresponding feature extraction method.</p>
 
-    <div style="display:flex; gap:16px; align-items:center; margin:12px 0;">
-      <image-component tag="image" source="../assets/robot_intelligence/cv/coloured_gloves.jpg" subtitle="Red and green gloves used for colour-based hand identification (Iteration 6)" width="25%"></image-component>
-    </div>
-
     <sl-divider></sl-divider>
 
     <!-- 5.3.3.3 DATA COLLECTION AND TRAINING -->
@@ -301,8 +324,10 @@
     <p>
       <strong>Block annotation fix:</strong> Initially, block annotations covered only the onset (arms rising). This made
       block onset indistinguishable from uppercut onset, hurting live inference. Extending annotations to cover the full
-      guard sequence (rise, hold, return) dramatically improved live block detection -- v10 had 97.3% validation accuracy
+      guard sequence (rise, hold, return) dramatically improved live block detection &mdash; v10 had 97.3% validation accuracy
       but poor live blocks; v11 had 96.8% validation but substantially better live performance due to this fix alone.
+      Block accuracy remains the lowest at 66.7% in validation due to having only 6 samples (the smallest class),
+      but its real-world usability improved significantly with the annotation change.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/annotation_freestyle.png" subtitle="Custom annotation GUI with timeline-based segment editing"></image-component>
