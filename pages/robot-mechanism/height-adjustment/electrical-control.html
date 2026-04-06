@@ -138,18 +138,10 @@
         wave regardless of the commanded speed, resulting in uncontrolled
         full-speed operation. The corrected assignment (above) was
         validated in firmware V3. See
-        <a href="../../upper-mechanism/troubleshooting.html">Troubleshooting
+        <a href="../arm-actuation/troubleshooting.html">Troubleshooting
         §5</a> for the full root-cause analysis.
       </sl-alert>
 
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="camera"></sl-icon>
-        <strong>Photo Placeholder:</strong> Physical MDDS10 wiring showing
-        Pin 3 &rarr; AN1, Pin 2 &rarr; DIG1, power terminals, and motor
-        output connections.<br>
-        <em>To add: place in
-        <code>assets/upper_mechanism/electrical/</code>.</em>
-      </sl-alert>
     </div>
 
     <sl-divider></sl-divider>
@@ -171,97 +163,34 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 5. REGENERATIVE BRAKING & BACK-EMF                     -->
-    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Regenerative Braking &amp; Back-EMF Management</h3>
-      <p>
-        The DC height motor operates as a <strong>generator</strong>
-        during the deceleration phase of height adjustment. When the
-        motor decelerates rapidly (e.g., an abrupt STOP command at
-        speed), the collapsing magnetic flux produces a
-        <strong>back-EMF</strong> voltage spike that is injected onto the
-        shared 24V bus.
-      </p>
-      <p>
-        If the rotor decelerates rapidly, the rate of magnetic flux
-        collapse produces a transient voltage spike that can exceed the
-        PSU's overvoltage protection (OVP) threshold (~28V). Upon
-        triggering OVP, the Mean Well PSU shuts down the entire 24V
-        rail, and all motor bus devices — including the four Damiao arm
-        motors — lose power simultaneously.
-      </p>
-
-      <sl-alert variant="danger" open>
-        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
-        <strong>Root Cause:</strong> This failure mode was discovered
-        during integration testing. The OVP trip was caused by the
-        <strong>DC height motor</strong> (via the Cytron MDDS10), not
-        the Damiao arm motors. The geared DC motor's higher rotor
-        inertia and the mechanical advantage of the screw jack produce
-        larger back-EMF transients than the smaller Damiao BLDC motors.
-      </sl-alert>
-
-      <h4>Software Mitigation — PWM Ramp-Down</h4>
-      <p>
-        A <code>_ramp_down()</code> method was implemented in the GUI
-        control layer (V3). Instead of issuing a single STOP command,
-        the method transmits <strong>six progressively decreasing
-        position commands</strong> over a 300 ms window, limiting the
-        rate of rotor deceleration and thereby capping the back-EMF
-        voltage below the OVP threshold.
-      </p>
-
-      <!-- ─── Technical Callout: Back-EMF ─── -->
-      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Back-EMF Physics</h4>
-        <p>
-          The induced voltage (<em>V<sub>emf</sub></em>) is proportional
-          to the rate of change of magnetic flux:
-        </p>
-        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
-          V<sub>emf</sub> = &minus;N &middot;
-          d&Phi; / dt &nbsp;&asymp;&nbsp;
-          K<sub>e</sub> &middot; &omega;
-        </p>
-        <p>
-          Where K<sub>e</sub> is the motor's back-EMF constant and
-          &omega; is the angular velocity at the moment of deceleration.
-          By controlling d&omega;/dt through the ramp-down, the firmware
-          limits V<sub>emf</sub> to below the OVP threshold. The 300 ms
-          ramp window was empirically determined to be sufficient for
-          the height motor's maximum operating speed.
-        </p>
-      </div>
-
-      <h4>Residual Risk &amp; Recommended Future Work</h4>
-      <p>
-        The software ramp-down addresses the common case but does not
-        protect against edge cases such as a user physically stopping the
-        height column mid-travel (instant deceleration from external
-        force). A hardware-level protection — either a <strong>TVS
-        (Transient Voltage Suppressor) clamp diode</strong> or an
-        <strong>Active Shunt Regulator</strong> on the 24V bus — is
-        recommended as a permanent solution. This is documented as a
-        future improvement in
-        <a href="../../upper-mechanism/troubleshooting.html">Troubleshooting
-        §6</a>.
-      </p>
-
+      <h3>Regenerative Braking &amp; Back-EMF</h3>
       <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="camera-video"></sl-icon>
-        <strong>Video Placeholder:</strong> Split-screen demonstration
-        comparing (1) abrupt stop showing bus voltage spike on
-        oscilloscope/multimeter, vs (2) ramp-down stop showing stable
-        bus voltage. Annotate the OVP threshold (~28V) on the trace.<br>
-        <em>To add: place video in
-        <code>assets/upper_mechanism/videos/</code> and use
-        <code>&lt;video&gt;</code> tag.</em>
+        <sl-icon slot="icon" name="link-45deg"></sl-icon>
+        The full regenerative braking analysis — including back-EMF
+        physics, the software ramp-down mitigation, and residual risk
+        assessment — is documented in
+        <strong><a href="../arm-actuation/troubleshooting.html">
+        Troubleshooting &amp; Iteration — Defect 6</a></strong>.
       </sl-alert>
     </div>
 
     <sl-divider></sl-divider>
+
+    <div>
+      <h3>Wiring Diagrams — Pending</h3>
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="diagram-3"></sl-icon>
+        <strong>Wiring diagrams are required</strong> for three
+        subsystems:
+        <ul style="margin:8px 0 0 0;">
+          <li><strong>Height motor</strong> — MDDS10 PWM/DIR, power terminals, motor output</li>
+          <li><strong>Base rotation</strong> — CAN Modbus driver, E-stop, Arduino R4 WiFi</li>
+          <li><strong>IMU (Padding)</strong> — Quad-MPU6050 I²C dual-bus topology</li>
+        </ul>
+      </sl-alert>
+    </div>
+
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 6. POWER INTEGRATION                                   -->
@@ -272,7 +201,7 @@
         The height motor is connected to the <strong>24V motor
         bus</strong> via the shared terminal block, alongside the four
         Damiao arm motors. The dual-rail power architecture (documented
-        in <a href="../../upper-mechanism/electrical-integration.html">
+        in <a href="../arm-actuation/electrical-integration.html">
         Arm Actuation — Electrical Integration</a>) isolates the 12V
         logic rail from the motor bus, ensuring that OVP trips caused by
         height motor back-EMF do not propagate to the Jetson or Teensy.
