@@ -3,23 +3,20 @@ const guiDeliverablesStatusEl = document.getElementById('gui-deliverables-status
 if (guiDeliverablesStatusEl) {
   new gridjs.Grid({
     columns: [
-      { name: 'Requirement', width: '30%' },
-      { name: 'Status', width: '15%' },
-      { name: 'Evidence', width: '55%' }
+      { name: 'Requirement', width: '25%' },
+      { name: 'Status', width: '12%' },
+      { name: 'Evidence', width: '63%' }
     ],
     data: [
-      ['Ease of Use (Primary Requirement)', 'Achieved', 'Maximum 3 clicks to any feature\nLarge touch targets (80x60px minimum)\nClear visual hierarchy\nConsistent navigation pattern'],
-      ['Combo Training', 'Achieved', '50-combo curriculum implemented\nProgressive difficulty (Beginner, Intermediate, Advanced)\nMastery-based progression validated'],
-      ['Performance Testing', 'Achieved', 'Power test: IMU sensor integration working\nStamina test: 2-minute endurance with metrics\nReaction test: CV-based detection integrated'],
-      ['Hardware Integration', 'Achieved', 'Sensor serial protocol functional\nCV system integration ready\nRobotic arm control interface implemented']
+      ['GUI-1: Ease of Use', 'Achieved', 'Hierarchical page stack navigation ensures intuitive drill-down and consistent back-button behaviour\nLarge touch targets (minimum 60px) for gloved-hand operation\nClear visual hierarchy with dark theme and color-coded punch types\nPattern lock authentication designed for gloved input'],
+      ['GUI-3: Structured Training Progression', 'Achieved', '50-combo curriculum implemented across Beginner, Intermediate, and Advanced tiers\nGroup-based sequential progression with mastery threshold (3.0/5.0 over 5 sessions)\nProficiency assessment on signup sets initial difficulty tier'],
+      ['GUI-4: Real-Time Session Data', 'Achieved', 'Combo prompts displayed in real-time during training sessions\nRound timers, rest timers, and performance metrics visible during active sessions\nPost-session results pages with scoring and trend indicators']
     ],
     search: false,
     sort: false,
     pagination: false,
     style: {
-      table: {
-        'white-space': 'pre-wrap'
-      }
+      table: { 'white-space': 'pre-wrap' }
     }
   }).render(guiDeliverablesStatusEl);
 }

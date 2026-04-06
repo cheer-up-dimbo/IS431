@@ -1,0 +1,182 @@
+/* ═══════════════════════════════════════════════════════
+   Report Navigation Sidebar
+   ═══════════════════════════════════════════════════════ */
+
+.report-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 20px 0;
+  font-family: var(--sl-font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  font-size: 0.82rem;
+  transition: transform 0.3s ease;
+}
+
+/* Scrollbar styling */
+.report-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.report-nav::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+
+/* Title / Header */
+.report-nav__title {
+  padding: 0 16px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 4px;
+  text-decoration: none;
+  display: block;
+}
+.report-nav__title:hover {
+  color: #3b82f6;
+}
+
+/* Expand/Collapse All controls */
+.report-nav__controls {
+  display: flex;
+  gap: 4px;
+  padding: 6px 16px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 4px;
+}
+.report-nav__ctrl-btn {
+  flex: 1;
+  background: #e8ecf0;
+  border: 1px solid #d0d5da;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 0.7rem;
+  color: #555;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.report-nav__ctrl-btn:hover {
+  background: #d0d5da;
+  color: #333;
+}
+
+/* Section headers (§1, §2, etc.) */
+.report-nav__section {
+  padding: 6px 16px;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: background 0.15s;
+}
+.report-nav__section:hover {
+  background: #e8ecf0;
+}
+.report-nav__section-arrow {
+  font-size: 0.65rem;
+  color: #999;
+  transition: transform 0.2s;
+}
+.report-nav__section.open .report-nav__section-arrow {
+  transform: rotate(90deg);
+}
+
+/* Nav links — controlled via .open class directly on the UL */
+.report-nav__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+.report-nav__links.open {
+  max-height: 2000px;
+}
+
+.report-nav__link {
+  display: block;
+  padding: 5px 16px 5px 28px;
+  color: #555;
+  text-decoration: none;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.report-nav__link:hover {
+  background: #e8ecf0;
+  color: #333;
+}
+.report-nav__link.active {
+  background: #e0edff;
+  color: #1d4ed8;
+  font-weight: 600;
+  border-left-color: #3b82f6;
+}
+
+/* Sub-links (deeper nesting) */
+.report-nav__sublink {
+  padding-left: 40px;
+  font-size: 0.75rem;
+}
+
+/* Push main content right */
+body.has-report-nav .content {
+  margin-left: 280px;
+  margin-right: auto;
+}
+
+/* Toggle button (for mobile / collapse) */
+.report-nav__toggle {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1001;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: none;
+  line-height: 1;
+}
+
+/* Collapsed state */
+.report-nav.collapsed {
+  transform: translateX(-100%);
+}
+body.nav-collapsed .content {
+  margin-left: auto;
+}
+
+/* Responsive: hide sidebar on small screens */
+@media (max-width: 1100px) {
+  .report-nav__toggle {
+    display: block;
+  }
+  .report-nav {
+    transform: translateX(-100%);
+  }
+  .report-nav.mobile-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  body.has-report-nav .content {
+    margin-left: auto;
+  }
+}

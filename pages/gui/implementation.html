@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../../index.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
@@ -63,6 +64,7 @@
       line-height: 1.6;
     }
   </style>
+  <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
 <body>
   <div class="content">
@@ -85,8 +87,9 @@
     <!-- ITERATIONS -->
     <div>
       <h3>Development Iterations</h3>
-      <table-component id="gui-iterations"></table-component>
+      <table-component id="gui-iterations" subtitle="Table: GUI Development Iterations"></table-component>
 
+      <!--
       <p>
         Several issues surfaced during testing rather than during design. Each was caught and
         resolved within the iteration that introduced it.
@@ -124,6 +127,7 @@
           and rely solely on the per-user database for session tracking going forward.
         </p>
       </div>
+      -->
     </div>
 
     <sl-divider></sl-divider>
@@ -169,7 +173,7 @@
         implementations without any changes to the layers above.
       </p>
 
-      <table-component id="gui-integration-specs"></table-component>
+      <table-component id="gui-integration-specs" subtitle="Table: Integration Layer Specifications"></table-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -207,7 +211,7 @@
         combo mastery. Users can also start training sessions remotely, adjust robot height,
         manage presets, and chat with the AI coach. Remote commands are written as JSON to a
         shared file that the GUI polls every 100 ms, providing near-instant responsiveness
-        without requiring a direct socket connection between the dashboard and the GUI process.
+        without requiring a direct socket connection between the dashboard and the GUI process. The backend implementation of the dashboard server, API endpoints, and WebSocket communication is documented in Section 5.4 (Robot Intelligence).
       </p>
     </div>
 
@@ -226,8 +230,17 @@
         (First Blood), 100 total punches (Century), fastest reaction time (Speed Demon), and
         highest defense rate (Iron Chin). A daily training streak counter encourages
         consistency, with bonus XP multipliers applied during active streaks. Personal records
-        for power, stamina, and reaction metrics are tracked and surfaced on the dashboard.
+        for power, stamina, and reaction metrics are tracked and surfaced on the dashboard. The session history interface consolidating all training types is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
+
+      <div style="margin-top:16px;">
+        <image-component
+          tag="gui-history"
+          source="../../assets/gui/screenshots/history.png"
+          subtitle="Figure: Unified session history interface with mode filtering"
+          width="85%">
+        </image-component>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -368,7 +381,9 @@
         </tbody>
       </table>
 
-      <table style="width:60%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: Proficiency Assessment Questions</p>
+
+      <table style="width:60%; border-collapse:collapse; margin:16px auto; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd;">Total Score</th>
@@ -381,6 +396,8 @@
           <tr style="background:#ffebee;"><td style="padding:8px; border:1px solid #ddd;">9 to 12</td><td style="padding:8px; border:1px solid #ddd;">Advanced</td></tr>
         </tbody>
       </table>
+
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: Proficiency Assessment Scoring</p>
 
       <p>
         The user can accept or override the suggestion on the result page before confirming.
@@ -397,10 +414,19 @@
         shots and text labels for defensive movements (slip, block, roll). A combo is considered
         mastered when the user has completed at least five sessions with an average score of 3.0
         out of 5.0 or above. Progress is tracked per-user in the SQLite database and persists
-        across sessions.
+        across sessions. The self-select sequence builder interface is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
 
-      <table-component id="gui-combo-notation"></table-component>
+      <table-component id="gui-combo-notation" subtitle="Table: Combo Notation System"></table-component>
+
+      <div style="margin-top:16px;">
+        <image-component
+          tag="gui-custom-sequence"
+          source="../../assets/gui/screenshots/custom_sequence_technique_drill.png"
+          subtitle="Figure: Self-select sequence builder with punch numpad and sequence list"
+          width="85%">
+        </image-component>
+      </div>
 
       <!-- SPARRING MARKOV CHAIN -->
       <h4>Sparring Mode: Markov Chain Generation</h4>
@@ -410,7 +436,7 @@
         transition probability matrix over punch types. Starting from a "start" state, the
         system picks the next punch based on weighted probabilities, continuing until an "end"
         state is reached or a safety limit of six punches per combo is hit. Sparring is
-        available to all proficiency levels.
+        available to all proficiency levels. The style selection interface is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
 
       <p>
@@ -458,6 +484,15 @@
         adaptation strengthens over time without fully overriding the style's character.
       </p>
 
+      <div style="margin-top:16px;">
+        <image-component
+          tag="gui-sparring-styles"
+          source="../../assets/gui/screenshots/sparring_drill.png"
+          subtitle="Figure: Sparring style selection with punch distribution and behaviour descriptions"
+          width="85%">
+        </image-component>
+      </div>
+
       <!-- AI COACHING -->
       <h4>AI Coaching Integration</h4>
       <p>
@@ -466,9 +501,19 @@
         via llama-cpp-python). On hardware where the model cannot be loaded (insufficient memory
         or missing model file), the system falls back to hardcoded template responses. This
         fallback was implemented as a design decision rather than an error state, since the
-        Jetson Nano's 4 GB of RAM makes model availability uncertain.
+        Jetson Nano's 4 GB of RAM makes model availability uncertain. The LLM pipeline, model selection, and prompt engineering details are documented in Section 5.4 (Robot Intelligence).
       </p>
 
+      <div style="margin-top:16px;">
+        <image-component
+          tag="gui-llm-chat"
+          source="../../assets/gui/screenshots/LLM_Chat.png"
+          subtitle="Figure: AI coaching chat interface with model configuration panel"
+          width="85%">
+        </image-component>
+      </div>
+
+      <!--
       <h4>Notable Bug Fixes</h4>
 
       <sl-details summary="Lambda signal bug: Qt boolean argument override">
@@ -514,6 +559,7 @@ class CustomPage(ButtonNavigationMixin, QWidget):
 # Required recreating the database with corrected schema
 # Existing data migrated: new_score = old_score * 5.0</pre>
       </sl-details>
+  -->
     </div>
 
     <sl-divider></sl-divider>
@@ -524,7 +570,7 @@ class CustomPage(ButtonNavigationMixin, QWidget):
       <p>
         The complete feature set delivered across all six iterations is summarised below.
       </p>
-      <table-component id="gui-feature-set"></table-component>
+      <table-component id="gui-feature-set" subtitle="Table: Complete Feature Set"></table-component>
     </div>
 
     <!-- BOTTOM NAVIGATION -->

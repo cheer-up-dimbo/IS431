@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../../index.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
@@ -19,6 +20,7 @@
       margin-top: 32px;
     }
   </style>
+  <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
 <body>
   <div class="content">
@@ -45,7 +47,7 @@
         scenarios verified correct behaviour under normal use conditions.
       </p>
 
-      <table-component id="gui-functional-testing"></table-component>
+      <table-component id="gui-functional-testing" subtitle="Table: Functional Test Results"></table-component>
 
       <p>
         All functional tests passed. The navigation stack test is worth highlighting: the
@@ -68,6 +70,14 @@
         7-inch touchscreen mounted directly on the robot, and a larger external monitor
         connected to the same Jetson Nano showing the same GUI output.
       </p>
+      <div style="margin-top:16px;">
+        <image-component
+          tag="gui-technique-tiers"
+          source="../../assets/gui/screenshots/technique_drill.png"
+          subtitle="Figure: Technique drill difficulty tier selection (Beginner, Intermediate, Advanced, Self-Select)"
+          width="85%">
+        </image-component>
+      </div>
       <h4>Observations</h4>
       <p>
         During the session, participants and observers consistently gravitated toward the larger
@@ -97,7 +107,7 @@
         The table below maps each GUI requirement back to its verification evidence.
       </p>
 
-      <table-component id="gui-deliverables-status"></table-component>
+      <table-component id="gui-deliverables-status" subtitle="Table: Requirements Verification Summary"></table-component>
     </div>
 
     <!-- BOTTOM NAVIGATION -->
