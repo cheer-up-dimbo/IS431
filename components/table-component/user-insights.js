@@ -2,30 +2,33 @@
 // Customer Profile & User Insights Table
 
 new gridjs.Grid({
-  columns: ["Customer Profile", "User Insights"],
+  columns: [
+    "Customer Profile",
+    {
+      name: "User Insights",
+      formatter: cell => gridjs.html(cell)
+    }
+  ],
   data: [
     [
       "Boxing-Gym Boxers",
-      `Boxers that train in gyms are motivated by competitiveness, discipline, and mastery, 
-but they also complain about the restrictions of their training spaces. Many complain about 
-schedule conflicts that interfere with training regularity, limited coaching feedback in packed 
-classes, and trouble finding regular training partners of appropriate competence.
-
-Additionally, there is a disconnect between data-driven knowledge and physical training, which 
-makes boxers uncertain of their rate of improvement. Secure sparring training experiences and 
-quantifiable performance monitoring are important to these users. They choose technology that 
-enhances their gym experience, improving accuracy, accountability, and accessibility outside of 
-regular gym hours rather than taking the place of instructors.`
+      `<ul style="margin:0; padding-left:18px;">
+<li>Motivated by competitiveness, discipline, and mastery</li>
+<li>Schedule conflicts interfere with training regularity</li>
+<li>Limited coaching feedback in packed group classes</li>
+<li>Difficulty finding regular sparring partners of matched skill</li>
+<li>Disconnect between data-driven knowledge and physical training; boxers want quantifiable progress monitoring</li>
+<li>Prefer technology that enhances gym experience rather than replacing instructors</li>
+</ul>`
     ],
     [
       "Training Support Stakeholders",
-      `In group lessons, coaches find it difficult to provide individualized attention and to 
-maintain engagement across a range of skill levels. Owners of gyms deal with high operational 
-expenses, schedule conflicts, and space limitations. Parents seek out surroundings that place a 
-high value on their children's safety.
-
-The desire for training tools that can improve learning, safety, and scalability—systems that 
-offer reliable feedback, lower the chance of injuries, and boost trainer productivity—is universal.`
+      `<ul style="margin:0; padding-left:18px;">
+<li>Coaches struggle to provide individualised attention across mixed skill levels</li>
+<li>Gym owners face high operational costs, scheduling conflicts, and space limitations</li>
+<li>Parents prioritise child safety during sparring and training</li>
+<li>Universal desire for tools that improve learning, safety, and scalability with reliable feedback and injury prevention</li>
+</ul>`
     ]
   ]
 }).render(document.getElementById("user-insights"));

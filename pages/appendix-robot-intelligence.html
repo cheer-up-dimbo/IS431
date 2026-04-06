@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Appendix 4 - Robot Intelligence</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="/components/report-nav/report-nav.js" defer></script>
+  <style>
+    .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="robot-intelligence.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Intelligence
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Appendix 4: Robot Intelligence</h2>
+
+    <sl-divider></sl-divider>
+
+    <!-- A. FULL UNIT TEST BREAKDOWN -->
+    <h3>A. Full Unit Test Breakdown</h3>
+    <p>
+      146 unit tests across 3 test files, supported by 12 shared pytest fixtures in <code>conftest.py</code>.
+    </p>
+
+    <h4>Shared Fixtures</h4>
+    <ul>
+      <li><code>db_manager</code> &mdash; fresh database per test</li>
+      <li><code>sample_user</code> &mdash; test account</li>
+      <li><code>sample_profiles</code> &mdash; beginner / intermediate / coach</li>
+      <li><code>sample_session</code> &mdash; training session with 87 punches</li>
+      <li><code>sample_sparring_session</code> &mdash; sparring with 210 punches</li>
+      <li><code>sample_punch_events</code> &mdash; CV + IMU + confirmed punches</li>
+      <li><code>sample_defense_data</code> &mdash; defense scenarios</li>
+    </ul>
+
+    <h4>test_punch_fusion.py &mdash; 44 tests</h4>
+    <table>
+      <thead>
+        <tr><th>Test Class</th><th>Tests</th><th>Coverage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TestRingBuffer</td><td>7</td><td>Ring buffer: maxlen eviction, time-based expiry, pop_match</td></tr>
+        <tr><td>TestCVIMUFusion</td><td>3</td><td>Fusion matching: within/outside window, closest-first priority</td></tr>
+        <tr><td>TestPadConstraints</td><td>10</td><td>Each punch &rarr; valid pad mapping</td></tr>
+        <tr><td>TestReclassification</td><td>8</td><td>Secondary prediction fallback, confidence thresholds</td></tr>
+        <tr><td>TestExpiredEvents</td><td>4</td><td>CV and IMU event expiry after timeout</td></tr>
+        <tr><td>TestDefenseClassification</td><td>8</td><td>Block, slip, dodge, hit priority ordering</td></tr>
+        <tr><td>TestSessionStats</td><td>4</td><td>Punch recording, accumulation, peak force, defense stats</td></tr>
+      </tbody>
+    </table>
+
+    <h4>test_gamification.py &mdash; 30 tests</h4>
+    <table>
+      <thead>
+        <tr><th>Test Class</th><th>Tests</th><th>Coverage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TestRankSystem</td><td>10</td><td>All 6 tiers (Novice &rarr; Elite), boundary conditions</td></tr>
+        <tr><td>TestSessionXP</td><td>7</td><td>Base XP per mode, completion bonus, multiplier, streak, floor</td></tr>
+        <tr><td>TestSessionScore</td><td>5</td><td>Perfect/zero/partial scores, boundary values</td></tr>
+        <tr><td>TestAchievements</td><td>5</td><td>Unlock conditions, duplicate prevention, listing</td></tr>
+        <tr><td>TestLeaderboard</td><td>3</td><td>Ranking computation, tie-breaking, empty boards</td></tr>
+      </tbody>
+    </table>
+
+    <h4>test_database.py &mdash; 45+ tests</h4>
+    <table>
+      <thead>
+        <tr><th>Test Class</th><th>Tests</th><th>Coverage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TestUserManagement</td><td>13</td><td>Create, duplicate prevention, password verify, get, list, coach</td></tr>
+        <tr><td>TestPatternLock</td><td>5</td><td>Set/verify pattern, wrong pattern, no pattern, overwrite</td></tr>
+        <tr><td>TestGuestSessions</td><td>5</td><td>Create, multiple, claim, double-claim prevention</td></tr>
+        <tr><td>TestPresets</td><td>7</td><td>Create, update, invalid field rejection, use count, favourites</td></tr>
+        <tr><td>TestTrainingSessions</td><td>8</td><td>Save/retrieve, detail, mode filter, limit, events, config</td></tr>
+        <tr><td>TestGamification</td><td>7</td><td>Add XP, rank progression, personal records, streaks, achievements</td></tr>
+      </tbody>
+    </table>
+
+    <sl-divider></sl-divider>
+
+    <!-- B. CDE FAIR CV PIPELINE -->
+    <h3>B. CDE Fair CV Pipeline</h3>
+    <p>
+      The CDE Fair version used HSV colour-based glove tracking as the primary detection method.
+      The Transformer model was not ready in time. This pipeline was replaced entirely in the final system.
+    </p>
+
+    <image-component
+      tag="image"
+      source="../assets/robot_intelligence/cde_fair/cv_pipeline.png"
+      subtitle="Figure: CDE Fair CV Pipeline — HSV colour tracking with depth-based punch detection">
+    </image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- C. ROC CURVES -->
+    <h3>C. ROC Curves</h3>
+    <p>
+      One-vs-rest ROC curves for each action class plus the micro-averaged curve.
+      Micro-averaged AUC of 0.999 indicates near-perfect class separability across all 8 actions.
+    </p>
+
+    <image-component
+      tag="image"
+      source="../assets/robot_intelligence/cv/interpretability/roc_curves.png"
+      subtitle="Figure: ROC Curves — micro-averaged AUC = 0.999">
+    </image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- D. REPOSITORY LINKS -->
+    <h3>D. Repository Links</h3>
+    <table>
+      <thead>
+        <tr><th>Repository</th><th>Description</th><th>Link</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Boxing Action Recognition</td>
+          <td>CV model training, feature extraction, annotation tools, data pipeline</td>
+          <td><a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank">github.com/Yogee-s/boxing_action_recognition</a></td>
+        </tr>
+        <tr>
+          <td>Boxing Robot Workspace</td>
+          <td>ROS 2 system, all nodes, GUI, phone dashboard, tests, deployment</td>
+          <td><a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank">github.com/Yogee-s/boxing_robot_ws</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <sl-divider></sl-divider>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="robot-intelligence-testing.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: Testing & Validation
+        </sl-button>
+      </a>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      &uarr; Top
+    </button>
+
+  </div>
+</body>
+</html>

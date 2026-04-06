@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Appendix 5 - Product Needs to Subsystem Mapping</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .mapping-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .mapping-table th, .mapping-table td { padding: 12px 14px; border: 1px solid #ccc; vertical-align: top; text-align: left; }
+    .mapping-table thead th { background: #f8f9fa; font-weight: 600; text-align: center; }
+    .mapping-table thead th:first-child { text-align: left; }
+    .mapping-table td:not(:first-child) { font-size: 0.9rem; }
+    .check { text-align: center; color: #1a73e8; font-weight: bold; }
+  </style>
+  <script src="/components/report-nav/report-nav.js" defer></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#appendices" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Appendix 5: Product Needs to Subsystem Mapping</h2>
+    <p>
+      The table below maps the five design considerations (derived from user
+      research and competitor analysis in Chapter 2) to the three BoxBunny
+      subsystems. Each cell describes how the subsystem contributes to that
+      design consideration. Empty cells indicate the subsystem is not directly
+      involved.
+    </p>
+
+    <table class="mapping-table">
+      <thead>
+        <tr>
+          <th style="width:20%;">Design Consideration</th>
+          <th style="width:26%;">User Interface (Ch. 5.1)</th>
+          <th style="width:27%;">Robot Mechanism (Ch. 5.2)</th>
+          <th style="width:27%;">Robot Intelligence (Ch. 5.3)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Skill Progression</strong></td>
+          <td>Guided drill selection, difficulty settings, and progressive training programmes displayed on the touchscreen</td>
+          <td>Arm actuation executes drill sequences at configurable speed and intensity</td>
+          <td>Adaptive difficulty adjustment based on detected user performance</td>
+        </tr>
+        <tr>
+          <td><strong>Adaptive Fight Intelligence</strong></td>
+          <td>Real-time visual and auditory cues for timing and rhythm</td>
+          <td>Rotation and arm actuation deliver reactive counter-punches and positional changes</td>
+          <td>Computer vision detects user punches and triggers appropriate robot responses</td>
+        </tr>
+        <tr>
+          <td><strong>Realistic Training Partner</strong></td>
+          <td></td>
+          <td>Active arm actuation, rotational yaw motion, and impact-absorbing padding simulate a physical sparring partner</td>
+          <td>User tracking enables the robot to maintain orientation and distance relative to the boxer</td>
+        </tr>
+        <tr>
+          <td><strong>Modular Boxing Platform</strong></td>
+          <td>Height and stance configuration via the touchscreen interface</td>
+          <td>Height-adjustable column, compact trapezoidal base, and rear-wheel portability accommodate diverse users and spaces</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>Performance Analytics</strong></td>
+          <td>Dashboard displays punch power, accuracy, timing, stamina, and session history</td>
+          <td>Impact sensors in padding measure punch force and contact location</td>
+          <td>Computer vision tracks reaction time and punch classification for analytics</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Scroll to top button -->
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

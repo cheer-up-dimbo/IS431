@@ -31,113 +31,170 @@
 
     <h2>Load Analysis &amp; Sizing</h2>
     <p>
-      This page presents the engineering calculations that size the rotation subsystem: from the timing-belt transmission parameters to the structural and drive-side load requirements under worst-case punch scenarios.
+      This page presents the engineering calculations that size the rotation subsystem, focusing specifically on the structural and drive-side load requirements under worst-case punch scenarios.
     </p>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. TIMING-BELT TRANSMISSION SIZING                    -->
+    <!-- 1. LOAD PHILOSOPHY & STRUCTURAL LOADING               -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>1. Timing-Belt Transmission Sizing</h3>
-      <p>
-        The timing-belt transmission was developed through a structured selection process rather than by approximation alone. The drive is based on a 400 W ZD BLDC motor with a 25:1 gearbox, providing an output shaft speed of <strong>120 rpm</strong>.
-      </p>
-
-      <div class="calc-card">
-        <div class="calc-header">1. Target Speed &amp; Ideal Ratio</div>
-        <div class="calc-body">
-          <p style="margin-top: 0;">The original yaw-speed target was approximately <strong>25 rpm</strong> (≈ 150&deg;/s). The required kinematic ratio was estimated as:</p>
-          <div class="equation-box">
-            i = n<sub>in</sub> / n<sub>out</sub> = 120 / 25 = <strong>4.8</strong>
-          </div>
-          <p style="margin-bottom: 0;">In ideal kinematic terms, the transmission stage requires approximately a 4.8:1 reduction.</p>
-        </div>
-      </div>
-
-      <div class="calc-card">
-        <div class="calc-header">2. Pulley Selection &amp; Packaging Compromise</div>
-        <div class="calc-body">
-          <p style="margin-top: 0;">The selected belt series is <strong>S8M (8 mm pitch)</strong>. Based on minimum tooth-count guidelines and geometric packaging constraints around the inner bearing ring, the following pulleys were selected:</p>
-          <div class="equation-box">
-            Small Pulley = 20 Teeth<br>
-            Large Pulley = 60 Teeth
-          </div>
-          <p>This yields an actual pulley ratio of:</p>
-          <div class="equation-box">
-            i = 60 / 20 = <strong>3</strong>
-          </div>
-          <p style="margin-bottom: 0;">This reveals that the final pulley stage is a <strong>packaging-driven compromise</strong> (3:1) relative to the ideal target of 4.8:1. The final integrated yaw speed requires physical confirmation during testing.</p>
-        </div>
-      </div>
-
-      <div class="calc-card">
-        <div class="calc-header">3. Belt Dimensions &amp; Power Rating</div>
-        <div class="calc-body">
-          <p style="margin-top: 0;">The belt was sized using a design power that includes an overload service factor (K<sub>s</sub> = 2.2):</p>
-          <div class="equation-box">
-            P<sub>d</sub> = 400 W &times; 2.2 = <strong>880 W (0.88 kW)</strong>
-          </div>
-          <p>Using the pitch-diameter relation (D<sub>p</sub> = pZ / &pi;), the pulley diameters are 152.78 mm and 50.92 mm. The standard belt length and centre distance converged to:</p>
-          <div class="equation-box">
-            Belt Length (Pitch) &approx; <strong>944 mm</strong><br>
-            Centre Distance (C) = <strong>352.6 mm</strong><br>
-            Belt Width (B<sub>w</sub>) = <strong>30 mm</strong>
-          </div>
-          <p style="margin-bottom: 0;">This width affects torque capacity, pulley face width, bracket packaging, and the overall radial space claim, prioritising robustness over minimum-size optimisation.</p>
-        </div>
-      </div>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. LOAD PHILOSOPHY & STRUCTURAL LOADING               -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>2. Load Philosophy &amp; Structural Loading</h3>
+      <h3>Load Philosophy &amp; Structural Loading</h3>
       <p>
         The load analysis answers a specific engineering question: <em>Can the yaw stage rotate responsively enough for realistic re-angling while remaining structurally safe under punching?</em> This means the yaw stage must be analysed as both a <strong>support structure</strong> and a <strong>drive system</strong>.
       </p>
 
       <h4>Load Philosophy</h4>
       <p>
-        BoxBunny distinguishes between a <strong>characteristic training load (F<sub>char</sub> = 1.8 kN)</strong> for normal operation and a conservative <strong>structural design load (F<sub>design</sub> = 2.7 kN)</strong> for safety. The bearing, rotating support structure, and frame are checked against F<sub>design</sub>, while the motor and transmission are selected primarily from F<sub>char</sub> and motion demands.
+        BoxBunny distinguishes between a <strong>characteristic training load (F<sub>char</sub> = 1.8 kN)</strong> for normal operation and a conservative <strong>structural design load (F<sub>design</sub> = 2.7 kN)</strong> for safety. A <strong>service factor (SF)</strong> is applied to nominal punch forces to account for dynamic impacts, ensuring components are sized with sufficient margin. The bearing, rotating support structure, and frame are checked against F<sub>design</sub>, while the motor and transmission are selected primarily from F<sub>char</sub> and motion demands.
       </p>
       
-      <image-component
-        width="70%" tag="image"
-        source="../../../assets/report appendix b/15-matrix-FBD Loads acting on Bearing.jpg"
-        subtitle="Figure: Free-Body Diagram of Loads acting on Bearing.">
-      </image-component>
+      <div style="display: flex; flex-direction: column; align-items: center; margin: 24px 0;">
+        <div style="width: 80%; max-width: 600px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fff;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
+            <defs>
+              <!-- Red Arrow for Applied Loads -->
+              <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#d32f2f" />
+              </marker>
+              <!-- Blue Arrow for Reaction/Weight/Friction -->
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#1976d2" />
+              </marker>
+              <!-- Dimension Line Arrows -->
+              <marker id="dim-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 10 0 L 0 5 L 10 10 z" fill="#757575" />
+              </marker>
+              <marker id="dim-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#757575" />
+              </marker>
+            </defs>
+
+            <!-- Background -->
+            <rect width="100%" height="100%" fill="#ffffff" />
+            
+            <!-- Ground Line & Hatching -->
+            <line x1="50" y1="400" x2="550" y2="400" stroke="#9e9e9e" stroke-width="3" />
+            <path d="M 70 400 L 60 410 M 110 400 L 100 410 M 150 400 L 140 410 M 190 400 L 180 410 M 230 400 L 220 410 M 270 400 L 260 410 M 310 400 L 300 410 M 350 400 L 340 410 M 390 400 L 380 410 M 430 400 L 420 410 M 470 400 L 460 410 M 510 400 L 500 410 M 550 400 L 540 410" stroke="#9e9e9e" stroke-width="1.5" />
+
+            <!-- Centerline -->
+            <line x1="300" y1="40" x2="300" y2="420" stroke="#bdbdbd" stroke-width="1.5" stroke-dasharray="10,5,2,5" />
+
+            <!-- Horizontal Axis -->
+            <line x1="80" y1="355" x2="520" y2="355" stroke="#bdbdbd" stroke-width="1.5" stroke-dasharray="10,5,2,5" />
+            <text x="80" y="345" font-family="sans-serif" font-size="12" fill="#757575">Horizontal Axis</text>
+
+            <!-- Base Structure -->
+            <rect x="210" y="370" width="180" height="30" fill="#eceff1" stroke="#424242" stroke-width="2" rx="2"/>
+
+            <!-- Slewing Bearing -->
+            <!-- Outer Rings (Fixed to base) -->
+            <rect x="230" y="340" width="20" height="30" fill="#cfd8dc" stroke="#424242" stroke-width="2"/>
+            <rect x="350" y="340" width="20" height="30" fill="#cfd8dc" stroke="#424242" stroke-width="2"/>
+            <!-- Inner Ring (Rotating) -->
+            <rect x="250" y="340" width="100" height="30" fill="#b0bec5" stroke="#424242" stroke-width="2"/>
+            <!-- Rolling Elements (Balls) -->
+            <circle cx="250" cy="355" r="5" fill="#ffffff" stroke="#424242" stroke-width="1.5"/>
+            <circle cx="350" cy="355" r="5" fill="#ffffff" stroke="#424242" stroke-width="1.5"/>
+
+            <!-- Ring Labels -->
+            <text x="140" y="315" font-family="sans-serif" font-size="12" fill="#424242">Outer Ring</text>
+            <line x1="190" y1="310" x2="235" y2="340" stroke="#757575" stroke-width="1"/>
+            <text x="375" y="315" font-family="sans-serif" font-size="12" fill="#424242">Inner Ring</text>
+            <line x1="370" y1="310" x2="340" y2="340" stroke="#757575" stroke-width="1"/>
+
+            <!-- Upper Body / Mast -->
+            <rect x="270" y="120" width="60" height="220" fill="#ffcc80" stroke="#f57c00" stroke-width="2" rx="4"/>
+            <!-- Target Area (Head/Torso) -->
+            <rect x="250" y="60" width="100" height="60" fill="#ffe0b2" stroke="#f57c00" stroke-width="2" rx="8"/>
+
+            <!-- Forces -->
+            <!-- F_design (Punch) -->
+            <line x1="90" y1="90" x2="240" y2="90" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
+            <text x="130" y="80" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">design</tspan></text>
+            
+            <!-- F_a (Axial Load / Weight) -->
+            <line x1="300" y1="180" x2="300" y2="330" stroke="#1976d2" stroke-width="4" marker-end="url(#arrow-blue)" />
+            <text x="310" y="260" font-family="sans-serif" font-size="18" fill="#1976d2" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">a</tspan></text>
+
+            <!-- F_r (Radial Load) -->
+            <line x1="150" y1="355" x2="220" y2="355" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
+            <text x="120" y="360" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">r</tspan></text>
+
+            <!-- M_k (Tilting Moment) -->
+            <path d="M 200 240 A 120 120 0 0 1 400 240" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-red)" />
+            <text x="410" y="220" font-family="sans-serif" font-size="20" fill="#d32f2f" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">k</tspan></text>
+
+            <!-- Dimensions -->
+            <!-- d (Lever arm) -->
+            <line x1="480" y1="90" x2="480" y2="355" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
+            <text x="495" y="230" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">d</text>
+            <!-- Extension lines -->
+            <line x1="360" y1="90" x2="490" y2="90" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="380" y1="355" x2="490" y2="355" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+          </svg>
+        </div>
+        <sub style="display: block; margin-top: 12px; font-style: italic; color: #555; text-align: center;">
+          Figure: Free-Body Diagram of loads acting on the slewing bearing.
+        </sub>
+      </div>
 
       <h4>Structural Loading of the Yaw Stage</h4>
-      <p>The yaw stage experiences three main structural loads:</p>
+      <p>The yaw stage bearing and frame experience three main loads that dictate their design:</p>
       <ul>
         <li>
-          <strong>F<sub>a</sub> (Axial Load):</strong> The mass above the bearing (F<sub>a</sub> &approx; m<sub>upper</sub> &times; g). Checked against the axial capacity of the 010.10.120 bearing.
-        </li>
-        <li>
-          <strong>F<sub>r</sub> (Radial Load):</strong> The horizontal component of a strike (F<sub>r</sub> &approx; F<sub>design</sub>). This radial loading is why a light turntable bearing was rejected.
-        </li>
-        <li>
-          <strong>M<sub>o</sub> (Overturning Moment):</strong> Generated because the punch acts above the bearing plane. 
+          <strong>F<sub>a</sub> (Axial Load):</strong> Total vertical load. This is the primarily the weight of all rotating components above the bearing. Assuming an upper mass of &approx; 25 kg:
           <div class="equation-box" style="margin: 8px 0; font-size: 0.95rem;">
-            M<sub>o</sub> = F<sub>design</sub> &times; h
+            F<sub>a</sub> &approx; m<sub>upper</sub> &times; g = 25 kg &times; 9.81 m/s&sup2; &approx; <strong>0.25 kN</strong>
           </div>
-          This moment is critical because it drives the bearing-capacity requirement and the need for outboard edge support. By placing the rotation axis low in the stack, it is best positioned to react to this combined loading.
+        </li>
+        <li>
+          <strong>F<sub>r</sub> (Radial Load):</strong> Forces acting perpendicular to the axis of rotation. This includes the horizontal component of a worst-case strike (F<sub>design</sub>). This significant radial loading is why a light turntable bearing was rejected.
+          <div class="equation-box" style="margin: 8px 0; font-size: 0.95rem;">
+            F<sub>r</sub> &approx; F<sub>design</sub> = <strong>2.7 kN</strong>
+          </div>
+        </li>
+        <li>
+          <strong>M<sub>k</sub> (Tilting Moment):</strong> Most critical structural load. It arises from the robot's weight at a vertical offset and punching forces applied at the head/torso height.
+          <div class="equation-box" style="margin: 8px 0; font-size: 0.95rem;">
+            M<sub>k</sub> = F<sub>design</sub> &times; d = 2.7 kN &times; 1.0 m &approx; <strong>2.7 kNm</strong>
+          </div>
+          <span style="font-size: 0.9rem; color: #555;">(Where <em>d &approx; 1.0 m</em> is the estimated perpendicular distance from the bearing centre to the upper punch impact zone).</span> This moment drives the bearing-capacity requirement and the need for outboard edge support. By placing the rotation axis low in the stack, it is best positioned to react to this combined loading.
         </li>
       </ul>
+
+      <div class="calc-card">
+        <div class="calc-header">Summary: Bearing Validation Requirements</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">To validate the <strong>010.10.120 non-geared slewing ring bearing</strong> against the manufacturer's load charts, the following peak structural requirements must fall within its safe operating envelope:</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.95rem;">
+            <thead>
+              <tr style="background-color: #f0f0f0;">
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Load Type</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Required Capacity (Minimum)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>Axial Load (F<sub>a</sub>)</strong></td><td style="padding: 10px; border: 1px solid #ddd;">&ge; 0.25 kN</td></tr>
+              <tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>Radial Load (F<sub>r</sub>)</strong></td><td style="padding: 10px; border: 1px solid #ddd;">&ge; 2.7 kN</td></tr>
+              <tr><td style="padding: 10px; border: 1px solid #ddd;"><strong>Tilting Moment (M<sub>k</sub>)</strong></td><td style="padding: 10px; border: 1px solid #ddd;">&ge; 2.7 kNm</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-bottom: 0; margin-top: 12px; font-size: 0.9rem; color: #666;">
+            <em>Note: These represent the Ultimate Limit State (ULS) using the 2.7 kN design load. The bearing's dynamic and static load curves must encompass this point (F<sub>a</sub>, M<sub>k</sub>) while accounting for the F<sub>r</sub> radial contribution.</em>
+          </p>
+        </div>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. DRIVE-SIDE LOAD ANALYSIS                           -->
+    <!-- 2. DRIVE-SIDE LOAD ANALYSIS                           -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>3. Drive-Side Load Analysis</h3>
+      <h3>2. Drive-Side Load Analysis</h3>
       <p>
         To achieve the target yaw speed of 150&deg;/s, the motor and transmission must supply enough torque to overcome <strong>inertial torque</strong> (accelerating the rotating mass), <strong>friction</strong>, and <strong>disturbance torque</strong> caused by user strikes. The timing-belt must carry the equivalent tangential force needed to rotate the stage and resist these loads. The motor mount, pulley hub, and shaft interfaces must sustain peak reaction loads associated with startup, reversal, and disturbance rejection, which close back through the fixed welded structure.
       </p>
@@ -147,7 +204,7 @@
         Punches are rarely perfectly centred or perfectly radial. In a worst-case scenario of a straight strike at a 45&deg; angle, the yaw stage must tolerate a combination of radial load, overturning moment, and torsional disturbance. 
       </p>
       <p>
-        The motor is not expected to "win" against every extreme strike by brute torque alone. Instead, the bearing, rotating plate, outer cam followers, and welded base carry the bulk of the structural disturbance, while the motor and transmission are sized so they can control the stage under realistic operational disturbance and recover cleanly after impact. This is fully consistent with the wider BoxBunny philosophy of separating <strong>structural survival</strong> from <strong>actuator serviceability</strong>.
+        The motor is not expected to resist against every extreme strike by brute torque alone. Instead, the bearing, rotating plate, outer cam followers, and welded base carry the bulk of the structural disturbance, while the motor and transmission are sized so they can control the stage under realistic operational disturbance and recover cleanly after impact. This is fully consistent with the wider BoxBunny philosophy of separating <strong>structural survival</strong> from <strong>actuator serviceability</strong>.
       </p>
 
       <h4>Remaining Analytical Gaps</h4>
@@ -168,9 +225,9 @@
           Prev: Mechanical Design
         </sl-button>
       </a>
-      <a href="electrical-control.html">
+      <a href="timing-belt-selection.html">
         <sl-button variant="default" size="medium">
-          Next: Electrical &amp; Control
+          Next: Timing Belt Selection
           <sl-icon slot="suffix" name="arrow-right"></sl-icon>
         </sl-button>
       </a>

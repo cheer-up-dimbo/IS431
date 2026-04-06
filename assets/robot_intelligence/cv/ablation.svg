@@ -1,0 +1,44 @@
+<svg width="900" height="280" viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;">
+  <rect width="900" height="280" fill="white" rx="8"/>
+
+  <!-- X axis grid lines and labels -->
+  <!-- Scale: 0%=x240, 100%=x840. Each 1%=6px -->
+  <line x1="240" y1="40" x2="240" y2="210" stroke="#B4B2A9" stroke-width="0.5"/>
+
+  <line x1="360" y1="40" x2="360" y2="210" stroke="#E8E5E0" stroke-width="0.5"/>
+  <text x="360" y="228" text-anchor="middle" font-size="11" font-weight="500" fill="#5F5E5A">20%</text>
+
+  <line x1="480" y1="40" x2="480" y2="210" stroke="#E8E5E0" stroke-width="0.5"/>
+  <text x="480" y="228" text-anchor="middle" font-size="11" font-weight="500" fill="#5F5E5A">40%</text>
+
+  <line x1="600" y1="40" x2="600" y2="210" stroke="#E8E5E0" stroke-width="0.5"/>
+  <text x="600" y="228" text-anchor="middle" font-size="11" font-weight="500" fill="#5F5E5A">60%</text>
+
+  <line x1="720" y1="40" x2="720" y2="210" stroke="#E8E5E0" stroke-width="0.5"/>
+  <text x="720" y="228" text-anchor="middle" font-size="11" font-weight="500" fill="#5F5E5A">80%</text>
+
+  <line x1="840" y1="40" x2="840" y2="210" stroke="#E8E5E0" stroke-width="0.5"/>
+  <text x="840" y="228" text-anchor="middle" font-size="11" font-weight="500" fill="#5F5E5A">100%</text>
+
+  <!-- X axis label -->
+  <text x="540" y="255" text-anchor="middle" font-size="12" font-weight="600" fill="#444441">Validation accuracy (%)</text>
+
+  <!-- Bar 1: Pose only 44.1% → width = 44.1*6 = 264.6 -->
+  <text x="230" y="66" text-anchor="end" font-size="14" font-weight="700" fill="#042C53">Pose only</text>
+  <text x="230" y="82" text-anchor="end" font-size="10" fill="#0C447C">RGB joint positions</text>
+  <rect x="240" y="54" width="265" height="36" rx="4" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="512" y="76" text-anchor="start" font-size="14" font-weight="700" fill="#042C53">44.1%</text>
+
+  <!-- Bar 2: Voxel only 80.6% → width = 80.6*6 = 483.6 -->
+  <text x="230" y="126" text-anchor="end" font-size="14" font-weight="700" fill="#04342C">Voxel only</text>
+  <text x="230" y="142" text-anchor="end" font-size="10" fill="#085041">Depth 3D motion</text>
+  <rect x="240" y="114" width="484" height="36" rx="4" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="731" y="136" text-anchor="start" font-size="14" font-weight="700" fill="#04342C">80.6%</text>
+
+  <!-- Bar 3: Fused 97.3% → width = 97.3*6 = 583.8 -->
+  <text x="230" y="186" text-anchor="end" font-size="14" font-weight="700" fill="#26215C">Both fused</text>
+  <text x="230" y="202" text-anchor="end" font-size="10" fill="#3C3489">Depth + RGB combined</text>
+  <rect x="240" y="174" width="584" height="36" rx="4" fill="#AFA9EC" stroke="#534AB7" stroke-width="0.8"/>
+  <text x="831" y="196" text-anchor="start" font-size="14" font-weight="700" fill="#26215C">97.3%</text>
+
+</svg>

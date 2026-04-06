@@ -3,19 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Robot Intelligence</title>
+  <title>IS-431: 5.3 Robot Intelligence</title>
   <link rel="icon" href="../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../index.css">
-  <link rel="stylesheet" href="../components/team-member/team-member.css">
-  <script type="module" src="../components/team-member/team-member.js"></script>
-  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
   <script type="module" src="../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
   <script src="../components/scroll-to-top/scroll-to-top.js"></script>
-  <script src="../components/table-component/table-component.js"></script>
-  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <style>
+    .section-nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .section-nav-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 24px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .section-nav-card:hover {
+      border-color: #4CAF50;
+      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+    }
+    .section-nav-card h3 {
+      margin: 12px 0 6px;
+      font-size: 1.05rem;
+    }
+    .section-nav-card p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: #666;
+    }
+    .section-nav-full {
+      display: block;
+      margin-top: 16px;
+    }
+    .section-nav-full .section-nav-card {
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 28px;
+      text-align: left;
+    }
+    .section-nav-full .section-nav-card sl-icon { flex-shrink: 0; }
+    .section-nav-full .section-nav-card h3 { margin: 0 0 4px 0; }
+    .section-nav-full .section-nav-card p { margin: 0; }
+    .node-tag {
+      display: inline-block;
+      background: #f0f4f8;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.88em;
+      color: #1a7f37;
+      font-weight: 500;
+    }
+  </style>
   <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
 <body>
@@ -27,193 +80,190 @@
       </sl-button>
     </a>
     <br>
-    <!-- 5.4 ROBOT INTELLIGENCE -->
+
+    <!-- OVERVIEW -->
     <div id="robot-intelligence">
-    <h2>5.4. Robot Intelligence (Yogeeswaran)</h2>
-        <p>
-            The Robot Intelligence subsystem delivers Performance Analytics, Adaptive Fight Intelligence, 
-            and Realistic Training Partner by using computer vision and an action-recognition model to detect punches,
-            predict responses, and analyse performance in real time. These product needs map to three core functions: 
-            Reaction Time (system responsiveness), Human Tracking (accurate motion following), and Counter-punching (safe, reactive sparring without a partner).
-        </p>
+      <h2>5.3 Robot Intelligence (Yogeeswaran)</h2>
+      <p>
+        The Robot Intelligence subsystem delivers real-time boxing action recognition
+        and adaptive robot behaviour. At its core is a computer vision pipeline that
+        classifies 8 punch types using depth-based 3D voxel motion features fused with
+        2D pose estimation. Reaction time detection and human tracking build on
+        processed frames from this action prediction pipeline.
+      </p>
+      <p>
+        A ROS 2 workspace orchestrates these CV outputs alongside IMU sensing,
+        AI sparring logic, and local LLM coaching to fulfil three product needs:
+        Performance Analytics, Adaptive Fight Intelligence, and Realistic Training Partner.
+      </p>
 
-        <image-component
-            tag="image"
-            source="../assets/robot_intelligence/needs_to_features.png"
-            subtitle="">
-        </image-component>
+      <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
+        <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
+        <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
+          <sl-button variant="default" size="small">
+            <sl-icon slot="prefix" name="github"></sl-icon>
+            Action Recognition
+          </sl-button>
+        </a>
+        <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none;">
+          <sl-button variant="default" size="small">
+            <sl-icon slot="prefix" name="github"></sl-icon>
+            Robot Workspace
+          </sl-button>
+        </a>
+      </div>
     </div>
 
-    <!-- 5.4.1 FUNCTION SPECIFICATIONS -->
-    <div id="robot-intelligence-specifications">
-    <h3>5.4.1. Function Specifications</h3>
+    <sl-divider></sl-divider>
 
-    <p>
-        The subsystem must process vision data and trigger motor responses with latency comparable to a 
-        human opponent. Based on reaction-time measurements from intermediate boxers, the system must meet 
-        the following performance targets:
-    </p>
+    <!-- 5.3.1 REQUIREMENTS AND DESIGN CONSIDERATIONS -->
+    <div id="requirements">
+      <h3>5.3.1 Requirements and Design Considerations</h3>
+      <p>
+        These requirements were derived from the Function Analysis, user journey,
+        and the physical constraints of deploying real-time computer vision on an
+        embedded platform during live boxing training.
+      </p>
 
-    <!-- FUNCTION SPECIFICATIONS TABLE -->
-    <table-component subtitle="Table 18: Robot Intelligence Performance Specifications">
-        <div id="table-robot-intelligence"></div>
-    </table-component>
-
-    <p>
-        A depth camera can be used to meet these requirements as it provides reliable detection, 
-        stable tracking, and accurate spatial awareness. Its wide field of view and high depth precision 
-        enable consistent 3D user tracking, making it the most effective option for maintaining smooth and
-        dynamic real-time interaction between the user and the robot.
-    </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-1</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classify 8 boxing actions in real-time at &gt;=30 FPS</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Match human defensive reaction speed; voxel temporal features depend on consistent 30fps frame intervals</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-2</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">End-to-end latency (camera to motor command) &lt;=150ms</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Matches average intermediate boxer defensive reaction time</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-3</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &gt;=90% on unseen person validation set</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Reduce false triggers and incorrect counter-punches during live sparring</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-4</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">CV + IMU sensor fusion for confirmed punch events</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Single-source detection unreliable; fusion eliminates false positives from camera noise and accidental pad contacts</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-5</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin Nano), no cloud</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-6</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Multiple adaptive AI sparring styles with weakness tracking</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Prevent user habituation; support varied training objectives</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-7</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time coaching feedback via local LLM</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Personalized technique guidance without cloud dependency</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">
+        Table: Robot Intelligence Requirements and Design Considerations
+      </p>
     </div>
 
-    <!-- 5.4.2 COMPUTER VISION -->
-    <div id="computer-vision">
-    <h3>5.4.2. Computer Vision</h3>
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.2 SYSTEM ARCHITECTURE -->
+    <div id="system-architecture">
+      <h3>5.3.2 System Architecture</h3>
+      <p>
+        The system runs on an NVIDIA Jetson Orin NX, hosting 12 ROS 2 Humble nodes
+        that communicate via 21 custom message types and 6 services.
+      </p>
+
+      <p>The primary data flow follows four stages:</p>
+      <ul style="margin:8px 0 16px; line-height:1.7;">
+        <li><strong>Capture</strong> &mdash; Intel RealSense D435i streams depth + RGB frames</li>
+        <li><strong>Perception</strong> &mdash; <span class="node-tag">cv_node</span> runs YOLO pose estimation and 3D voxel extraction in parallel, feeding a transformer-based action classifier</li>
+        <li><strong>Fusion</strong> &mdash; <span class="node-tag">punch_processor</span> matches CV detections with IMU pad impacts using temporal and pad-constraint filtering</li>
+        <li><strong>Downstream</strong> &mdash; Confirmed punches propagate to <span class="node-tag">session_manager</span>, <span class="node-tag">drill_manager</span>, <span class="node-tag">sparring_engine</span>, <span class="node-tag">analytics_node</span>, and <span class="node-tag">llm_node</span></li>
+      </ul>
+
+      <image-component
+          tag="image"
+          source="../assets/robot_intelligence/ros/node_graph.svg"
+          subtitle="Figure: BoxBunny ROS 2 System Node Graph — 12 nodes, 40+ topics, 6 services">
+      </image-component>
+
+      <h4 style="margin-top:28px;">Session State Machine</h4>
+
+      <image-component
+          tag="image"
+          source="../assets/robot_intelligence/ros/session_state_machine.svg"
+          subtitle="Figure: BoxBunny Session State Machine — 5 states coordinating all node behaviour">
+      </image-component>
+
+      <p style="margin-top:12px;">
+        The session lifecycle is managed by a 5-state machine. Each state transition triggers
+        coordinated side effects across all nodes — for example, the CV frame rate scales from
+        ~6 fps (idle) to 30 fps (active), and data collection only runs during active rounds.
+        The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
+        (techniques, sparring, free, performance tests) sharing this same state machine.
+      </p>
     </div>
 
-    <!-- 5.4.2.1 REACTION TIME & HUMAN TRACKING -->
-    <div id="reaction-time-tracking">
-    <h4>5.4.2.1. Reaction Time and Human Tracking</h4>
+    <sl-divider></sl-divider>
 
-    <p>
-        Both functions use a pre-trained YOLO pose-estimation model, which provides continuous 3D keypoints
-        for real-time user tracking. The pose-estimation framework is based on the Ultralytics YOLO Pose model, 
-        documented at 
-        <a href="https://docs.ultralytics.com/tasks/pose/" target="_blank">Ultralytics Pose Documentation</a>.
-    </p>
+    <!-- NAVIGATION CARDS -->
+    <div id="subsections">
+      <h3>Subsections</h3>
+      <div class="section-nav-grid">
+        <a class="section-nav-card" href="robot-intelligence-cv.html">
+          <sl-icon name="camera-video" style="font-size:1.6rem;"></sl-icon>
+          <h3>CV &amp; Action Recognition</h3>
+          <p>96.8% fusion model, 9-iteration journey</p>
+        </a>
+        <a class="section-nav-card" href="robot-intelligence-integration.html">
+          <sl-icon name="cpu" style="font-size:1.6rem;"></sl-icon>
+          <h3>Intelligent Behaviour &amp; Control</h3>
+          <p>Sensor fusion, sparring AI, LLM coaching</p>
+        </a>
+        <a class="section-nav-card" href="robot-intelligence-software.html">
+          <sl-icon name="bar-chart-line" style="font-size:1.6rem;"></sl-icon>
+          <h3>Dashboard &amp; Analytics</h3>
+          <p>Phone dashboard, performance insights</p>
+        </a>
+      </div>
+      <div class="section-nav-full">
+        <a class="section-nav-card" href="robot-intelligence-testing.html">
+          <sl-icon name="clipboard-check" style="font-size:1.6rem;"></sl-icon>
+          <div>
+            <h3>Testing &amp; Validation</h3>
+            <p>CDE Fair deployment, 146 automated tests, model interpretability analysis</p>
+          </div>
+        </a>
+      </div>
 
-
-    <ul style="margin-left: 1.5rem;">
-    <li><strong>Human Tracking</strong>: Relies on stable frame-to-frame detection for accurate motion prediction and safe interaction.</li>
-    <li><strong>Reaction Time</strong>: Uses calibrated pose-change thresholds to detect punch initiation and trigger a response within the 150&nbsp;ms target.</li>
-    </ul>
-
-
-    <image-component
-        width="40%"
-        tag="image"
-        source="../assets/robot_intelligence/pose_estimation_model.jpg"
-        subtitle="Figure 20: Pose estimation model">
-    </image-component>
+      <div style="margin-top:20px; text-align:center;">
+        <a href="appendix-robot-intelligence.html" style="text-decoration:none;">
+          <sl-button variant="default" size="medium">
+            <sl-icon slot="prefix" name="journal-text"></sl-icon>
+            Appendix: Robot Intelligence
+          </sl-button>
+        </a>
+      </div>
     </div>
 
-    <!-- 5.4.2.2 COUNTER PUNCH -->
-    <div id="counter-punch">
-    <h4>5.4.2.2. Counter Punch</h4>
-    <p>
-        The counter-punch function uses a custom-trained action-recognition model, 
-        unlike reaction time and tracking, which rely on pre-trained YOLO pose estimation. 
-        The model classifies punch types from pose sequences and maps them to predefined counteractions,
-        enabling dynamic and adaptive sparring behaviour. Here is the link to our 
-        <a href="https://github.com/Yogee-s/boxing_ai_ws" target="_blank">full training and inference codebase</a>.
-    </p>
-    </div>
-
-    <!-- 5.4.2.3 MODEL PIPELINE -->
-    <div id="model-pipeline">
-    <h4>5.4.2.3. Model Pipeline</h4>
-
-    <p>
-        <strong>Training Pipeline:</strong> Pose estimation extracts keypoint sequences from labelled training videos. 
-        These sequences are used to train a custom temporal model to recognise punch patterns. Various architectures (LSTM, TCN, transformer-based) 
-        will be explored to balance accuracy and real-time latency.
-    </p>
-
-    <image-component
-        tag="image"
-        source="../assets/robot_intelligence/training_pipeline.jpg"
-        subtitle="Figure 21: Training pipeline">
-    </image-component>
-
-    <p>
-        <strong>Inference Pipeline:</strong>  In real time, the depth camera captures frames, pose estimation generates keypoints, 
-        and the trained model predicts the user’s punch. This predicted punch maps directly to a corresponding counteraction, allowing immediate robot response.
-    </p>
-
-    <image-component
-        tag="image"
-        source="../assets/robot_intelligence/inference_pipeline.jpg"
-        subtitle="Figure 22: Inference pipeline">
-    </image-component>
-    </div>
-
-    <!-- 5.4.2.4 TRAINED MODEL -->
-    <div id="trained-model">
-    <h4>5.4.2.4. Trained Model</h4>
-
-    <p>
-        An initial LSTM-based model (<a href="https://www.geeksforgeeks.org/deep-learning/deep-learning-introduction-to-long-short-term-memory/" target="_blank">Long Short-Term Memory</a>, 
-        a simple neural-network architecture designed to recognise patterns over time) 
-        was trained on a small 2D keypoint dataset and achieved high accuracy on unseen videos, validating the end-to-end pipeline 
-        from pose extraction to temporal classification. Next, a larger dataset will be collected using the robot’s depth camera to 
-        incorporate 3D keypoints (x, y, depth), which is expected to significantly improve accuracy. The final model will also be 
-        benchmarked for real-time inference speed to guide processor and hardware selection for meeting reaction-time constraints.
-    </p>
-
-
-    <div class="video-row">
-        <div class="video-box">
-        <video controls src="../assets/robot_intelligence/trained_model_jab.mp4"></video>
-        <sub>Jab Model</sub>
-        </div>
-
-        <div class="video-box">
-        <video controls src="../assets/robot_intelligence/trained_model_hook.mp4"></video>
-        <sub>Hook Model</sub>
-        </div>
-
-        <div class="video-box">
-        <video controls src="../assets/robot_intelligence/trained_model_uppercut.mp4"></video>
-        <sub>Uppercut Model</sub>
-        </div>
-    </div>
-    </div>
-
-    <!-- 5.4.2.5 CAMERA POSITION TESTING -->
-    <div id="camera-orientation">
-    <h4>5.4.2.5. Position & Orientation of Camera (Testing)</h4>
-
-    <p>
-        Testing showed that classification accuracy decreases when the camera viewpoint differs from the 
-        dataset’s original perspective, as the model fails to interpret unfamiliar pose patterns. This confirms 
-        that the camera position on the robot must remain fixed, and future datasets must be captured from the mounted viewpoint to ensure consistent performance.
-    </p>
-
-    <div class="video-row two-up">
-        <div class="video-box">
-        <video controls src="../assets/robot_intelligence/orientation_top.mp4"></video>
-        <sub>Top View</sub>
-        </div>
-
-        <div class="video-box">
-        <video controls src="../assets/robot_intelligence/orientation_bottom.mp4"></video>
-        <sub>Bottom View</sub>
-        </div>
-    </div>
-
-    <div class="video-row single">
-        <div class="video-box">
-        <video controls src="../assets/robot_intelligence/orientation_front.mp4"></video>
-        <sub>Front View</sub>
-        </div>
-    </div>
-    </div>
   </div>
+
+  <!-- SCROLL TO TOP -->
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
-    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
   </sl-button>
-  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
-  <script>
-    (function() {
-      var origRender = gridjs.Grid.prototype.render;
-      gridjs.Grid.prototype.render = function(el) {
-        if (!el) return this;
-        return origRender.call(this, el);
-      };
-    })();
-  </script>
-  <script type="module" src="../components/table-component/table-component.js"></script>
-  <script src="../components/table-component/tables.js"></script>
 </body>
 </html>

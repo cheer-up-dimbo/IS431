@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 910" width="1500" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1.5L8 5L2 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1.5L8 5L2 8.5" fill="none" stroke="#1a6cb5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="910" fill="#FAFAF8"/>
+
+  <!-- TITLE -->
+  <text x="750" y="46" text-anchor="middle" font-size="34" font-weight="700" fill="#111">BoxBunny — ROS 2 System Node Graph</text>
+  <text x="750" y="72" text-anchor="middle" font-size="13.5" fill="#555">Jetson Orin NX · 12 nodes · 40+ topics · 6 services · 21 custom msg types</text>
+
+  <!-- LEGEND (top-right, clean 3-column grid) -->
+  <g transform="translate(1200,28)">
+    <rect width="286" height="86" rx="9" fill="#fff" stroke="#ccc" stroke-width="0.7"/>
+    <text x="14" y="18" font-size="11.5" font-weight="700" fill="#111">Legend</text>
+    <!-- Row 1 -->
+    <rect x="14" y="28" width="12" height="12" rx="2.5" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.6"/>
+    <text x="32" y="38" font-size="10" fill="#333">Perception</text>
+    <rect x="108" y="28" width="12" height="12" rx="2.5" fill="#D6F5E8" stroke="#1D9E75" stroke-width="0.6"/>
+    <text x="126" y="38" font-size="10" fill="#333">Sensor fusion</text>
+    <rect x="210" y="28" width="12" height="12" rx="2.5" fill="#DBE9FA" stroke="#378ADD" stroke-width="0.6"/>
+    <text x="228" y="38" font-size="10" fill="#333">Session</text>
+    <!-- Row 2 -->
+    <rect x="14" y="48" width="12" height="12" rx="2.5" fill="#FAECE7" stroke="#D85A30" stroke-width="0.6"/>
+    <text x="32" y="58" font-size="10" fill="#333">Training engine</text>
+    <rect x="136" y="48" width="12" height="12" rx="2.5" fill="#E4F0D5" stroke="#639922" stroke-width="0.6"/>
+    <text x="154" y="58" font-size="10" fill="#333">Intelligence</text>
+    <!-- Row 3 -->
+    <rect x="14" y="68" width="12" height="12" rx="2.5" fill="#EEECEA" stroke="#aaa" stroke-width="0.6"/>
+    <text x="32" y="78" font-size="10" fill="#333">HW / interface</text>
+    <line x1="140" y1="75" x2="164" y2="75" stroke="#333" stroke-width="1.2" marker-end="url(#a)"/>
+    <text x="171" y="79" font-size="10" fill="#333">Topic</text>
+    <line x1="206" y1="75" x2="230" y2="75" stroke="#1a6cb5" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#s)"/>
+    <text x="237" y="79" font-size="10" fill="#333">Service</text>
+  </g>
+
+  <!-- SECTION DIVIDERS (colored lines + labels) -->
+  <line x1="30" y1="120" x2="200" y2="120" stroke="#ccc" stroke-width="0.5"/>
+  <text x="30" y="134" font-size="10" font-weight="700" fill="#999" letter-spacing="1">HARDWARE</text>
+
+  <line x1="30" y1="228" x2="200" y2="228" stroke="#B5AFF0" stroke-width="0.5"/>
+  <text x="30" y="242" font-size="10" font-weight="700" fill="#7F77DD" letter-spacing="1">PERCEPTION</text>
+
+  <line x1="30" y1="358" x2="200" y2="358" stroke="#8ED4B4" stroke-width="0.5"/>
+  <text x="30" y="372" font-size="10" font-weight="700" fill="#1D9E75" letter-spacing="1">SENSOR FUSION</text>
+
+  <line x1="30" y1="484" x2="200" y2="484" stroke="#9AC5EE" stroke-width="0.5"/>
+  <text x="30" y="498" font-size="10" font-weight="700" fill="#378ADD" letter-spacing="1">SESSION CONTROL</text>
+
+  <line x1="30" y1="612" x2="200" y2="612" stroke="#F0A57A" stroke-width="0.5"/>
+  <text x="30" y="626" font-size="10" font-weight="700" fill="#D85A30" letter-spacing="1">TRAINING ENGINES</text>
+
+  <line x1="30" y1="732" x2="200" y2="732" stroke="#E0B86A" stroke-width="0.5"/>
+  <text x="30" y="746" font-size="10" font-weight="700" fill="#BA7517" letter-spacing="1">ROBOT ACTUATION</text>
+
+  <line x1="30" y1="822" x2="200" y2="822" stroke="#ccc" stroke-width="0.5"/>
+  <text x="30" y="836" font-size="10" font-weight="700" fill="#999" letter-spacing="1">USER INTERFACES</text>
+
+
+  <!-- ════════════ HARDWARE (y=140–194) ════════════ -->
+
+  <rect x="420" y="140" width="310" height="54" rx="10" fill="#EEECEA" stroke="#aaa" stroke-width="0.8"/>
+  <text x="575" y="164" text-anchor="middle" font-size="14.5" font-weight="700" fill="#111">Intel RealSense D435i</text>
+  <text x="575" y="183" text-anchor="middle" font-size="11" fill="#555">RGB 960×540 + Depth 640×480 @30 fps</text>
+
+  <rect x="870" y="140" width="310" height="54" rx="10" fill="#EEECEA" stroke="#aaa" stroke-width="0.8"/>
+  <text x="1025" y="164" text-anchor="middle" font-size="14.5" font-weight="700" fill="#111">Teensy 4.1 (micro-ROS)</text>
+  <text x="1025" y="183" text-anchor="middle" font-size="11" fill="#555">4 pad IMUs · 2 arm IMUs · motor control</text>
+
+  <line x1="575" y1="194" x2="575" y2="248" stroke="#aaa" stroke-width="1.1" stroke-dasharray="3 3" marker-end="url(#a)"/>
+  <text x="588" y="226" font-size="10.5" fill="#888" font-weight="500">USB 3.0</text>
+  <line x1="1025" y1="194" x2="1025" y2="248" stroke="#aaa" stroke-width="1.1" stroke-dasharray="3 3" marker-end="url(#a)"/>
+  <text x="1038" y="226" font-size="10.5" fill="#888" font-weight="500">serial</text>
+
+
+  <!-- ════════════ PERCEPTION (y=248–314) ════════════ -->
+
+  <rect x="408" y="248" width="335" height="66" rx="10" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+  <text x="575" y="277" text-anchor="middle" font-size="15" font-weight="700" fill="#26215C">cv_node</text>
+  <text x="575" y="301" text-anchor="middle" font-size="11.5" fill="#534AB7">Action recognition · YOLO + Transformer</text>
+
+  <rect x="858" y="248" width="335" height="66" rx="10" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+  <text x="1025" y="277" text-anchor="middle" font-size="15" font-weight="700" fill="#26215C">imu_node</text>
+  <text x="1025" y="301" text-anchor="middle" font-size="11.5" fill="#534AB7">IMU processing · mode switching</text>
+
+  <path d="M575 314 L575 340 Q575 346 581 346 L624 346 Q630 346 630 352 L630 378" fill="none" stroke="#333" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="593" y="341" font-size="11" font-weight="500" fill="#333">/cv/detection</text>
+  <path d="M1025 314 L1025 340 Q1025 346 1019 346 L836 346 Q830 346 830 352 L830 378" fill="none" stroke="#333" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="848" y="341" font-size="11" font-weight="500" fill="#333">/imu/punch_event</text>
+
+
+  <!-- ════════════ SENSOR FUSION (y=378–434) ════════════ -->
+
+  <rect x="540" y="378" width="380" height="56" rx="10" fill="#D6F5E8" stroke="#1D9E75" stroke-width="0.8"/>
+  <text x="730" y="402" text-anchor="middle" font-size="15" font-weight="700" fill="#04342C">punch_processor</text>
+  <text x="730" y="422" text-anchor="middle" font-size="11.5" fill="#0F6E56">CV + IMU fusion · defense detection</text>
+
+  <rect x="1150" y="378" width="275" height="56" rx="10" fill="#E4F0D5" stroke="#639922" stroke-width="0.8"/>
+  <text x="1288" y="402" text-anchor="middle" font-size="15" font-weight="700" fill="#173404">analytics_node</text>
+  <text x="1288" y="422" text-anchor="middle" font-size="11.5" fill="#3B6D11">Statistics · trends · fatigue index</text>
+  <text x="1288" y="446" text-anchor="middle" font-size="9.5" fill="#777" font-style="italic">→ GUI, dashboard (/analytics/session)</text>
+
+  <line x1="920" y1="400" x2="1148" y2="400" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="960" y="393" font-size="11" font-weight="500" fill="#333">/punch/confirmed, /session_summary</text>
+
+  <line x1="730" y1="434" x2="730" y2="504" stroke="#333" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="744" y="476" font-size="11" font-weight="500" fill="#333">/punch/confirmed</text>
+
+
+  <!-- ════════════ SESSION CONTROL (y=504–572) ════════════ -->
+
+  <rect x="540" y="504" width="380" height="68" rx="10" fill="#DBE9FA" stroke="#378ADD" stroke-width="0.8"/>
+  <text x="730" y="528" text-anchor="middle" font-size="15" font-weight="700" fill="#042C53">session_manager</text>
+  <text x="730" y="548" text-anchor="middle" font-size="11.5" fill="#185FA5">Session lifecycle · state machine · SQLite</text>
+  <text x="730" y="565" text-anchor="middle" font-size="10" fill="#7ab4e8" font-style="italic">Broadcasts /session/state → all nodes</text>
+
+  <rect x="1150" y="504" width="275" height="56" rx="10" fill="#E4F0D5" stroke="#639922" stroke-width="0.8"/>
+  <text x="1288" y="528" text-anchor="middle" font-size="15" font-weight="700" fill="#173404">llm_node</text>
+  <text x="1288" y="548" text-anchor="middle" font-size="11.5" fill="#3B6D11">AI coach · Qwen 2.5 3B (local GPU)</text>
+  <text x="1288" y="572" text-anchor="middle" font-size="9.5" fill="#777" font-style="italic">→ GUI (/coach/tip)</text>
+
+  <path d="M920 418 L1099 418 Q1105 418 1105 424 L1105 530 Q1105 536 1111 536 L1148 536" fill="none" stroke="#555" stroke-width="1.1" marker-end="url(#a)"/>
+  <text x="1113" y="480" font-size="10" fill="#555" font-weight="500">/punch/confirmed</text>
+  <path d="M920 542 L1099 542 Q1105 542 1105 536" fill="none" stroke="#555" stroke-width="1.1"/>
+  <text x="960" y="557" font-size="10" fill="#555" font-weight="500">/session_summary</text>
+  <circle cx="1105" cy="536" r="3" fill="#555"/>
+
+
+  <!-- SESSION → ENGINES -->
+
+  <path d="M575 572 L575 592 Q575 598 569 598 L441 598 Q435 598 435 604 L435 634" fill="none" stroke="#1a6cb5" stroke-width="1.3" stroke-dasharray="6 3" marker-end="url(#s)"/>
+  <text x="465" y="593" font-size="11" font-weight="500" fill="#1a6cb5">/drill/start (service)</text>
+
+  <line x1="730" y1="572" x2="730" y2="634" stroke="#333" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="744" y="608" font-size="11" font-weight="500" fill="#333">/session/config_json</text>
+
+  <path d="M862 572 L862 592 Q862 598 868 598 L1019 598 Q1025 598 1025 604 L1025 634" fill="none" stroke="#333" stroke-width="1.4" marker-end="url(#a)"/>
+
+
+  <!-- ════════════ TRAINING ENGINES (y=634–690) ════════════ -->
+
+  <rect x="300" y="634" width="270" height="56" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
+  <text x="435" y="658" text-anchor="middle" font-size="15" font-weight="700" fill="#4A1B0C">drill_manager</text>
+  <text x="435" y="678" text-anchor="middle" font-size="11.5" fill="#993C1D">Combo validation · 50+ drills</text>
+
+  <rect x="598" y="634" width="264" height="56" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
+  <text x="730" y="658" text-anchor="middle" font-size="15" font-weight="700" fill="#4A1B0C">sparring_engine</text>
+  <text x="730" y="678" text-anchor="middle" font-size="11.5" fill="#993C1D">Sparring AI · Markov styles</text>
+
+  <rect x="890" y="634" width="280" height="56" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
+  <text x="1030" y="658" text-anchor="middle" font-size="15" font-weight="700" fill="#4A1B0C">free_training_engine</text>
+  <text x="1030" y="678" text-anchor="middle" font-size="11.5" fill="#993C1D">Reactive mode · counter mappings</text>
+
+
+  <!-- ENGINES → ROBOT (bus) -->
+  <line x1="730" y1="690" x2="730" y2="712" stroke="#333" stroke-width="1.3"/>
+  <line x1="1025" y1="690" x2="1025" y2="712" stroke="#333" stroke-width="1.3"/>
+  <line x1="730" y1="712" x2="1025" y2="712" stroke="#333" stroke-width="1.3"/>
+  <line x1="860" y1="712" x2="860" y2="754" stroke="#333" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="878" y="728" font-size="11" font-weight="500" fill="#333">/robot/command</text>
+  <circle cx="730" cy="712" r="3" fill="#333"/>
+  <circle cx="860" cy="712" r="3" fill="#333"/>
+  <circle cx="1025" cy="712" r="3" fill="#333"/>
+
+
+  <!-- ════════════ ROBOT ACTUATION (y=754–810) ════════════ -->
+
+  <rect x="620" y="754" width="400" height="56" rx="10" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/>
+  <text x="820" y="778" text-anchor="middle" font-size="15" font-weight="700" fill="#412402">robot_node</text>
+  <text x="820" y="798" text-anchor="middle" font-size="11.5" fill="#854F0B">Motor bridge · 4 Dynamixel · height · yaw</text>
+  <text x="820" y="822" text-anchor="middle" font-size="9.5" fill="#888" font-style="italic">Also: /cv/person_direction · /robot/height  |  → Teensy motors · V4 GUI</text>
+
+
+  <!-- ════════════ USER INTERFACES (y=840–900) ════════════ -->
+
+  <rect x="340" y="840" width="410" height="60" rx="10" fill="#EEECEA" stroke="#aaa" stroke-width="0.8"/>
+  <text x="545" y="862" text-anchor="middle" font-size="14.5" font-weight="700" fill="#111">BoxBunny GUI (PySide6)</text>
+  <text x="545" y="880" text-anchor="middle" font-size="11" fill="#555">7" touchscreen · ROS bridge · 24 pages</text>
+  <text x="545" y="894" text-anchor="middle" font-size="9.5" fill="#777">Sub: /session/state · /coach/tip · /drill/progress · /punch/confirmed</text>
+
+  <rect x="960" y="840" width="390" height="60" rx="10" fill="#EEECEA" stroke="#aaa" stroke-width="0.8"/>
+  <text x="1155" y="862" text-anchor="middle" font-size="14.5" font-weight="700" fill="#111">FastAPI dashboard</text>
+  <text x="1155" y="880" text-anchor="middle" font-size="11" fill="#555">Vue 3 SPA · phone WiFi AP · port 8080</text>
+  <text x="1155" y="894" text-anchor="middle" font-size="9.5" fill="#777">IPC to GUI via /tmp JSON · /analytics/session · Svc: /llm/generate</text>
+
+
+  <!-- GUI → session_manager (service, left channel at x=220) -->
+  <path d="M370 840 L370 830 Q370 824 364 824 L226 824 Q220 824 220 818 L220 538 Q220 532 226 532 L538 532" fill="none" stroke="#1a6cb5" stroke-width="1.3" stroke-dasharray="6 3" marker-end="url(#s)"/>
+  <text x="230" y="725" font-size="10.5" font-weight="500" fill="#1a6cb5">/session/start</text>
+  <text x="230" y="740" font-size="10.5" font-weight="500" fill="#1a6cb5">/session/end</text>
+  <text x="230" y="755" font-size="10.5" font-weight="500" fill="#1a6cb5">(services)</text>
+
+  <!-- Dashboard → GUI (IPC) -->
+  <line x1="960" y1="870" x2="752" y2="870" stroke="#aaa" stroke-width="1.1" stroke-dasharray="3 3" marker-end="url(#a)"/>
+  <text x="800" y="864" font-size="10.5" fill="#888" font-weight="500">IPC via /tmp JSON files</text>
+
+</svg>

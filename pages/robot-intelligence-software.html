@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.3.5 Dashboard & Analytics</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="/components/report-nav/report-nav.js" defer></script>
+  <style>
+    .page-nav-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 32px 0 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="robot-intelligence.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Intelligence
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- 5.3.5 INTRO -->
+    <h1>5.3.5 Dashboard & Analytics</h1>
+
+    <p>
+      Beyond core intelligence, <strong>BoxBunny</strong> provides a software layer that transforms raw training data
+      into actionable insights, delivers AI coaching analysis, and enables convenient remote control.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.5.1 COMMUNICATION ARCHITECTURE -->
+    <h2>5.3.5.1 Communication Architecture</h2>
+
+    <p>
+      The system uses a 3-layer communication architecture connecting the desktop GUI, phone dashboard, and ROS 2 backend:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Layer</th>
+          <th style="padding:8px; border:1px solid #ddd;">From &rarr; To</th>
+          <th style="padding:8px; border:1px solid #ddd;">Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">ROS Bridge</td>
+          <td style="padding:8px; border:1px solid #ddd;">GUI &harr; ROS Core</td>
+          <td style="padding:8px; border:1px solid #ddd;">QThread, Qt signals, async services</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">IPC Files</td>
+          <td style="padding:8px; border:1px solid #ddd;">Dashboard &harr; GUI</td>
+          <td style="padding:8px; border:1px solid #ddd;">JSON files in <code>/tmp/</code>, 100ms polling</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">REST + WS</td>
+          <td style="padding:8px; border:1px solid #ddd;">Dashboard &harr; Backend</td>
+          <td style="padding:8px; border:1px solid #ddd;">HTTP API + WebSocket real-time</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The phone dashboard is accessible over the robot's WiFi access point. Users control
+      <strong>BoxBunny</strong> from their phone &mdash; no typing on a 7-inch touchscreen with boxing gloves,
+      no bending down, and natural mobile interaction for chatting with the AI coach.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.svg" subtitle="Figure: GUI & Dashboard Communication Architecture"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.5.2 ANALYTICS & PERFORMANCE INSIGHTS -->
+    <h2>5.3.5.2 Analytics & Performance Insights</h2>
+
+    <p>
+      All training data flows through the system into meaningful user insights:
+    </p>
+
+    <ul>
+      <li>
+        <strong>Session-Level Analytics</strong>: Each session publishes a <strong>SessionPunchSummary</strong>
+        with 20+ fields &mdash; punch distribution by type, force levels, pad distribution, rounds completed,
+        punches per minute, max power, and movement metrics. Stored in per-user SQLite for long-term tracking.
+      </li>
+      <li>
+        <strong>Trend Analysis</strong>: Time-series analytics across four periods (7/30/90 days, all time) for
+        five metrics: volume, reaction time, power, defence rate, and stamina.
+      </li>
+      <li>
+        <strong>Peer Comparison</strong>: Population benchmarks by age, gender, and skill level across 6 metrics.
+        Tiers range from "Getting Started" (&lt;10th percentile) to "Elite" (&gt;90th).
+      </li>
+      <li>
+        <strong>Personal Records</strong>: All-time bests for power, stamina, and reaction time tracked in a
+        dedicated <strong>personal_records</strong> table and surfaced with the date achieved.
+      </li>
+      <li>
+        <strong>Sparring-Specific</strong>: Defence breakdown (blocks, slips, dodges, hits received) and weakness
+        profile revealing which punches the user struggles to defend &mdash; the same data driving the AI
+        sparring engine's targeting.
+      </li>
+    </ul>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.5.3 AI COACH ANALYSIS & TRAINING SUGGESTIONS -->
+    <h2>5.3.5.3 AI Coach Analysis & Training Suggestions</h2>
+
+    <ul>
+      <li>
+        <strong>Post-Session Analysis</strong>: The LLM receives the full <strong>SessionPunchSummary</strong>
+        and generates a 2&ndash;3 paragraph analysis referencing specific metrics, weak areas, and improvement trends.
+      </li>
+      <li>
+        <strong>Actionable Drill Suggestions</strong>: The LLM outputs structured tags
+        (<code>[DRILL:Name|combo=1-2|rounds=2|work=60s|speed=Medium]</code>) parsed into clickable cards
+        that launch the suggested configuration with one tap.
+      </li>
+      <li>
+        <strong>Interactive AI Chat</strong>: Full-screen chat with word-by-word streaming (20ms/word).
+        Users ask technique questions, request training plans, or get stat explanations.
+        History is persisted with follow-up suggestions after each response.
+      </li>
+      <li>
+        <strong>Convenience Design</strong>: Users chat from their phone instead of the 7-inch touchscreen.
+        This was directly motivated by CDE AI Fair feedback where touchscreen typing was a friction point.
+      </li>
+    </ul>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.5.4 PHONE DASHBOARD FEATURES -->
+    <h2>5.3.5.4 Phone Dashboard Features</h2>
+
+    <p>
+      The phone dashboard is a <strong>Vue 3</strong> SPA (Composition API, Pinia, Tailwind CSS, Chart.js)
+      served by a <strong>FastAPI</strong> backend. Key views:
+    </p>
+
+    <ul>
+      <li>
+        <strong>Dashboard Home</strong>: XP progress ring, weekly goal with streak counter,
+        training heat map, quick stats with trend arrows, peer comparison bars,
+        recent session card, and AI coach quote of the day.
+      </li>
+      <li>
+        <strong>Performance</strong>: Trend charts across selectable periods for all 5 key metrics
+        with personal best callouts.
+      </li>
+      <li>
+        <strong>Training Remote</strong>: Quick preset grid for one-tap session start, navigation buttons
+        to remotely control the GUI, and press-and-hold height adjustment. Users configure their
+        session from their phone and walk to the robot ready to go.
+      </li>
+      <li>
+        <strong>Coach View</strong> (coach accounts only): Group circuit training dashboard &mdash;
+        manage participant rotation, view live stats, load presets, and review past sessions.
+      </li>
+    </ul>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.5.5 API & DATABASE DESIGN -->
+    <h2>5.3.5.5 API & Database Design</h2>
+
+    <h3>FastAPI Backend (7 routers under <code>/api/</code>)</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Router</th>
+          <th style="padding:8px; border:1px solid #ddd;">Key Endpoints</th>
+          <th style="padding:8px; border:1px solid #ddd;">Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">auth</td>
+          <td style="padding:8px; border:1px solid #ddd;">login, signup, pattern-login, profile</td>
+          <td style="padding:8px; border:1px solid #ddd;">JWT auth (7-day TTL) + SHA-256 pattern lock</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">sessions</td>
+          <td style="padding:8px; border:1px solid #ddd;">current, history, trends, detail, raw</td>
+          <td style="padding:8px; border:1px solid #ddd;">Session data with pagination and mode filtering</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">gamification</td>
+          <td style="padding:8px; border:1px solid #ddd;">profile, achievements, leaderboard, benchmarks</td>
+          <td style="padding:8px; border:1px solid #ddd;">XP, ranks, badges, peer comparison</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">chat</td>
+          <td style="padding:8px; border:1px solid #ddd;">status, message, history</td>
+          <td style="padding:8px; border:1px solid #ddd;">LLM coaching via ROS service bridge</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">remote</td>
+          <td style="padding:8px; border:1px solid #ddd;">command, height, presets</td>
+          <td style="padding:8px; border:1px solid #ddd;">GUI remote control via IPC files</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">presets</td>
+          <td style="padding:8px; border:1px solid #ddd;">list, create, update, delete, favourite</td>
+          <td style="padding:8px; border:1px solid #ddd;">Training preset management</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">coach</td>
+          <td style="padding:8px; border:1px solid #ddd;">load-config, start/end-station, live, sessions</td>
+          <td style="padding:8px; border:1px solid #ddd;">Group training management (coach role)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Two-Tier SQLite Database</h3>
+
+    <ul>
+      <li>
+        <strong>Main DB</strong> (<code>boxbunny_main.db</code>): Shared tables for users (password hash + pattern lock),
+        auth sessions, training presets, and coaching sessions.
+      </li>
+      <li>
+        <strong>Per-User DB</strong> (<code>users/{username}/boxbunny.db</code>): Isolated tables for training sessions,
+        events, combo progress, performance tests, sparring, weakness profiles, and gamification (XP, achievements, streaks, records).
+      </li>
+      <li>
+        <strong>Design rationale</strong>: Per-user databases provide data isolation, enable concurrent writes
+        without lock contention, and simplify backup and export.
+      </li>
+    </ul>
+
+    <h3>WebSocket</h3>
+
+    <p>
+      Real-time session updates via <code>ws://&lt;host&gt;:8080/ws</code> with events for session
+      started/stats/completed. Uses 30-second keepalive ping/pong and automatic reconnection with
+      exponential backoff (max 10 attempts) plus state sync on reconnect.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.5.6 GAMIFICATION SYSTEM -->
+    <h2>5.3.5.6 Gamification System</h2>
+
+    <h3>6 Rank Tiers</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Rank</th>
+          <th style="padding:8px; border:1px solid #ddd;">XP Threshold</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Novice</td>
+          <td style="padding:8px; border:1px solid #ddd;">0</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Contender</td>
+          <td style="padding:8px; border:1px solid #ddd;">500</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Fighter</td>
+          <td style="padding:8px; border:1px solid #ddd;">1,500</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Warrior</td>
+          <td style="padding:8px; border:1px solid #ddd;">4,000</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Champion</td>
+          <td style="padding:8px; border:1px solid #ddd;">10,000</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Elite</td>
+          <td style="padding:8px; border:1px solid #ddd;">25,000</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>XP Calculation</h3>
+
+    <p>
+      Base XP varies by mode (Training 50, Sparring 80, Free 30, Performance Tests 40) with bonuses for
+      completion and score. Difficulty multipliers: 1.0&times; Beginner, 1.3&times; Intermediate,
+      1.6&times; Advanced, 2.0&times; Elite. Minimum 10 XP per session.
+    </p>
+
+    <h3>12+ Achievements</h3>
+
+    <p>
+      Including "First Blood" (first session), "Century" (100 punches), "Speed Demon" (lightning reaction),
+      "Weekly Warrior" (7-day streak), and "Perfect Round" (100% accuracy). Each badge awarded only once.
+    </p>
+
+    <h3>Streaks & Goals</h3>
+
+    <p>
+      Daily training streak tracking with longest streak records. Configurable weekly goal
+      (default 3 sessions/week) with progress tracking.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="robot-intelligence-integration.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: Intelligent Behaviour & Control
+        </sl-button>
+      </a>
+      <a href="robot-intelligence-testing.html">
+        <sl-button variant="default" size="medium">
+          Next: Testing & Validation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      &uarr; Top
+    </button>
+
+  </div>
+</body>
+</html>

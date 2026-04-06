@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 780" width="1500" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M2 1.5L8 5L2 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M8 1.5L2 5L8 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="780" fill="#FAFAF8"/>
+
+  <!-- TITLE -->
+  <text x="750" y="42" text-anchor="middle" font-size="34" font-weight="700" fill="#111">GUI &amp; Dashboard Communication</text>
+  <text x="750" y="66" text-anchor="middle" font-size="14" fill="#555">BoxBunny · Jetson Orin NX</text>
+
+
+  <!-- ═══════════ PHONE CARD ═══════════ -->
+  <rect x="55" y="100" width="340" height="270" rx="14" fill="#fff" stroke="#D85A30" stroke-width="1"/>
+  <rect x="55" y="100" width="340" height="52" rx="14" fill="#D85A30"/>
+  <rect x="55" y="130" width="340" height="22" fill="#D85A30"/>
+  <text x="225" y="132" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Phone Dashboard</text>
+  <text x="225" y="178" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Vue 3 SPA · WiFi AP :8080</text>
+
+  <text x="75" y="210" font-size="13.5" fill="#444">Browse <tspan font-weight="700" fill="#333">11 pages</tspan> — dashboard, chat, training</text>
+  <text x="75" y="236" font-size="13.5" fill="#444">Control robot <tspan font-weight="700" fill="#333">remotely</tspan> — start, height, presets</text>
+  <text x="75" y="262" font-size="13.5" fill="#444">Receive <tspan font-weight="700" fill="#333">live updates</tspan> via WebSocket</text>
+  <text x="75" y="288" font-size="13.5" fill="#444">Secure <tspan font-weight="700" fill="#333">token auth</tspan> — 7-day expiry</text>
+
+  <line x1="75" y1="302" x2="375" y2="302" stroke="#f0e0d8" stroke-width="0.6"/>
+  <text x="225" y="324" text-anchor="middle" font-size="12" fill="#888">4 Pinia stores · auto-reconnect · state sync</text>
+  <text x="225" y="344" text-anchor="middle" font-size="12" fill="#888">session stats · completion events · ping 30 s</text>
+
+
+  <!-- ═══════════ FASTAPI CARD ═══════════ -->
+  <rect x="530" y="100" width="340" height="270" rx="14" fill="#fff" stroke="#378ADD" stroke-width="1"/>
+  <rect x="530" y="100" width="340" height="52" rx="14" fill="#378ADD"/>
+  <rect x="530" y="130" width="340" height="22" fill="#378ADD"/>
+  <text x="700" y="132" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">FastAPI Backend</text>
+  <text x="700" y="178" text-anchor="middle" font-size="13" font-weight="600" fill="#333">Python · Uvicorn · port 8080</text>
+
+  <text x="550" y="210" font-size="13.5" fill="#444">Serves <tspan font-weight="700" fill="#333">8 API groups</tspan> — auth, sessions, chat ...</text>
+  <text x="550" y="236" font-size="13.5" fill="#444">Pushes <tspan font-weight="700" fill="#333">live data</tspan> via WebSocket (/ws)</text>
+  <text x="550" y="262" font-size="13.5" fill="#444">Writes <tspan font-weight="700" fill="#333">3 IPC files</tspan> to control GUI</text>
+  <text x="550" y="288" font-size="13.5" fill="#444">Calls <tspan font-weight="700" fill="#333">ROS /llm/generate</tspan> for AI chat</text>
+
+  <line x1="550" y1="302" x2="850" y2="302" stroke="#d8e8f8" stroke-width="0.6"/>
+  <text x="700" y="324" text-anchor="middle" font-size="12" fill="#888">login.json · command.json · height.json</text>
+  <text x="700" y="344" text-anchor="middle" font-size="12" fill="#888">gamification · presets · coach · export</text>
+
+
+  <!-- ═══════════ GUI CARD ═══════════ -->
+  <rect x="1005" y="100" width="345" height="270" rx="14" fill="#fff" stroke="#7F77DD" stroke-width="1"/>
+  <rect x="1005" y="100" width="345" height="52" rx="14" fill="#7F77DD"/>
+  <rect x="1005" y="130" width="345" height="22" fill="#7F77DD"/>
+  <text x="1178" y="132" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">BoxBunny GUI</text>
+  <text x="1178" y="178" text-anchor="middle" font-size="13" font-weight="600" fill="#333">PySide6 · 7" touchscreen · 1024×600</text>
+
+  <text x="1025" y="210" font-size="13.5" fill="#444">Displays <tspan font-weight="700" fill="#333">24 pages</tspan> — training, sparring, results</text>
+  <text x="1025" y="236" font-size="13.5" fill="#444">Polls <tspan font-weight="700" fill="#333">IPC files</tspan> every 100 ms</text>
+  <text x="1025" y="262" font-size="13.5" fill="#444">Bridges to <tspan font-weight="700" fill="#333">ROS 2</tspan> — 10 subs, 2 pubs, 3 svcs</text>
+  <text x="1025" y="288" font-size="13.5" fill="#444">Accepts <tspan font-weight="700" fill="#333">4 inputs</tspan> — touch, IMU, KB, phone</text>
+
+  <line x1="1025" y1="302" x2="1330" y2="302" stroke="#e0ddf8" stroke-width="0.6"/>
+  <text x="1178" y="324" text-anchor="middle" font-size="12" fill="#888">GuiBridge runs as background QThread</text>
+  <text x="1178" y="344" text-anchor="middle" font-size="12" fill="#888">QStackedWidget · PageRouter · SoundManager</text>
+
+
+  <!-- ═══════════ COMMUNICATION ARROWS ═══════════ -->
+
+  <!-- Phone ↔ FastAPI: HTTP -->
+  <line x1="395" y1="200" x2="528" y2="200" stroke="#333" stroke-width="2.2" marker-end="url(#a)" marker-start="url(#b)"/>
+  <rect x="424" y="184" width="68" height="22" rx="6" fill="#333"/>
+  <text x="458" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">HTTP</text>
+
+  <!-- Phone ↔ FastAPI: WS -->
+  <line x1="395" y1="300" x2="528" y2="300" stroke="#333" stroke-width="2.2" marker-end="url(#a)" marker-start="url(#b)"/>
+  <rect x="432" y="284" width="52" height="22" rx="6" fill="#333"/>
+  <text x="458" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">WS</text>
+
+  <!-- FastAPI → GUI: IPC -->
+  <line x1="870" y1="250" x2="1003" y2="250" stroke="#BA7517" stroke-width="2.2" marker-end="url(#a)"/>
+  <rect x="902" y="234" width="56" height="22" rx="6" fill="#BA7517"/>
+  <text x="930" y="250" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">IPC</text>
+  <text x="930" y="270" text-anchor="middle" font-size="11" font-weight="500" fill="#854F0B">/tmp JSON · 100 ms</text>
+
+
+  <!-- ═══════════ ROW 2: ROS + DBs ═══════════ -->
+
+  <!-- ROS 2 -->
+  <rect x="1005" y="440" width="345" height="82" rx="14" fill="#fff" stroke="#1D9E75" stroke-width="1"/>
+  <rect x="1005" y="440" width="345" height="40" rx="14" fill="#1D9E75"/>
+  <rect x="1005" y="462" width="345" height="18" fill="#1D9E75"/>
+  <text x="1178" y="466" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">ROS 2 Core</text>
+  <text x="1178" y="498" text-anchor="middle" font-size="12.5" fill="#0F6E56">12 nodes · 40+ topics · 6 services</text>
+  <text x="1178" y="516" text-anchor="middle" font-size="11" fill="#888">session_mgr · cv · imu · punch_proc · robot · llm</text>
+
+  <!-- GUI ↔ ROS -->
+  <line x1="1178" y1="370" x2="1178" y2="438" stroke="#1D9E75" stroke-width="2.2" marker-end="url(#a)" marker-start="url(#b)"/>
+  <rect x="1194" y="386" width="108" height="22" rx="6" fill="#1D9E75"/>
+  <text x="1248" y="402" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">pub/sub + svc</text>
+
+  <!-- Databases -->
+  <rect x="490" y="440" width="195" height="72" rx="12" fill="#fff" stroke="#999" stroke-width="0.8"/>
+  <rect x="490" y="440" width="195" height="34" rx="12" fill="#888"/>
+  <rect x="490" y="460" width="195" height="14" fill="#888"/>
+  <text x="588" y="462" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Main DB</text>
+  <text x="588" y="494" text-anchor="middle" font-size="11" fill="#555">users · auth · presets</text>
+
+  <rect x="710" y="440" width="195" height="72" rx="12" fill="#fff" stroke="#999" stroke-width="0.8"/>
+  <rect x="710" y="440" width="195" height="34" rx="12" fill="#888"/>
+  <rect x="710" y="460" width="195" height="14" fill="#888"/>
+  <text x="808" y="462" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">User DBs</text>
+  <text x="808" y="494" text-anchor="middle" font-size="11" fill="#555">sessions · XP · records</text>
+
+  <!-- FastAPI → DBs -->
+  <line x1="650" y1="370" x2="650" y2="438" stroke="#888" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="664" y="410" font-size="11" font-weight="600" fill="#888">R/W</text>
+  <line x1="760" y1="370" x2="760" y2="438" stroke="#888" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <!-- FastAPI → ROS (/llm) -->
+  <path d="M870 340 L930 340 Q936 340 936 346 L936 478 Q936 484 942 484 L1003 484" fill="none" stroke="#1D9E75" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="946" y="420" font-size="10.5" font-weight="600" fill="#1D9E75">/llm/generate</text>
+
+  <!-- GUI → User DB -->
+  <path d="M1060 370 L1060 400 Q1060 406 1054 406 L814 406 Q808 406 808 412 L808 438" fill="none" stroke="#aaa" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+  <text x="940" y="400" font-size="10" fill="#aaa">GUI read-only</text>
+
+  <!-- ROS → User DB -->
+  <path d="M1060 522 L1060 548 Q1060 554 1054 554 L814 554 Q808 554 808 548 L808 514" fill="none" stroke="#aaa" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+  <text x="930" y="550" font-size="10" fill="#aaa">session_mgr writes</text>
+
+
+  <!-- ═══════════ KEY FLOWS (centered) ═══════════ -->
+  <g transform="translate(0,590)">
+    <text x="750" y="20" text-anchor="middle" font-size="16" font-weight="700" fill="#111">Key data flows</text>
+
+    <!-- Training start -->
+    <g transform="translate(490,36)">
+      <rect x="0" y="0" width="120" height="26" rx="6" fill="#D85A30"/>
+      <text x="60" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Training start</text>
+      <text x="134" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="152" y="18" font-size="12.5" font-weight="600" fill="#D85A30">Phone</text>
+      <text x="202" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="218" y="18" font-size="12.5" font-weight="600" fill="#378ADD">/remote</text>
+      <text x="276" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="292" y="18" font-size="12.5" font-weight="600" fill="#BA7517">IPC</text>
+      <text x="318" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="334" y="18" font-size="12.5" font-weight="600" fill="#7F77DD">GUI</text>
+      <text x="366" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="382" y="18" font-size="12.5" font-weight="600" fill="#1D9E75">ROS</text>
+      <text x="414" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="430" y="18" font-size="12.5" font-weight="600" fill="#378ADD">WS</text>
+      <text x="456" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="472" y="18" font-size="12.5" font-weight="600" fill="#D85A30">Phone</text>
+    </g>
+
+    <!-- AI chat -->
+    <g transform="translate(490,70)">
+      <rect x="0" y="0" width="120" height="26" rx="6" fill="#378ADD"/>
+      <text x="60" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">AI coach chat</text>
+      <text x="134" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="152" y="18" font-size="12.5" font-weight="600" fill="#D85A30">Phone</text>
+      <text x="202" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="218" y="18" font-size="12.5" font-weight="600" fill="#378ADD">FastAPI</text>
+      <text x="280" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="296" y="18" font-size="12.5" font-weight="600" fill="#1D9E75">ROS /llm</text>
+      <text x="366" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="382" y="18" font-size="12.5" font-weight="600" fill="#1D9E75">Qwen 2.5</text>
+      <text x="450" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="466" y="18" font-size="12.5" font-weight="600" fill="#D85A30">Phone</text>
+    </g>
+
+    <!-- Login -->
+    <g transform="translate(490,104)">
+      <rect x="0" y="0" width="120" height="26" rx="6" fill="#7F77DD"/>
+      <text x="60" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Phone login</text>
+      <text x="134" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="152" y="18" font-size="12.5" font-weight="600" fill="#D85A30">Phone</text>
+      <text x="202" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="218" y="18" font-size="12.5" font-weight="600" fill="#378ADD">/auth</text>
+      <text x="260" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="276" y="18" font-size="12.5" font-weight="600" fill="#BA7517">IPC</text>
+      <text x="302" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="318" y="18" font-size="12.5" font-weight="600" fill="#7F77DD">GUI syncs</text>
+      <text x="388" y="18" font-size="14" fill="#bbb">→</text>
+      <text x="404" y="18" font-size="12.5" font-weight="600" fill="#378ADD">WS state_sync</text>
+    </g>
+  </g>
+
+</svg>

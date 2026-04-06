@@ -1,118 +1,211 @@
     <div id="final-design">
       <h2>4. Final Design (Jeanette and Zakir)</h2>
+      <p>
+        With requirements and methodology established in Chapters 2 and 3, this
+        chapter consolidates them into a system architecture (4.1) and user
+        journey (4.2). These define the top-level structure and interaction model
+        that inform the subsystem-level conceptual design in Chapter 5.
+      </p>
     </div>
 
     <div id="system-overview">
       <h3>4.1 System Overview (Jeanette)</h3>
       <p>Building on the identified product needs, the BoxBunny robot is organised
-      into three key subsystems, each addressing a distinct set of functions
-      (Figure 5):</p>
+      into three key subsystems, each addressing a distinct set of functions:</p>
       <ul type="disc">
           <li>
-              <strong>User Interface</strong> – touchscreen, visual feedback, and
+              <strong>User Interface</strong>: touchscreen, visual feedback, and
               control logic for configuring and running training sessions.
           </li>
           <li>
-              <strong>Robot Mechanism</strong> – the integrated physical platform
-              comprising Base (stability &amp; portability), Rotation (yaw tracking),
+              <strong>Robot Mechanism</strong>: the integrated physical platform
+              comprising Base (stability and portability), Rotation (yaw tracking),
               Height Adjustment (user-adaptive positioning), Padding (impact sensing
-              &amp; contact points), and Arm Actuation (punch execution via 2-DOF
+              and contact points), and Arm Actuation (punch execution via 2-DOF
               coaxial differential joints). Together these subsystems position the
               robot and deliver safe, realistic striking interaction.
           </li>
           <li>
-              <strong>Robot Intelligence</strong> – primarily User Tracking,
+              <strong>Robot Intelligence</strong>: primarily User Tracking,
               enabling the robot to respond to the boxer's movement and adapt
               drills in real time.
           </li>
       </ul>
       <p>
-          Each of these subsystems is detailed in the following sections.
+        For a detailed mapping of how each product need (Table 4) relates to
+        these subsystems, see
+        <a href="pages/appendix-product-mapping.html">Appendix 5: Product Needs
+        to Subsystem Mapping</a>.
       </p>
-      <image-component
-        width="70%"
-        tag="image"
-        source="assets/Lower_mechanism/0-full robot product feature - cad overview.png"
-        subtitle="Figure 5: Product Features of BoxBunny">
-      </image-component>
-
-
     </div>
 
     <div id="user-journey">
       <h3>4.2 User Journey (Zakir)</h3>
-      <h4 id="end-to-end-user-flow">4.2.1 End-to-End User Flow </h4>
       <p>
-        The flowchart in Figure 6 illustrates the complete user journey when interacting with the robot,
-        from the start of a session to its conclusion. Each activity is color-coded according to its
-        corresponding product feature category, as indicated in the legend on the right. The session begins
-        with height adjustment and selecting the training parameters that match the user's goals. Once training
-        starts, the robot functions as an intelligent training partner. The robot enables users to strike designated
-        zones, defend against simulated punches through arm actuation, and move or orient itself in response to the
-        user. At the end of the session, the robot generates performance analytics displayed on the dashboard. From
-        there, users can choose to begin a new session or exit, depending on their needs.
+        The swim lane diagram below shows how the three subsystems collaborate
+        across the five phases of a training session. During setup, only the
+        User Interface is active. At countdown, all three subsystems initialise:
+        the intelligence layer ramps CV inference to 30 Hz and resets tracking
+        baselines, while the mechanism auto-adjusts height using person
+        detection. During active training, the subsystems operate in a
+        continuous loop where intelligence detects and classifies user actions,
+        the mechanism responds with arm actuation and yaw tracking, and the
+        interface displays live feedback and coaching tips.
       </p>
 
-      <image-component
-        width="70%"
-        tag="image"
-        source="assets/user_journey/User_Journey_Counter_Punch.png"
-        subtitle="Figure 6: User Journey Flowchart">
-      </image-component>
+      <div style="width:100%; overflow-x:auto; margin:24px 0;">
+        <svg viewBox="0 0 700 310" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; font-family:system-ui, sans-serif;">
+          <style>
+            .lane-label { font-size: 12px; font-weight: bold; fill: #333; }
+            .phase-label { font-size: 11px; font-weight: bold; fill: #444; text-anchor: middle; }
+            .swim-node { transition: opacity 0.2s; }
+            .swim-node:hover { opacity: 0.8; }
+          </style>
+          <defs>
+            <marker id="slA" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+              <polygon points="0 0, 7 2.5, 0 5" fill="#555"/>
+            </marker>
+            <marker id="slDown" markerWidth="7" markerHeight="5" refX="3.5" refY="5" orient="auto">
+              <polygon points="0 0, 3.5 5, 7 0" fill="#888"/>
+            </marker>
+            <marker id="slUp" markerWidth="7" markerHeight="5" refX="3.5" refY="0" orient="auto">
+              <polygon points="0 5, 3.5 0, 7 5" fill="#888"/>
+            </marker>
+          </defs>
 
-    </div>
+          <!-- Phase column headers -->
+          <text x="165" y="18" class="phase-label">Setup</text>
+          <text x="290" y="18" class="phase-label">Countdown</text>
+          <text x="435" y="18" class="phase-label">Active Training</text>
+          <text x="570" y="18" class="phase-label">Rest</text>
+          <text x="655" y="18" class="phase-label">Results</text>
 
-    <div id="training-modes-overview">
-      <h4>4.2.2 Training Modes Overview</h4>
-      <p>
-        The robot offers two primary training modes: Training and Performance.
-      </p>
-      <p>
-        Firstly, Training Mode includes Techniques and Spar.
-      </p>
-      <ul>
-        <li> Spar features five preset boxer types that simulate common opponent styles.</li>
-        <li> Techniques provides three categories: Punch Combination Library, Offensive Drills, and Defensive Drills.</li>
-        <ul>
-          <li> Punch Combination Library includes multiple difficulty levels and allows users to customise their own punch sequences.</li>
-          <li> Offensive and Defensive Drills focus on developing the user's specific attacking and defensive skills respectively.</li>
-        </ul>
-      </ul>
-      <p>
-        Performance Mode measures key physical attributes such as stamina, punch power, and reaction time.
-      </p>
-      <p>
-         Additionally, the Others menu on the homepage enables users to adjust system settings such as switching
-         between orthodox and southpaw, while the Insights feature provides a summary of training metrics and performance
-         trends.
-      </p>
-    </div>
-    <div id="movement-behavior">
-      <h4>4.2.3 Movement Behavior</h4>
-      <p>
-        When the user selects the training parameters, they are interacting with the Skill Progression component of the
-        product. This feature determines the appropriate motor actuations and software activations (such as computer vision)
-        required for the session. As shown in Figure 7, users can choose from several training categories such as Training,
-        Performance, and Others with each serving different purposes. For clarity, this report focuses only on the green pathway,
-        as detailing every iteration would be unnecessarily exhaustive.
-      </p>
-      <p>
-        The green pathway leads to the Counter Punch Mode, which is intentionally chosen because it engages the full range of the
-        robot's capabilities. This mode is for all skill levels, as it replicates one of the most common foundational sparring
-        opponents: a reactive boxer who waits for the user to initiate an attack and responds with precise, well-timed counters
-        (typically jabs and crosses). This style is characterized by low aggression, high timing sensitivity, and reactive movement.
-      </p>
-      <p>
-        Translated into robot behaviour, the system uses computer vision to detect the user's punches. For every punch thrown by the
-        user, the robot responds with a counter-punch by actuating its arm motors. Additionally, the robot adjusts its position by
-        moving linearly when the user steps forward or backward, and it maintains proper orientation by rotating to face the user.
-        This ensures a realistic and continuous sparring interaction.
-      </p>
+          <!-- Phase column dividers -->
+          <line x1="228" y1="26" x2="228" y2="265" stroke="#ddd" stroke-width="1"/>
+          <line x1="355" y1="26" x2="355" y2="265" stroke="#ddd" stroke-width="1"/>
+          <line x1="525" y1="26" x2="525" y2="265" stroke="#ddd" stroke-width="1"/>
+          <line x1="615" y1="26" x2="615" y2="265" stroke="#ddd" stroke-width="1"/>
 
-      <image-component
-        width="70%"
-        tag="image"
-        source="assets/user_journey/user_journey.png"
-        subtitle="Figure 7: Simplified User Journey to Counterpuncher Training">
-      </image-component>
+          <!-- Lane backgrounds -->
+          <rect x="100" y="28" width="600" height="72" fill="#e3f2fd" rx="4" opacity="0.4"/>
+          <rect x="100" y="106" width="600" height="72" fill="#e8f5e9" rx="4" opacity="0.4"/>
+          <rect x="100" y="184" width="600" height="72" fill="#f3e5f5" rx="4" opacity="0.4"/>
+
+          <!-- Lane labels -->
+          <text x="8" y="58" class="lane-label">User</text>
+          <text x="8" y="72" class="lane-label">Interface</text>
+
+          <text x="8" y="136" class="lane-label">Robot</text>
+          <text x="8" y="150" class="lane-label">Mechanism</text>
+
+          <text x="8" y="214" class="lane-label">Robot</text>
+          <text x="8" y="228" class="lane-label">Intelligence</text>
+
+          <!-- Lane divider lines -->
+          <line x1="100" y1="103" x2="700" y2="103" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="100" y1="181" x2="700" y2="181" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+
+          <!-- ========== SETUP PHASE ========== -->
+          <g class="swim-node">
+            <rect x="110" y="42" width="108" height="44" rx="6" fill="#1565c0"/>
+            <text x="164" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Login, Config,</text>
+            <text x="164" y="74" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Mode Select</text>
+            <title>User logs in (pattern lock), completes proficiency assessment, selects training mode and parameters</title>
+          </g>
+
+          <!-- Arrow Setup -> Countdown -->
+          <line x1="218" y1="64" x2="236" y2="64" stroke="#555" stroke-width="1.5" marker-end="url(#slA)"/>
+
+          <!-- ========== COUNTDOWN PHASE ========== -->
+          <g class="swim-node">
+            <rect x="238" y="42" width="108" height="44" rx="6" fill="#1565c0"/>
+            <text x="292" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Countdown</text>
+            <text x="292" y="74" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Timer</text>
+            <title>3-2-1-GO countdown with sound cues, IMU switches to training mode</title>
+          </g>
+          <g class="swim-node">
+            <rect x="243" y="118" width="98" height="40" rx="6" fill="#2e7d32"/>
+            <text x="292" y="135" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Auto Height</text>
+            <text x="292" y="148" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Adjust</text>
+            <title>Height column auto-adjusts to user via CV person detection (bbox_top_y targeting 15% of frame)</title>
+          </g>
+          <g class="swim-node">
+            <rect x="243" y="196" width="98" height="40" rx="6" fill="#7b1fa2"/>
+            <text x="292" y="213" text-anchor="middle" fill="white" font-size="10" font-weight="bold">CV Ramp-Up</text>
+            <text x="292" y="226" text-anchor="middle" fill="white" font-size="10" font-weight="bold">+ Baseline</text>
+            <title>CV inference ramps from 6 Hz to 30 Hz; lateral and depth baselines reset to current position</title>
+          </g>
+          <!-- Cross-lane: Intelligence drives Mechanism height -->
+          <line x1="292" y1="196" x2="292" y2="158" stroke="#888" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#slUp)"/>
+
+          <!-- Arrow Countdown -> Active -->
+          <line x1="346" y1="64" x2="362" y2="64" stroke="#555" stroke-width="1.5" marker-end="url(#slA)"/>
+
+          <!-- ========== ACTIVE TRAINING PHASE ========== -->
+          <g class="swim-node">
+            <rect x="364" y="38" width="152" height="50" rx="6" fill="#1565c0"/>
+            <text x="440" y="57" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Live Feedback,</text>
+            <text x="440" y="71" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Timer, Coach Tips</text>
+            <title>Round timer, combo display, punch counter, streak tracker, and LLM coaching tips every 18s</title>
+          </g>
+          <g class="swim-node">
+            <rect x="369" y="116" width="142" height="44" rx="6" fill="#2e7d32"/>
+            <text x="440" y="134" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Arm Actuation,</text>
+            <text x="440" y="148" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Yaw Tracking</text>
+            <title>Robot arms execute punches (sparring/free) or hold position (techniques). Yaw motor tracks user lateral position.</title>
+          </g>
+          <g class="swim-node">
+            <rect x="369" y="194" width="142" height="44" rx="6" fill="#7b1fa2"/>
+            <text x="440" y="212" text-anchor="middle" fill="white" font-size="11" font-weight="bold">CV+IMU Fusion,</text>
+            <text x="440" y="226" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Person Tracking</text>
+            <title>CV detects punch type at 30 Hz, IMU confirms pad impact, fusion engine produces confirmed punches. Person direction drives yaw motor.</title>
+          </g>
+          <!-- Cross-lane arrows: Intelligence -> Mechanism, Mechanism -> UI, Intelligence -> UI -->
+          <line x1="420" y1="194" x2="420" y2="160" stroke="#888" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#slUp)"/>
+          <line x1="460" y1="116" x2="460" y2="88" stroke="#888" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#slUp)"/>
+          <line x1="480" y1="194" x2="480" y2="88" stroke="#888" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#slUp)"/>
+
+          <!-- Arrow Active -> Rest -->
+          <line x1="516" y1="64" x2="533" y2="64" stroke="#555" stroke-width="1.5" marker-end="url(#slA)"/>
+
+          <!-- ========== REST PHASE ========== -->
+          <g class="swim-node">
+            <rect x="535" y="42" width="72" height="44" rx="6" fill="#1565c0"/>
+            <text x="571" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Rest</text>
+            <text x="571" y="74" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Timer</text>
+            <title>Rest countdown between rounds, shows round stats summary</title>
+          </g>
+
+          <!-- Arrow Rest -> Results -->
+          <line x1="607" y1="64" x2="621" y2="64" stroke="#555" stroke-width="1.5" marker-end="url(#slA)"/>
+
+          <!-- ========== RESULTS PHASE ========== -->
+          <g class="swim-node">
+            <rect x="623" y="42" width="68" height="44" rx="6" fill="#1565c0"/>
+            <text x="657" y="60" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Results</text>
+            <text x="657" y="74" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Display</text>
+            <title>Post-session results: punch distribution, accuracy, defence rate, XP earned</title>
+          </g>
+          <g class="swim-node">
+            <rect x="623" y="196" width="68" height="40" rx="6" fill="#7b1fa2"/>
+            <text x="657" y="213" text-anchor="middle" fill="white" font-size="10" font-weight="bold">AI Coach</text>
+            <text x="657" y="226" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Analysis</text>
+            <title>LLM generates post-session analysis with personalised feedback and drill suggestions</title>
+          </g>
+          <line x1="657" y1="196" x2="657" y2="86" stroke="#888" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#slUp)"/>
+
+          <!-- Legend -->
+          <rect x="110" y="275" width="14" height="14" rx="3" fill="#1565c0"/>
+          <text x="130" y="287" font-size="10" fill="#333">User Interface</text>
+          <rect x="240" y="275" width="14" height="14" rx="3" fill="#2e7d32"/>
+          <text x="260" y="287" font-size="10" fill="#333">Robot Mechanism</text>
+          <rect x="395" y="275" width="14" height="14" rx="3" fill="#7b1fa2"/>
+          <text x="415" y="287" font-size="10" fill="#333">Robot Intelligence</text>
+          <line x1="555" y1="282" x2="590" y2="282" stroke="#888" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="598" y="287" font-size="10" fill="#333">Data flow</text>
+        </svg>
+      </div>
+      <sub style="display:block; text-align:center; margin-top:4px; font-style:italic; font-size:0.9rem;">
+        Figure 6: BoxBunny user journey swim lane diagram showing subsystem collaboration across session phases.
+      </sub>
     </div>

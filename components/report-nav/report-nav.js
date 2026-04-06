@@ -55,7 +55,16 @@
             { label: 'Verification Results', href: '/pages/robot-mechanism/testing.html' },
           ]
         },
-        { label: '5.3 Robot Intelligence', href: '/pages/robot-intelligence.html' },
+        {
+          label: '5.3 Robot Intelligence',
+          href: '/pages/robot-intelligence.html',
+          children: [
+            { label: 'CV & Action Recognition', href: '/pages/robot-intelligence-cv.html' },
+            { label: 'Intelligent Behaviour', href: '/pages/robot-intelligence-integration.html' },
+            { label: 'Dashboard & Analytics', href: '/pages/robot-intelligence-software.html' },
+            { label: 'Testing & Validation', href: '/pages/robot-intelligence-testing.html' },
+          ]
+        },
       ]
     },
     {
@@ -72,6 +81,7 @@
       children: [
         { label: 'Appendix 1: Upper Mechanism', href: '/pages/appendix-upper.html' },
         { label: 'Appendix 2: Lower Mechanism', href: '/pages/appendix-lower.html' },
+        { label: 'Appendix 4: Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
       ]
     },
   ];

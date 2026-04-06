@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.3.6 Testing & Validation</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="/components/report-nav/report-nav.js" defer></script>
+  <style>
+    .page-nav-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 32px 0 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="robot-intelligence.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Intelligence
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- 5.3.6 INTRO -->
+    <h1>5.3.6 Testing & Validation</h1>
+
+    <p>
+      The Robot Intelligence subsystem was validated through real-world deployment, automated test suites,
+      and detailed model analysis. This section covers methodology, results, and limitations.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.1 CDE AI FAIR -->
+    <h2>5.3.6.1 CDE AI Fair &mdash; Real-World Deployment</h2>
+
+    <p>
+      <strong>BoxBunny</strong> was deployed at the "Robotics Meets AI Showcase" in late January 2025.
+      Members of the public physically interacted with the robot in a live setting. This earlier version
+      ran 9 ROS 2 packages with HSV colour-based glove tracking and 3 drill modes.
+    </p>
+
+    <p>The showcase revealed real-world challenges that directly shaped the final system:</p>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <caption style="caption-side:bottom; text-align:left; padding-top:8px; font-size:0.85rem; color:#666;">
+        Table: CDE Fair Issues and Fixes
+      </caption>
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Issue</th>
+          <th style="padding:8px; border:1px solid #ddd;">Problem</th>
+          <th style="padding:8px; border:1px solid #ddd;">Fix in Final System</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Background clutter</td>
+          <td style="padding:8px; border:1px solid #ddd;">People walking behind the user caused false punch detections</td>
+          <td style="padding:8px; border:1px solid #ddd;">Nearest-person tracking prioritises closest and largest person</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Colour tracking failure</td>
+          <td style="padding:8px; border:1px solid #ddd;">HSV glove tracking susceptible to similarly-coloured objects</td>
+          <td style="padding:8px; border:1px solid #ddd;">Replaced with Transformer-based action recognition model</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Variable punching stances</td>
+          <td style="padding:8px; border:1px solid #ddd;">Fixed velocity thresholds unreliable across users</td>
+          <td style="padding:8px; border:1px solid #ddd;">Switched to depth-based proximity detection</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">LLM cold start</td>
+          <td style="padding:8px; border:1px solid #ddd;">Several seconds delay on first coaching prompt</td>
+          <td style="padding:8px; border:1px solid #ddd;">Lazy model loading at GUI startup</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Touchscreen input friction</td>
+          <td style="padding:8px; border:1px solid #ddd;">Typing on 7&Prime; touchscreen awkward with gloves</td>
+          <td style="padding:8px; border:1px solid #ddd;">Phone dashboard enables mobile interaction</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Camera resource contention</td>
+          <td style="padding:8px; border:1px solid #ddd;">Multiple CV consumers each opening camera caused contention</td>
+          <td style="padding:8px; border:1px solid #ddd;">Single camera node publishes to shared topics</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      These lessons directly shaped the final system. Most notably, colour tracking limitations
+      motivated the Transformer-based action recognition model.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="Figure: CDE Fair Version — ROS 2 Architecture (9 packages)"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cde_fair/reaction_drill_flow.png" subtitle="Figure: Reaction Drill State Flow"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.2 TESTING INFRASTRUCTURE -->
+    <h2>5.3.6.2 Testing Infrastructure</h2>
+
+    <p>
+      Testing followed a bottom-up strategy: unit tests validate individual components, integration tests
+      verify cross-module communication, and system-level testing uses hardware simulation.
+      Totals: <strong>146 pytest unit tests</strong>, <strong>28 integration tests</strong>, and a
+      <strong>12-section master notebook</strong> for the full operational workflow.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.3 KEY UNIT TESTS -->
+    <h2>5.3.6.3 Key Unit Tests</h2>
+
+    <p>
+      146 unit tests across 3 files with 12 shared pytest fixtures. Key categories highlighted below
+      (full breakdown in the Appendix):
+    </p>
+
+    <h3>Sensor Fusion &mdash; 44 tests (<code>test_punch_fusion.py</code>)</h3>
+    <ul>
+      <li><strong>Ring buffer operations (7)</strong>: maxlen eviction, time-based expiry, pop_match</li>
+      <li><strong>Pad-constraint filtering (10)</strong>: each punch type accepted only on valid pads</li>
+      <li><strong>Reclassification (8)</strong>: secondary prediction fallback on pad constraint violations</li>
+      <li><strong>Defence classification (8)</strong>: priority ordering (HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN)</li>
+    </ul>
+
+    <h3>Gamification &mdash; 30 tests (<code>test_gamification.py</code>)</h3>
+    <ul>
+      <li><strong>Rank system (10)</strong>: all 6 tiers, boundary conditions, XP calculations</li>
+      <li><strong>Session XP (7)</strong>: base XP per mode, completion bonus, difficulty multiplier, streak</li>
+      <li><strong>Achievements (5)</strong>: unlock conditions, duplicate prevention</li>
+    </ul>
+
+    <h3>Database &mdash; 45+ tests (<code>test_database.py</code>)</h3>
+    <ul>
+      <li><strong>User management (13)</strong>: CRUD, password verification, duplicate prevention</li>
+      <li><strong>Pattern lock (5)</strong>: SHA-256 hashing, set/verify/overwrite</li>
+      <li><strong>Session persistence (8)</strong>: save/retrieve, mode filtering, event logging</li>
+      <li><strong>Gamification persistence (7)</strong>: XP tracking, rank progression, personal records</li>
+    </ul>
+
+    <p>Run command: <code>python3 -m pytest tests/ -v</code></p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.4 INTEGRATION TESTING -->
+    <h2>5.3.6.4 Integration Testing</h2>
+
+    <p>
+      28 cross-module tests (<code>notebooks/scripts/test_integration.py</code>) validate:
+    </p>
+
+    <ul>
+      <li>Configuration loading and YAML validation across all config files</li>
+      <li>Pad-location constraint mapping (punch type &rarr; pad validity matrix)</li>
+      <li>CV + IMU fusion end-to-end (temporal matching, reclassification)</li>
+      <li>All 21 ROS message field verification</li>
+      <li>Motor protocol validation (punch codes 1&ndash;6 &rarr; motor commands)</li>
+      <li>Reaction time detection logic</li>
+    </ul>
+
+    <p>Run command: <code>python3 notebooks/scripts/test_integration.py</code></p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.5 SYSTEM-LEVEL TESTING -->
+    <h2>5.3.6.5 System-Level Testing</h2>
+
+    <h3>Teensy Simulator</h3>
+
+    <p>
+      A GUI-based simulator emulating the Teensy 4.1 with 6 IMU sensors (4 pad + 2 arm),
+      enabling full system testing without physical hardware. Supports manual mode (click to inject
+      pad impacts with configurable force) and auto mode (predefined punch sequences for reproducible testing).
+    </p>
+
+    <p>Used in development mode: <code>ros2 launch boxbunny_core boxbunny_dev.launch.py</code></p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Teensy Simulator — manual impact injection"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Simulator preset configuration"></image-component>
+
+    <div class="video-row single">
+      <div class="video-box">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska"></video>
+        <sub>Teensy Simulator — demo walkthrough</sub>
+      </div>
+    </div>
+
+    <h3>Master Notebook (<code>boxbunny_runner.ipynb</code>)</h3>
+
+    <p>A 12-section Jupyter notebook serving as the primary operational testing orchestrator:</p>
+
+    <ol>
+      <li><strong>Build & Setup</strong> &mdash; colcon build, dependency check</li>
+      <li><strong>Unit Tests</strong> &mdash; run full 146-test pytest suite</li>
+      <li><strong>System Check</strong> &mdash; hardware verification (camera, CUDA, models, database)</li>
+      <li><strong>Launch System</strong> &mdash; start all ROS 2 nodes + Teensy simulator + GUI</li>
+      <li><strong>Stop System</strong> &mdash; graceful shutdown</li>
+      <li><strong>GUI Test</strong> &mdash; visual inspection of all 24 pages</li>
+      <li><strong>Phone Dashboard</strong> &mdash; start server + public tunnel + QR code</li>
+      <li><strong>CV Model Live Test</strong> &mdash; camera feed with pose skeleton + action label overlay</li>
+      <li><strong>LLM Coach Test</strong> &mdash; interactive AI coach chat GUI</li>
+      <li><strong>Build Vue Frontend</strong> &mdash; rebuild SPA after changes</li>
+      <li><strong>Sound Test</strong> &mdash; play all 18 audio effects</li>
+      <li><strong>Demo Profiles & Benchmarks</strong> &mdash; user cards + percentile rankings</li>
+    </ol>
+
+    <h3>Launch Configurations</h3>
+
+    <ul>
+      <li><code>boxbunny_dev.launch.py</code> &mdash; Development mode with Teensy simulator (no hardware needed)</li>
+      <li><code>boxbunny_full.launch.py</code> &mdash; Production mode with real hardware</li>
+      <li><code>headless.launch.py</code> &mdash; Processing nodes only (no GUI)</li>
+    </ul>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.6 MODEL VALIDATION & INTERPRETABILITY -->
+    <h2>5.3.6.6 Model Validation & Interpretability</h2>
+
+    <h3>Overall Performance</h3>
+
+    <p>
+      The deployed model (v11) achieves <strong>96.8% validation accuracy</strong> on an unseen person
+      and <strong>94.2% macro F1-score</strong>, with only 7/222 samples misclassified. Model v10
+      reached 97.3% but had poorer live block detection, so v11 was selected.
+    </p>
+
+    <h3>Confusion Matrix</h3>
+
+    <p>
+      Most errors occur between biomechanically similar punches &mdash; left hook confused with
+      left uppercut, block confused with idle. Block has the lowest per-class accuracy (66.7%)
+      due to only 6 validation samples.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Figure: Confusion Matrix — 7/222 misclassifications"></image-component>
+
+    <h3>Per-Class Accuracy</h3>
+
+    <p>
+      Right hook and right uppercut: 100%. Cross: 98.1%. Jab: 96.4%. Left hook: 96.0%.
+      Left uppercut: 91.7%. Idle: 100%. Block: 66.7%.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Figure: Per-Class Accuracy"></image-component>
+
+    <h3>Training Convergence</h3>
+
+    <p>
+      A 2&times;2 dashboard showing loss, accuracy, learning rate, and train-val gap across 133 epochs.
+      The model converged at epoch 73 with minimal overfitting.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/training_overview.png" subtitle="Figure: Training Overview — convergence at epoch 73 with minimal overfitting"></image-component>
+
+    <h3>t-SNE Embeddings</h3>
+
+    <p>
+      The 384-dimensional sequence embeddings projected to 2D via t-SNE show tight, well-separated
+      clusters per action class. Clusters with partial overlap (e.g., left hook / left uppercut)
+      correspond to the highest off-diagonal confusion matrix values.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="Figure: t-SNE Embeddings — well-separated clusters indicate discriminative feature learning"></image-component>
+
+    <h3>Attention Heatmaps</h3>
+
+    <p>
+      Per-layer attention across 4 Transformer layers reveals meaningful temporal learning:
+      early layers attend to nearby frames, later layers cover the full 12-frame window.
+      This local-to-global progression confirms hierarchical temporal reasoning.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/attention_heatmap_layers.png" subtitle="Figure: Transformer Attention — early layers local, later layers capture broader patterns"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.7 VERIFICATION SUMMARY -->
+    <h2>5.3.6.7 Verification Summary</h2>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <caption style="caption-side:bottom; text-align:left; padding-top:8px; font-size:0.85rem; color:#666;">
+        Table: Robot Intelligence Requirements Verification Summary &mdash; all requirements met
+      </caption>
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Req</th>
+          <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+          <th style="padding:8px; border:1px solid #ddd;">Test Method</th>
+          <th style="padding:8px; border:1px solid #ddd;">Result</th>
+          <th style="padding:8px; border:1px solid #ddd;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-1</td>
+          <td style="padding:8px; border:1px solid #ddd;">8 actions at &ge;30 FPS</td>
+          <td style="padding:8px; border:1px solid #ddd;">TensorRT FP16 benchmark on Jetson</td>
+          <td style="padding:8px; border:1px solid #ddd;">~24ms/frame = 42fps theoretical, 30fps sustained</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-2</td>
+          <td style="padding:8px; border:1px solid #ddd;">Latency &le;150ms</td>
+          <td style="padding:8px; border:1px solid #ddd;">End-to-end measurement (camera &rarr; motor)</td>
+          <td style="padding:8px; border:1px solid #ddd;">~120ms (parallel CV + ROS pipeline)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-3</td>
+          <td style="padding:8px; border:1px solid #ddd;">Accuracy &ge;90% unseen person</td>
+          <td style="padding:8px; border:1px solid #ddd;">Holdout validation (128 samples, unseen person)</td>
+          <td style="padding:8px; border:1px solid #ddd;">96.8% (v11 deployed), 97.3% (v10)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-4</td>
+          <td style="padding:8px; border:1px solid #ddd;">CV+IMU fusion</td>
+          <td style="padding:8px; border:1px solid #ddd;">44 fusion unit tests + 28 integration tests + live sparring</td>
+          <td style="padding:8px; border:1px solid #ddd;">All tests pass, &gt;85% IMU confirmation rate</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-5</td>
+          <td style="padding:8px; border:1px solid #ddd;">On-device inference</td>
+          <td style="padding:8px; border:1px solid #ddd;">Jetson deployment (CV + LLM simultaneous)</td>
+          <td style="padding:8px; border:1px solid #ddd;">All models fit in ~2.5GB of 8GB shared memory</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-6</td>
+          <td style="padding:8px; border:1px solid #ddd;">Multiple AI styles</td>
+          <td style="padding:8px; border:1px solid #ddd;">5 Markov styles tested across 3 difficulty levels</td>
+          <td style="padding:8px; border:1px solid #ddd;">All 5 styles functional with weakness tracking</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">RI-7</td>
+          <td style="padding:8px; border:1px solid #ddd;">Local LLM coaching</td>
+          <td style="padding:8px; border:1px solid #ddd;">Live session tip generation + fallback test</td>
+          <td style="padding:8px; border:1px solid #ddd;">Tips every ~18s, 65 fallback tips operational</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pass</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.6.8 LIMITATIONS -->
+    <h2>5.3.6.8 Limitations</h2>
+
+    <p>All requirements were met, but several limitations remain:</p>
+
+    <ul>
+      <li>
+        <strong>Block class underrepresentation</strong>: Only 6 validation samples yield 66.7% accuracy.
+        More varied blocking data would improve this.
+      </li>
+      <li>
+        <strong>Glove occlusion</strong>: Heavy gloves occlude YOLO wrist keypoints at punch extension.
+        Mitigated by pose dropout augmentation and 12-frame temporal context, but remains a
+        fundamental single-camera constraint.
+      </li>
+      <li>
+        <strong>Camera viewpoint sensitivity</strong>: The model is tightly coupled to its training camera angle.
+        Different viewpoints require re-recording the entire dataset.
+      </li>
+      <li>
+        <strong>Single camera</strong>: No multi-view triangulation. Some punches appear identical from one viewpoint.
+      </li>
+      <li>
+        <strong>Jetson thermal constraints</strong>: Sustained high-load sessions (30fps CV + LLM) may cause
+        throttling. Adaptive frame rate and LLM timeout (20s) manage the thermal budget.
+      </li>
+      <li>
+        <strong>LLM generation quality</strong>: The 3B model with 128-token cap limits coaching depth.
+        Adequate for real-time tips, but post-session analysis can be generic.
+      </li>
+      <li>
+        <strong>D435i IMU kernel</strong>: The RealSense D435i's built-in IMU requires <code>hid_sensor_hub</code>,
+        unavailable on Jetson's Tegra kernel. Manual <code>--camera-pitch</code> is used as a workaround.
+      </li>
+    </ul>
+
+    <sl-divider></sl-divider>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="robot-intelligence-software.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: Dashboard & Analytics
+        </sl-button>
+      </a>
+      <a href="appendix-robot-intelligence.html">
+        <sl-button variant="default" size="medium">
+          Appendix: Robot Intelligence
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      &uarr; Top
+    </button>
+
+  </div>
+</body>
+</html>

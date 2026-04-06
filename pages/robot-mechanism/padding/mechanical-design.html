@@ -101,33 +101,173 @@
     <!-- STRIKE-ZONE PLACEMENT -->
     <div>
       <h3>Strike-Zone Placement</h3>
+
       <h4>Anatomical Basis</h4>
       <p>
-        The robot must position its head and torso striking targets at anatomically
-        correct heights across a user range of 150 to 190 cm. Since the height
-        adjustment is a single-DOF screw jack, both targets move together with a
-        fixed vertical separation.
+        BoxBunny's striking targets correspond to two anatomical landmarks
+        commonly targeted in boxing: the head (chin level) and the torso
+        (solar plexus/liver region). The robot uses a single-DOF screw-jack
+        height adjustment, so both targets translate together with a fixed
+        vertical separation. This means the placement must be derived from
+        body-proportion data that scales predictably across the intended user
+        range of 150 to 190 cm.
       </p>
-      <h4>Scaling Across User Range</h4>
       <p>
-        Standard anthropometric proportions place the chin at approximately 87 to 92%
-        of standing height and the solar plexus (xiphoid process) at approximately
-        70 to 75% of standing height (Pheasant and Haslegrave, 2006). For a 170 cm
-        adult, this gives a head-to-torso separation of roughly 29 to 37 cm. The
-        robot's head and torso pad centres were set to a fixed separation of
-        approximately 34 cm, which sits at the midpoint of this anatomical range.
-        Applying the mean anthropometric ratios across the operating range gives
-        predicted head strike heights of approximately 138 cm (at 150 cm user height)
-        to 175 cm (at 190 cm user height), consistent with the screw jack's 400 mm
+        Published anthropometric data (Pheasant and Haslegrave, 2006) places
+        the chin at approximately 87 to 92% of standing stature and the
+        xiphoid process (solar plexus) at approximately 70 to 75% of standing
+        stature. The xiphoid process marks the lower boundary of the sternum
+        and sits directly above the solar plexus and liver, making it a
+        reliable skeletal reference for the torso strike zone. These ratios
+        are consistent across adult populations when expressed as proportions
+        of stature, allowing the robot to scale its targets using two
+        dimensionless ratios:
+      </p>
+      <ul>
+        <li><strong>r<sub>head</sub> = 0.92</strong> (chin height / stature, midpoint of 0.87 to 0.92 range)</li>
+        <li><strong>r<sub>torso</sub> = 0.72</strong> (xiphoid height / stature, midpoint of 0.70 to 0.75 range)</li>
+      </ul>
+
+      <h4>Design Envelope</h4>
+      <p>
+        Applying these ratios across the 150 to 190 cm operating range defines
+        the vertical envelope that the screw jack must cover:
+      </p>
+
+      <table class="spec-table" style="max-width:550px;">
+        <thead>
+          <tr>
+            <th>Target</th>
+            <th>@ 150 cm user</th>
+            <th>@ 190 cm user</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Head strike height</strong></td>
+            <td>138 cm</td>
+            <td>175 cm</td>
+          </tr>
+          <tr>
+            <td><strong>Torso strike height</strong></td>
+            <td>108 cm</td>
+            <td>137 cm</td>
+          </tr>
+          <tr>
+            <td><strong>Head-torso separation</strong></td>
+            <td>30 cm</td>
+            <td>38 cm</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        The head-torso separation varies from approximately 30 cm (shorter
+        users) to 38 cm (taller users), with a mean of approximately 34 cm.
+        Because the screw jack moves both pads as a unit, the robot adopts a
+        fixed vertical separation of 34 cm between the head and torso pad
+        centres. The total vertical travel required is 175 cm minus 138 cm =
+        37 cm for the head target, which falls within the screw jack's 400 mm
         stroke.
       </p>
-      <h4>Zone-Based Design</h4>
+
+      <!-- Annotated human silhouette SVG -->
+      <div style="width:100%; overflow-x:auto; margin:24px 0;">
+        <svg viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:520px; height:auto; font-family:system-ui, sans-serif; display:block; margin:0 auto;">
+
+          <!-- 150 cm user (left) -->
+          <!-- Body outline -->
+          <ellipse cx="120" cy="60" rx="16" ry="19" fill="none" stroke="#1565c0" stroke-width="2"/>
+          <line x1="120" y1="79" x2="120" y2="180" stroke="#1565c0" stroke-width="2"/>
+          <line x1="120" y1="100" x2="90" y2="150" stroke="#1565c0" stroke-width="2"/>
+          <line x1="120" y1="100" x2="150" y2="150" stroke="#1565c0" stroke-width="2"/>
+          <line x1="120" y1="180" x2="100" y2="290" stroke="#1565c0" stroke-width="2"/>
+          <line x1="120" y1="180" x2="140" y2="290" stroke="#1565c0" stroke-width="2"/>
+
+          <!-- Head strike zone (chin) -->
+          <line x1="60" y1="75" x2="170" y2="75" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <rect x="155" y="66" width="60" height="18" rx="3" fill="#e53935"/>
+          <text x="185" y="79" text-anchor="middle" fill="white" font-size="10" font-weight="bold">138 cm</text>
+
+          <!-- Torso strike zone (xiphoid) -->
+          <line x1="60" y1="133" x2="170" y2="133" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <rect x="155" y="124" width="60" height="18" rx="3" fill="#2e7d32"/>
+          <text x="185" y="137" text-anchor="middle" fill="white" font-size="10" font-weight="bold">108 cm</text>
+
+          <!-- Separation annotation -->
+          <line x1="55" y1="75" x2="55" y2="133" stroke="#555" stroke-width="1"/>
+          <line x1="50" y1="75" x2="60" y2="75" stroke="#555" stroke-width="1"/>
+          <line x1="50" y1="133" x2="60" y2="133" stroke="#555" stroke-width="1"/>
+          <text x="48" y="108" text-anchor="end" fill="#555" font-size="9">30 cm</text>
+
+          <!-- Ground line and height label -->
+          <line x1="80" y1="290" x2="160" y2="290" stroke="#999" stroke-width="1"/>
+          <text x="120" y="310" text-anchor="middle" fill="#1565c0" font-size="12" font-weight="bold">150 cm user</text>
+
+          <!-- Ratio labels -->
+          <text x="120" y="340" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">head</tspan> = 0.92</text>
+          <text x="120" y="355" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">torso</tspan> = 0.72</text>
+
+          <!-- 190 cm user (right) -->
+          <!-- Body outline (taller) -->
+          <ellipse cx="380" cy="38" rx="18" ry="21" fill="none" stroke="#1565c0" stroke-width="2"/>
+          <line x1="380" y1="59" x2="380" y2="175" stroke="#1565c0" stroke-width="2"/>
+          <line x1="380" y1="82" x2="345" y2="140" stroke="#1565c0" stroke-width="2"/>
+          <line x1="380" y1="82" x2="415" y2="140" stroke="#1565c0" stroke-width="2"/>
+          <line x1="380" y1="175" x2="355" y2="290" stroke="#1565c0" stroke-width="2"/>
+          <line x1="380" y1="175" x2="405" y2="290" stroke="#1565c0" stroke-width="2"/>
+
+          <!-- Head strike zone (chin) -->
+          <line x1="310" y1="55" x2="435" y2="55" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <rect x="420" y="46" width="60" height="18" rx="3" fill="#e53935"/>
+          <text x="450" y="59" text-anchor="middle" fill="white" font-size="10" font-weight="bold">175 cm</text>
+
+          <!-- Torso strike zone (xiphoid) -->
+          <line x1="310" y1="120" x2="435" y2="120" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <rect x="420" y="111" width="60" height="18" rx="3" fill="#2e7d32"/>
+          <text x="450" y="124" text-anchor="middle" fill="white" font-size="10" font-weight="bold">137 cm</text>
+
+          <!-- Separation annotation -->
+          <line x1="305" y1="55" x2="305" y2="120" stroke="#555" stroke-width="1"/>
+          <line x1="300" y1="55" x2="310" y2="55" stroke="#555" stroke-width="1"/>
+          <line x1="300" y1="120" x2="310" y2="120" stroke="#555" stroke-width="1"/>
+          <text x="298" y="92" text-anchor="end" fill="#555" font-size="9">38 cm</text>
+
+          <!-- Ground line and height label -->
+          <line x1="335" y1="290" x2="425" y2="290" stroke="#999" stroke-width="1"/>
+          <text x="380" y="310" text-anchor="middle" fill="#1565c0" font-size="12" font-weight="bold">190 cm user</text>
+
+          <!-- Ratio labels -->
+          <text x="380" y="340" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">head</tspan> = 0.92</text>
+          <text x="380" y="355" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">torso</tspan> = 0.72</text>
+
+          <!-- Centre annotation: fixed 34 cm -->
+          <rect x="210" y="155" width="100" height="40" rx="6" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
+          <text x="260" y="173" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">Fixed: 34 cm</text>
+          <text x="260" y="187" text-anchor="middle" fill="#777" font-size="9">(design mean)</text>
+
+          <!-- Legend -->
+          <line x1="175" y1="390" x2="200" y2="390" stroke="#e53935" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="208" y="394" fill="#333" font-size="9">Head (chin) strike zone</text>
+          <line x1="330" y1="390" x2="355" y2="390" stroke="#2e7d32" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="363" y="394" fill="#333" font-size="9">Torso (xiphoid) strike zone</text>
+        </svg>
+      </div>
+      <sub style="display:block; text-align:center; margin-top:4px; font-style:italic; font-size:0.9rem;">
+        Figure: Strike-zone heights at the operating range extremes, derived from anthropometric ratios (Pheasant and Haslegrave, 2006).
+      </sub>
+
+      <h4>Zone-Based Pad Sizing</h4>
       <p>
-        Because the fixed 34 cm separation cannot perfectly match every user's
-        individual proportions, the pads are designed as zones rather than single
-        points. Sizing the pads tall enough ensures that users of varying body
-        proportions still experience a hittable, anatomically reasonable target
-        without requiring independent vertical adjustment of each pad.
+        The fixed 34 cm separation is the mean of the anatomical range
+        (30 to 38 cm). For shorter users, the actual head-torso gap is
+        smaller than 34 cm, so the pads overlap slightly in coverage. For
+        taller users, the gap is larger, leaving a small uncovered region
+        between pads. To accommodate this variation without adding mechanical
+        complexity, the pads are designed as vertically extended zones rather
+        than point targets. Sizing each pad tall enough to span the
+        inter-user variation ensures that the head and torso remain hittable
+        across the full 150 to 190 cm range.
       </p>
     </div>
 
@@ -413,6 +553,25 @@
         degrading both surface finish and mechanical strength (Di Caprio et al.,
         2025). For a part of this size, a dry-box filament feed system would be
         necessary.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- FUTURE WORK: VARIABLE RATIO -->
+    <div>
+      <h3>Future Work: Variable Head-Torso Ratio</h3>
+      <p>
+        The current design uses a fixed 34 cm head-torso separation derived
+        from mean anthropometric proportions. In practice, the ratio between
+        head and torso height is not constant across statures: shorter
+        individuals tend to have a proportionally smaller head-torso gap than
+        taller individuals (approximately 30 cm at 150 cm versus 38 cm at
+        190 cm). A future revision could introduce a second degree of freedom,
+        for example a secondary linear actuator or adjustable mounting rail,
+        to allow the head-torso spacing to scale with user height. This would
+        improve anatomical accuracy at the extremes of the operating range,
+        at the cost of additional mechanical complexity and calibration.
       </p>
     </div>
 

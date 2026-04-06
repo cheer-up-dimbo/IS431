@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.3.3 Computer Vision & Action Recognition</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="/components/report-nav/report-nav.js" defer></script>
+  <style>
+    .video-grid-4col {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .video-grid-4col .video-cell video {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+    .video-grid-4col .video-cell sub {
+      display: block;
+      margin-top: 4px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: #555;
+    }
+    @media (max-width: 800px) {
+      .video-grid-4col { grid-template-columns: repeat(2, 1fr); }
+    }
+    .page-nav-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 32px 0 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="robot-intelligence.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Intelligence
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- 5.3.3 INTRO -->
+    <h2>5.3.3 Computer Vision & Action Recognition</h2>
+
+    <p>
+      The CV subsystem delivers three functions: the <strong>action prediction model</strong> (core),
+      <strong>reaction time detection</strong>, and <strong>human tracking</strong>. The latter two consume
+      processed frames from the action prediction pipeline rather than running independent perception stacks.
+    </p>
+
+    <p>
+      The action prediction model classifies 8 boxing actions (jab, cross, left/right hook, left/right uppercut,
+      block, idle) in real time -- before the punch completes. It uses a single Intel RealSense D435i RGB-D camera
+      mounted on the robot. Key constraints: punches travel toward the camera with heavy glove occlusion at extension,
+      only the upper body is visible, and inference must run on an NVIDIA Jetson Orin Nano at 30fps.
+    </p>
+
+    <div style="margin:12px 0;">
+      <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
+        <sl-button variant="default" size="small">
+          <sl-icon slot="prefix" name="github"></sl-icon>
+          Action Recognition Repository
+        </sl-button>
+      </a>
+    </div>
+
+    <image-component tag="image" source="../assets/robot_intelligence/needs_to_features.png" subtitle="Product needs mapped to CV functions -- action prediction feeds both reaction time detection and human tracking"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.3.1 MODEL ARCHITECTURE -->
+    <h2>5.3.3.1 Model Architecture</h2>
+    <h3>FusionVoxelPoseTransformerModel (~1.75M parameters)</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Component</th>
+          <th style="padding:8px; border:1px solid #ddd;">Input</th>
+          <th style="padding:8px; border:1px solid #ddd;">Output</th>
+          <th style="padding:8px; border:1px solid #ddd;">Key Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Voxel Branch</td>
+          <td style="padding:8px; border:1px solid #ddd;">12&sup3; grid &times; 2 channels</td>
+          <td style="padding:8px; border:1px solid #ddd;">192-dim</td>
+          <td style="padding:8px; border:1px solid #ddd;">Conv3D stem, delta@2 (67ms) + delta@8 (267ms)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Pose Branch</td>
+          <td style="padding:8px; border:1px solid #ddd;">42-dim (7 keypoints)</td>
+          <td style="padding:8px; border:1px solid #ddd;">64-dim</td>
+          <td style="padding:8px; border:1px solid #ddd;">Confidence-gated, same YOLO for train/inference</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Fusion</td>
+          <td style="padding:8px; border:1px solid #ddd;">256-dim concat</td>
+          <td style="padding:8px; border:1px solid #ddd;">192-dim</td>
+          <td style="padding:8px; border:1px solid #ddd;">Linear projection + LayerNorm</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Transformer</td>
+          <td style="padding:8px; border:1px solid #ddd;">12-frame window</td>
+          <td style="padding:8px; border:1px solid #ddd;">384-dim</td>
+          <td style="padding:8px; border:1px solid #ddd;">4 layers, 8 heads, causal masking</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Classifier</td>
+          <td style="padding:8px; border:1px solid #ddd;">384-dim</td>
+          <td style="padding:8px; border:1px solid #ddd;">8 classes</td>
+          <td style="padding:8px; border:1px solid #ddd;">Mean+max pool &rarr; MLP</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The <strong>voxel branch</strong> uses a person-centred 12&sup3; occupancy grid (~13cm per voxel) with two
+      temporal delta channels capturing short-term punch onset (delta@2, 67ms) and full arc trajectory (delta@8, 267ms).
+      The <strong>pose branch</strong> extracts 7 upper-body keypoints via <code>yolo26n-pose.pt</code>, encoding
+      normalised coordinates, confidence scores, arm extension ratios, shoulder rotation, elbow angles, and velocities
+      into a 42-dim feature vector.
+    </p>
+
+    <p>
+      <strong>Confidence gating</strong> is a key design decision: the pose output is scaled by mean YOLO joint
+      confidence. When YOLO is uncertain (e.g., glove occlusion at punch extension), pose is suppressed and the model
+      falls back to voxel-only classification. This graceful degradation is reinforced during training through
+      clip-level pose dropout (15%) and per-joint dropout (10%, simulating wrist occlusion by gloves).
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/model_architecture.svg" subtitle="Figure: FusionVoxelPoseTransformer Architecture -- dual-branch fusion with transformer temporal encoding"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.3.2 FEATURE EXPLORATION -->
+    <h2>5.3.3.2 Feature Exploration</h2>
+    <h3>Development Journey</h3>
+
+    <p>
+      The final architecture emerged through 9 major iterations, each addressing specific failure modes of the previous approach.
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">#</th>
+          <th style="padding:8px; border:1px solid #ddd;">Approach</th>
+          <th style="padding:8px; border:1px solid #ddd;">Accuracy</th>
+          <th style="padding:8px; border:1px solid #ddd;">Key Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">1</td>
+          <td style="padding:8px; border:1px solid #ddd;">2D Pose (YouTube + LSTM)</td>
+          <td style="padding:8px; border:1px solid #ddd;">High (on YouTube)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Validated pipeline. YouTube angles did not match robot-mounted camera.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">2</td>
+          <td style="padding:8px; border:1px solid #ddd;">3D Pose (RealSense depth lifting)</td>
+          <td style="padding:8px; border:1px solid #ddd;">~67%</td>
+          <td style="padding:8px; border:1px solid #ddd;">Boxing gloves occlude wrist keypoints at the moment detection matters most.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">3</td>
+          <td style="padding:8px; border:1px solid #ddd;">Raw RGBD + 3D CNNs (Swin3D, 88M params)</td>
+          <td style="padding:8px; border:1px solid #ddd;">N/A</td>
+          <td style="padding:8px; border:1px solid #ddd;">Model too large for edge hardware.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">4</td>
+          <td style="padding:8px; border:1px solid #ddd;">RGBD + Segmentation + Causal Transformer</td>
+          <td style="padding:8px; border:1px solid #ddd;">N/A</td>
+          <td style="padding:8px; border:1px solid #ddd;">Still pixel-based, still required Colab for training.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">5</td>
+          <td style="padding:8px; border:1px solid #ddd;">Depth Feature Engineering (Z-Mask grid)</td>
+          <td style="padding:8px; border:1px solid #ddd;">N/A</td>
+          <td style="padding:8px; border:1px solid #ddd;">2D depth grid lost 3D spatial info. Hooks vs uppercuts indistinguishable.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">6</td>
+          <td style="padding:8px; border:1px solid #ddd;">Voxel + Colour Tracking</td>
+          <td style="padding:8px; border:1px solid #ddd;">~68%</td>
+          <td style="padding:8px; border:1px solid #ddd;">Required coloured gloves (red/green). HSV tracking unreliable in variable lighting.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">7</td>
+          <td style="padding:8px; border:1px solid #ddd;">Voxel-Only Transformer (12&sup3;)</td>
+          <td style="padding:8px; border:1px solid #ddd;">80.6%</td>
+          <td style="padding:8px; border:1px solid #ddd;">Left/right confusion: 19/56 jabs misclassified as cross (34% error).</td>
+        </tr>
+        <tr style="background:#e8f5e9;">
+          <td style="padding:8px; border:1px solid #ddd;"><strong>8</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Pose Fusion</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>97.3%</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Breakthrough.</strong> Pose eliminated left/right confusion completely. Full circle — pose returned.</td>
+        </tr>
+        <tr style="background:#e8f5e9;">
+          <td style="padding:8px; border:1px solid #ddd;"><strong>9</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Production (v11, Jetson)</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>96.8%</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Block annotation fix, TensorRT optimisation, parallel processing. <strong>Deployed.</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <sub>Table: Development iterations -- each built on specific failure modes of the previous</sub>
+
+    <h3>Feature Comparison</h3>
+
+    <div class="video-grid-4col">
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/1_rgbd_baseline.mp4"></video>
+        <sub>1. RGBD Baseline</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/2_2d_skeleton.mp4"></video>
+        <sub>2. 2D Skeleton</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/3_3d_skeleton_rgbd.mp4"></video>
+        <sub>3. 3D Skeleton + RGBD</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/4_voxel_delta.mp4"></video>
+        <sub>4. Voxel Delta</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/5_rgbd_bbox_crop.mp4"></video>
+        <sub>5. RGBD Bbox Crop</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/6_segmentation_depth.mp4"></video>
+        <sub>6. Segmentation + Depth</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/7_zmask_grid_com.mp4"></video>
+        <sub>7. Z-Mask Grid</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/8_glove_color_tracking.mp4"></video>
+        <sub>8. Colour Tracking</sub>
+      </div>
+    </div>
+
+    <p>Each video shows the same boxing footage processed through the corresponding feature extraction method.</p>
+
+    <div style="display:flex; gap:16px; align-items:center; margin:12px 0;">
+      <image-component tag="image" source="../assets/robot_intelligence/cv/coloured_gloves.jpg" subtitle="Red and green gloves used for colour-based hand identification (Iteration 6)" width="25%"></image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.3.3 DATA COLLECTION AND TRAINING -->
+    <h2>5.3.3.3 Data Collection and Training</h2>
+
+    <h3>Recording Infrastructure</h3>
+    <p>
+      A custom recording tool captures at 30fps (960&times;540 RGB + 848&times;480 depth) from a D435i mounted at ~1.5m height, 1-2m from the user.
+    </p>
+
+    <p>
+      <strong>Critical pipeline fix:</strong> Early recordings silently dropped depth frames (~15fps actual vs 30fps expected)
+      because the laptop could not write float32 depth arrays to an external SSD fast enough. The fix: a dedicated capture
+      thread running independently of disk I/O, an async writer thread with a 300-frame queue buffer, non-blocking enqueue,
+      and frame-drop diagnostics. All early data had to be re-collected and re-annotated from scratch.
+    </p>
+
+    <div class="video-row two-up">
+      <div class="video-box">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/recording_tool.png" subtitle="Recording tool interface with presets"></image-component>
+      </div>
+      <div class="video-box">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/camera_stand.jpg" subtitle="D435i camera on testing stand (used before robot was built)"></image-component>
+      </div>
+    </div>
+
+    <h3>Annotation</h3>
+    <p>
+      A custom timeline-based annotation tool (<code>annotate_punches_gui.py</code>) with drag-to-resize segments and
+      auto-save every 30 seconds. Punch segments span from the first preparatory cue (shoulder drop, hip rotation)
+      to full extension -- retraction is excluded because it looks similar across punch types.
+    </p>
+
+    <p>
+      <strong>Block annotation fix:</strong> Initially, block annotations covered only the onset (arms rising). This made
+      block onset indistinguishable from uppercut onset, hurting live inference. Extending annotations to cover the full
+      guard sequence (rise, hold, return) dramatically improved live block detection -- v10 had 97.3% validation accuracy
+      but poor live blocks; v11 had 96.8% validation but substantially better live performance due to this fix alone.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/annotation_freestyle.png" subtitle="Custom annotation GUI with timeline-based segment editing"></image-component>
+
+    <h3>Dataset</h3>
+    <p>
+      808 training segments from 2 people (7 clips) + 128 validation segments from 1 unseen person (1 clip), across
+      8 action classes. Class imbalance mitigated with balanced sampling and focal loss (&gamma;=1.5).
+    </p>
+
+    <p>
+      <strong>Data quality over architecture:</strong> Removing one person's inconsistent data improved accuracy from
+      92.8% to 97.3% (+4.5%) -- larger than any architecture change across 6 models tested. This was the single
+      biggest accuracy gain in the project.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/data_quality.svg" subtitle="Data curation had the largest impact on accuracy -- larger than any architecture change"></image-component>
+
+    <h3>Training</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+          <th style="padding:8px; border:1px solid #ddd;">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Epochs</td>
+          <td style="padding:8px; border:1px solid #ddd;">300 (early stop patience 60)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Batch size</td>
+          <td style="padding:8px; border:1px solid #ddd;">16</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Optimiser</td>
+          <td style="padding:8px; border:1px solid #ddd;">AdamW (LR 0.0005, weight decay 0.01)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">LR schedule</td>
+          <td style="padding:8px; border:1px solid #ddd;">Warmup 20 epochs &rarr; cosine decay to 1e-6</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Loss</td>
+          <td style="padding:8px; border:1px solid #ddd;">Focal loss (&gamma;=1.5) + label smoothing (0.03)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Best epoch</td>
+          <td style="padding:8px; border:1px solid #ddd;">73 / 133 trained</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Key augmentation -- horizontal flip</strong> (50%): exploits boxing's left/right symmetry by flipping the
+      voxel X-axis, swapping left/right pose features, and swapping labels (jab&harr;cross, left_hook&harr;right_hook,
+      left_uppercut&harr;right_uppercut), effectively doubling the dataset. Other augmentations: speed (0.8-1.2&times;),
+      voxel shift/cutout/stretch, multi-window (9, 12 frames).
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/pipeline.svg" subtitle="Training and deployment pipeline"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.3.4 ABLATION STUDY -->
+    <h2>5.3.3.4 Ablation Study</h2>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Mode</th>
+          <th style="padding:8px; border:1px solid #ddd;">Validation Accuracy</th>
+          <th style="padding:8px; border:1px solid #ddd;">What It Captures</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Pose only</td>
+          <td style="padding:8px; border:1px solid #ddd;">44.1%</td>
+          <td style="padding:8px; border:1px solid #ddd;">Joint positions but no spatial/3D motion context</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Voxel only</td>
+          <td style="padding:8px; border:1px solid #ddd;">80.6%</td>
+          <td style="padding:8px; border:1px solid #ddd;">3D motion trajectories but cannot distinguish left from right</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Both fused</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>97.3%</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Complete picture -- spatial motion + joint-level discrimination</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The branches provide genuinely complementary information. Without pose, 34% of jabs were misclassified as cross
+      because both produce identical "straight forward" voxel patterns -- only wrist positions from the pose stream
+      reveal which hand is punching. The voxel branch in turn captures 3D arc trajectories that distinguish hooks from
+      uppercuts, which 2D pose alone cannot represent. Fusion eliminated left/right confusion completely, yielding
+      a +16.7% gain over voxel-only.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/cv/ablation.svg" subtitle="Ablation study: both branches contribute unique information"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="robot-intelligence.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: Robot Intelligence
+        </sl-button>
+      </a>
+      <a href="robot-intelligence-integration.html">
+        <sl-button variant="default" size="medium">
+          Next: Intelligent Behaviour & Control
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      &uarr; Top
+    </button>
+
+  </div>
+</body>
+</html>

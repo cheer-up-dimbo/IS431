@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 920" width="1500" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1.5L8 5L2 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="920" fill="#FAFAF8"/>
+
+  <!-- TITLE (centered) -->
+  <text x="750" y="46" text-anchor="middle" font-size="34" font-weight="700" fill="#111">CV + IMU Sensor Fusion Pipeline</text>
+  <text x="750" y="72" text-anchor="middle" font-size="13.5" fill="#555">BoxBunny · punch_processor · Real-time action recognition and impact fusion</text>
+
+  <!-- LEGEND (top-right, compact) -->
+  <g transform="translate(1300,20)">
+    <rect width="190" height="76" rx="9" fill="#fff" stroke="#ccc" stroke-width="0.7"/>
+    <text x="14" y="18" font-size="11.5" font-weight="700" fill="#111">Legend</text>
+    <rect x="14" y="30" width="12" height="12" rx="2.5" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.6"/>
+    <text x="32" y="40" font-size="10" fill="#333">CV pipeline</text>
+    <rect x="104" y="30" width="12" height="12" rx="2.5" fill="#DBE9FA" stroke="#378ADD" stroke-width="0.6"/>
+    <text x="122" y="40" font-size="10" fill="#333">IMU pipeline</text>
+    <rect x="14" y="50" width="12" height="12" rx="2.5" fill="#D6F5E8" stroke="#1D9E75" stroke-width="0.6"/>
+    <text x="32" y="60" font-size="10" fill="#333">Fusion</text>
+    <rect x="104" y="50" width="12" height="12" rx="2.5" fill="#FAECE7" stroke="#D85A30" stroke-width="0.6"/>
+    <text x="122" y="60" font-size="10" fill="#333">Defense</text>
+  </g>
+
+  <!-- PAD CONSTRAINTS (far-right column, beside IMU boxes) -->
+  <g transform="translate(1310,230)">
+    <rect width="180" height="172" rx="8" fill="#fff" stroke="#ccc" stroke-width="0.6"/>
+    <text x="14" y="20" font-size="10" font-weight="700" fill="#555">PAD CONSTRAINTS</text>
+    <line x1="10" y1="28" x2="170" y2="28" stroke="#eee" stroke-width="0.4"/>
+    <text x="14" y="48" font-size="10" font-weight="600" fill="#444">centre</text>
+    <text x="14" y="62" font-size="9.5" fill="#666">jab, cross</text>
+    <text x="14" y="80" font-size="10" font-weight="600" fill="#444">left</text>
+    <text x="14" y="94" font-size="9.5" fill="#666">L hook, L uppercut</text>
+    <text x="14" y="112" font-size="10" font-weight="600" fill="#444">right</text>
+    <text x="14" y="126" font-size="9.5" fill="#666">R hook, R uppercut</text>
+    <text x="14" y="144" font-size="10" font-weight="600" fill="#444">head</text>
+    <text x="14" y="158" font-size="9.5" fill="#666">all punch types</text>
+  </g>
+
+  <!-- 8 CLASSES (below pad constraints) -->
+  <g transform="translate(1310,412)">
+    <rect width="180" height="108" rx="8" fill="#fff" stroke="#ccc" stroke-width="0.6"/>
+    <text x="14" y="20" font-size="10" font-weight="700" fill="#555">8 OUTPUT CLASSES</text>
+    <line x1="10" y1="28" x2="170" y2="28" stroke="#eee" stroke-width="0.4"/>
+    <text x="14" y="46" font-size="10.5" fill="#444">jab</text>
+    <text x="14" y="62" font-size="10.5" fill="#444">cross</text>
+    <text x="14" y="78" font-size="10.5" fill="#444">left hook</text>
+    <text x="14" y="94" font-size="10.5" fill="#444">right hook</text>
+    <text x="100" y="46" font-size="10.5" fill="#444">left uppercut</text>
+    <text x="100" y="62" font-size="10.5" fill="#444">right uppercut</text>
+    <text x="100" y="78" font-size="10.5" fill="#444">block</text>
+    <text x="100" y="94" font-size="10.5" fill="#444">idle</text>
+  </g>
+
+
+  <!-- SECTION DIVIDERS -->
+  <line x1="30" y1="100" x2="190" y2="100" stroke="#ccc" stroke-width="0.5"/>
+  <text x="30" y="114" font-size="10" font-weight="700" fill="#999" letter-spacing="1">SENSORS</text>
+
+  <line x1="30" y1="200" x2="190" y2="200" stroke="#B5AFF0" stroke-width="0.5"/>
+  <text x="30" y="214" font-size="10" font-weight="700" fill="#7F77DD" letter-spacing="1">CV PIPELINE</text>
+
+  <line x1="820" y1="200" x2="980" y2="200" stroke="#9AC5EE" stroke-width="0.5"/>
+  <text x="820" y="214" font-size="10" font-weight="700" fill="#378ADD" letter-spacing="1">IMU PIPELINE</text>
+
+  <line x1="30" y1="608" x2="190" y2="608" stroke="#8ED4B4" stroke-width="0.5"/>
+  <text x="30" y="622" font-size="10" font-weight="700" fill="#1D9E75" letter-spacing="1">FUSION ENGINE</text>
+
+  <line x1="30" y1="800" x2="190" y2="800" stroke="#ccc" stroke-width="0.5"/>
+  <text x="30" y="814" font-size="10" font-weight="700" fill="#999" letter-spacing="1">OUTPUTS</text>
+
+
+  <!-- ════════════ SENSORS ════════════ -->
+
+  <rect x="240" y="128" width="330" height="50" rx="10" fill="#EEECEA" stroke="#aaa" stroke-width="0.8"/>
+  <text x="405" y="150" text-anchor="middle" font-size="14.5" font-weight="700" fill="#111">Intel RealSense D435i</text>
+  <text x="405" y="168" text-anchor="middle" font-size="11" fill="#555">RGB 960×540 + Depth 848×480 @30 fps</text>
+
+  <rect x="900" y="128" width="330" height="50" rx="10" fill="#EEECEA" stroke="#aaa" stroke-width="0.8"/>
+  <text x="1065" y="150" text-anchor="middle" font-size="14.5" font-weight="700" fill="#111">Teensy 4.1 (micro-ROS)</text>
+  <text x="1065" y="168" text-anchor="middle" font-size="11" fill="#555">4× pad accelerometers @100 Hz</text>
+
+  <!-- Sensor → pipeline arrows -->
+  <line x1="405" y1="178" x2="405" y2="230" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="420" y="209" font-size="10.5" font-weight="500" fill="#444">RGB + Depth</text>
+
+  <line x1="1065" y1="178" x2="1065" y2="230" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="1080" y="209" font-size="10.5" font-weight="500" fill="#444">Raw accel</text>
+
+
+  <!-- ════════════ CV PIPELINE (3 high-level boxes) ════════════ -->
+
+  <!-- Stage 1: Perception (all dimension info INSIDE the box) -->
+  <rect x="210" y="230" width="390" height="66" rx="10" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+  <text x="405" y="256" text-anchor="middle" font-size="15" font-weight="700" fill="#26215C">Pose + depth perception</text>
+  <text x="405" y="276" text-anchor="middle" font-size="11" fill="#534AB7">YOLO Pose (7 keypoints, 42 dims) + Voxel grid (12³, 3,456 dims)</text>
+
+  <!-- Arrow with label to the SIDE, not on the line -->
+  <line x1="405" y1="296" x2="405" y2="340" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="420" y="324" font-size="10.5" font-weight="500" fill="#444">3,498 dims/frame</text>
+
+  <!-- Stage 2: Temporal + Model -->
+  <rect x="210" y="340" width="390" height="66" rx="10" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+  <text x="405" y="366" text-anchor="middle" font-size="15" font-weight="700" fill="#26215C">Temporal fusion + classification</text>
+  <text x="405" y="386" text-anchor="middle" font-size="11" fill="#534AB7">12-frame window (400 ms) → Transformer → 8 classes</text>
+
+  <line x1="405" y1="406" x2="405" y2="440" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+
+  <!-- Stage 3: Post-processing -->
+  <rect x="210" y="440" width="390" height="56" rx="10" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+  <text x="405" y="464" text-anchor="middle" font-size="15" font-weight="700" fill="#26215C">Post-processing</text>
+  <text x="405" y="484" text-anchor="middle" font-size="11" fill="#534AB7">EMA smoothing → Hysteresis → Causal state machine</text>
+
+  <!-- CV Output -->
+  <line x1="405" y1="496" x2="405" y2="540" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="420" y="524" font-size="10.5" font-weight="500" fill="#444">@30 Hz</text>
+
+  <rect x="270" y="540" width="270" height="42" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.7"/>
+  <text x="405" y="566" text-anchor="middle" font-size="13" font-weight="700" fill="#26215C">PunchDetection</text>
+
+
+  <!-- ════════════ TIMING PANEL (between pipelines) ════════════ -->
+  <g transform="translate(30,234)">
+    <rect width="130" height="186" rx="8" fill="#fff" stroke="#ddd" stroke-width="0.6"/>
+    <text x="65" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#555">TIMING</text>
+    <line x1="10" y1="28" x2="120" y2="28" stroke="#eee" stroke-width="0.4"/>
+    <text x="14" y="48" font-size="10" font-weight="600" fill="#444">YOLO Pose</text>
+    <text x="116" y="48" text-anchor="end" font-size="10" fill="#666">~6 ms</text>
+    <text x="14" y="68" font-size="10" font-weight="600" fill="#444">Voxel grid</text>
+    <text x="116" y="68" text-anchor="end" font-size="10" fill="#666">~2 ms</text>
+    <text x="14" y="88" font-size="10" font-weight="600" fill="#444">Temporal</text>
+    <text x="116" y="88" text-anchor="end" font-size="10" fill="#666">400 ms</text>
+    <text x="14" y="108" font-size="10" font-weight="600" fill="#444">Transformer</text>
+    <text x="116" y="108" text-anchor="end" font-size="10" fill="#666">~8 ms</text>
+    <text x="14" y="128" font-size="10" font-weight="600" fill="#444">Post-proc</text>
+    <text x="116" y="128" text-anchor="end" font-size="10" fill="#666">~1 ms</text>
+    <line x1="10" y1="140" x2="120" y2="140" stroke="#ddd" stroke-width="0.4"/>
+    <text x="14" y="160" font-size="10.5" font-weight="700" fill="#333">Total CV</text>
+    <text x="116" y="160" text-anchor="end" font-size="10.5" font-weight="700" fill="#333">~15 ms</text>
+    <text x="65" y="178" text-anchor="middle" font-size="9" fill="#777">(+400 ms temporal)</text>
+  </g>
+
+
+  <!-- ════════════ IMU PIPELINE ════════════ -->
+
+  <rect x="890" y="230" width="350" height="66" rx="10" fill="#DBE9FA" stroke="#378ADD" stroke-width="0.8"/>
+  <text x="1065" y="256" text-anchor="middle" font-size="15" font-weight="700" fill="#042C53">Signal processing</text>
+  <text x="1065" y="276" text-anchor="middle" font-size="11" fill="#185FA5">Gravity calibration → threshold 5.0 m/s² → debounce 350 ms</text>
+
+  <line x1="1065" y1="296" x2="1065" y2="340" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+
+  <rect x="890" y="340" width="350" height="66" rx="10" fill="#DBE9FA" stroke="#378ADD" stroke-width="0.8"/>
+  <text x="1065" y="366" text-anchor="middle" font-size="15" font-weight="700" fill="#042C53">Force + pad classification</text>
+  <text x="1065" y="386" text-anchor="middle" font-size="11" fill="#185FA5">Light (0.33) · Medium (0.66) · Hard (1.0)</text>
+  <text x="1065" y="402" text-anchor="middle" font-size="11" fill="#185FA5">4 pads: centre · left · right · head</text>
+
+  <line x1="1065" y1="406" x2="1065" y2="450" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="1080" y="434" font-size="10.5" font-weight="500" fill="#444">on impact</text>
+
+  <rect x="925" y="450" width="280" height="42" rx="8" fill="#DBE9FA" stroke="#378ADD" stroke-width="0.7"/>
+  <text x="1065" y="476" text-anchor="middle" font-size="13" font-weight="700" fill="#042C53">PunchEvent</text>
+
+
+  <!-- ════════════ CONVERGE TO FUSION ════════════ -->
+
+  <!-- PunchDetection → Fusion (label ABOVE arrow, not on it) -->
+  <path d="M405 582 L405 614 Q405 620 411 620 L460 620" fill="none" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="310" y="600" font-size="10.5" font-weight="500" fill="#444">CV buffer (0.8 s)</text>
+
+  <!-- PunchEvent → Fusion -->
+  <path d="M1065 492 L1065 660 Q1065 666 1059 666 L920 666" fill="none" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="1075" y="586" font-size="10.5" font-weight="500" fill="#444">IMU trigger</text>
+
+
+  <!-- ════════════ FUSION ENGINE ════════════ -->
+
+  <rect x="460" y="630" width="460" height="140" rx="12" fill="#D6F5E8" stroke="#1D9E75" stroke-width="1"/>
+  <text x="690" y="656" text-anchor="middle" font-size="16" font-weight="700" fill="#04342C">Sensor fusion engine</text>
+  <text x="690" y="676" text-anchor="middle" font-size="11.5" fill="#0F6E56">IMU event triggers query of CV prediction buffer by pad constraints</text>
+
+  <rect x="478" y="690" width="134" height="36" rx="6" fill="#B8E8D2" stroke="#1D9E75" stroke-width="0.5"/>
+  <text x="545" y="705" text-anchor="middle" font-size="10" font-weight="600" fill="#085041">CV + IMU match</text>
+  <text x="545" y="720" text-anchor="middle" font-size="9" fill="#0F6E56">frame-count voting</text>
+
+  <rect x="624" y="690" width="134" height="36" rx="6" fill="#B8E8D2" stroke="#1D9E75" stroke-width="0.5"/>
+  <text x="691" y="705" text-anchor="middle" font-size="10" font-weight="600" fill="#085041">CV-only fallback</text>
+  <text x="691" y="720" text-anchor="middle" font-size="9" fill="#0F6E56">3+ frames, conf ≥ 0.6</text>
+
+  <rect x="770" y="690" width="134" height="36" rx="6" fill="#B8E8D2" stroke="#1D9E75" stroke-width="0.5"/>
+  <text x="837" y="705" text-anchor="middle" font-size="10" font-weight="600" fill="#085041">IMU-only fallback</text>
+  <text x="837" y="720" text-anchor="middle" font-size="9" fill="#0F6E56">infer type from pad</text>
+
+  <text x="690" y="755" text-anchor="middle" font-size="10" fill="#0F6E56" font-style="italic">Pad constraint violation → reclassify via secondary predictions (conf ≥ 0.25)</text>
+
+
+  <!-- Defense Detection -->
+  <rect x="980" y="640" width="310" height="90" rx="12" fill="#FAECE7" stroke="#D85A30" stroke-width="0.8"/>
+  <text x="1135" y="668" text-anchor="middle" font-size="15" font-weight="700" fill="#4A1B0C">Defense detection</text>
+  <text x="1135" y="688" text-anchor="middle" font-size="11" fill="#993C1D">RobotCommand → open 500 ms window</text>
+  <text x="1135" y="708" text-anchor="middle" font-size="11" fill="#993C1D">Accumulate: arm strikes + CV blocks + tracking</text>
+  <text x="1135" y="724" text-anchor="middle" font-size="11" fill="#993C1D">Classify: HIT > BLOCK > SLIP > DODGE</text>
+
+  <line x1="920" y1="680" x2="978" y2="680" stroke="#888" stroke-width="0.8" stroke-dasharray="4 3"/>
+
+
+  <!-- ════════════ OUTPUTS ════════════ -->
+
+  <line x1="620" y1="770" x2="620" y2="822" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+
+  <rect x="440" y="822" width="360" height="56" rx="10" fill="#E4F0D5" stroke="#639922" stroke-width="0.8"/>
+  <text x="620" y="846" text-anchor="middle" font-size="15" font-weight="700" fill="#173404">ConfirmedPunch</text>
+  <text x="620" y="866" text-anchor="middle" font-size="11" fill="#3B6D11">{type, pad, level, force, cv_conf, imu_confirmed}</text>
+
+  <line x1="1135" y1="730" x2="1135" y2="822" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+
+  <rect x="975" y="822" width="320" height="56" rx="10" fill="#E4F0D5" stroke="#639922" stroke-width="0.8"/>
+  <text x="1135" y="846" text-anchor="middle" font-size="15" font-weight="700" fill="#173404">DefenseEvent</text>
+  <text x="1135" y="866" text-anchor="middle" font-size="11" fill="#3B6D11">{arm, punch_code, struck, defense_type}</text>
+
+  <text x="620" y="900" text-anchor="middle" font-size="10" fill="#777" font-style="italic">→ session_manager · analytics · drill_manager · sparring_engine · llm_node · GUI</text>
+  <text x="1135" y="900" text-anchor="middle" font-size="10" fill="#777" font-style="italic">→ session_manager · analytics · GUI</text>
+
+</svg>

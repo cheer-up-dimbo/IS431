@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Appendix 3 - GUI Interface</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .screenshot-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 24px 0;
+    }
+    .screenshot-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fafafa;
+      transition: box-shadow 0.2s;
+    }
+    .screenshot-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .screenshot-card img {
+      width: 100%;
+      display: block;
+    }
+    .screenshot-card .caption {
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+    .screenshot-card .caption h4 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+    }
+    .screenshot-card .caption p {
+      margin: 0;
+      color: #666;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+    @media (max-width: 700px) {
+      .screenshot-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#appendices" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Report
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Appendix 3: GUI Interface Screenshots</h2>
+    <p>
+      This appendix presents detailed screenshots of the BoxBunny GUI across all
+      major features and training modes. Each screenshot captures the interface as
+      rendered on the 10.1-inch touchscreen display (1280x800).
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- TRAINING MODES -->
+    <h3>Training Modes</h3>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/technique_drill.png" alt="Technique drill selection">
+        <div class="caption">
+          <h4>Technique Drills</h4>
+          <p>Difficulty tier selection for the 50-combo curriculum. Users choose from
+          Beginner (15 combos), Intermediate (20 combos), Advanced (15 combos), or
+          Self-Select to create custom sequences.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/custom_sequence_technique_drill.png" alt="Custom sequence builder">
+        <div class="caption">
+          <h4>Self-Select Sequence Builder</h4>
+          <p>Custom punch sequence creation interface. The left panel shows the
+          current sequence list, the right panel provides numpad-style buttons for
+          punch types (1-6) and defensive movements, and the bottom bar confirms
+          the selection.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/sparring_drill.png" alt="Sparring style selection">
+        <div class="caption">
+          <h4>Sparring Mode</h4>
+          <p>AI opponent style selection. Five styles are available: Boxer, Brawler,
+          Counter-Puncher, Pressure, and Switch. The description panel shows punch
+          type distribution and behavioral characteristics for each style.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/performance_drills.png" alt="Performance tests">
+        <div class="caption">
+          <h4>Performance Tests</h4>
+          <p>Three standalone assessment modes: Power (peak punch force via IMU),
+          Stamina (2-minute endurance with fatigue tracking), and Reaction Time
+          (CV-based response measurement with tier classification).</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- USER MANAGEMENT & ONBOARDING -->
+    <h3>User Management and Onboarding</h3>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/quick_assessment.png" alt="Proficiency assessment">
+        <div class="caption">
+          <h4>Proficiency Assessment</h4>
+          <p>Six-question assessment presented during signup to determine the user's
+          initial skill level. Responses are scored and mapped to Beginner,
+          Intermediate, or Advanced, which sets the default combo difficulty tier.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/preset.png" alt="Quick start presets">
+        <div class="caption">
+          <h4>Quick Start Presets</h4>
+          <p>Saved training configurations for one-tap session launch. Each preset
+          stores the training mode, difficulty, round count, work/rest timers, and
+          speed. Users can create, edit, and delete presets from the settings page.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- COACHING & AI -->
+    <h3>Coaching and AI Features</h3>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/coach_welcome_page.png" alt="Coach station">
+        <div class="caption">
+          <h4>Coach Station</h4>
+          <p>Group circuit training dashboard. The coach sets participant count (up to
+          30), selects a station preset, and manages the rotation. Recent session
+          history is shown at the bottom for quick reference.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/LLM_Chat.png" alt="LLM coaching chat">
+        <div class="caption">
+          <h4>AI Coaching Chat</h4>
+          <p>Post-session AI feedback interface. The chat area displays coaching
+          analysis at the top. Advanced settings at the bottom expose model
+          configuration (temperature, max tokens, context window, threads) for
+          development and tuning purposes.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ANALYTICS & HISTORY -->
+    <h3>Analytics and History</h3>
+
+    <div class="screenshot-grid">
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/history.png" alt="Session history">
+        <div class="caption">
+          <h4>Session History</h4>
+          <p>Unified history interface consolidating all training types. Users can
+          filter by mode (combo drills, sparring, performance tests) and view
+          per-session details including scores, punch counts, and trend indicators.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="../assets/gui/screenshots/guest_welcome_page.png" alt="Homepage">
+        <div class="caption">
+          <h4>Homepage</h4>
+          <p>Main landing page after login. Four training categories are presented
+          as large touch-friendly cards: Techniques, Sparring, Free Training, and
+          Performance. Quick Start and Settings are accessible from the top bar.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

@@ -200,55 +200,6 @@
       </ul>
     </div>
 
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 5. LOAD ANALYSIS FRAMEWORK                            -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Load Analysis Framework</h3>
-      <p>
-        The main loads on the yaw bearing were identified as:
-      </p>
-
-      <image-component
-        tag="image"
-        source="../../../assets/report appendix b/15-matrix-FBD Loads acting on Bearing.jpg"
-        subtitle="Figure: Free-Body Diagram of loads acting on the slewing bearing.">
-      </image-component>
-
-      <ul>
-        <li>
-          <strong>F<sub>a</sub> (Axial Load):</strong> Total vertical
-          load — primarily the weight of all rotating components above
-          the bearing (torso frame, arms, padding, sensors).
-        </li>
-        <li>
-          <strong>F<sub>r</sub> (Radial Load):</strong> Horizontal
-          punching forces and off-centre loads due to asymmetric mass
-          distribution.
-        </li>
-        <li>
-          <strong>M<sub>k</sub> (Tilting Moment):</strong> The most
-          critical load — arises from the robot's weight at a vertical
-          offset and punching forces applied at the head/torso height.
-          Calculated as M<sub>k</sub> = F × d, where d is the
-          perpendicular distance from the bearing centre.
-        </li>
-        <li>
-          <strong>M<sub>r</sub> (Friction Torque):</strong> Internal
-          resistance to rotation, dependent on bearing diameter, preload
-          and lubricant. Contributes to the baseline motor torque
-          requirement.
-        </li>
-      </ul>
-      <p>
-        A <strong>service factor (SF)</strong> is applied to nominal
-        loads to account for dynamic impacts — peak punch forces of up
-        to ~1.5 kN for average users generate short-duration tilting moments.
-      </p>
-    </div>
-
 
     <!-- BOTTOM NAVIGATION -->
     <div class="page-nav-row">
