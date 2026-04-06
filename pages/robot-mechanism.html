@@ -35,56 +35,13 @@
     <div id="robot-mechanism">
       <h2>5.2 Robot Mechanism</h2>
       <p>
-        The robot mechanism encompasses all physical hardware — mechanical
-        structures, actuators, sensors, and supporting electrical and firmware
-        systems — that together enable BoxBunny to behave as a realistic,
-        interactive boxing training partner rather than a static target. At the
-        system level, the mechanism has five principal responsibilities:
+        The robot mechanism encompasses all physical hardware, including mechanical structures, actuators, sensors, and supporting electrical and firmware elements, that together enable BoxBunny to operate as a realistic and interactive boxing training partner rather than a static target. At the system level, five principal functions are served by the mechanism: stable physical support capable of resisting punching-induced overturning moments; motorised yaw rotation for re-angling the upper body to present changing attack and defence lines; motorised vertical adjustment to match the robot's striking targets to users of different statures; impact-absorbing contact surfaces with embedded sensing for training analytics; and a high-velocity 2-DOF arm actuation mechanism capable of delivering anatomically correct jabs, hooks, and uppercuts.
       </p>
-      <ol>
-        <li>
-          <strong>Stable and safe base</strong> — resist punching-induced
-          overturning moments, protect the user's footwork space, and remain
-          portable for transport and public demonstrations.
-        </li>
-        <li>
-          <strong>Rotation about yaw axis</strong> — re-angle the robot to
-          present changing attack and defence lines during drills, replicating a
-          coach's pivoting footwork.
-        </li>
-        <li>
-          <strong>Height adjustability</strong> — match the robot's head and
-          torso targets to users of different statures so that striking zones
-          remain anatomically correct.
-        </li>
-        <li>
-          <strong>Impact-absorbing contact surfaces</strong> — provide
-          realistic, safe striking targets with embedded sensing for training
-          analytics.
-        </li>
-        <li>
-          <strong>Arm actuation</strong> — deliver targeted punches at
-          anatomically correct striking zones using a high-velocity 2-DOF
-          mechanism, enabling jabs, hooks, and uppercuts.
-        </li>
-      </ol>
-    <p>
-      <strong>Note on Project Scope:</strong> While full footwork movement technically requires 
-      both linear (forward-backward) and rotational (yaw) movement, the project was scoped down 
-      to ensure high-quality execution within our timeframe. The mechanical development was branched 
-      into two main phases: <strong>Phase 1</strong> handles static stability and the height adjustment 
-      subsystem, while <strong>Phase 2</strong> focuses on the rotation subsystem. Consequently, linear 
-      movement has been scoped out of the current mechanical prototype.
-    </p>
       <p>
-        These functions were decomposed from the broader project goals
-        established in the problem clarification and design methodology phases.
-        A key integration principle across all subsystems is that the mechanism
-        was designed <strong>from system-level behaviour downward</strong>,
-        rather than by combining isolated parts. The robot first had to remain
-        upright, safe, and spatially compact in a boxing environment. Only after
-        these high-level requirements were defined were they decomposed into
-        subsystem-level functions following the left side of the V-model.
+        It is noted that full footwork movement technically requires both linear forward-backward translation and rotational yaw motion. Mechanical development was phased to prioritise high-quality execution within the available timeframe: Phase 1 addressed static stability and the height adjustment subsystem, while Phase 2 focused on the rotation subsystem. Linear movement has therefore been scoped out of the current mechanical prototype.
+      </p>
+      <p>
+        These functions were decomposed from the broader project goals established during the problem clarification and design methodology phases. A key integration principle across all subsystems is that the mechanism was designed from system-level behaviour downward, rather than by combining isolated components. The robot was first required to remain upright, safe, and spatially compact within a boxing environment. Only after these high-level requirements were defined were they decomposed into subsystem-level design criteria following the left side of the V-model, as described in the System Design Narrative below.
       </p>
     </div>
 
@@ -151,7 +108,122 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. OVERALL SUBSYSTEM ARCHITECTURE                      -->
+    <!-- 3. SYSTEM DESIGN NARRATIVE (V-MODEL LEFT SIDE)         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>System Design Narrative</h3>
+      <p>
+        Following the V-Model framework, system-level requirements RM-1 through RM-7 were established before any subsystem design was initiated. These requirements were then decomposed into subsystem-level engineering criteria, each driving a dedicated development effort across mechanical, electrical, and firmware domains. The diagram below illustrates the BoxBunny-specific V-model: design decomposition on the left, fabrication and integration at the base, and verification closure on the right. Horizontal dashed lines indicate the correspondence between each design phase and its verification counterpart.
+      </p>
+
+      <!-- BoxBunny V-Model SVG Diagram -->
+      <div style="margin: 24px 0; text-align: center; overflow-x: auto;">
+        <svg viewBox="0 0 1200 510" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1200px; border-radius:12px; border:1px solid #e5e7eb; background:#fafafa;" overflow="visible">
+          <!-- Title -->
+          <text x="600" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#0f172a" font-family="sans-serif">BoxBunny — Systems Engineering V-Model</text>
+
+          <!-- V-arm: Design (blue) -->
+          <polyline points="220,80 330,210 445,335 600,435" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- V-arm: Verification (green) -->
+          <polyline points="980,80 870,210 755,335 600,435" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
+
+          <!-- Dashed horizontal connectors -->
+          <line x1="220" y1="80" x2="980" y2="80" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
+          <line x1="330" y1="210" x2="870" y2="210" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
+          <line x1="445" y1="335" x2="755" y2="335" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+          <!-- Design nodes -->
+          <circle cx="220" cy="80" r="18" fill="#2563eb" stroke="white" stroke-width="2.5"/>
+          <circle cx="330" cy="210" r="18" fill="#2563eb" stroke="white" stroke-width="2.5"/>
+          <circle cx="445" cy="335" r="18" fill="#2563eb" stroke="white" stroke-width="2.5"/>
+          <!-- Build node -->
+          <circle cx="600" cy="435" r="22" fill="#d97706" stroke="white" stroke-width="2.5"/>
+          <!-- Verification nodes -->
+          <circle cx="755" cy="335" r="18" fill="#16a34a" stroke="white" stroke-width="2.5"/>
+          <circle cx="870" cy="210" r="18" fill="#16a34a" stroke="white" stroke-width="2.5"/>
+          <circle cx="980" cy="80" r="18" fill="#16a34a" stroke="white" stroke-width="2.5"/>
+
+          <!-- Design labels (right-aligned) -->
+          <text x="202" y="67" text-anchor="end" font-size="12" font-weight="600" fill="#1e40af" font-family="sans-serif">Problem Definition</text>
+          <text x="202" y="82" text-anchor="end" font-size="10" fill="#64748b" font-family="sans-serif">System requirements RM-1 to RM-7</text>
+
+          <text x="312" y="197" text-anchor="end" font-size="12" font-weight="600" fill="#1e40af" font-family="sans-serif">System-Level Design</text>
+          <text x="312" y="212" text-anchor="end" font-size="10" fill="#64748b" font-family="sans-serif">Mech. stack, power and data architecture</text>
+
+          <text x="427" y="322" text-anchor="end" font-size="12" font-weight="600" fill="#1e40af" font-family="sans-serif">Subsystem Design</text>
+          <text x="427" y="337" text-anchor="end" font-size="10" fill="#64748b" font-family="sans-serif">Base, Rotation, Height, Padding, Arm</text>
+
+          <!-- Build label -->
+          <text x="600" y="474" text-anchor="middle" font-size="12" font-weight="600" fill="#92400e" font-family="sans-serif">Fabrication &amp; Assembly</text>
+          <text x="600" y="489" text-anchor="middle" font-size="10" fill="#78350f" font-family="sans-serif">Steel welding, 3D-printing, integration</text>
+
+          <!-- Verification labels (left-aligned) -->
+          <text x="773" y="322" text-anchor="start" font-size="12" font-weight="600" fill="#166534" font-family="sans-serif">Subsystem Validation</text>
+          <text x="773" y="337" text-anchor="start" font-size="10" fill="#64748b" font-family="sans-serif">Analysis, physical tests, benchmarks</text>
+
+          <text x="888" y="197" text-anchor="start" font-size="12" font-weight="600" fill="#166534" font-family="sans-serif">System Integration Testing</text>
+          <text x="888" y="212" text-anchor="start" font-size="10" fill="#64748b" font-family="sans-serif">RM-1 to RM-7 verification matrix</text>
+
+          <text x="998" y="67" text-anchor="start" font-size="12" font-weight="600" fill="#166534" font-family="sans-serif">System Acceptance</text>
+          <text x="998" y="82" text-anchor="start" font-size="10" fill="#64748b" font-family="sans-serif">Full boxing drill demonstration</text>
+
+          <!-- Legend -->
+          <rect x="20" y="476" width="12" height="12" fill="#2563eb" rx="2"/>
+          <text x="36" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Design decomposition</text>
+          <rect x="190" y="476" width="12" height="12" fill="#16a34a" rx="2"/>
+          <text x="206" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Verification &amp; validation</text>
+          <rect x="370" y="476" width="12" height="12" fill="#d97706" rx="2"/>
+          <text x="386" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Fabrication</text>
+          <line x1="465" y1="482" x2="492" y2="482" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="498" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Verification correspondence</text>
+        </svg>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Figure: BoxBunny Systems Engineering V-Model showing design decomposition (left, blue), fabrication at the base (orange), and verification closure (right, green). Dashed lines indicate requirement-to-verification correspondence at each level.
+        </sub>
+      </div>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Structural Foundation: Base and Rotation
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-1, RM-2, RM-4, RM-7</sl-badge>
+      </h4>
+      <p>
+        The trapezoidal base geometry resolves the tension between RM-1 (stability under punching loads) and RM-2 (compact footwork clearance) through a single geometric decision: the plan form is narrower at the front and wider at the rear, simultaneously increasing the restoring moment and reducing intrusion into the boxer's working zone. The rigid mounted plate at the top of the base serves as the geometric datum for the entire mechanism stack above. At the base of the stack, the rotation subsystem achieves RM-4 via a non-geared slewing bearing paired with an off-axis timing-belt drive, with outboard cam-follower supports extending anti-tilt resistance without enlarging the bearing footprint; full derivation is provided in Sections <a href="robot-mechanism/base.html">5.2.1</a> and <a href="robot-mechanism/rotation.html">5.2.2</a>.
+      </p>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Adaptive Height Targeting: Height Adjustment
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-3</sl-badge>
+      </h4>
+      <p>
+        The critical design insight is the separation of vertical lift from lateral structural resistance within a single assembly: the screw jack operates in axial compression only, while all punching-induced lateral loads are resolved by the telescopic column structure and Delrin wear-pad interfaces. This decoupling prevents screw binding and provides inherent fail-safe position retention through the self-locking geometry of the jack. Full design rationale and load analysis are documented in <a href="robot-mechanism/height-adjustment.html">Section 5.2.3</a>.
+      </p>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Impact Absorption and Sensing: Padding
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-6</sl-badge>
+      </h4>
+      <p>
+        The multi-layer padding architecture resolves the tension between energy absorption and sensing fidelity by separating these functions across distinct physical layers: polyethylene foam absorbs surface energy, anti-vibration isolation mounts protect the 3D-printed arm drivetrain, and MPU6050 IMUs are positioned at the interface layer where sufficient acceleration signal remains. Two firmware-level defects — an I²C bus hang caused by parasitic capacitance on long wires, and a Nyquist blind-spot in punch detection — were identified and resolved during integration. Full mechanical and electrical details are in <a href="robot-mechanism/padding.html">Section 5.2.4</a>.
+      </p>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Strike Delivery: Arm Actuation
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-5</sl-badge>
+      </h4>
+      <p>
+        The 2-DOF coaxial differential joint enables three strike types (jab, hook, uppercut) from a single compact pivot, with both actuators co-located at the pivot to minimise moment of inertia. Actuator platform selection iterated through servo and ODrive configurations before settling on the Damiao DM-J4310-2EC; a post-CDE Fair material revision replaced polymer shafts with a 6 mm stainless steel D-shaft to achieve sustained sparring capability. RM-5 is <em>partially fulfilled</em>: the arm's kinematic design is sufficient, but Damiao PID acceleration and deceleration ramps impose approximately 0.4 to 0.5 s of constant overhead per strike; the full analysis is in <a href="robot-mechanism/arm-actuation.html#limitations">Section 5.2.5 Limitations</a>.
+      </p>
+
+      <h4 style="margin-bottom: 8px;">System Integration</h4>
+      <p>
+        Three cross-cutting decisions unify all five subsystems: a dual-rail power architecture isolating the 24 V motor bus from the 12 V logic rail, preventing regenerative braking events from disrupting the control layer; a two-tier control hierarchy separating the deterministic 200 Hz firmware loop on the Teensy 4.0 from combat decision logic on the Jetson Orin NX under ROS 2; and a WiFi UDP link for the rotation axis, eliminating cable fatigue through the rotating base joint. The rigid mounted plate of the base closes the mechanical interface chain, propagating subsystem alignment upward through the entire stack.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. OVERALL SUBSYSTEM ARCHITECTURE                      -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Overall Subsystem Architecture</h3>
@@ -289,7 +361,7 @@
             <td style="padding:8px; border:1px solid #ddd;">Arm Actuation</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed timing: command 90° arc, measure completion time</td>
             <td style="padding:8px; border:1px solid #ddd;">90° in ≤ 0.25 s (jab, hook, and uppercut)</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#b45309; font-weight:bold;">Partial — kinematic speed achieved; Damiao PID ramps add ~0.4–0.5 s overhead. See <a href="robot-mechanism/arm-actuation.html#limitations">Section 5.2.5 Limitations</a>.</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-6</td>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Appendix 3 — Arm Actuation Supplementary</title>
+  <title>IS-431: Appendix 7 — Arm Actuation Troubleshooting</title>
   <link rel="icon" href="../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -32,13 +32,14 @@
     </a>
     <br>
 
-    <h2>Appendix 3: Arm Actuation — Testing, Evaluation and Troubleshooting</h2>
+    <h2>Appendix 7: Arm Actuation Troubleshooting</h2>
     <p>
-      This appendix consolidates the detailed testing and evaluation data (formerly
-      Section 5.2.5.5) and the full troubleshooting and iteration log (formerly
-      Section 5.2.5.6) for the arm actuation subsystem. Summary results and key
-      findings are presented in the main report at
+      This appendix consolidates the detailed troubleshooting and iteration log
+      for the arm actuation subsystem. Summary results and key findings are
+      presented in the main report at
       <a href="robot-mechanism/arm-actuation.html">Section 5.2.5 Arm Actuation</a>.
+      Full test data and benchmarks are documented in
+      <a href="robot-mechanism/arm-actuation/testing-evaluation.html">Section 5.2.5.5 Testing and Evaluation</a>.
     </p>
 
     <sl-divider></sl-divider>
@@ -47,7 +48,7 @@
     <!-- A3.1 TESTING AND EVALUATION                            -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>A3.1 Testing and Evaluation</h3>
+      <h3>Testing and Evaluation</h3>
       <p>
         This section presents the performance criteria, test procedures, results,
         and limitations of the arm actuation subsystem. Each test maps directly to
@@ -55,7 +56,7 @@
       </p>
 
       <!-- ─── Performance Criteria ─── -->
-      <h4>A3.1.1 Performance Criteria</h4>
+      <h4>Performance Criteria</h4>
       <p>
         The following measurable targets were established from the torque
         calculations (see <a href="appendix-upper.html">Appendix 1</a>),
@@ -106,7 +107,7 @@
       </table>
 
       <!-- ─── Test Results ─── -->
-      <h4>A3.1.2 Test Results</h4>
+      <h4>Test Results</h4>
       <p>
         Results from the speed test validation (N=43 tests, all 6 standard
         strikes) are presented below. PC-2, PC-3, and PC-4 require dedicated
@@ -162,7 +163,7 @@
       </table>
 
       <!-- ─── Speed Test Benchmark ─── -->
-      <h4 id="speed-test-benchmark">A3.1.3 Speed Test Benchmark (N = 43 Tests)</h4>
+      <h4 id="speed-test-benchmark">Speed Test Benchmark (N = 43 Tests)</h4>
       <p>
         A controlled strike-speed benchmark was conducted using the Speed Test tab
         across all 6 standard strikes at set speeds ranging from 10 to 30 rad/s,
@@ -296,7 +297,7 @@
     <!-- A3.2 TROUBLESHOOTING AND ITERATION                     -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>A3.2 Troubleshooting and Iteration</h3>
+      <h3>Troubleshooting and Iteration</h3>
       <p>
         This section presents the nine principal engineering defects encountered
         during integration, their root-cause analysis, and implemented resolutions.

@@ -505,111 +505,27 @@
           </tr>
         </tbody>
       </table>
+      <p>
+        Full test methodology, per-strike benchmark data, PID overhead analysis, and video evidence are documented in
+        <a href="arm-actuation/testing-evaluation.html">Section 5.2.5.5 Testing and Evaluation</a>.
+      </p>
+    </div>
 
-      <h4>Speed Benchmark Summary (N = 43, All 6 Strikes at 25 rad/s)</h4>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd;">Strike</th>
-            <th style="padding:8px; border:1px solid #ddd;">Arm</th>
-            <th style="padding:8px; border:1px solid #ddd;">Avg WU&rarr;AP (s)</th>
-            <th style="padding:8px; border:1px solid #ddd;">Avg Total (s)</th>
-            <th style="padding:8px; border:1px solid #ddd;">Peak System Power (W)</th>
-            <th style="padding:8px; border:1px solid #ddd;">Peak Current (A)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Jab</td>
-            <td style="padding:8px; border:1px solid #ddd;">Left</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.66</td>
-            <td style="padding:8px; border:1px solid #ddd;">1.24</td>
-            <td style="padding:8px; border:1px solid #ddd;">~10.5</td>
-            <td style="padding:8px; border:1px solid #ddd;">M1: 0.63, M2: 0.58</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Left Hook</td>
-            <td style="padding:8px; border:1px solid #ddd;">Left</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.67</td>
-            <td style="padding:8px; border:1px solid #ddd;">1.25</td>
-            <td style="padding:8px; border:1px solid #ddd;">~9.7</td>
-            <td style="padding:8px; border:1px solid #ddd;">M1: 0.57, M2: 0.59</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Left Uppercut</td>
-            <td style="padding:8px; border:1px solid #ddd;">Left</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.55</td>
-            <td style="padding:8px; border:1px solid #ddd;">1.09</td>
-            <td style="padding:8px; border:1px solid #ddd;">~10.1</td>
-            <td style="padding:8px; border:1px solid #ddd;">M1: 0.49, M2: 0.57</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Cross</td>
-            <td style="padding:8px; border:1px solid #ddd;">Right</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.61</td>
-            <td style="padding:8px; border:1px solid #ddd;">1.18</td>
-            <td style="padding:8px; border:1px solid #ddd;">~9.4</td>
-            <td style="padding:8px; border:1px solid #ddd;">M3: 0.61, M4: 0.63</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Right Hook</td>
-            <td style="padding:8px; border:1px solid #ddd;">Right</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.62</td>
-            <td style="padding:8px; border:1px solid #ddd;">1.20</td>
-            <td style="padding:8px; border:1px solid #ddd;">~8.6</td>
-            <td style="padding:8px; border:1px solid #ddd;">M3: 0.51, M4: 0.69</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Right Uppercut</td>
-            <td style="padding:8px; border:1px solid #ddd;">Right</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.57</td>
-            <td style="padding:8px; border:1px solid #ddd;">1.07</td>
-            <td style="padding:8px; border:1px solid #ddd;">~8.9</td>
-            <td style="padding:8px; border:1px solid #ddd;">M3: 0.52, M4: 0.62</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="6" style="padding:8px; border:1px solid #ddd; font-size:0.85rem; color:#555; font-style:italic;">
-              WU = Windup position, AP = Apex (strike) position. Timing measured via firmware timestamp delta.
-              All current values are motor-shaft readings from Damiao CAN telemetry.
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+    <sl-divider></sl-divider>
 
-      <sl-alert variant="success" open>
-        <sl-icon slot="icon" name="check-circle"></sl-icon>
-        <strong>Key Finding:</strong> Peak per-motor current never exceeded 0.69 A
-        across all 43 tests, representing 34% of the 2.0 A safety limit and less
-        than 5% of the 16 A theoretical stall current. Total arm peak power was
-        approximately 33 W against a theoretical maximum of 384 W (16 A stall &times; 24 V).
-        Zero safety trips were recorded.
-      </sl-alert>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 8. LIMITATIONS                                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="limitations">
+      <h3>5.2.5.0.8 Limitations</h3>
 
-      <sl-alert variant="primary" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>PID Overhead Note:</strong> Uppercuts are the fastest strike type
-        (0.55 s average WU&rarr;AP) due to shorter motor travel. The original 0.25 s
-        target was physically unachievable: the Damiao internal PID applies
-        acceleration and deceleration ramps adding approximately 0.4&ndash;0.5 s
-        of constant overhead regardless of set speed. The revised target of
-        &le; 0.70 s was met. See
-        <a href="arm-actuation/testing-evaluation.html">Section 5.2.5.5</a>
-        for full overhead analysis.
-      </sl-alert>
-
-      <div style="margin-top:24px;">
-        <h4>Video Evidence</h4>
-        <div class="video-row single">
-          <div class="video-box">
-            <video controls preload="metadata" style="width:100%; border-radius:8px;">
-              <source src="../../assets/upper_mechanism/videos/Arm_Chain_Execution.mp4" type="video/mp4">
-            </video>
-            <sub>Strike library chain execution — three sequential strikes (Jab, Left Hook, Uppercut) demonstrating vector alignment skip logic and proportional snap-back recovery. Recorded from GUI V4 during N=43 speed test session.</sub>
-          </div>
-        </div>
-      </div>
+      <h4>Damiao PID Firmware Acceleration and Deceleration Ramps</h4>
+      <p>
+        The most significant current limitation of the arm actuation subsystem is not a mechanical or electrical constraint, but a firmware one inherent to the Damiao DM-J4310-2EC actuator platform. The system-level requirement RM-5 specifies that a 90&deg; arm sweep must be completed in 0.25 s. Kinematic analysis and torque calculations confirm that the motor's rated output torque and top angular velocity are mechanically sufficient to achieve this target within the arm's moment of inertia; the physical system is not speed-limited by its mechanics. The limiting factor is the Damiao actuator's internal closed-loop PID controller, which applies a fixed acceleration ramp at the start of every commanded motion and a symmetric deceleration ramp approaching the target position, irrespective of the commanded speed setpoint. Across 43 validated speed-benchmark trials, this ramp overhead was measured at approximately 0.4 to 0.5 s per strike, constituting the dominant fraction of the total motion time.
+      </p>
+      <p>
+        As a consequence, the best recorded full-stroke time of 0.64 s (Left Jab at 30 rad/s) reflects the PID ramp overhead rather than a kinematic ceiling. The requirement target of 0.25 s could be approached only if the Damiao firmware were modified to reduce or eliminate its internal ramp profile, or if the actuator were replaced with a platform permitting direct torque or velocity control without internal position-loop overhead. For the purposes of this report, RM-5 is classified as <em>partially fulfilled</em>: the arm's kinematic design meets the intent of the requirement, and the shortfall is attributed specifically to an externally imposed firmware constraint rather than a design deficiency in the mechanical or electrical architecture. A full analysis of the PID overhead, including measured ramp profiles across all six strike types and speed setpoints, is documented in <a href="arm-actuation/testing-evaluation.html">Section 5.2.5.5 (Testing and Evaluation)</a>.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -631,7 +547,7 @@
     <div>
       <h3>Detailed Documentation</h3>
       <p>
-        Complete technical documentation is organised across four primary sections and two supplementary references:
+        Complete technical documentation is organised across five sections:
       </p>
       <div class="section-nav-grid">
         <a href="arm-actuation/design-ideation.html" class="section-nav-card">
@@ -654,16 +570,12 @@
           <h3>5.2.5.4 Firmware &amp; Software</h3>
           <p>200 Hz unified loop, GUI V4, Strike Library, ROS 2 interface</p>
         </a>
-        <a href="../appendix-arm.html#a3-1" class="section-nav-card">
+        <a href="arm-actuation/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
-          <h3>Appendix 3A &mdash; Testing &amp; Evaluation</h3>
-          <p>N=43 benchmark, PID overhead analysis, power budget validation (Appendix 3)</p>
+          <h3>5.2.5.5 Testing &amp; Evaluation</h3>
+          <p>N=43 benchmark, PID overhead analysis, power budget validation</p>
         </a>
-        <a href="../appendix-arm.html#a3-2" class="section-nav-card">
-          <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
-          <h3>Appendix 3B &mdash; Troubleshooting &amp; Iteration</h3>
-          <p>9 cross-layer defects: root-cause analysis and resolutions (Appendix 3)</p>
-        </a>
+
       </div>
     </div>
 

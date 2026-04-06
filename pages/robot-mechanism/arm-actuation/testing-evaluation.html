@@ -450,18 +450,15 @@
 
     <!-- ─── Video Evidence Slots ─── -->
     <div>
-      <h3>5.2.5.5.5 Media Placeholder</h3>
-      <p>
-        Test recordings will be added here as they are captured during
-        physical validation sessions.
-      </p>
-
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="camera-video"></sl-icon>
-        <strong>Media to be added:</strong> Video evidence for speed tests,
-        endurance runs, and FSM chain demonstrations. Save to
-        <code>assets/upper_mechanism/videos/</code>.
-      </sl-alert>
+      <h3>5.2.5.5.5 Video Evidence</h3>
+      <div class="video-row single">
+        <div class="video-box">
+          <video controls preload="metadata" style="width:100%; border-radius:8px;">
+            <source src="../../../assets/upper_mechanism/videos/Arm_Chain_Execution.mp4" type="video/mp4">
+          </video>
+          <sub>Strike library chain execution — three sequential strikes (Jab, Left Hook, Uppercut) demonstrating vector alignment skip logic and proportional snap-back recovery. Recorded from GUI V4 during N=43 speed test session.</sub>
+        </div>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -504,9 +501,9 @@
           Prev: Firmware &amp; Software
         </sl-button>
       </a>
-      <a href="troubleshooting.html">
+      <a href="../../robot-intelligence.html">
         <sl-button variant="default" size="medium">
-          Next: Troubleshooting
+          Next: 5.3 Robot Intelligence
           <sl-icon slot="suffix" name="arrow-right"></sl-icon>
         </sl-button>
       </a>

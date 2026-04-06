@@ -115,6 +115,7 @@
         { label: 'Appendix 4 - User Interview Questions', href: '/pages/appendix-interview-questions.html' },
         { label: 'Appendix 5 - Product Needs Mapping', href: '/pages/appendix-product-mapping.html' },
         { label: 'Appendix 6 - Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
+        { label: 'Appendix 7 - Arm Actuation Troubleshooting', href: '/pages/robot-mechanism/arm-actuation/troubleshooting.html' },
       ]
     },
     {
@@ -138,24 +139,17 @@
     ],
     '/pages/robot-mechanism/rotation.html': [
       { label: 'Design Ideation', href: '/pages/robot-mechanism/rotation/design-ideation.html' },
-      { label: 'Motion Axis Selection', href: '/pages/robot-mechanism/rotation/motion-axis-selection.html' },
-      { label: 'Bearing Selection', href: '/pages/robot-mechanism/rotation/bearing-selection.html' },
-      { label: 'Drive Architecture', href: '/pages/robot-mechanism/rotation/drive-architecture.html' },
-      { label: 'Outboard Support', href: '/pages/robot-mechanism/rotation/outboard-support.html' },
-      { label: 'Electrical & Control', href: '/pages/robot-mechanism/rotation/electrical-control.html' },
       { label: 'Mechanical Design', href: '/pages/robot-mechanism/rotation/mechanical-design.html' },
       { label: 'Load Analysis', href: '/pages/robot-mechanism/rotation/load-analysis.html' },
+      { label: 'Timing Belt Selection', href: '/pages/robot-mechanism/rotation/timing-belt-selection.html' },
+      { label: 'Electrical & Control', href: '/pages/robot-mechanism/rotation/electrical-control.html' },
       { label: 'Testing & Evaluation', href: '/pages/robot-mechanism/rotation/testing-evaluation.html' },
     ],
     '/pages/robot-mechanism/height-adjustment.html': [
-      { label: 'Concept Generation', href: '/pages/robot-mechanism/height-adjustment/concept-generation.html' },
       { label: 'Design Ideation', href: '/pages/robot-mechanism/height-adjustment/design-ideation.html' },
-      { label: 'Calculations & Sizing', href: '/pages/robot-mechanism/height-adjustment/calculations-sizing.html' },
-      { label: 'Structural Layout', href: '/pages/robot-mechanism/height-adjustment/structural-layout.html' },
       { label: 'Mechanical Design', href: '/pages/robot-mechanism/height-adjustment/mechanical-design.html' },
-      { label: 'Lift-Structure Separation', href: '/pages/robot-mechanism/height-adjustment/lift-structure-separation.html' },
-      { label: 'Electrical & Control', href: '/pages/robot-mechanism/height-adjustment/electrical-control.html' },
       { label: 'Load Analysis', href: '/pages/robot-mechanism/height-adjustment/load-analysis.html' },
+      { label: 'Electrical & Control', href: '/pages/robot-mechanism/height-adjustment/electrical-control.html' },
       { label: 'Testing & Evaluation', href: '/pages/robot-mechanism/height-adjustment/testing-evaluation.html' },
     ],
     '/pages/robot-mechanism/padding.html': [
@@ -170,7 +164,6 @@
       { label: 'Electrical Integration', href: '/pages/robot-mechanism/arm-actuation/electrical-integration.html' },
       { label: 'Firmware & Software', href: '/pages/robot-mechanism/arm-actuation/firmware-software.html' },
       { label: 'Testing & Evaluation', href: '/pages/robot-mechanism/arm-actuation/testing-evaluation.html' },
-      { label: 'Troubleshooting', href: '/pages/robot-mechanism/arm-actuation/troubleshooting.html' },
     ],
   };
 
