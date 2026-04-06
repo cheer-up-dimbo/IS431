@@ -1,164 +1,190 @@
     <div id="design-methodology">
       <h2>3. Design Methodology (Zakir)</h2>
       <p>
-        To translate the problem of interest and value propositions into actionable design
-        outcomes, this project adopted Pahl and Beitz (Pahl, Beitz, Feldhusen, & Grote, 2007)
-        approach to engineering design. Their framework emphasizes a logical, iterative progression
-        from problem definition to detailed realization, ensuring that all design decisions remain
-        traceable to user needs, competitor insights, and technical requirements.
+        This project uses the Pahl and Beitz (Pahl, Beitz, Feldhusen, &amp; Grote, 2007)
+        framework for clarification of task and concept generation, combined with
+        the Systems Engineering V-Model (INCOSE, 2023) to structure decomposition
+        and verification across all system levels.
       </p>
-      <p>
-       According to Pahl and Beitz (Pahl, Beitz, Feldhusen, & Grote, 2007), there are four main stages of design:
-      </p>
-
-      <ul>
-        <li>Clarification of Task: Involves understanding and defining the design problem, identifying user and technical requirements, and outlining key system functions.</li>
-        <li>Conceptual Design: Focuses on developing alternative principles and mechanisms that could satisfy these functions.</li>
-        <li>Embodiment Design: Refines selected concepts, assessing feasibility, structure, and integration across subsystems.</li>
-        <li>Detail Design: Finalizes the chosen concept for prototyping and testing.</li>
-      </ul>
-
-      <p>
-       Each phase is supported by specific design tools developed for this project:
-      </p>
-
-      <ul>
-        <li>Clarification of Task → Product Needs Translation</li>
-        <li>Conceptual Design → Solution Principles and Concept Generation</li>
-        <li>Embodiment Design → Concept Screening</li>
-        <li>Detail Design → Prototyping and Testing</li>
-      </ul>
-
-      <p>
-        Every choice, from determining market gaps to improving technical performance, was supported
-        by methodical reasoning through this organized design technique. It offered the engineering
-        expertise required to turn research findings into a logical, useful, and user-focused boxing
-        training program.
-      </p>
-
     </div>
 
     <div id="clarification-of-task">
       <h3>3.1 Clarification of Task</h3>
       <p>
         Insights from the competition study were first translated into specific product requirements
-        using the Product Needs Translation tool (Table 5), which identified important enhancements,
+        using the Product Needs Translation tool (Table 4), which identified important enhancements,
         performance standards, and user experience objectives. The Function Specifications, which included
         explicit functions, performance standards, and design justifications for the robot's subsystems
         (arms, head, legs, body, skeleton, and interface), were subsequently influenced by these translated
         needs.
       </p>
 
-      <table-component subtitle="Table 5: Product Needs Translation">
-        <div id="product-needs"></div>
-      </table-component>
+      <p>
+        The full product needs translation is available in
+        <a href="#annex-product-needs">Annex: Product Needs Translation</a>.
+      </p>
     </div>
 
     <div id="v-model">
       <h3>3.2 Systems Engineering V-Model</h3>
       <p>
-        While Pahl and Beitz provides the design-stage methodology for
-        generating and refining concepts, it does not prescribe how
-        <strong>verification and validation</strong> activities should be
-        structured across system levels. For this, the project adopted the
-        <strong>Systems Engineering V-Model</strong> — a lifecycle framework
-        that maps every decomposition step on the left side of the "V" to a
-        corresponding integration and verification step on the right side
-        (Forsberg, Mooz &amp; Cotterman, 2005).
+        The diagram below presents the V-Model adopted as the guiding design
+        and verification framework for BoxBunny (INCOSE, 2023). The left arm
+        decomposes a subsystem from its concept of operations down to
+        implementation, while the right arm verifies at each corresponding
+        level. Dashed horizontal lines represent traceability: every
+        requirement defined on the left has a pre-defined verification method
+        on the right.
       </p>
       <p>
-        The V-Model was originally introduced by Forsberg and Mooz (1991) to
-        address shortcomings of linear, waterfall-based system development by
-        emphasising the critical role of verification and validation (V&amp;V)
-        planning <em>concurrently with</em> requirements decomposition, rather
-        than as an afterthought. It has since been standardised for
-        mechatronic product development by VDI 2206 (2004), which positions
-        the V-Model as the macro-level process map for managing the
-        interdisciplinary integration of mechanical, electronic, and software
-        subsystems — precisely the challenge faced by BoxBunny.
+        This framework applies at every level of the system. Each of the three
+        subsystems (User Interface, Robot Mechanism, Robot Intelligence) enters
+        the V-Model at Concept of Operations and progresses through its own
+        system requirements, high-level design, detailed design, and
+        implementation. Within Robot Mechanism, the framework is applied again
+        at a finer granularity: each sub-subsystem (Base, Rotation, Height
+        Adjustment, Padding, Arm Actuation) derives its own requirements from
+        the mechanism-level requirements, generates and selects concepts, builds,
+        and verifies independently. The V-Model therefore operates recursively,
+        scaling from the full system down to individual components.
       </p>
 
-      <image-component
-        width="80%"
-        tag="image"
-        source="assets/design_methodology/v_model.png"
-        subtitle="Figure: The Systems Engineering V-Model (adapted from Forsberg, Mooz &amp; Cotterman, 2005). The left side decomposes system-level requirements into subsystem and component specifications; the right side integrates and verifies at each corresponding level.">
-      </image-component>
+      <!-- V-Model SVG Diagram -->
+      <div style="width:100%; overflow-x:auto; margin:24px 0;">
+        <svg viewBox="0 0 580 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; font-family:system-ui, sans-serif;">
+          <style>
+            .vnode { transition: opacity 0.2s; }
+            .vnode:hover { opacity: 0.8; }
+          </style>
 
-      <h4>Left Side — Decomposition and Definition</h4>
-      <p>
-        The left descending arm of the V represents the progressive
-        decomposition of the system from high-level concept of operations down
-        to detailed component design:
-      </p>
-      <ol>
-        <li><strong>Concept of Operations</strong> — establish the operational
-          context, user needs, and system-level goals (covered in Chapters 1–2
-          of this report).</li>
-        <li><strong>System Requirements</strong> — derive measurable,
-          testable requirements from the concept of operations (Section 3.1
-          and the performance criteria in Section 3).</li>
-        <li><strong>High-Level Design</strong> — decompose the system into
-          subsystems and define their interfaces (Section 4 — Final Design and
-          System Architecture).</li>
-        <li><strong>Detailed Design</strong> — design each subsystem's
-          mechanical, electrical, and firmware components in full detail
-          (Section 5 — Conceptual Design subsystem pages).</li>
-        <li><strong>Implementation</strong> — fabricate, assemble, and program
-          the physical prototype.</li>
-      </ol>
+          <!-- Connecting lines: left arm -->
+          <line x1="140" y1="42" x2="188" y2="90" stroke="#555" stroke-width="2"/>
+          <line x1="188" y1="122" x2="236" y2="170" stroke="#555" stroke-width="2"/>
+          <line x1="236" y1="202" x2="275" y2="240" stroke="#555" stroke-width="2"/>
+          <line x1="275" y1="272" x2="290" y2="287" stroke="#555" stroke-width="2"/>
 
-      <h4>Right Side — Integration and Recomposition</h4>
-      <p>
-        The right ascending arm mirrors the left side, with each
-        verification level mapped to the corresponding decomposition level:
-      </p>
-      <ol>
-        <li><strong>Unit / Device Testing</strong> — verify individual
-          components (motors, sensors, firmware modules) against their
-          detailed design specifications.</li>
-        <li><strong>Subsystem Verification</strong> — verify each integrated
-          subsystem (e.g., the rotation module, height-adjustment column, arm
-          actuation) against the subsystem-level requirements derived from
-          the system requirements.</li>
-        <li><strong>System Verification &amp; Deployment</strong> — verify the
-          fully integrated robot mechanism as a whole against the system-level
-          requirements (RM-1 through RM-7).</li>
-        <li><strong>System Validation</strong> — validate the complete system
-          against the original concept of operations through user testing and
-          performance assessment.</li>
-      </ol>
+          <!-- Connecting lines: right arm -->
+          <line x1="330" y1="287" x2="345" y2="272" stroke="#555" stroke-width="2"/>
+          <line x1="345" y1="240" x2="384" y2="202" stroke="#555" stroke-width="2"/>
+          <line x1="384" y1="170" x2="432" y2="122" stroke="#555" stroke-width="2"/>
+          <line x1="432" y1="90" x2="480" y2="42" stroke="#555" stroke-width="2"/>
 
-      <h4>Horizontal Traceability</h4>
-      <p>
-        The horizontal arrows connecting the left and right sides represent
-        <strong>verification plans</strong> that are defined during the
-        decomposition phase and executed during integration. For BoxBunny,
-        this means that every requirement established on the left side
-        (e.g., "remain upright under punching loads with FoS ≥ 1.5") has a
-        pre-defined test method on the right side (e.g., "tipping test with
-        applied load at maximum height extension").
-      </p>
-      <p>
-        This traceability is documented explicitly in the
-        <a href="pages/robot-mechanism.html">Robot Mechanism</a> section,
-        where each subsystem page links system requirements to subsystem
-        design criteria and verification methods.
-      </p>
+          <!-- Bottom V vertex -->
+          <line x1="290" y1="303" x2="330" y2="303" stroke="#555" stroke-width="2"/>
 
-      <h4>References</h4>
-      <ul style="font-size: 0.95rem; line-height: 1.7;">
-        <li>Forsberg, K. &amp; Mooz, H. (1991). The Relationship of System
-          Engineering to the Project Cycle.
-          <em>Proceedings of the First Annual Symposium of the National
-          Council on Systems Engineering (NCOSE)</em>, pp. 57–65.</li>
-        <li>Forsberg, K., Mooz, H. &amp; Cotterman, H. (2005).
-          <em>Visualizing Project Management: Models and Frameworks for
-          Mastering Complex Systems</em>, 3rd ed. John Wiley &amp; Sons.</li>
-        <li>INCOSE (2015). <em>Systems Engineering Handbook: A Guide for
-          System Life Cycle Processes and Activities</em>, 4th ed.
-          (INCOSE-TP-2003-002-04). John Wiley &amp; Sons.</li>
-        <li>VDI 2206 (2004). <em>Design Methodology for Mechatronic
-          Systems</em>. Verein Deutscher Ingenieure (VDI).</li>
-      </ul>
+          <!-- Horizontal traceability (dashed) -->
+          <line x1="140" y1="24" x2="480" y2="24" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+          <line x1="188" y1="104" x2="432" y2="104" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+          <line x1="236" y1="184" x2="384" y2="184" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+          <line x1="275" y1="254" x2="345" y2="254" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+
+          <!-- === LEFT ARM (Decomposition, blues) === -->
+          <g class="vnode">
+            <rect x="2" y="6" width="138" height="38" rx="5" fill="#1565c0"/>
+            <text x="71" y="30" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Concept of Ops</text>
+          </g>
+          <g class="vnode">
+            <rect x="50" y="86" width="138" height="38" rx="5" fill="#1976d2"/>
+            <text x="119" y="110" text-anchor="middle" fill="white" font-size="12" font-weight="bold">System Req.</text>
+          </g>
+          <g class="vnode">
+            <rect x="98" y="166" width="138" height="38" rx="5" fill="#1e88e5"/>
+            <text x="167" y="190" text-anchor="middle" fill="white" font-size="12" font-weight="bold">High-Level Design</text>
+          </g>
+          <g class="vnode">
+            <rect x="146" y="246" width="138" height="38" rx="5" fill="#2196f3"/>
+            <text x="215" y="270" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Detailed Design</text>
+          </g>
+
+          <!-- Implementation (vertex, neutral) -->
+          <g class="vnode">
+            <rect x="240" y="290" width="140" height="34" rx="5" fill="#546e7a"/>
+            <text x="310" y="312" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Implementation</text>
+          </g>
+
+          <!-- === RIGHT ARM (Verification, greens) === -->
+          <g class="vnode">
+            <rect x="332" y="246" width="138" height="38" rx="5" fill="#43a047"/>
+            <text x="401" y="270" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Unit Testing</text>
+          </g>
+          <g class="vnode">
+            <rect x="380" y="166" width="138" height="38" rx="5" fill="#388e3c"/>
+            <text x="449" y="186" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Subsystem</text>
+            <text x="449" y="199" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Verification</text>
+          </g>
+          <g class="vnode">
+            <rect x="428" y="86" width="138" height="38" rx="5" fill="#2e7d32"/>
+            <text x="497" y="110" text-anchor="middle" fill="white" font-size="12" font-weight="bold">System Validation</text>
+          </g>
+          <g class="vnode">
+            <rect x="476" y="6" width="138" height="38" rx="5" fill="#1b5e20"/>
+            <text x="545" y="30" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Deployed System</text>
+          </g>
+
+          <!-- Arm labels -->
+          <text x="30" y="155" text-anchor="middle" fill="#999" font-size="10" font-style="italic" transform="rotate(-50,30,155)">Decomposition</text>
+          <text x="550" y="155" text-anchor="middle" fill="#999" font-size="10" font-style="italic" transform="rotate(50,550,155)">Verification</text>
+        </svg>
+      </div>
+
+      <!-- Colour-coded legend table -->
+      <table style="width:100%; border-collapse:collapse; margin:8px 0 16px 0; font-size:0.92rem;">
+        <thead>
+          <tr>
+            <th style="padding:8px 12px; border:1px solid #ccc; background:#f8f9fa; text-align:left; width:24%;">Stage</th>
+            <th style="padding:8px 12px; border:1px solid #ccc; background:#f8f9fa; text-align:left;">Description</th>
+            <th style="padding:8px 12px; border:1px solid #ccc; background:#f8f9fa; text-align:left; width:34%;">BoxBunny Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#1565c0;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>Concept of Operations</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Define the operational context, user needs, and goals for the subsystem</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">For Robot Mechanism: the robot must rotate, adjust height, and deliver punches safely</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#1976d2;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>System Requirements</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Derive measurable, testable requirements from the concept of operations</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">RM-4: yaw angular velocity of ~150 deg/s; RM-5: 90 deg strike in 0.25 s or less</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#1e88e5;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>High-Level Design</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Decompose into sub-components and define interfaces between them</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Robot Mechanism splits into Base, Rotation, Height Adjustment, Padding, Arm Actuation</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#2196f3;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>Detailed Design</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Design each component in full detail: mechanical, electrical, and software</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Rotation: slewing bearing selection, timing-belt drive sizing, motor mounting</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#546e7a;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>Implementation</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Fabricate, assemble, and program the physical component or module</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Machine parts, wire motors, flash firmware</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#43a047;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>Unit Testing</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Verify individual components against their detailed design specifications</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Test motor torque output, sensor accuracy, firmware response time</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#388e3c;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>Subsystem Verification</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Verify the integrated subsystem against its derived system requirements</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">RM-4 test: measure actual yaw angular velocity of assembled rotation module</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#2e7d32;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>System Validation</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Validate the complete subsystem against original user needs and operational goals</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">User testing: does the robot feel like a realistic sparring partner?</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px; border:1px solid #ccc;"><span style="display:inline-block;width:12px;height:12px;background:#1b5e20;border-radius:3px;vertical-align:middle;margin-right:6px;"></span>Deployed System</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Validated and integrated subsystem ready for operation</td>
+            <td style="padding:8px 12px; border:1px solid #ccc;">Fully assembled BoxBunny platform deployed in a gym</td>
+          </tr>
+        </tbody>
+      </table>
+      <sub style="display:block; text-align:center; margin-top:4px; font-style:italic; font-size:0.9rem;">
+        Figure 5: Systems Engineering V-Model framework, adapted from INCOSE (2023). Applied recursively to each BoxBunny subsystem and sub-subsystem.
+      </sub>
     </div>

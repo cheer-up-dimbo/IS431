@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Appendix - User Interview Questions</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../components/table-component/table-component.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <script src="/components/report-nav/report-nav.js" defer></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#appendices" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Appendix: User Interview Questions</h2>
+    <p>
+      The following guiding questions were used during unstructured interviews
+      across six boxing gyms in Singapore. Questions were tailored to each
+      stakeholder segment.
+    </p>
+
+    <table-component subtitle="User Interview Questions">
+      <div id="interview-qn"></div>
+    </table-component>
+  </div>
+
+  <!-- Scroll to top button -->
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+  <script>
+    (function() {
+      var origRender = gridjs.Grid.prototype.render;
+      gridjs.Grid.prototype.render = function(el) {
+        if (!el) return this;
+        return origRender.call(this, el);
+      };
+    })();
+  </script>
+  <script src="../components/table-component/interview-qn.js"></script>
+</body>
+</html>
