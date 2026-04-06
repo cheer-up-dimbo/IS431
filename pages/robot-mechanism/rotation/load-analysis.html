@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Rotation Load Analysis &amp; Sizing</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .calc-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 20px 0; }
+    .calc-header { background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; color: #333; }
+    .calc-body { padding: 16px; font-size: 0.95rem; color: #444; }
+    .equation-box { background: #f4f7fa; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../rotation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Rotation Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Load Analysis &amp; Sizing</h2>
+    <p>
+      This page presents the engineering calculations that size the rotation subsystem: from the timing-belt transmission parameters to the structural and drive-side load requirements under worst-case punch scenarios.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. TIMING-BELT TRANSMISSION SIZING                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>1. Timing-Belt Transmission Sizing</h3>
+      <p>
+        The timing-belt transmission was developed through a structured selection process rather than by approximation alone. The drive is based on a 400 W ZD BLDC motor with a 25:1 gearbox, providing an output shaft speed of <strong>120 rpm</strong>.
+      </p>
+
+      <div class="calc-card">
+        <div class="calc-header">1. Target Speed &amp; Ideal Ratio</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The original yaw-speed target was approximately <strong>25 rpm</strong> (≈ 150&deg;/s). The required kinematic ratio was estimated as:</p>
+          <div class="equation-box">
+            i = n<sub>in</sub> / n<sub>out</sub> = 120 / 25 = <strong>4.8</strong>
+          </div>
+          <p style="margin-bottom: 0;">In ideal kinematic terms, the transmission stage requires approximately a 4.8:1 reduction.</p>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-header">2. Pulley Selection &amp; Packaging Compromise</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The selected belt series is <strong>S8M (8 mm pitch)</strong>. Based on minimum tooth-count guidelines and geometric packaging constraints around the inner bearing ring, the following pulleys were selected:</p>
+          <div class="equation-box">
+            Small Pulley = 20 Teeth<br>
+            Large Pulley = 60 Teeth
+          </div>
+          <p>This yields an actual pulley ratio of:</p>
+          <div class="equation-box">
+            i = 60 / 20 = <strong>3</strong>
+          </div>
+          <p style="margin-bottom: 0;">This reveals that the final pulley stage is a <strong>packaging-driven compromise</strong> (3:1) relative to the ideal target of 4.8:1. The final integrated yaw speed requires physical confirmation during testing.</p>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-header">3. Belt Dimensions &amp; Power Rating</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The belt was sized using a design power that includes an overload service factor (K<sub>s</sub> = 2.2):</p>
+          <div class="equation-box">
+            P<sub>d</sub> = 400 W &times; 2.2 = <strong>880 W (0.88 kW)</strong>
+          </div>
+          <p>Using the pitch-diameter relation (D<sub>p</sub> = pZ / &pi;), the pulley diameters are 152.78 mm and 50.92 mm. The standard belt length and centre distance converged to:</p>
+          <div class="equation-box">
+            Belt Length (Pitch) &approx; <strong>944 mm</strong><br>
+            Centre Distance (C) = <strong>352.6 mm</strong><br>
+            Belt Width (B<sub>w</sub>) = <strong>30 mm</strong>
+          </div>
+          <p style="margin-bottom: 0;">This width affects torque capacity, pulley face width, bracket packaging, and the overall radial space claim, prioritising robustness over minimum-size optimisation.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. LOAD PHILOSOPHY & STRUCTURAL LOADING               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>2. Load Philosophy &amp; Structural Loading</h3>
+      <p>
+        The load analysis answers a specific engineering question: <em>Can the yaw stage rotate responsively enough for realistic re-angling while remaining structurally safe under punching?</em> This means the yaw stage must be analysed as both a <strong>support structure</strong> and a <strong>drive system</strong>.
+      </p>
+
+      <h4>Load Philosophy</h4>
+      <p>
+        BoxBunny distinguishes between a <strong>characteristic training load (F<sub>char</sub> = 1.8 kN)</strong> for normal operation and a conservative <strong>structural design load (F<sub>design</sub> = 2.7 kN)</strong> for safety. The bearing, rotating support structure, and frame are checked against F<sub>design</sub>, while the motor and transmission are selected primarily from F<sub>char</sub> and motion demands.
+      </p>
+      
+      <image-component
+        width="70%" tag="image"
+        source="../../../assets/report appendix b/15-matrix-FBD Loads acting on Bearing.jpg"
+        subtitle="Figure: Free-Body Diagram of Loads acting on Bearing.">
+      </image-component>
+
+      <h4>Structural Loading of the Yaw Stage</h4>
+      <p>The yaw stage experiences three main structural loads:</p>
+      <ul>
+        <li>
+          <strong>F<sub>a</sub> (Axial Load):</strong> The mass above the bearing (F<sub>a</sub> &approx; m<sub>upper</sub> &times; g). Checked against the axial capacity of the 010.10.120 bearing.
+        </li>
+        <li>
+          <strong>F<sub>r</sub> (Radial Load):</strong> The horizontal component of a strike (F<sub>r</sub> &approx; F<sub>design</sub>). This radial loading is why a light turntable bearing was rejected.
+        </li>
+        <li>
+          <strong>M<sub>o</sub> (Overturning Moment):</strong> Generated because the punch acts above the bearing plane. 
+          <div class="equation-box" style="margin: 8px 0; font-size: 0.95rem;">
+            M<sub>o</sub> = F<sub>design</sub> &times; h
+          </div>
+          This moment is critical because it drives the bearing-capacity requirement and the need for outboard edge support. By placing the rotation axis low in the stack, it is best positioned to react to this combined loading.
+        </li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. DRIVE-SIDE LOAD ANALYSIS                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>3. Drive-Side Load Analysis</h3>
+      <p>
+        To achieve the target yaw speed of 150&deg;/s, the motor and transmission must supply enough torque to overcome <strong>inertial torque</strong> (accelerating the rotating mass), <strong>friction</strong>, and <strong>disturbance torque</strong> caused by user strikes. The timing-belt must carry the equivalent tangential force needed to rotate the stage and resist these loads. The motor mount, pulley hub, and shaft interfaces must sustain peak reaction loads associated with startup, reversal, and disturbance rejection, which close back through the fixed welded structure.
+      </p>
+
+      <h4>Worst-Case Strike Scenario</h4>
+      <p>
+        Punches are rarely perfectly centred or perfectly radial. In a worst-case scenario of a straight strike at a 45&deg; angle, the yaw stage must tolerate a combination of radial load, overturning moment, and torsional disturbance. 
+      </p>
+      <p>
+        The motor is not expected to "win" against every extreme strike by brute torque alone. Instead, the bearing, rotating plate, outer cam followers, and welded base carry the bulk of the structural disturbance, while the motor and transmission are sized so they can control the stage under realistic operational disturbance and recover cleanly after impact. This is fully consistent with the wider BoxBunny philosophy of separating <strong>structural survival</strong> from <strong>actuator serviceability</strong>.
+      </p>
+
+      <h4>Remaining Analytical Gaps</h4>
+      <ul>
+        <li>Physical measurement of yaw speed and acceleration.</li>
+        <li>Validation of belt compliance, tooth-jump margin, and tension stability under reversals.</li>
+        <li>Confirmation of cam-follower contact behaviour under real load to avoid overconstraint caused by fabrication tolerances.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Mechanical Design
+        </sl-button>
+      </a>
+      <a href="electrical-control.html">
+        <sl-button variant="default" size="medium">
+          Next: Electrical &amp; Control
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

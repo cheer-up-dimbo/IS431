@@ -11,11 +11,6 @@
   <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
-  <style>
-    .page-nav-row {
-      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
-    }
-  </style>
 </head>
 <body>
   <div class="content">
@@ -300,15 +295,22 @@ Jetson Orin NX                    Arduino Uno R4 WiFi
       </table>
     </div>
 
-    <!-- BOTTOM NAVIGATION -->
-    <div class="page-nav-row">
-      <a href="outboard-support.html">
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="load-analysis.html">
         <sl-button variant="default" size="medium">
           <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-          Prev: Outboard Support
+          Prev: Load Analysis
         </sl-button>
       </a>
-<div></div>
+      <a href="testing-evaluation.html">
+        <sl-button variant="default" size="medium">
+          Next: Testing &amp; Evaluation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
   </div>
 
