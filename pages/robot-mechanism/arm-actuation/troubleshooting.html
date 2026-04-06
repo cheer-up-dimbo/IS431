@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Troubleshooting &amp; Iteration — Upper Mechanism</title>
+  <title>IS-431: 5.2.5.6 Troubleshooting &amp; Iteration — Arm Actuation</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -30,7 +30,7 @@
     </a>
     <br>
 
-    <h2>Troubleshooting &amp; Iteration</h2>
+    <h2>5.2.5.6 Troubleshooting &amp; Iteration</h2>
     <p>
       This section presents the nine principal engineering defects encountered
       during integration, their root-cause analysis, and implemented
@@ -409,6 +409,62 @@
         strike trajectories.
       </p>
     </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Archived: §5.2.5.4.4 Dynamic Speed Adaptation ─── -->
+    <div>
+      <h3>5.2.5.4.4 Dynamic Speed Adaptation <span style="font-weight:normal; font-size:0.8em; color:#6b7280;">(Archived — Not Deployed)</span></h3>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="archive"></sl-icon>
+        This subsection was drafted as part of the firmware specification but was not included in the final deployed firmware. It is retained here for reference.
+      </sl-alert>
+      <p>
+        When enabled, the system estimates joint-space travel distance and
+        computes the required speed to complete the movement within the
+        allocated duration. The effective velocity is clamped between a
+        baseline speed and a configured maximum to prevent overshoot or
+        motor overload:
+      </p>
+      <p style="font-family: serif; font-size: 1.10rem; text-align: center;">
+        v<sub>eff</sub> = min(max(v<sub>base</sub>,&nbsp;d<sub>total</sub>&nbsp;/&nbsp;(T&nbsp;&minus;&nbsp;0.3)),&nbsp;v<sub>max</sub>)
+        &nbsp;&nbsp;&nbsp;(Eq. 17)
+      </p>
+      <p>
+        where d<sub>total</sub> is the joint-space Euclidean travel distance
+        (rad), T is the allotted movement duration (s), and the 0.3 s
+        margin accounts for deceleration settling time. This scheme was
+        prototyped but ultimately replaced by fixed-velocity profiling in
+        the deployed firmware due to instability at short travel distances
+        where d<sub>total</sub>&nbsp;/&nbsp;(T&nbsp;&minus;&nbsp;0.3) diverged.
+      </p>
+    </div>
+
+    <!-- ─── Archived: Joint-Space Pitch Clamping ─── -->
+    <div>
+      <h3>Joint-Space Pitch Clamping (Decoupling Dilemma — Resolved)
+        <span style="font-weight:normal; font-size:0.8em; color:#6b7280;">(Archived — Moved from Mechanical Design)</span>
+      </h3>
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="archive"></sl-icon>
+        This section was moved here from §5.2.5.2.2 Mechanical Design. It documents the firmware-level resolution of a mechanical constraint.
+      </sl-alert>
+      <p>
+        Due to the differential coupling, it is mathematically impossible
+        to enforce safe pitch limits using static independent motor bounds.
+        Because any roll rotation carries the pitch mechanism with it via
+        the bevel gear, a simple per-motor position clamp would silently
+        violate structural pitch limits during compound movements. The
+        resolution is a joint-space clamping pass performed in
+        <code>homing_tab.py</code>: motor targets are converted to joint
+        space, pitch is clamped to the calibrated structural limits
+        [pitch<sub>lower</sub>,&nbsp;pitch<sub>upper</sub>], then
+        converted back to motor positions via Eq.&nbsp;3–4 with full
+        coupling compensation. The roll motor remains unrestricted.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
 
     <!-- BOTTOM NAVIGATION -->
     <div class="page-nav-row">

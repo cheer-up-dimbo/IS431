@@ -9,11 +9,11 @@
   // ─── Navigation Structure ───────────────────────────────────────────
   const NAV_TREE = [
     {
-      label: '§1 Introduction',
+      label: '1. Introduction',
       href: '/index.html#introduction',
     },
     {
-      label: '§2 Problem Clarification',
+      label: '2. Problem Clarification',
       href: '/index.html#problem-clarification',
       children: [
         { label: '2.1 Background', href: '/index.html#background' },
@@ -23,7 +23,7 @@
       ]
     },
     {
-      label: '§3 Design Methodology',
+      label: '3. Design Methodology',
       href: '/index.html#design-methodology',
       children: [
         { label: '3.1 Clarification of Task', href: '/index.html#clarification-of-task' },
@@ -31,7 +31,7 @@
       ]
     },
     {
-      label: '§4 Final Design',
+      label: '4. Final Design',
       href: '/index.html#final-design',
       children: [
         { label: '4.1 System Overview', href: '/index.html#system-overview' },
@@ -39,7 +39,7 @@
       ]
     },
     {
-      label: '§5 Conceptual Design',
+      label: '5. Conceptual Design',
       href: '/index.html#conceptual-design',
       children: [
         { label: '5.1 GUI', href: '/pages/gui.html' },
@@ -68,7 +68,7 @@
       ]
     },
     {
-      label: '§6 Project Timeline',
+      label: '6. Project Timeline',
       href: '/index.html#project-timeline',
     },
     {

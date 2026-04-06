@@ -70,8 +70,12 @@
     <div>
       <h3>2. Lateral Loads &amp; Moments</h3>
       <p>
-        Punches applied to the head or torso generate lateral forces and overturning moments on the upper carriage. The structural design punch load (<strong>F<sub>design</sub> = 2.7 kN</strong>) is used to size the components against these forces.
+        Punches applied to the head or torso generate lateral forces and overturning moments on the upper carriage. The BoxBunny load philosophy distinguishes between two load cases to size the components against these forces:
       </p>
+      <ul>
+        <li><strong>Characteristic training load (F<sub>char</sub> = 1.8 kN):</strong> Represents a strong but realistic punch for serviceability and moving-component behaviour.</li>
+        <li><strong>Structural design load (F<sub>design</sub> = 2.7 kN):</strong> Represents a conservative upper-bound event (incorporating a 1.5 factor) for ultimate structural survival.</li>
+      </ul>
       <div class="calc-card">
         <div class="calc-header">Guide Rail Loading</div>
         <div class="calc-body">
@@ -90,9 +94,36 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 3. STROKE & SPEED -->
+    <!-- 3. LOAD PATH SEPARATION -->
     <div>
-      <h3>3. Stroke &amp; Speed Requirement</h3>
+      <h3>3. Separation of Load Paths</h3>
+      <p>
+        The load analysis of this subsystem is fundamentally a load-path analysis. The final design is mechanically robust because the screw jack is explicitly isolated from absorbing punching-induced side loads.
+      </p>
+      <div class="calc-card">
+        <div class="calc-header">Vertical Lifting Load Path</div>
+        <div class="calc-body">
+          <div class="equation-box" style="font-size: 0.95rem;">
+            Upper robot body &rarr; 8080 inner tube &rarr; screw jack mount &rarr;<br>travelling nut &rarr; HK2T screw jack &rarr; lower support structure
+          </div>
+        </div>
+      </div>
+      <div class="calc-card">
+        <div class="calc-header">Lateral Punch-Disturbance Load Path</div>
+        <div class="calc-body">
+          <div class="equation-box" style="font-size: 0.95rem;">
+            Upper robot body &rarr; 8080 inner tube &rarr; Delrin wear pads &rarr;<br>outer welded lift tube &rarr; welded plate &amp; lower structure &rarr; robot base
+          </div>
+          <p style="margin-bottom: 0;">The telescopic column expressly behaves as the lateral stabiliser and structural guide, diverting bending moments away from the screw jack.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. STROKE & SPEED -->
+    <div>
+      <h3>4. Stroke &amp; Speed Requirement</h3>
       
       <div class="calc-card">
         <div class="calc-header">Required Linear Speed</div>
@@ -108,9 +139,9 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 4. SCREW JACK SELECTION -->
+    <!-- 5. SCREW JACK SELECTION -->
     <div>
-      <h3>4. Screw Jack Selection (HK2T)</h3>
+      <h3>5. Screw Jack Selection (HK2T)</h3>
       <p>
         The <strong>HK2T travelling-nut manual screw jack</strong> was selected as the axial lifting device. In a travelling-nut configuration, the screw rotates while the nut moves linearly &mdash; the nut is connected directly to the moving inner member of the telescopic column.
       </p>
@@ -123,9 +154,9 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 5. MOTOR INPUT REQUIREMENT -->
+    <!-- 6. MOTOR INPUT REQUIREMENT -->
     <div>
-      <h3>5. Motor Input Requirement</h3>
+      <h3>6. Motor Input Requirement</h3>
       
       <div class="calc-card">
         <div class="calc-header">Required Motor RPM</div>

@@ -9,9 +9,72 @@
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../../index.css">
   <script type="module" src="../../components/image/image-component.js"></script>
+  <script type="module" src="../../components/video/video.js"></script>
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../../components/lightbox/lightbox.js" defer></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <script src="/components/report-nav/report-nav.js" defer></script>
+  <style>
+    .kpi-pass  { color: #2e7d32; font-weight: bold; }
+    .kpi-pend  { color: #78716c; }
+    .page-nav-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+    }
+    .diagram-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+    @media (max-width: 768px) {
+      .diagram-pair { grid-template-columns: 1fr; }
+    }
+    /* ── Model Viewer Hotspots (matches mechanical-design.html) ── */
+    .Hotspot {
+      background: #3b82f6;
+      border-radius: 32px;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .Hotspot:not([data-visible]) {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .HotspotAnnotation {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+      color: #333;
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      left: calc(100% + 24px);
+      padding: 6px 10px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: max-content;
+    }
+    .HotspotAnnotation::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      width: 24px;
+      height: 2px;
+      background: #3b82f6;
+      transform: translateY(-50%);
+    }
+    model-viewer.hide-hotspots .Hotspot {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -26,148 +89,169 @@
     <div id="arm-actuation-subsystem">
       <h2>5.2.5 Arm Actuation</h2>
       <p>
-        The arm actuation subsystem is the primary strike-delivery mechanism
-        of BoxBunny. Its function is to replicate the upper-body actions of a
-        human training partner — executing targeted punches at anatomically
-        correct striking zones and providing real-time impact detection for
-        training analytics.
+        The arm actuation subsystem constitutes the primary strike-delivery mechanism
+        of BoxBunny. Its function is to replicate the upper-body actions of a human
+        training partner, executing targeted punches at anatomically derived striking
+        zones and providing real-time impact detection for training analytics. This
+        page presents an executive summary of the subsystem design, from requirements
+        through to validated test results. Detailed derivations are linked in each
+        subsection below.
       </p>
     </div>
 
     <sl-divider></sl-divider>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. DESIGN REQUIREMENTS                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Requirements &amp; Considerations</h3>
-      <p>The arm actuation subsystem responds to system-level requirement <strong>RM-5</strong>:</p>
-      <ul>
-        <li><strong>Strike velocity:</strong> Execute 90° in ≤ 0.25 s for human-competitive punch speeds</li>
-        <li><strong>Strike types:</strong> Jab (pitch), Hook (roll), Uppercut (coordinated pitch+roll)</li>
-        <li><strong>Mass centralisation:</strong> Minimise moment of inertia to achieve target velocities within motor torque limits</li>
-        <li><strong>Safety:</strong> Multi-layered protection (hardware current limit, firmware dI/dt monitoring, application-level auto-retract)</li>
-      </ul>
-
-      <h4>Required Striking Motions</h4>
-      <image-component
-        width="40%"
-        tag="image"
-        source="../../assets/upper_mechanism/5.2.1.1strike_zones.png"
-        subtitle="Figure: Anatomically derived striking zones — Head, Celiac Plexus, and Liver.">
-      </image-component>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <div>
-      <h3>Design</h3>
-
-      <h4>2-DOF Coaxial Differential Joint</h4>
+      <h3>5.2.5.0.1 Design Requirements</h3>
       <p>
-        The selected solution is a <strong>2-Degrees-of-Freedom mechanism</strong>
-        employing a coaxial differential gear arrangement with two
-        <strong>Damiao DM-J4310-2EC brushless motors</strong> per arm. The
-        pitch axis delivers vertical rotation (jab), while the roll axis
-        provides horizontal rotation (hook, uppercut). Coordinated combination
-        enables all required strike patterns from a single compact joint.
+        The arm actuation subsystem responds to system-level requirement RM-5,
+        which specifies that the robot must deliver mechanically realistic boxing
+        strikes across three anatomically correct target zones: head, celiac plexus,
+        and liver. The subsystem requirements derived from RM-5 are as follows:
       </p>
-
-      <h4>Mass Centralisation</h4>
-      <p>
-        Both motors are mounted <strong>side-by-side at the base</strong> of
-        the arm assembly, each driving a pinion gear into the central coaxial
-        gear stack. This concentrates the heaviest components at the pivot
-        point, drastically reducing the arm's <strong>moment of
-        inertia</strong> — the primary reason the system achieves
-        human-competitive punch velocities without exceeding stress limits of
-        3D-printed drivetrain components.
-      </p>
-
-      <h4>Differential Coupling Challenge</h4>
-      <p>
-        The coaxial arrangement introduces kinematic coupling: any roll
-        rotation causes the internal bevel gear to "walk," producing
-        <strong>parasitic pitch change</strong>. The firmware must
-        mathematically cancel this coupling in real-time. When a pure roll
-        is commanded, both motors are driven at identical speeds to prevent
-        the bevel gear from walking.
-      </p>
-
-      <div class="video-row">
-        <image-component
-          width="60%" tag="image"
-          source="../../assets/upper_mechanism/arm_up.jpg"
-          subtitle="Arm in raised (windup) position.">
-        </image-component>
-        <image-component
-          width="60%" tag="image"
-          source="../../assets/upper_mechanism/arm_down.jpg"
-          subtitle="Arm in lowered (apex / strike) position.">
-        </image-component>
-      </div>
-
-      <h4>Combat Orbit FSM</h4>
-      <p>
-        The <strong>Dynamic Sparring engine</strong> transforms the system
-        from a coordinate-following actuator into a reactive sparring partner:
-      </p>
-      <ol>
-        <li><strong>Vector Alignment Skip:</strong> Skips windup when consecutive strikes share similar trajectories (threshold: 30°)</li>
-        <li><strong>Perimeter Transit Routing:</strong> Routes arm around workspace perimeter to avoid crossing the user's body zone</li>
-        <li><strong>Proportional Snap-Back:</strong> Dynamic recovery position maintains guard without returning to zero</li>
-      </ol>
-
-      <h4>Multi-Layered Safety</h4>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd;">Layer</th>
-            <th style="padding:10px; border:1px solid #ddd;">Mechanism</th>
-            <th style="padding:10px; border:1px solid #ddd;">Response</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Req ID</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Requirement</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Rationale</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Hardware</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Damiao built-in current limiter</td>
-            <td style="padding:10px; border:1px solid #ddd;">&lt; 1 ms</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5a</td>
+            <td style="padding:10px; border:1px solid #ddd;">Execute a 90&deg; arm sweep in &le; 0.70 s</td>
+            <td style="padding:10px; border:1px solid #ddd;">Original 0.25 s target revised to account for Damiao PID acceleration overhead (see Testing, Section 5.2.5.5)</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Firmware</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Software dI/dt monitoring (Teensy 4.0)</td>
-            <td style="padding:10px; border:1px solid #ddd;">5 ms</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5b</td>
+            <td style="padding:10px; border:1px solid #ddd;">Deliver three distinct strike types: Jab (pitch), Hook (roll), Uppercut (pitch&thinsp;+&thinsp;roll)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Padwork rehabilitation literature defines these as the fundamental training strikes</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Application</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Kinematic auto-retract (GUI V3)</td>
-            <td style="padding:10px; border:1px solid #ddd;">~50 ms</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5c</td>
+            <td style="padding:10px; border:1px solid #ddd;">Mass centralisation: minimise arm moment of inertia</td>
+            <td style="padding:10px; border:1px solid #ddd;">All heavy components must be placed at the pivot to achieve target speeds within motor torque limits</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5d</td>
+            <td style="padding:10px; border:1px solid #ddd;">Multi-layered safety: hardware, firmware, and application protection</td>
+            <td style="padding:10px; border:1px solid #ddd;">Defence-in-depth required for a system physically interacting with a human trainer</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5e</td>
+            <td style="padding:10px; border:1px solid #ddd;">Real-time impact detection on all three target zones</td>
+            <td style="padding:10px; border:1px solid #ddd;">Training analytics require per-strike confirmation of contact and intensity</td>
           </tr>
         </tbody>
       </table>
-
-      <h4>Low-Level Control</h4>
-      <p>
-        The arm actuation uses a <strong>24V motor bus</strong> with
-        <strong>CAN bus parallel connection</strong> (4 motors, 1 Mbps, 120 Ω
-        termination) for motor communication, and an isolated
-        <strong>12V logic rail</strong> (dual-supply architecture) to prevent
-        regenerative braking OVP trips from disrupting the Teensy/Jetson.
-        The Teensy 4.0 runs a unified <strong>200 Hz control loop</strong>
-        integrating CAN motor commands, I²C sensor reads, and micro-ROS
-        publishing.
-      </p>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- DESIGN EVOLUTION SUMMARY                               -->
+    <!-- 2. PERFORMANCE CRITERIA                                -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Design Evolution Summary</h3>
+      <h3>5.2.5.0.2 Performance Criteria</h3>
       <p>
-        The following table summarises the five major design iterations
-        and the engineering rationale for each transition — spanning
-        mechanical hardware, motor selection, structural revision, and
-        motion planning logic:
+        The following measurable performance criteria were derived from the design
+        requirements above and verified using instrumentation available within the
+        project scope. Torque calculations are provided in
+        <a href="../appendix-upper.html">Appendix 1</a>.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd;">PC ID</th>
+            <th style="padding:10px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:10px; border:1px solid #ddd;">Target</th>
+            <th style="padding:10px; border:1px solid #ddd;">Req Link</th>
+            <th style="padding:10px; border:1px solid #ddd;">Method</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:10px; border:1px solid #ddd;">Strike speed (90&deg; rotation)</td>
+            <td style="padding:10px; border:1px solid #ddd;">&le; 0.70 s</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5a</td>
+            <td style="padding:10px; border:1px solid #ddd;">Firmware timestamp delta (N=43 speed tests)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:10px; border:1px solid #ddd;">Sparring endurance</td>
+            <td style="padding:10px; border:1px solid #ddd;">5 min continuous, &lt;60&deg;C motors</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5d</td>
+            <td style="padding:10px; border:1px solid #ddd;">Continuous sparring session + Damiao temperature telemetry</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:10px; border:1px solid #ddd;">Regenerative braking safety</td>
+            <td style="padding:10px; border:1px solid #ddd;">No PSU trip over 5 emergency stops</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5d</td>
+            <td style="padding:10px; border:1px solid #ddd;">Visual confirmation and voltmeter monitoring</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:10px; border:1px solid #ddd;">Multi-strike chain execution</td>
+            <td style="padding:10px; border:1px solid #ddd;">3-strike chain &le; 5 s total</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5b</td>
+            <td style="padding:10px; border:1px solid #ddd;">Video timestamp and GUI console log</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:10px; border:1px solid #ddd;">Peak motor current within safety limit</td>
+            <td style="padding:10px; border:1px solid #ddd;">&lt; 2.0 A per motor</td>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5d</td>
+            <td style="padding:10px; border:1px solid #ddd;">CAN current telemetry (N=43 speed tests)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. SUBSECTION HIGHLIGHTS                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>5.2.5.0.3 Subsection Highlights</h3>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left; width:22%;">Section</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Key Contribution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">5.2.5.1 Design &amp; Ideation</td>
+            <td style="padding:10px; border:1px solid #ddd;">2-DOF coaxial differential joint selected from three motor platforms (servo, ODrive, Damiao); mass centralised at pivot to minimise moment of inertia.</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">5.2.5.2 Mechanical Design</td>
+            <td style="padding:10px; border:1px solid #ddd;">Structural failures observed at CDE Fair informed a material science revision from polymer shafts to a 6 mm stainless steel D-shaft with Delrin pin reinforcement, achieving sustained sparring capability.</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">5.2.5.3 Electrical Integration</td>
+            <td style="padding:10px; border:1px solid #ddd;">Dual-supply architecture (24 V motor bus / 12 V isolated logic rail) prevents regenerative braking OVP events from triggering a full robotic shutdown.</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">5.2.5.4 Firmware &amp; Software</td>
+            <td style="padding:10px; border:1px solid #ddd;">Teensy 4.0 executes a deterministic 200 Hz unified loop (CAN + I2C + micro-ROS); a two-tier ROS 2 architecture separates real-time motor control from combat decision logic on the Jetson Orin NX.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Design Evolution</h4>
+      <p>
+        Five major iterations were required to achieve the final deployed
+        configuration. The following table summarises each transition and the
+        engineering rationale.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
         <thead>
@@ -181,203 +265,404 @@
         <tbody>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">1. Interim</td>
-            <td style="padding:10px; border:1px solid #ddd;">Gear-rail coaxial joint + servo motors</td>
-            <td style="padding:10px; border:1px solid #ddd;">DOF validated; servos failed under impact</td>
-            <td style="padding:10px; border:1px solid #ddd;">&rarr; BLDC motors required for impact resilience</td>
+            <td style="padding:10px; border:1px solid #ddd;">Gear-rail coaxial joint with servo motors</td>
+            <td style="padding:10px; border:1px solid #ddd;">DOF validated; servos failed under impact load</td>
+            <td style="padding:10px; border:1px solid #ddd;">BLDC motors required for impact resilience</td>
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">2. ODrive</td>
-            <td style="padding:10px; border:1px solid #ddd;">ODrive V3.6 + 360KV outrunner</td>
-            <td style="padding:10px; border:1px solid #ddd;">FOC validated; jitter, no absolute position, too bulky</td>
-            <td style="padding:10px; border:1px solid #ddd;">&rarr; Integrated actuator required</td>
+            <td style="padding:10px; border:1px solid #ddd;">ODrive V3.6 with 360 KV outrunner</td>
+            <td style="padding:10px; border:1px solid #ddd;">FOC validated; jitter, no absolute position, excessive volume</td>
+            <td style="padding:10px; border:1px solid #ddd;">Integrated actuator required</td>
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">3. Damiao</td>
-            <td style="padding:10px; border:1px solid #ddd;">DM-J4310-2EC + helical-spur 3:1 gearbox</td>
-            <td style="padding:10px; border:1px solid #ddd;">All requirements met; fair demo successful</td>
-            <td style="padding:10px; border:1px solid #ddd;">&rarr; Structural failures exposed at fair</td>
+            <td style="padding:10px; border:1px solid #ddd;">DM-J4310-2EC with 3:1 external spur gearbox (30:1 total)</td>
+            <td style="padding:10px; border:1px solid #ddd;">All requirements met; CDE Fair demonstration successful</td>
+            <td style="padding:10px; border:1px solid #ddd;">Structural failures exposed at CDE Fair under repeated impact</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;">4. Post-Fair</td>
-            <td style="padding:10px; border:1px solid #ddd;">Stainless D-shaft + Delrin pin hybrid interface</td>
+            <td style="padding:10px; border:1px solid #ddd;">4. Post-CDE-Fair</td>
+            <td style="padding:10px; border:1px solid #ddd;">Stainless D-shaft, Delrin pin, M2 screw reinforcement</td>
             <td style="padding:10px; border:1px solid #ddd;">Structural integrity validated; sustained sparring achieved</td>
-            <td style="padding:10px; border:1px solid #ddd;">&rarr; Motion quality insufficient (jerky return-to-zero)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Stateless return-to-zero motion produced unacceptable mechanical wear and poor sparring realism</td>
           </tr>
-          <tr style="background:#f9fafb;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>5. Combat Orbit</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Stateless &rarr; State-Aware FSM (Combat Orbit)</td>
-            <td style="padding:10px; border:1px solid #ddd;">Fluid, continuous sparring; reduced mechanical wear from unnecessary return-to-zero cycles</td>
-            <td style="padding:10px; border:1px solid #ddd;">Current operational configuration: Euclidean skip-logic + proportional snap-back maintain kinetic fluidity</td>
+          <tr style="background:#f0fdf4;">
+            <td style="padding:10px; border:1px solid #ddd;">5. Final</td>
+            <td style="padding:10px; border:1px solid #ddd;">State-aware motion planning: vector alignment skip, proportional snap-back recovery</td>
+            <td style="padding:10px; border:1px solid #ddd;">Fluid, continuous sparring; reduced mechanical wear</td>
+            <td style="padding:10px; border:1px solid #ddd;">Current deployed configuration</td>
           </tr>
         </tbody>
       </table>
-      <p>
-        The structural failures and post-fair material science revisions
-        are documented in
-        <a href="arm-actuation/mechanical-design.html">Mechanical Design</a>. The
-        transition from stateless motion to the Combat Orbit FSM — driven
-        by both mechanical longevity and training fidelity requirements —
-        is documented in
-        <a href="arm-actuation/firmware-software.html">Firmware &amp; Software</a>.
-      </p>
     </div>
 
     <sl-divider></sl-divider>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. FINAL ARM DESIGN                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Scope of Work Completed</h3>
+      <h3>5.2.5.0.4 Final Arm Design</h3>
       <p>
-        Following the interim demonstration, the Upper Mechanism underwent
-        extensive development spanning mechanical redesign, electrical
-        integration, firmware engineering, and software architecture. The
-        following table summarises the principal deliverables and their
-        current status.
+        The final deployed arm assembly consists of a compact 2-DOF coaxial
+        differential joint, two Damiao DM-J4310-2EC integrated actuators mounted
+        at the pivot, a 3:1 external helical-spur gear reduction stage, and a
+        training stick with multi-layer padding incorporating embedded MPU6050 IMUs
+        for impact detection.
       </p>
+      <div class="model-viewer-container" style="margin: 24px 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 4px;">
+          <span style="font-size:0.95rem; color:#555;">
+            <sl-icon name="info-circle" style="vertical-align:middle; margin-right:4px;"></sl-icon>
+            Interact with the 3D model to explore the arm joint assembly. Toggle annotations to view key components.
+          </span>
+          <sl-button id="toggle-hotspots-front" size="small" variant="default" pill>Hide Annotations</sl-button>
+        </div>
+        <model-viewer
+          src="../../assets/3d_models/arm_joint_V5.glb"
+          alt="Interactive 3D Model: V5 Arm Joint Assembly"
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          auto-rotate-delay="2000"
+          tone-mapping="neutral"
+          shadow-intensity="0.66"
+          shadow-softness="1"
+          style="width:100%; height:500px; border-radius:12px; background:#f0f0f0;">
+          <!-- 1. Motor 1 — Roll -->
+          <button class="Hotspot" slot="hotspot-motor1" data-position="-0.027009130254934774m 0.027992178471240803m -0.04305389864049759m" data-normal="0.18025513159793682m 0.9836198897605687m -1.3215802495993298e-7m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">Motor 1 — Roll (DM-J4310-2EC)</div>
+          </button>
+          <!-- 2. Motor 2 — Pitch -->
+          <button class="Hotspot" slot="hotspot-motor2" data-position="0.032742324634128746m 0.02847557348865756m -0.04155627676495496m" data-normal="0.06037839243513814m 0.9981755605738554m -1.34113708870663e-7m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">Motor 2 — Pitch (DM-J4310-2EC)</div>
+          </button>
+          <!-- 3. Central Gear Stack (3:1 Helical-Spur) -->
+          <button class="Hotspot" slot="hotspot-gear" data-position="0.0013267442323015508m 0.02330380535771693m -0.0030132951556644944m" data-normal="0.8478129181226903m 0.29563551787641623m -0.44024186129243953m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">Central Gear Stack (3:1 Helical-Spur)</div>
+          </button>
+          <!-- 4. Bevel Gear Coupling -->
+          <button class="Hotspot" slot="hotspot-bevel" data-position="-0.0012330250149203835m 0.015137529120881288m 0.05579315541027723m" data-normal="-0.10509427200033826m 0.937739148535577m -0.33105963706935015m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">Bevel Gear Coupling</div>
+          </button>
+          <!-- 5. Stainless Steel D-Shaft (6mm) -->
+          <button class="Hotspot" slot="hotspot-shaft" data-position="0.00003588621110451186m 0.0024999999441206455m 0.07403480349854283m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">Stainless Steel D-Shaft (6 mm)</div>
+          </button>
+          <div class="progress-bar hide" slot="progress-bar"><div class="update-bar"></div></div>
+        </model-viewer>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Interactive 3D Model: V5 Coaxial Differential Arm Joint Assembly. Full annotated view in
+          <a href="arm-actuation/mechanical-design.html">Section 5.2.5.2 Mechanical Design</a>.
+        </sub>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-hotspots-front');
+            const viewer = document.querySelector('#front-model-viewer');
+            let hotspotsVisible = true;
+            toggleBtn.addEventListener('click', () => {
+              hotspotsVisible = !hotspotsVisible;
+              const mv = document.querySelector('model-viewer');
+              if (hotspotsVisible) {
+                mv.classList.remove('hide-hotspots');
+                toggleBtn.textContent = 'Hide Annotations';
+              } else {
+                mv.classList.add('hide-hotspots');
+                toggleBtn.textContent = 'Show Annotations';
+              }
+            });
+          });
+        </script>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. POWER ARCHITECTURE                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>5.2.5.0.5 Power Architecture</h3>
+      <p>
+        The arm motor power subsystem operates from a Mean Well LRS-200-24
+        (200 W, 24 V, 8.8 A) switched-mode PSU. All four Damiao motors receive
+        power in parallel from a common distribution busbar. The 12 V logic rail
+        is isolated from the motor bus to prevent regenerative braking OVP events
+        from disrupting the Teensy or Jetson. Measured steady-state draw is
+        approximately 8 W per motor at 24 V across 43 validated tests, with a
+        combined peak of approximately 33 W.
+      </p>
+      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
+        <img src="../../assets/system_architecture/power_arms.png"
+             alt="Arm actuation power subsystem diagram"
+             data-zoom
+             title="Click to enlarge"
+             style="width:100%; max-width:900px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
+        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
+          Arm actuation power subsystem: Mean Well LRS-200-24 (200 W, 24 V, 8.8 A)
+          supplying four Damiao DM-J4310-2EC motors in parallel via a distribution
+          busbar, with RegenClamp V0.3 protection against back-EMF OVP spikes.
+          <span style="color:#3b82f6;">&mdash; Click to enlarge.</span>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. DATA ARCHITECTURE                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>5.2.5.0.6 Data Architecture</h3>
+      <p>
+        The arm actuation data path spans three hardware layers. At the
+        microcontroller level, the Teensy 4.0 issues Position-Speed mode
+        CAN commands to the four Damiao motors at up to 200 Hz (Sparse
+        Edge-Trigger strategy) and polls the four MPU6050 IMUs across two
+        I2C buses. Motor feedback and IMU data are packed into a 21-double
+        payload and published via micro-ROS to the Jetson Orin NX. The Jetson
+        hosts the GUI V4 application, which executes the combat decision logic
+        and publishes motor commands on the
+        <code>/motor_commands</code> topic at 100 Hz.
+      </p>
+      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
+        <img src="../../assets/system_architecture/data_control_arms.png"
+             alt="Arm actuation data and control architecture"
+             data-zoom
+             title="Click to enlarge"
+             style="width:100%; max-width:1000px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
+        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
+          Arm actuation data and control architecture: CAN bus (1 Mbps, 4&times; Damiao
+          DM-J4310-2EC), I2C dual-bus (400 kHz, 4&times; MPU6050 IMUs), micro-ROS USB
+          bridge to Jetson Orin NX, and ROS 2 GUI&nbsp;V4 command loop at 100 Hz.
+          <span style="color:#3b82f6;">&mdash; Click to enlarge.</span>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 7. TEST AND EVALUATION RESULTS                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>5.2.5.0.7 Test and Evaluation Results</h3>
+      <p>
+        A controlled speed-test benchmark was conducted across all six standard
+        strikes at set speeds ranging from 10 to 30 rad/s, with a minimum of
+        three repetitions each, for a total of 43 validated tests. All tests
+        were completed with zero safety trips, zero current-limit events, and
+        zero position timeouts. Full methodology and raw data are documented in
+        <a href="arm-actuation/testing-evaluation.html">Section 5.2.5.5 Testing and Evaluation</a>.
+      </p>
+
+      <h4>Performance Criteria Outcome</h4>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Domain</th>
-            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Deliverable</th>
-            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Status</th>
+            <th style="padding:10px; border:1px solid #ddd;">PC ID</th>
+            <th style="padding:10px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:10px; border:1px solid #ddd;">Target</th>
+            <th style="padding:10px; border:1px solid #ddd;">Measured</th>
+            <th style="padding:10px; border:1px solid #ddd;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#f0fdf4;">
+            <td style="padding:10px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:10px; border:1px solid #ddd;">Strike speed (90&deg;)</td>
+            <td style="padding:10px; border:1px solid #ddd;">&le; 0.70 s</td>
+            <td style="padding:10px; border:1px solid #ddd;">0.64 s best (Left Jab at 30 rad/s)</td>
+            <td style="padding:10px; border:1px solid #ddd;" class="kpi-pass">Pass</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:10px; border:1px solid #ddd;">Sparring endurance (5 min, &lt;60&deg;C)</td>
+            <td style="padding:10px; border:1px solid #ddd;">5 min continuous</td>
+            <td style="padding:10px; border:1px solid #ddd;">Pending formal session</td>
+            <td style="padding:10px; border:1px solid #ddd;" class="kpi-pend">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:10px; border:1px solid #ddd;">Regenerative braking safety</td>
+            <td style="padding:10px; border:1px solid #ddd;">No PSU trip / 5 E-stops</td>
+            <td style="padding:10px; border:1px solid #ddd;">Pending dedicated test session</td>
+            <td style="padding:10px; border:1px solid #ddd;" class="kpi-pend">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:10px; border:1px solid #ddd;">Multi-strike chain (&le; 5 s for 3 strikes)</td>
+            <td style="padding:10px; border:1px solid #ddd;">&le; 5 s total</td>
+            <td style="padding:10px; border:1px solid #ddd;">Pending chain-execution test</td>
+            <td style="padding:10px; border:1px solid #ddd;" class="kpi-pend">Pending</td>
+          </tr>
+          <tr style="background:#f0fdf4;">
+            <td style="padding:10px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:10px; border:1px solid #ddd;">Peak motor current</td>
+            <td style="padding:10px; border:1px solid #ddd;">&lt; 2.0 A per motor</td>
+            <td style="padding:10px; border:1px solid #ddd;">0.69 A max (Right Hook, M4); N=43</td>
+            <td style="padding:10px; border:1px solid #ddd;" class="kpi-pass">Pass</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Speed Benchmark Summary (N = 43, All 6 Strikes at 25 rad/s)</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Strike</th>
+            <th style="padding:8px; border:1px solid #ddd;">Arm</th>
+            <th style="padding:8px; border:1px solid #ddd;">Avg WU&rarr;AP (s)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Avg Total (s)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Peak System Power (W)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Peak Current (A)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;" rowspan="3"><strong>Mechanical</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Coaxial Differential Joint with 3:1 helical-spur gear reduction and bevel gear coupling</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Jab</td>
+            <td style="padding:8px; border:1px solid #ddd;">Left</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.66</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.24</td>
+            <td style="padding:8px; border:1px solid #ddd;">~10.5</td>
+            <td style="padding:8px; border:1px solid #ddd;">M1: 0.63, M2: 0.58</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;">Post-fair structural revision (6 mm stainless D-shaft, Delrin pin, M2 screw reinforcement)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Left Hook</td>
+            <td style="padding:8px; border:1px solid #ddd;">Left</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.67</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.25</td>
+            <td style="padding:8px; border:1px solid #ddd;">~9.7</td>
+            <td style="padding:8px; border:1px solid #ddd;">M1: 0.57, M2: 0.59</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;">Multi-layer padding with anti-vibration isolation mounts</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Left Uppercut</td>
+            <td style="padding:8px; border:1px solid #ddd;">Left</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.55</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.09</td>
+            <td style="padding:8px; border:1px solid #ddd;">~10.1</td>
+            <td style="padding:8px; border:1px solid #ddd;">M1: 0.49, M2: 0.57</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;" rowspan="3"><strong>Electrical</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">24V motor bus + isolated 12V logic rail (dual-supply architecture)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Cross</td>
+            <td style="padding:8px; border:1px solid #ddd;">Right</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.61</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.18</td>
+            <td style="padding:8px; border:1px solid #ddd;">~9.4</td>
+            <td style="padding:8px; border:1px solid #ddd;">M3: 0.61, M4: 0.63</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;">CAN Bus parallel connection (4 motors, 1 Mbps, 120 &Omega; termination)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Right Hook</td>
+            <td style="padding:8px; border:1px solid #ddd;">Right</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.62</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.20</td>
+            <td style="padding:8px; border:1px solid #ddd;">~8.6</td>
+            <td style="padding:8px; border:1px solid #ddd;">M3: 0.51, M4: 0.69</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;">Quad-IMU I2C sensing (MPU6050 &times; 3, dual-bus 400 kHz)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;" rowspan="4"><strong>Firmware &amp; Software</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Teensy 4.0 Firmware V4 — 200 Hz unified loop (CAN + I2C + micro-ROS)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;">GUI V3 (<code>unified_GUI_V3.py</code>, 2278 lines) — PyQt5/PyQtGraph, 8 operational tabs</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;">Dynamic Sparring FSM — vector alignment skip, perimeter transit routing, proportional snap-back</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;">ROS 2 External Control Interface — 7 topics (4 subscribers, 3 publishers)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">Validated</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Integration</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">9 cross-layer defects root-caused and resolved (firmware, middleware, application, electrical)</td>
-            <td style="padding:10px; border:1px solid #ddd; color:green;">8 Resolved / 1 Mitigated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Right Uppercut</td>
+            <td style="padding:8px; border:1px solid #ddd;">Right</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.57</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.07</td>
+            <td style="padding:8px; border:1px solid #ddd;">~8.9</td>
+            <td style="padding:8px; border:1px solid #ddd;">M3: 0.52, M4: 0.62</td>
           </tr>
         </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" style="padding:8px; border:1px solid #ddd; font-size:0.85rem; color:#555; font-style:italic;">
+              WU = Windup position, AP = Apex (strike) position. Timing measured via firmware timestamp delta.
+              All current values are motor-shaft readings from Damiao CAN telemetry.
+            </td>
+          </tr>
+        </tfoot>
       </table>
+
+      <sl-alert variant="success" open>
+        <sl-icon slot="icon" name="check-circle"></sl-icon>
+        <strong>Key Finding:</strong> Peak per-motor current never exceeded 0.69 A
+        across all 43 tests, representing 34% of the 2.0 A safety limit and less
+        than 5% of the 16 A theoretical stall current. Total arm peak power was
+        approximately 33 W against a theoretical maximum of 384 W (16 A stall &times; 24 V).
+        Zero safety trips were recorded.
+      </sl-alert>
+
+      <sl-alert variant="primary" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        <strong>PID Overhead Note:</strong> Uppercuts are the fastest strike type
+        (0.55 s average WU&rarr;AP) due to shorter motor travel. The original 0.25 s
+        target was physically unachievable: the Damiao internal PID applies
+        acceleration and deceleration ramps adding approximately 0.4&ndash;0.5 s
+        of constant overhead regardless of set speed. The revised target of
+        &le; 0.70 s was met. See
+        <a href="arm-actuation/testing-evaluation.html">Section 5.2.5.5</a>
+        for full overhead analysis.
+      </sl-alert>
+
+      <div style="margin-top:24px;">
+        <h4>Video Evidence</h4>
+        <div class="video-row single">
+          <div class="video-box">
+            <video controls preload="metadata" style="width:100%; border-radius:8px;">
+              <source src="../../assets/upper_mechanism/videos/Arm_Chain_Execution.mp4" type="video/mp4">
+            </video>
+            <sub>Strike library chain execution — three sequential strikes (Jab, Left Hook, Uppercut) demonstrating vector alignment skip logic and proportional snap-back recovery. Recorded from GUI V4 during N=43 speed test session.</sub>
+          </div>
+        </div>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
 
-    <div>
-      <h3>Summary of Key Contributions</h3>
-      <ol>
-        <li>
-          <strong>Coaxial Differential Kinematics with Mass
-          Centralisation:</strong> Closed-form forward and inverse
-          kinematic equations were derived for the coupled 2-DOF joint,
-          incorporating real-time parasitic pitch compensation. Motor
-          mass centralisation at the pivot reduces moment of inertia,
-          enabling human-competitive strike velocities.
-        </li>
-        <li>
-          <strong>Combat Orbit FSM:</strong> A continuous-state sparring
-          engine replaced stateless point-to-point motion, integrating
-          vector alignment skip logic, perimeter transit routing, and
-          proportional snap-back to produce fluid, uninterrupted combat
-          sequences.
-        </li>
-        <li>
-          <strong>Multi-Layered Safety Architecture:</strong> Three
-          independent protection tiers — hardware current limiting,
-          firmware dI/dt obstruction detection, and application-level
-          kinematic auto-retract — provide defence-in-depth for both
-          the drivetrain and the user.
-        </li>
-        <li>
-          <strong>IMU-Based Strike Analytics:</strong> A Quad-IMU data
-          acquisition pipeline — initially validated on an isolated rig
-          at 500 Hz — was merged into the unified firmware for real-time
-          punch detection via L2 acceleration vector norm thresholding.
-        </li>
-        <li>
-          <strong>Regenerative Braking Mitigation &amp; Dual-Rail
-          Isolation:</strong> Software ramp-down and power rail
-          separation resolved PSU OVP trips during high-speed sparring,
-          ensuring uninterrupted system operation.
-        </li>
-        <li>
-          <strong>Systematic Defect Resolution:</strong> Nine cross-layer
-          integration defects — spanning CAN protocol parsing, I2C bus
-          reliability, micro-ROS transport recovery, and regenerative
-          braking — were diagnosed and resolved through structured
-          root-cause analysis.
-        </li>
-      </ol>
+    <div style="display:flex; justify-content:flex-end; margin: 4px 0;">
+      <a href="arm-actuation/design-ideation.html">
+        <sl-button variant="default" size="medium">
+          Continue to Detailed Documentation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
 
     <sl-divider></sl-divider>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 8. DETAILED DOCUMENTATION NAVIGATION                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Detailed Documentation</h3>
-      <p>Complete technical documentation organised into six sections:</p>
+      <p>
+        Complete technical documentation is organised across four primary sections and two supplementary references:
+      </p>
       <div class="section-nav-grid">
         <a href="arm-actuation/design-ideation.html" class="section-nav-card">
           <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
-          <h3>Design &amp; Ideation</h3>
-          <p>Motion analysis, concept selection, motor selection</p>
+          <h3>5.2.5.1 Design &amp; Ideation</h3>
+          <p>Motion analysis, concept selection, motor selection rationale</p>
         </a>
         <a href="arm-actuation/mechanical-design.html" class="section-nav-card">
           <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
-          <h3>Mechanical Design</h3>
-          <p>Joint kinematics, gear reduction, structural revisions</p>
+          <h3>5.2.5.2 Mechanical Design</h3>
+          <p>Joint kinematics, gear reduction, structural revisions and material science</p>
         </a>
         <a href="arm-actuation/electrical-integration.html" class="section-nav-card">
           <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
-          <h3>Electrical Integration</h3>
-          <p>Power architecture, CAN bus, dual-rail isolation</p>
+          <h3>5.2.5.3 Electrical Integration</h3>
+          <p>Dual-rail power architecture, CAN bus, I2C IMU topology</p>
         </a>
         <a href="arm-actuation/firmware-software.html" class="section-nav-card">
           <sl-icon name="code-slash" style="font-size: 2rem;"></sl-icon>
-          <h3>Firmware &amp; Software</h3>
-          <p>V4 firmware, GUI V3, Dynamic Sparring FSM, ROS 2</p>
+          <h3>5.2.5.4 Firmware &amp; Software</h3>
+          <p>200 Hz unified loop, GUI V4, Strike Library, ROS 2 interface</p>
         </a>
-        <a href="arm-actuation/testing-evaluation.html" class="section-nav-card">
+        <a href="../appendix-arm.html#a3-1" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
-          <h3>Testing &amp; Evaluation</h3>
-          <p>Performance criteria, test results, video evidence</p>
+          <h3>Appendix 3A &mdash; Testing &amp; Evaluation</h3>
+          <p>N=43 benchmark, PID overhead analysis, power budget validation (Appendix 3)</p>
         </a>
-        <a href="arm-actuation/troubleshooting.html" class="section-nav-card">
+        <a href="../appendix-arm.html#a3-2" class="section-nav-card">
           <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
-          <h3>Troubleshooting &amp; Iteration</h3>
-          <p>9 defects: root-cause analysis and resolutions</p>
+          <h3>Appendix 3B &mdash; Troubleshooting &amp; Iteration</h3>
+          <p>9 cross-layer defects: root-cause analysis and resolutions (Appendix 3)</p>
         </a>
       </div>
     </div>
@@ -385,7 +670,7 @@
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
-    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
   </sl-button>
 </body>
 </html>

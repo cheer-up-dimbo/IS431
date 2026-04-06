@@ -29,12 +29,12 @@
     <br>
 
     <h2>5.2.4 Padding — Electrical Integration</h2>
-
-    <sl-alert variant="warning" open>
-      <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-      <strong>Content Pending:</strong> This page provides a structural
-      outline. Detailed content will be populated by the robotics agent.
-    </sl-alert>
+    <p>
+      This section documents the electrical design of the embedded IMU
+      sensing system, covering sensor selection, I2C topology, wiring
+      considerations, and the strike detection signal pipeline from
+      hardware to software.
+    </p>
 
     <sl-divider></sl-divider>
 
@@ -62,28 +62,79 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. PLANNED CONTENT                                     -->
+    <!-- 2. SENSOR SELECTION                                    -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>MPU6050 Sensor Selection</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        MPU6050 6-axis IMU selection rationale. 3-axis accelerometer +
-        3-axis gyroscope. Cost, availability, I²C interface, and suitability
-        for impact detection applications.
-      </sl-alert>
-
-      <h3>Quad-IMU I²C Topology</h3>
       <p>
-        The MPU6050 supports only two I²C addresses (<code>0x68</code>
+        The InvenSense MPU6050 6-axis MEMS inertial
+        measurement unit was selected for embedded impact detection. The
+        sensor integrates a 3-axis accelerometer and a 3-axis gyroscope
+        in a single QFN package (4 mm x 4 mm x 0.9 mm), communicating
+        via I2C at up to 400 kHz.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Parameter</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Value</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Relevance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Accelerometer range</td>
+            <td style="padding:10px; border:1px solid #ddd;">&plusmn;2/4/8/16 g (configurable)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Configurable &plusmn;2/4/8/16 g (hardware range); configured to &plusmn;16 g. Strike detection threshold: 20 m/s&sup2; (software L2 norm applied to raw acceleration vector)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Output data rate</td>
+            <td style="padding:10px; border:1px solid #ddd;">Up to 1 kHz</td>
+            <td style="padding:10px; border:1px solid #ddd;">Sampled at 200 Hz (matched to Teensy unified loop)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">I2C addresses</td>
+            <td style="padding:10px; border:1px solid #ddd;"><code>0x68</code> (AD0 LOW), <code>0x69</code> (AD0 HIGH)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Limits to 2 sensors per I2C bus; dual-bus topology required for 4 sensors</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Operating voltage</td>
+            <td style="padding:10px; border:1px solid #ddd;">3.3V (logic), 5V tolerant via breakout</td>
+            <td style="padding:10px; border:1px solid #ddd;">Compatible with Teensy 4.0 3.3V logic levels</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">Cost</td>
+            <td style="padding:10px; border:1px solid #ddd;">~$2 per breakout board</td>
+            <td style="padding:10px; border:1px solid #ddd;">Enables deployment of 4 sensors within budget</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The gyroscope channels are not used for strike detection. Velocity
+        integration was evaluated but abandoned due to thermal random-walk
+        drift inherent in MEMS gyroscopes. The system relies exclusively
+        on accelerometer peak-vector magnitude tracking for impact
+        classification.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. I2C TOPOLOGY                                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Quad-IMU I2C Topology</h3>
+      <p>
+        The MPU6050 supports only two I2C addresses (<code>0x68</code>
         and <code>0x69</code>, selected by the AD0 pin). To accommodate
-        four sensors, the Teensy 4.0's two independent hardware I²C
+        four sensors, the Teensy 4.0's two independent hardware I2C
         buses are both utilised:
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; text-align:left;">I²C Bus</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">I2C Bus</th>
             <th style="padding:10px; border:1px solid #ddd; text-align:left;">Teensy Pins</th>
             <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x68</th>
             <th style="padding:10px; border:1px solid #ddd; text-align:left;">Address 0x69</th>
@@ -100,31 +151,68 @@
             <td style="padding:10px; border:1px solid #ddd;"><code>Wire1</code></td>
             <td style="padding:10px; border:1px solid #ddd;">SDA: Pin 17, SCL: Pin 16</td>
             <td style="padding:10px; border:1px solid #ddd;">Right Body</td>
-            <td style="padding:10px; border:1px solid #ddd;">Reserved (Head)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Head Pad</td>
           </tr>
         </tbody>
       </table>
       <p>
-        Both buses operate at <strong>400 kHz</strong> (I²C Fast Mode).
+        Both buses operate at 400 kHz (I2C Fast Mode).
         Each MPU6050 read transaction requires approximately 14 bytes,
-        consuming ~280 µs per sensor at 400 kHz.
+        consuming ~280 &micro;s per sensor at 400 kHz.
       </p>
 
-      <h3>Wiring Considerations</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        Long (30–40 cm) unshielded jumper wires to padding zones introduce
-        parasitic capacitance. Impact on signal integrity at 400 kHz, and
-        mitigation through Hard STOP I²C protocol. See
-        <a href="troubleshooting.html">Troubleshooting §7</a>.
-      </sl-alert>
+      <image-component
+        tag="image"
+        source="../../../assets/system_architecture/data_imu.png"
+        subtitle="IMU data architecture: four MPU6050 sensors connected via I2C (400 kHz) to the Teensy 4.0 across two hardware buses (Wire, Wire1). Sensors cover Centre Pad (0x68), Left Body (0x69), Right Body (0x68), and Head Pad (0x69). Raw 3-axis acceleration data is packed into indices 9–20 of the 21-double /motor_feedback payload and published via micro-ROS.">
+      </image-component>
+    </div>
 
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. WIRING CONSIDERATIONS                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Wiring Considerations</h3>
+      <p>
+        The IMU sensors are embedded within the padding zones, connected
+        to the Teensy 4.0 via 30&ndash;40 cm unshielded jumper
+        wires routed through the arm mechanism. This wire length
+        introduces parasitic capacitance that degrades signal integrity
+        at 400 kHz I2C Fast Mode.
+      </p>
+      <p>
+        During integration testing, this parasitic capacitance caused the
+        MPU6050's internal state machine to lock the SDA line permanently
+        when an I2C "Repeated Start" command was issued. The bus hang was
+        unrecoverable without a full power cycle. The resolution involved
+        replacing all Repeated Start transactions with a physical
+        Hard STOP (<code>endTransmission(true)</code>)
+        after every register write, resetting the sensor state machine
+        before each read. This adds approximately 20 &micro;s of latency
+        per sensor, well within the 5 ms loop budget.
+      </p>
+      <p>
+        Full root-cause analysis and signal-integrity timing diagrams are
+        documented in
+        <a href="troubleshooting.html">Troubleshooting, Section 7: I2C Bus
+        Hang on Long-Wire IMU Routing</a>.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. STRIKE DETECTION PIPELINE                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
       <h3>Strike Detection Pipeline</h3>
       <p>
         The raw 3-axis acceleration from each IMU is included in the
         expanded <code>/motor_feedback</code> payload (21 doubles)
         published via micro-ROS at 200 Hz. On the application side
-        (GUI V3), the <strong>IMU Diagnostics Tab</strong> computes the
+        (GUI V4), the <strong>IMU Diagnostics Tab</strong> computes the
         L2 norm:
       </p>
       <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
@@ -135,9 +223,27 @@
         When ||a|| exceeds a configurable threshold (default: 2.0 g),
         the system registers a valid strike event and publishes data
         (sensor ID, peak acceleration, timestamp) to the
-        <code>/strike_events</code> ROS 2 topic.
+        <code>/robot/strike_detected</code> ROS 2 topic.
       </p>
 
+      <h4>Nyquist-Aware Sample Scanning</h4>
+      <p>
+        The GUI refresh rate (20 Hz) produces 50 ms frames, but punch
+        impact spikes can be as brief as 30 ms. A naive single-sample
+        evaluation at the GUI tick boundary would miss impacts occurring
+        between frames. The detection algorithm therefore scans
+        using <code>np.max(mag_arr[-n_scan:])</code>, where n_scan
+        equals the number of firmware samples per GUI frame (typically
+        10 at 200 Hz / 20 Hz).
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. IMU TIMING BUDGET                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
       <h3>IMU Timing Budget</h3>
       <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
         <h4 style="margin-top:0; color:#1e40af;">Within 200 Hz Unified Loop</h4>
@@ -154,7 +260,7 @@
               <td style="padding:8px; border:1px solid #c5cee0;">~0.8 ms</td>
             </tr>
             <tr>
-              <td style="padding:8px; border:1px solid #c5cee0;"><strong>I²C IMU reads (up to 4 sensors)</strong></td>
+              <td style="padding:8px; border:1px solid #c5cee0;"><strong>I2C IMU reads (up to 4 sensors)</strong></td>
               <td style="padding:8px; border:1px solid #c5cee0;"><strong>~1.1 ms</strong></td>
             </tr>
             <tr>

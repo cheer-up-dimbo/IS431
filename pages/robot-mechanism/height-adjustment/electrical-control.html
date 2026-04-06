@@ -11,6 +11,7 @@
   <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../../../components/lightbox/lightbox.js" defer></script>
   <style>
     .page-nav-row {
       display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
@@ -78,19 +79,39 @@
     <div>
       <h3>Motor Specification &amp; Selection</h3>
       <p>
-        The vertical axis uses a <strong>LGYMSZSS 24V DC gear motor</strong>
-        driving the HK2T screw-jack input shaft. The motor was selected
-        based on a back-calculated speed requirement of <strong>~800
-        rpm</strong> at the jack input to achieve the RM-3 travel-time
-        target.
+        The vertical axis uses a CHP-36GP-555 brushed DC
+        gear motor (24V, 36mm diameter) with an integrated all-metal
+        planetary gearbox (27:1 ratio) driving the HK2T screw-jack input
+        shaft. The motor was selected based on a back-calculated speed
+        requirement of approximately 800 rpm at the jack input to
+        achieve the RM-3 travel-time target.
       </p>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Content Pending:</strong> Full motor datasheet
-        specifications (rated torque, stall current, gear ratio), torque
-        calculation at the screw-jack under full payload, and motor
-        selection decision matrix to be added once validated.
-      </sl-alert>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Parameter</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Model</td><td style="padding:8px; border:1px solid #ddd;">CHP-36GP-555</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Type</td><td style="padding:8px; border:1px solid #ddd;">Brushed DC with all-metal planetary gearbox</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Supply voltage</td><td style="padding:8px; border:1px solid #ddd;">24V DC</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Gearbox ratio</td><td style="padding:8px; border:1px solid #ddd;">27:1 (i27)</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Output speed (no-load)</td><td style="padding:8px; border:1px solid #ddd;">440 RPM</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Rated current</td><td style="padding:8px; border:1px solid #ddd;">~2.6 A</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Stall current</td><td style="padding:8px; border:1px solid #ddd;">~21 A</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Rated torque</td><td style="padding:8px; border:1px solid #ddd;">~1.37 N&middot;m (14 kg&middot;cm)</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Shaft</td><td style="padding:8px; border:1px solid #ddd;">8 mm D-type</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Encoder</td><td style="padding:8px; border:1px solid #ddd;">AB phase Hall effect (present, currently unused)</td></tr>
+        </tbody>
+      </table>
+
+      <image-component
+        tag="image"
+        source="../../../assets/system_architecture/power_height.png"
+        subtitle="Height motor power subsystem: CHP-36GP-555 powered from the 24V bus via Cytron MDDS10 driver, with RegenClamp V0.3 interposed to protect the bus from back-EMF spikes on hard-stop deceleration. Generated from D2 source."
+      ></image-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -101,8 +122,8 @@
     <div>
       <h3>Motor Driver — Cytron MDDS10</h3>
       <p>
-        The <strong>Cytron MDDS10</strong> dual-channel motor driver
-        operates in <strong>Sign-Magnitude mode</strong>, requiring two
+        The Cytron MDDS10 dual-channel motor driver
+        operates in Sign-Magnitude mode, requiring two
         control signals: a PWM signal (speed) and a digital signal
         (direction). The corrected pin assignments are:
       </p>
@@ -154,10 +175,10 @@
       <h3>Self-Locking Safety</h3>
       <p>
         The HK2T screw-jack's travelling-nut design provides
-        <strong>inherent self-locking</strong>: the lead angle of the
+        inherent self-locking: the lead angle of the
         screw thread is below the friction angle, meaning the column
         holds position even when motor power is removed. This is a
-        critical safety feature — the robot must not descend
+        critical safety feature, as the robot must not descend
         unexpectedly onto the user during training.
       </p>
     </div>
@@ -165,60 +186,120 @@
     <sl-divider></sl-divider>
 
     <div>
-      <h3>Regenerative Braking &amp; Back-EMF</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        The full regenerative braking analysis — including back-EMF
-        physics, the software ramp-down mitigation, and residual risk
-        assessment — is documented in
-        <strong><a href="../arm-actuation/troubleshooting.html">
-        Troubleshooting &amp; Iteration — Defect 6</a></strong>.
-      </sl-alert>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <div>
-      <h3>Wiring Diagrams — Pending</h3>
-      <sl-alert variant="warning" open>
-        <sl-icon slot="icon" name="diagram-3"></sl-icon>
-        <strong>Wiring diagrams are required</strong> for three
-        subsystems:
-        <ul style="margin:8px 0 0 0;">
-          <li><strong>Height motor</strong> — MDDS10 PWM/DIR, power terminals, motor output</li>
-          <li><strong>Base rotation</strong> — CAN Modbus driver, E-stop, Arduino R4 WiFi</li>
-          <li><strong>IMU (Padding)</strong> — Quad-MPU6050 I²C dual-bus topology</li>
-        </ul>
-      </sl-alert>
-    </div>
-
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 6. POWER INTEGRATION                                   -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Power Integration</h3>
+      <h3>Regenerative Braking and Brake Resistor Sizing</h3>
       <p>
-        The height motor is connected to the <strong>24V motor
-        bus</strong> via the shared terminal block, alongside the four
-        Damiao arm motors. The dual-rail power architecture (documented
-        in <a href="../arm-actuation/electrical-integration.html">
-        Arm Actuation — Electrical Integration</a>) isolates the 12V
-        logic rail from the motor bus, ensuring that OVP trips caused by
-        height motor back-EMF do not propagate to the Jetson or Teensy.
+        The firmware ramp-down mitigation governs deceleration during
+        height adjustment operations; the RegenClamp V0.3 dissipates
+        residual back-EMF on the 24V bus at end-of-travel. At full rated
+        speed, the motor armature decelerates over the firmware-controlled
+        ramp, converting kinetic energy into a back-EMF voltage that is
+        absorbed by the RegenClamp before it can exceed the PSU
+        over-voltage protection (OVP) threshold (~28V).
       </p>
-      <sl-alert variant="neutral" open>
+      <p>
+        The full back-EMF physics and software ramp-down mitigation are
+        documented in
+        <a href="../arm-actuation/troubleshooting.html">Arm Actuation
+        Troubleshooting: Defect 6</a>. This section documents the
+        hardware brake resistor sized against the confirmed motor specs.
+      </p>
+
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#1e40af;">Brake Resistor Derivation</h4>
+        <p>
+          Winding resistance from confirmed stall current:
+        </p>
+        <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
+          R<sub>winding</sub> = V<sub>supply</sub> / I<sub>stall</sub> = 24V / 21A &asymp; 1.14 &Omega;
+        </p>
+        <p>
+          The RegenClamp V0.3 clamps the bus at ~26.5V and diverts energy
+          through the brake resistor:
+        </p>
+        <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
+          I<sub>brake</sub> = 26.5V / 10&Omega; = 2.65A &nbsp;&nbsp;
+          P<sub>peak</sub> = 26.5V &times; 2.65A &asymp; 70W
+        </p>
+      </div>
+
+      <h4>Brake Resistor Validation</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+            <th style="padding:8px; border:1px solid #ddd;">Previous (Estimated)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Confirmed (CHP-36GP-555)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Winding resistance</td>
+            <td style="padding:8px; border:1px solid #ddd;">~1&ndash;2 &Omega;</td>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>1.14 &Omega;</strong> (24V / 21A)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Within assumed range</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Braking current</td>
+            <td style="padding:8px; border:1px solid #ddd;">Estimated</td>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>2.65 A</strong> (26.5V / 10&Omega;)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Below 30A clamp limit</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Peak brake power</td>
+            <td style="padding:8px; border:1px solid #ddd;">Estimated</td>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>70W</strong> for &lt;300ms pulses</td>
+            <td style="padding:8px; border:1px solid #ddd;">50W aluminium body handles short pulses</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Max unprotected regen current</td>
+            <td style="padding:8px; border:1px solid #ddd;">~13A (estimated)</td>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>~21A</strong> (V / R<sub>winding</sub>)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strengthens RegenClamp necessity</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="warning" open>
+        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+        <strong>Procurement Required:</strong> Brake resistor specified as
+        a <strong>10&Omega; / 50W aluminium-housed wirewound resistor</strong>
+        (to procure). Must be installed between the RegenClamp output and
+        the MDDS10 power input before the software ramp-down safety net is
+        removed from firmware.
+      </sl-alert>
+
+      <sl-alert variant="primary" open>
         <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Content Pending:</strong> Current draw profile during
-        height adjustment operations (steady-state, peak inrush, and
-        back-EMF transient measurements) to be added once instrumented.
+        <strong>Significance:</strong> The confirmed stall current of 21A
+        means unprotected hard-stops would inject ~21A of regen current
+        onto the 24V bus, almost certainly exceeding the PSU OVP threshold
+        (~28V). The RegenClamp limits this to a controlled 2.65A discharge,
+        quantitatively justifying the hardware protection.
       </sl-alert>
     </div>
 
     <sl-divider></sl-divider>
 
+    <div>
+      <h3>Height Motor Power Subsystem</h3>
+      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
+        <img src="../../../assets/system_architecture/power_height.png"
+             alt="Height adjustment power subsystem"
+             data-zoom
+             title="Click to enlarge"
+             style="width:100%; min-width:400px; max-width:800px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
+        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
+          Height motor power subsystem: CHP-36GP-555 brushed DC motor on the 24V bus via
+          Cytron MDDS10 driver, with RegenClamp V0.3 and 10&Omega;/50W brake resistor for
+          back-EMF dissipation. <span style="color:#3b82f6;"> &mdash; Click to enlarge.</span>
+        </div>
+      </div>
+    </div>
+
+
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. VERIFICATION TARGETS                                -->
+    <!-- 6. VERIFICATION TARGETS                                -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Verification Targets</h3>
