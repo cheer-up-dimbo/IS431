@@ -6,6 +6,14 @@
 (function () {
   'use strict';
 
+  // ─── Base Path (derived from this script's URL) ────────────────────
+  // Script lives at {base}/components/report-nav/report-nav.js
+  // so we strip that suffix to get the site root URL.
+  const _script = document.currentScript;
+  const BASE = _script
+    ? _script.src.replace(/\/components\/report-nav\/report-nav\.js.*$/, '')
+    : '';
+
   // ─── Navigation Structure ───────────────────────────────────────────
   const NAV_TREE = [
     {
@@ -138,7 +146,7 @@
   }
 
   function resolveHref(href) {
-    return href;
+    return BASE + href;
   }
 
   function isActive(href) {
@@ -333,7 +341,7 @@
   // ─── Inject ─────────────────────────────────────────────────────────
   function init() {
     // Inject CSS
-    const cssPath = resolveHref('/components/report-nav/report-nav.css');
+    const cssPath = BASE + '/components/report-nav/report-nav.css';
     if (!document.querySelector('link[href*="report-nav"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
