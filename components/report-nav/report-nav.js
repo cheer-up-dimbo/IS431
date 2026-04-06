@@ -81,7 +81,7 @@
       children: [
         { label: 'Appendix 1: Upper Mechanism', href: '/pages/appendix-upper.html' },
         { label: 'Appendix 2: Lower Mechanism', href: '/pages/appendix-lower.html' },
-        { label: 'Appendix 4: Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
+        { label: 'Appendix 6: Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
       ]
     },
   ];

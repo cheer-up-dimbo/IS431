@@ -31,7 +31,7 @@
     <br>
 
     <!-- 5.3.6 INTRO -->
-    <h1>5.3.6 Testing & Validation</h1>
+    <h2>5.3.6 Testing & Validation</h2>
 
     <p>
       The Robot Intelligence subsystem was validated through real-world deployment, automated test suites,
@@ -101,8 +101,17 @@
       motivated the Transformer-based action recognition model.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="Figure: CDE Fair Version — ROS 2 Architecture (9 packages)"></image-component>
-    <image-component tag="image" source="../assets/robot_intelligence/cde_fair/reaction_drill_flow.png" subtitle="Figure: Reaction Drill State Flow"></image-component>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; align-items:end;">
+      <div>
+        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="CDE Fair — ROS 2 Architecture" width="100%"></image-component>
+      </div>
+      <div>
+        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/cv_pipeline.png" subtitle="CDE Fair — HSV CV Pipeline" width="100%"></image-component>
+      </div>
+      <div>
+        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/reaction_drill_flow.png" subtitle="Reaction Drill State Flow" width="100%"></image-component>
+      </div>
+    </div>
 
     <sl-divider></sl-divider>
 
@@ -149,7 +158,7 @@
       <li><strong>Gamification persistence (7)</strong>: XP tracking, rank progression, personal records</li>
     </ul>
 
-    <p>Run command: <code>python3 -m pytest tests/ -v</code></p>
+    <p style="text-align:left;">Run command: <code>python3 -m pytest tests/ -v</code></p>
 
     <sl-divider></sl-divider>
 
@@ -169,7 +178,7 @@
       <li>Reaction time detection logic</li>
     </ul>
 
-    <p>Run command: <code>python3 notebooks/scripts/test_integration.py</code></p>
+    <p style="text-align:left;">Run command: <code>python3 notebooks/scripts/test_integration.py</code></p>
 
     <sl-divider></sl-divider>
 
@@ -184,15 +193,21 @@
       pad impacts with configurable force) and auto mode (predefined punch sequences for reproducible testing).
     </p>
 
-    <p>Used in development mode: <code>ros2 launch boxbunny_core boxbunny_dev.launch.py</code></p>
+    <p style="text-align:left;">Used in development mode: <code>ros2 launch boxbunny_core boxbunny_dev.launch.py</code></p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Teensy Simulator — manual impact injection"></image-component>
-    <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Simulator preset configuration"></image-component>
+    <div style="display:grid; grid-template-columns:2fr 3fr; gap:16px; margin:16px 0; align-items:center;">
+      <div>
+        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Teensy Simulator — manual impact injection" width="100%"></image-component>
+      </div>
+      <div>
+        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Preset configuration" width="100%"></image-component>
+      </div>
+    </div>
 
-    <div class="video-row single">
+    <div class="video-row single" style="margin-top:12px;">
       <div class="video-box">
-        <video autoplay loop muted playsinline src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska"></video>
-        <sub>Teensy Simulator — demo walkthrough</sub>
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska" style="max-width:700px;"></video>
+        <sub>Teensy Simulator in action — injecting pad impacts and observing system response</sub>
       </div>
     </div>
 
@@ -228,61 +243,89 @@
     <!-- 5.3.6.6 MODEL VALIDATION & INTERPRETABILITY -->
     <h2>5.3.6.6 Model Validation & Interpretability</h2>
 
+    <p>
+      This section presents how well the final model performs and provides visual evidence
+      of what the model has learned internally. The goal is to verify that the model is
+      making decisions for the right reasons, not just memorising patterns.
+    </p>
+
     <h3>Overall Performance</h3>
 
     <p>
       The deployed model (v11) achieves <strong>96.8% validation accuracy</strong> on an unseen person
-      and <strong>94.2% macro F1-score</strong>, with only 7/222 samples misclassified. Model v10
-      reached 97.3% but had poorer live block detection, so v11 was selected.
+      and <strong>94.2% macro F1-score</strong>, with only 7 out of 222 samples misclassified. Model v10
+      reached 97.3% but had poorer live block detection, so v11 was selected for deployment.
     </p>
 
-    <h3>Confusion Matrix</h3>
+    <h3>Classification Results</h3>
 
     <p>
-      Most errors occur between biomechanically similar punches &mdash; left hook confused with
-      left uppercut, block confused with idle. Block has the lowest per-class accuracy (66.7%)
-      due to only 6 validation samples.
+      The <strong>confusion matrix</strong> (left) shows exactly where the model gets confused.
+      Each cell represents how often a true punch type (row) was predicted as another type (column).
+      The strong diagonal means the model is correct most of the time. The few off-diagonal
+      cells reveal that errors occur between biomechanically similar punches &mdash; for example,
+      left hook confused with left uppercut (both involve the left arm swinging), and block
+      confused with idle (both involve minimal movement).
     </p>
-
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Figure: Confusion Matrix — 7/222 misclassifications"></image-component>
-
-    <h3>Per-Class Accuracy</h3>
-
     <p>
-      Right hook and right uppercut: 100%. Cross: 98.1%. Jab: 96.4%. Left hook: 96.0%.
-      Left uppercut: 91.7%. Idle: 100%. Block: 66.7%.
+      The <strong>per-class accuracy</strong> chart (right) shows the hit rate for each punch type
+      individually. Most classes exceed 96%, with right hook and right uppercut achieving
+      perfect 100%. Block is the weakest at 66.7%, primarily because it had only 6 validation
+      samples &mdash; meaning just 2 misclassifications drop it significantly. Collecting more
+      block samples would likely improve this.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Figure: Per-Class Accuracy"></image-component>
+    <div class="video-row two-up">
+      <div class="video-box">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Confusion Matrix — 7/222 misclassifications" width="100%"></image-component>
+      </div>
+      <div class="video-box">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Per-Class Accuracy — most classes above 96%" width="100%"></image-component>
+      </div>
+    </div>
 
     <h3>Training Convergence</h3>
 
     <p>
-      A 2&times;2 dashboard showing loss, accuracy, learning rate, and train-val gap across 133 epochs.
-      The model converged at epoch 73 with minimal overfitting.
+      The dashboard below tracks how the model improved during training. The <strong>loss</strong>
+      (top-left) measures how wrong the model's predictions are &mdash; lower is better. The
+      <strong>accuracy</strong> (top-right) shows the percentage of correct predictions on both
+      training data (blue) and unseen validation data (pink). The gap between the two lines
+      indicates overfitting &mdash; here the gap stays narrow, confirming the model generalises
+      well rather than memorising training examples. The model reached its best performance at
+      epoch 73 out of 133.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/training_overview.png" subtitle="Figure: Training Overview — convergence at epoch 73 with minimal overfitting"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/training_overview.png" subtitle="Training Overview — convergence at epoch 73, minimal overfitting gap"></image-component>
 
-    <h3>t-SNE Embeddings</h3>
+    <h3>What the Model Learned (t-SNE Visualisation)</h3>
 
     <p>
-      The 384-dimensional sequence embeddings projected to 2D via t-SNE show tight, well-separated
-      clusters per action class. Clusters with partial overlap (e.g., left hook / left uppercut)
-      correspond to the highest off-diagonal confusion matrix values.
+      To understand what the model has learned internally, its high-dimensional representations
+      (384 dimensions) are compressed to 2D using a technique called t-SNE. Each dot represents
+      one punch sample, coloured by its true class. If the model has learned meaningful features,
+      samples of the same punch type should cluster together and different types should be
+      separated. The plot below confirms this &mdash; tight, well-separated clusters for each
+      action class. Notably, the clusters that show partial overlap (left hook / left uppercut)
+      match exactly the classes that confuse the model in the confusion matrix above.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="Figure: t-SNE Embeddings — well-separated clusters indicate discriminative feature learning"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="t-SNE Embeddings — each dot is a punch sample, same-colour clusters confirm discriminative learning" width="70%"></image-component>
 
-    <h3>Attention Heatmaps</h3>
+    <h3>Temporal Attention Patterns</h3>
 
     <p>
-      Per-layer attention across 4 Transformer layers reveals meaningful temporal learning:
-      early layers attend to nearby frames, later layers cover the full 12-frame window.
-      This local-to-global progression confirms hierarchical temporal reasoning.
+      The model uses a Transformer architecture that decides how much attention to pay to each
+      frame in the 12-frame input window. The heatmaps below show these attention patterns
+      across the 4 Transformer layers. <strong>Early layers</strong> (left) focus on nearby frames
+      &mdash; the model first looks at local motion. <strong>Later layers</strong> (right) attend
+      across the full window &mdash; combining local cues into a broader understanding of the
+      full punch trajectory. This progression from local to global attention is a hallmark of
+      effective temporal learning and confirms the model is reasoning about motion sequences,
+      not just reacting to individual frames.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/attention_heatmap_layers.png" subtitle="Figure: Transformer Attention — early layers local, later layers capture broader patterns"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/attention_heatmap_layers.png" subtitle="Transformer Attention — early layers attend locally, later layers capture full punch trajectories"></image-component>
 
     <sl-divider></sl-divider>
 
