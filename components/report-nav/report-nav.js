@@ -80,8 +80,15 @@
       ]
     },
     {
-      label: '6. Project Timeline',
-      href: '/index.html#project-timeline',
+      label: '6. Discussion & Future Work',
+      href: '/index.html#future-work',
+      children: [
+        { label: '6.1 Discussion', href: '/index.html#discussion' },
+        { label: '6.2 Limitations', href: '/index.html#limitations' },
+        { label: '6.3 Recommendations', href: '/index.html#recommendations' },
+        { label: '6.4 Test Plan', href: '/index.html#test-plan' },
+        { label: '6.5 Conclusion', href: '/index.html#conclusion' },
+      ]
     },
     {
       label: 'References',
@@ -245,11 +252,15 @@
         });
       }
 
-      const labelSpan = document.createElement('span');
-      labelSpan.textContent = section.label;
-      sectionEl.appendChild(labelSpan);
-
       if (hasChildren) {
+        // Label is a clickable link that navigates to the section
+        const labelLink = document.createElement('a');
+        labelLink.textContent = section.label;
+        labelLink.href = resolveHref(section.href);
+        labelLink.style.cssText = 'color:inherit; text-decoration:none; flex:1;';
+        labelLink.addEventListener('click', (e) => e.stopPropagation());
+        sectionEl.appendChild(labelLink);
+
         const arrow = document.createElement('span');
         arrow.className = 'report-nav__section-arrow';
         arrow.textContent = '▶';
@@ -331,6 +342,9 @@
         nav.appendChild(linksList);
       } else {
         // No children — make it a direct link
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = section.label;
+        sectionEl.appendChild(labelSpan);
         sectionEl.style.cursor = 'pointer';
         sectionEl.addEventListener('click', () => {
           window.location.href = resolveHref(section.href);
