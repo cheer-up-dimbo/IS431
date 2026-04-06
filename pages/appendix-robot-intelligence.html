@@ -33,30 +33,29 @@
     <!-- A. FULL UNIT TEST BREAKDOWN -->
     <h3>A. Full Unit Test Breakdown</h3>
     <p>
-      The 146 unit tests are distributed across 3 test files, supported by 12
-      shared pytest fixtures defined in <code>conftest.py</code>.
+      146 unit tests across 3 test files, supported by 12 shared pytest fixtures in <code>conftest.py</code>.
     </p>
 
     <h4>Shared Fixtures</h4>
     <ul>
-      <li><code>db_manager</code> — fresh database per test</li>
-      <li><code>sample_user</code> — test account</li>
-      <li><code>sample_profiles</code> — beginner / intermediate / coach</li>
-      <li><code>sample_session</code> — training session with 87 punches</li>
-      <li><code>sample_sparring_session</code> — sparring with 210 punches</li>
-      <li><code>sample_punch_events</code> — CV + IMU + confirmed punches</li>
-      <li><code>sample_defense_data</code> — defense scenarios</li>
+      <li><code>db_manager</code> &mdash; fresh database per test</li>
+      <li><code>sample_user</code> &mdash; test account</li>
+      <li><code>sample_profiles</code> &mdash; beginner / intermediate / coach</li>
+      <li><code>sample_session</code> &mdash; training session with 87 punches</li>
+      <li><code>sample_sparring_session</code> &mdash; sparring with 210 punches</li>
+      <li><code>sample_punch_events</code> &mdash; CV + IMU + confirmed punches</li>
+      <li><code>sample_defense_data</code> &mdash; defense scenarios</li>
     </ul>
 
-    <h4>test_punch_fusion.py — 44 tests</h4>
+    <h4>test_punch_fusion.py &mdash; 44 tests</h4>
     <table>
       <thead>
         <tr><th>Test Class</th><th>Tests</th><th>Coverage</th></tr>
       </thead>
       <tbody>
-        <tr><td>TestRingBuffer</td><td>7</td><td>Ring buffer operations: maxlen eviction, time-based expiry, pop_match</td></tr>
+        <tr><td>TestRingBuffer</td><td>7</td><td>Ring buffer: maxlen eviction, time-based expiry, pop_match</td></tr>
         <tr><td>TestCVIMUFusion</td><td>3</td><td>Fusion matching: within/outside window, closest-first priority</td></tr>
-        <tr><td>TestPadConstraints</td><td>10</td><td>Each punch &rarr; valid pad mapping (jab&rarr;centre, left_hook&rarr;left, etc.)</td></tr>
+        <tr><td>TestPadConstraints</td><td>10</td><td>Each punch &rarr; valid pad mapping</td></tr>
         <tr><td>TestReclassification</td><td>8</td><td>Secondary prediction fallback, confidence thresholds</td></tr>
         <tr><td>TestExpiredEvents</td><td>4</td><td>CV and IMU event expiry after timeout</td></tr>
         <tr><td>TestDefenseClassification</td><td>8</td><td>Block, slip, dodge, hit priority ordering</td></tr>
@@ -64,13 +63,13 @@
       </tbody>
     </table>
 
-    <h4>test_gamification.py — 30 tests</h4>
+    <h4>test_gamification.py &mdash; 30 tests</h4>
     <table>
       <thead>
         <tr><th>Test Class</th><th>Tests</th><th>Coverage</th></tr>
       </thead>
       <tbody>
-        <tr><td>TestRankSystem</td><td>10</td><td>All 6 rank tiers (Novice&rarr;Elite), boundary conditions</td></tr>
+        <tr><td>TestRankSystem</td><td>10</td><td>All 6 tiers (Novice &rarr; Elite), boundary conditions</td></tr>
         <tr><td>TestSessionXP</td><td>7</td><td>Base XP per mode, completion bonus, multiplier, streak, floor</td></tr>
         <tr><td>TestSessionScore</td><td>5</td><td>Perfect/zero/partial scores, boundary values</td></tr>
         <tr><td>TestAchievements</td><td>5</td><td>Unlock conditions, duplicate prevention, listing</td></tr>
@@ -78,13 +77,13 @@
       </tbody>
     </table>
 
-    <h4>test_database.py — 45+ tests</h4>
+    <h4>test_database.py &mdash; 45+ tests</h4>
     <table>
       <thead>
         <tr><th>Test Class</th><th>Tests</th><th>Coverage</th></tr>
       </thead>
       <tbody>
-        <tr><td>TestUserManagement</td><td>13</td><td>Create, duplicate prevention, password verify, get, list, coach type</td></tr>
+        <tr><td>TestUserManagement</td><td>13</td><td>Create, duplicate prevention, password verify, get, list, coach</td></tr>
         <tr><td>TestPatternLock</td><td>5</td><td>Set/verify pattern, wrong pattern, no pattern, overwrite</td></tr>
         <tr><td>TestGuestSessions</td><td>5</td><td>Create, multiple, claim, double-claim prevention</td></tr>
         <tr><td>TestPresets</td><td>7</td><td>Create, update, invalid field rejection, use count, favourites</td></tr>
@@ -98,15 +97,14 @@
     <!-- B. CDE FAIR CV PIPELINE -->
     <h3>B. CDE Fair CV Pipeline</h3>
     <p>
-      The CDE Fair version used HSV colour-based glove tracking as the primary
-      detection method, as the Transformer-based action recognition model was not
-      ready in time. This pipeline was replaced entirely in the final system.
+      The CDE Fair version used HSV colour-based glove tracking as the primary detection method.
+      The Transformer model was not ready in time. This pipeline was replaced entirely in the final system.
     </p>
 
     <image-component
       tag="image"
       source="../assets/robot_intelligence/cde_fair/cv_pipeline.png"
-      subtitle="Figure: CDE Fair Computer Vision Pipeline — HSV colour tracking with depth-based punch detection">
+      subtitle="Figure: CDE Fair CV Pipeline — HSV colour tracking with depth-based punch detection">
     </image-component>
 
     <sl-divider></sl-divider>
@@ -114,9 +112,8 @@
     <!-- C. ROC CURVES -->
     <h3>C. ROC Curves</h3>
     <p>
-      Receiver Operating Characteristic curves for each action class (one-vs-rest)
-      plus the micro-averaged curve. The micro-averaged AUC of 0.999 indicates
-      near-perfect class separability across all 8 action classes.
+      One-vs-rest ROC curves for each action class plus the micro-averaged curve.
+      Micro-averaged AUC of 0.999 indicates near-perfect class separability across all 8 actions.
     </p>
 
     <image-component

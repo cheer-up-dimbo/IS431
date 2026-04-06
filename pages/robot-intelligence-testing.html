@@ -34,9 +34,8 @@
     <h1>5.3.6 Testing & Validation</h1>
 
     <p>
-      The Robot Intelligence subsystem was validated through a combination of real-world deployment testing, automated
-      test suites, and detailed model analysis. This section covers the testing methodology, results, and identified
-      limitations.
+      The Robot Intelligence subsystem was validated through real-world deployment, automated test suites,
+      and detailed model analysis. This section covers methodology, results, and limitations.
     </p>
 
     <sl-divider></sl-divider>
@@ -45,15 +44,12 @@
     <h2>5.3.6.1 CDE AI Fair &mdash; Real-World Deployment</h2>
 
     <p>
-      BoxBunny was deployed as a prototype at the &ldquo;Robotics Meets AI Showcase&rdquo; event in late January 2025,
-      where members of the public physically interacted with the robot in a live demonstration setting. This was an
-      earlier, streamlined version of the system running 9 ROS 2 packages with HSV colour-based glove tracking and
-      3 training drill modes (Reaction Time, Shadow Sparring, Defence).
+      <strong>BoxBunny</strong> was deployed at the "Robotics Meets AI Showcase" in late January 2025.
+      Members of the public physically interacted with the robot in a live setting. This earlier version
+      ran 9 ROS 2 packages with HSV colour-based glove tracking and 3 drill modes.
     </p>
 
-    <p>
-      The showcase revealed several real-world challenges that directly informed the design of the final system:
-    </p>
+    <p>The showcase revealed real-world challenges that directly shaped the final system:</p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <caption style="caption-side:bottom; text-align:left; padding-top:8px; font-size:0.85rem; color:#666;">
@@ -70,40 +66,39 @@
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Background clutter</td>
           <td style="padding:8px; border:1px solid #ddd;">People walking behind the user caused false punch detections</td>
-          <td style="padding:8px; border:1px solid #ddd;">Nearest-person tracking algorithm prioritises closest and largest person</td>
+          <td style="padding:8px; border:1px solid #ddd;">Nearest-person tracking prioritises closest and largest person</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Colour tracking failure</td>
-          <td style="padding:8px; border:1px solid #ddd;">HSV glove tracking susceptible to similarly-coloured objects in the environment</td>
-          <td style="padding:8px; border:1px solid #ddd;">Replaced entirely with Transformer-based action recognition model</td>
+          <td style="padding:8px; border:1px solid #ddd;">HSV glove tracking susceptible to similarly-coloured objects</td>
+          <td style="padding:8px; border:1px solid #ddd;">Replaced with Transformer-based action recognition model</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Variable punching stances</td>
-          <td style="padding:8px; border:1px solid #ddd;">Fixed velocity thresholds unreliable across different users</td>
-          <td style="padding:8px; border:1px solid #ddd;">Switched to depth-based proximity detection (hand approaching camera)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Fixed velocity thresholds unreliable across users</td>
+          <td style="padding:8px; border:1px solid #ddd;">Switched to depth-based proximity detection</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">LLM cold start</td>
           <td style="padding:8px; border:1px solid #ddd;">Several seconds delay on first coaching prompt</td>
-          <td style="padding:8px; border:1px solid #ddd;">Lazy model loading at GUI startup instead of first prompt</td>
+          <td style="padding:8px; border:1px solid #ddd;">Lazy model loading at GUI startup</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Touchscreen input friction</td>
-          <td style="padding:8px; border:1px solid #ddd;">Typing questions on 7&Prime; touchscreen awkward &mdash; users had to bend down</td>
-          <td style="padding:8px; border:1px solid #ddd;">Phone dashboard enables mobile interaction from user's own device</td>
+          <td style="padding:8px; border:1px solid #ddd;">Typing on 7&Prime; touchscreen awkward with gloves</td>
+          <td style="padding:8px; border:1px solid #ddd;">Phone dashboard enables mobile interaction</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Camera resource contention</td>
           <td style="padding:8px; border:1px solid #ddd;">Multiple CV consumers each opening camera caused contention</td>
-          <td style="padding:8px; border:1px solid #ddd;">Single camera node publishes to shared topics that all consumers subscribe to</td>
+          <td style="padding:8px; border:1px solid #ddd;">Single camera node publishes to shared topics</td>
         </tr>
       </tbody>
     </table>
 
     <p>
-      These real-world deployment lessons directly shaped the final BoxBunny system &mdash; most notably, the colour
-      tracking limitations motivated the entire development of the Transformer-based action recognition model that
-      became the core of the final system.
+      These lessons directly shaped the final system. Most notably, colour tracking limitations
+      motivated the Transformer-based action recognition model.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="Figure: CDE Fair Version — ROS 2 Architecture (9 packages)"></image-component>
@@ -115,10 +110,10 @@
     <h2>5.3.6.2 Testing Infrastructure</h2>
 
     <p>
-      Testing followed a bottom-up strategy: unit tests validate individual components, integration tests verify
-      cross-module communication, and system-level testing uses hardware simulation and operational notebooks.
-      In total: <strong>146 pytest unit tests</strong>, <strong>28 integration tests</strong>, and a
-      <strong>12-section master notebook</strong> covering the full operational test workflow.
+      Testing followed a bottom-up strategy: unit tests validate individual components, integration tests
+      verify cross-module communication, and system-level testing uses hardware simulation.
+      Totals: <strong>146 pytest unit tests</strong>, <strong>28 integration tests</strong>, and a
+      <strong>12-section master notebook</strong> for the full operational workflow.
     </p>
 
     <sl-divider></sl-divider>
@@ -127,31 +122,31 @@
     <h2>5.3.6.3 Key Unit Tests</h2>
 
     <p>
-      The 146 unit tests are organised across 3 test files with 12 shared pytest fixtures. The most critical test
-      categories are highlighted below (full breakdown available in the Appendix):
+      146 unit tests across 3 files with 12 shared pytest fixtures. Key categories highlighted below
+      (full breakdown in the Appendix):
     </p>
 
     <h3>Sensor Fusion &mdash; 44 tests (<code>test_punch_fusion.py</code>)</h3>
     <ul>
-      <li><strong>Ring buffer operations (7 tests)</strong>: maxlen eviction, time-based expiry, pop_match behaviour</li>
-      <li><strong>Pad-constraint filtering (10 tests)</strong>: validates that each punch type is only accepted on biomechanically valid pads (e.g., jab only on centre pad, left hook only on left pad)</li>
-      <li><strong>Reclassification (8 tests)</strong>: verifies secondary prediction fallback when primary prediction violates pad constraints</li>
-      <li><strong>Defence classification (8 tests)</strong>: validates priority ordering (HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN)</li>
+      <li><strong>Ring buffer operations (7)</strong>: maxlen eviction, time-based expiry, pop_match</li>
+      <li><strong>Pad-constraint filtering (10)</strong>: each punch type accepted only on valid pads</li>
+      <li><strong>Reclassification (8)</strong>: secondary prediction fallback on pad constraint violations</li>
+      <li><strong>Defence classification (8)</strong>: priority ordering (HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN)</li>
     </ul>
 
     <h3>Gamification &mdash; 30 tests (<code>test_gamification.py</code>)</h3>
     <ul>
-      <li><strong>Rank system (10 tests)</strong>: all 6 tiers from Novice to Elite, boundary conditions, XP calculations</li>
-      <li><strong>Session XP (7 tests)</strong>: base XP per mode, completion bonus, difficulty multiplier, streak bonus</li>
-      <li><strong>Achievements (5 tests)</strong>: unlock conditions, duplicate prevention</li>
+      <li><strong>Rank system (10)</strong>: all 6 tiers, boundary conditions, XP calculations</li>
+      <li><strong>Session XP (7)</strong>: base XP per mode, completion bonus, difficulty multiplier, streak</li>
+      <li><strong>Achievements (5)</strong>: unlock conditions, duplicate prevention</li>
     </ul>
 
     <h3>Database &mdash; 45+ tests (<code>test_database.py</code>)</h3>
     <ul>
-      <li><strong>User management (13 tests)</strong>: CRUD operations, password verification, duplicate prevention</li>
-      <li><strong>Pattern lock (5 tests)</strong>: SHA-256 hashing, set/verify/overwrite</li>
-      <li><strong>Session persistence (8 tests)</strong>: save/retrieve, mode filtering, event logging</li>
-      <li><strong>Gamification persistence (7 tests)</strong>: XP tracking, rank progression, personal records</li>
+      <li><strong>User management (13)</strong>: CRUD, password verification, duplicate prevention</li>
+      <li><strong>Pattern lock (5)</strong>: SHA-256 hashing, set/verify/overwrite</li>
+      <li><strong>Session persistence (8)</strong>: save/retrieve, mode filtering, event logging</li>
+      <li><strong>Gamification persistence (7)</strong>: XP tracking, rank progression, personal records</li>
     </ul>
 
     <p>Run command: <code>python3 -m pytest tests/ -v</code></p>
@@ -167,10 +162,10 @@
 
     <ul>
       <li>Configuration loading and YAML validation across all config files</li>
-      <li>Pad-location constraint mapping correctness (punch type &rarr; pad validity matrix)</li>
-      <li>CV + IMU fusion algorithm end-to-end (temporal matching, reclassification)</li>
-      <li>All 21 ROS message field verification (every custom message type has correct fields)</li>
-      <li>Motor protocol validation (punch codes 1&ndash;6 map correctly to motor commands)</li>
+      <li>Pad-location constraint mapping (punch type &rarr; pad validity matrix)</li>
+      <li>CV + IMU fusion end-to-end (temporal matching, reclassification)</li>
+      <li>All 21 ROS message field verification</li>
+      <li>Motor protocol validation (punch codes 1&ndash;6 &rarr; motor commands)</li>
       <li>Reaction time detection logic</li>
     </ul>
 
@@ -184,10 +179,9 @@
     <h3>Teensy Simulator</h3>
 
     <p>
-      A GUI-based simulator that emulates the Teensy 4.1 microcontroller with 6 IMU sensors (4 pad sensors + 2 arm
-      sensors), enabling complete system testing without physical hardware. The simulator supports manual mode (click
-      buttons to inject individual pad impacts with configurable force levels) and auto mode (execute predefined punch
-      sequences for reproducible testing). Preset configurations allow different test scenarios to be saved and replayed.
+      A GUI-based simulator emulating the Teensy 4.1 with 6 IMU sensors (4 pad + 2 arm),
+      enabling full system testing without physical hardware. Supports manual mode (click to inject
+      pad impacts with configurable force) and auto mode (predefined punch sequences for reproducible testing).
     </p>
 
     <p>Used in development mode: <code>ros2 launch boxbunny_core boxbunny_dev.launch.py</code></p>
@@ -197,7 +191,7 @@
 
     <div class="video-row single">
       <div class="video-box">
-        <video controls src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska"></video>
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska"></video>
         <sub>Teensy Simulator — demo walkthrough</sub>
       </div>
     </div>
@@ -224,7 +218,7 @@
     <h3>Launch Configurations</h3>
 
     <ul>
-      <li><code>boxbunny_dev.launch.py</code> &mdash; Development mode with Teensy simulator (no physical hardware needed)</li>
+      <li><code>boxbunny_dev.launch.py</code> &mdash; Development mode with Teensy simulator (no hardware needed)</li>
       <li><code>boxbunny_full.launch.py</code> &mdash; Production mode with real hardware</li>
       <li><code>headless.launch.py</code> &mdash; Processing nodes only (no GUI)</li>
     </ul>
@@ -237,18 +231,17 @@
     <h3>Overall Performance</h3>
 
     <p>
-      The deployed model (v11) achieves <strong>96.8% validation accuracy</strong> on an unseen person,
-      <strong>94.2% macro F1-score</strong>, with only 7 out of 222 validation samples misclassified. The best
-      accuracy model (v10) reached 97.3% but had poorer live block detection, leading to v11 being selected for
-      deployment.
+      The deployed model (v11) achieves <strong>96.8% validation accuracy</strong> on an unseen person
+      and <strong>94.2% macro F1-score</strong>, with only 7/222 samples misclassified. Model v10
+      reached 97.3% but had poorer live block detection, so v11 was selected.
     </p>
 
     <h3>Confusion Matrix</h3>
 
     <p>
-      Most errors occur between biomechanically similar punch types &mdash; left hook confused with left uppercut,
-      and block confused with idle. Block has the lowest per-class accuracy at 66.7% due to having only 6 validation
-      samples (the smallest class).
+      Most errors occur between biomechanically similar punches &mdash; left hook confused with
+      left uppercut, block confused with idle. Block has the lowest per-class accuracy (66.7%)
+      due to only 6 validation samples.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Figure: Confusion Matrix — 7/222 misclassifications"></image-component>
@@ -256,8 +249,8 @@
     <h3>Per-Class Accuracy</h3>
 
     <p>
-      Right hook and right uppercut achieve 100%, cross 98.1%, jab 96.4%, left hook 96.0%, left uppercut 91.7%,
-      idle 100%, block 66.7%.
+      Right hook and right uppercut: 100%. Cross: 98.1%. Jab: 96.4%. Left hook: 96.0%.
+      Left uppercut: 91.7%. Idle: 100%. Block: 66.7%.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Figure: Per-Class Accuracy"></image-component>
@@ -265,9 +258,8 @@
     <h3>Training Convergence</h3>
 
     <p>
-      A 2&times;2 dashboard showing loss, accuracy, learning rate schedule, and train-val accuracy gap across 133
-      epochs. The model converged at epoch 73 with minimal overfitting, validated by the narrow gap between training
-      and validation accuracy throughout.
+      A 2&times;2 dashboard showing loss, accuracy, learning rate, and train-val gap across 133 epochs.
+      The model converged at epoch 73 with minimal overfitting.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/training_overview.png" subtitle="Figure: Training Overview — convergence at epoch 73 with minimal overfitting"></image-component>
@@ -275,10 +267,9 @@
     <h3>t-SNE Embeddings</h3>
 
     <p>
-      The model's learned 384-dimensional sequence embeddings, projected to 2D via t-SNE, show tight, well-separated
-      clusters for each action class. This confirms the model has learned discriminative features rather than memorising
-      training data. Notably, the clusters that show partial overlap (e.g., left hook and left uppercut) correspond
-      exactly to the highest off-diagonal values in the confusion matrix.
+      The 384-dimensional sequence embeddings projected to 2D via t-SNE show tight, well-separated
+      clusters per action class. Clusters with partial overlap (e.g., left hook / left uppercut)
+      correspond to the highest off-diagonal confusion matrix values.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="Figure: t-SNE Embeddings — well-separated clusters indicate discriminative feature learning"></image-component>
@@ -286,10 +277,9 @@
     <h3>Attention Heatmaps</h3>
 
     <p>
-      Per-layer attention weights across the 4 Transformer layers reveal meaningful temporal learning: early layers
-      focus on local temporal patterns (attending primarily to nearby frames), while later layers develop broader
-      attention spans covering the full 12-frame window. This progression from local to global temporal reasoning
-      demonstrates that the Transformer is learning hierarchical temporal representations, not simply averaging.
+      Per-layer attention across 4 Transformer layers reveals meaningful temporal learning:
+      early layers attend to nearby frames, later layers cover the full 12-frame window.
+      This local-to-global progression confirms hierarchical temporal reasoning.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/attention_heatmap_layers.png" subtitle="Figure: Transformer Attention — early layers local, later layers capture broader patterns"></image-component>
@@ -370,41 +360,36 @@
     <!-- 5.3.6.8 LIMITATIONS -->
     <h2>5.3.6.8 Limitations</h2>
 
-    <p>While all requirements were met, several limitations remain:</p>
+    <p>All requirements were met, but several limitations remain:</p>
 
     <ul>
       <li>
-        <strong>Block class underrepresentation</strong>: With only 6 validation samples, block accuracy (66.7%) is
-        the weakest class. More training data from varied blocking styles would improve this.
+        <strong>Block class underrepresentation</strong>: Only 6 validation samples yield 66.7% accuracy.
+        More varied blocking data would improve this.
       </li>
       <li>
-        <strong>Glove occlusion</strong>: Heavy boxing gloves occlude YOLO wrist keypoint detection at punch
-        extension &mdash; the exact moment when detection matters most. Mitigated by pose dropout augmentation and
-        temporal context (12 frames outvotes 2&ndash;3 bad frames), but remains a fundamental constraint of
-        single-camera 2D pose estimation.
+        <strong>Glove occlusion</strong>: Heavy gloves occlude YOLO wrist keypoints at punch extension.
+        Mitigated by pose dropout augmentation and 12-frame temporal context, but remains a
+        fundamental single-camera constraint.
       </li>
       <li>
-        <strong>Camera viewpoint sensitivity</strong>: The model is tightly coupled to the camera angle used during
-        training. Different viewpoints require re-recording and re-annotating the entire dataset, as models do not
-        generalise across viewpoints.
+        <strong>Camera viewpoint sensitivity</strong>: The model is tightly coupled to its training camera angle.
+        Different viewpoints require re-recording the entire dataset.
       </li>
       <li>
-        <strong>Single camera</strong>: No multi-view triangulation. Some punches appear identical from a single
-        forward-facing viewpoint.
+        <strong>Single camera</strong>: No multi-view triangulation. Some punches appear identical from one viewpoint.
       </li>
       <li>
-        <strong>Jetson thermal constraints</strong>: Sustained high-load sessions (30fps CV + LLM generation) may
-        cause thermal throttling. Adaptive frame rate and LLM timeout (20s) help manage the thermal budget.
+        <strong>Jetson thermal constraints</strong>: Sustained high-load sessions (30fps CV + LLM) may cause
+        throttling. Adaptive frame rate and LLM timeout (20s) manage the thermal budget.
       </li>
       <li>
-        <strong>LLM generation quality</strong>: The 3B parameter model with a 128-token generation cap limits
-        coaching depth. Adequate for real-time 1&ndash;2 sentence tips, but post-session analysis occasionally
-        produces generic advice.
+        <strong>LLM generation quality</strong>: The 3B model with 128-token cap limits coaching depth.
+        Adequate for real-time tips, but post-session analysis can be generic.
       </li>
       <li>
-        <strong>D435i IMU kernel</strong>: The RealSense D435i's built-in IMU requires the
-        <code>hid_sensor_hub</code> kernel module, which is unavailable on the Jetson's Tegra kernel. Manual camera
-        pitch configuration (<code>--camera-pitch</code>) is used as a workaround.
+        <strong>D435i IMU kernel</strong>: The RealSense D435i's built-in IMU requires <code>hid_sensor_hub</code>,
+        unavailable on Jetson's Tegra kernel. Manual <code>--camera-pitch</code> is used as a workaround.
       </li>
     </ul>
 
