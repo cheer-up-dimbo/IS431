@@ -60,17 +60,17 @@
             { label: '5.2.3 Height Adjustment', href: '/pages/robot-mechanism/height-adjustment.html' },
             { label: '5.2.4 Padding', href: '/pages/robot-mechanism/padding.html' },
             { label: '5.2.5 Arm Actuation', href: '/pages/robot-mechanism/arm-actuation.html' },
-            { label: 'Verification Results', href: '/pages/robot-mechanism/testing.html' },
+            { label: '5.2.6 Verification Results', href: '/pages/robot-mechanism/testing.html' },
           ]
         },
         {
           label: '5.3 Robot Intelligence',
           href: '/pages/robot-intelligence.html',
           children: [
-            { label: 'CV & Action Recognition', href: '/pages/robot-intelligence-cv.html' },
-            { label: 'Intelligent Behaviour', href: '/pages/robot-intelligence-integration.html' },
-            { label: 'Dashboard & Analytics', href: '/pages/robot-intelligence-software.html' },
-            { label: 'Testing & Validation', href: '/pages/robot-intelligence-testing.html' },
+            { label: '5.3.1 CV & Action Recognition', href: '/pages/robot-intelligence-cv.html' },
+            { label: '5.3.2 Intelligent Behaviour', href: '/pages/robot-intelligence-integration.html' },
+            { label: '5.3.3 Dashboard & Analytics', href: '/pages/robot-intelligence-software.html' },
+            { label: '5.3.4 Testing & Validation', href: '/pages/robot-intelligence-testing.html' },
           ]
         },
       ]
@@ -89,6 +89,9 @@
       children: [
         { label: 'Appendix 1: Upper Mechanism', href: '/pages/appendix-upper.html' },
         { label: 'Appendix 2: Lower Mechanism', href: '/pages/appendix-lower.html' },
+        { label: 'Appendix 3: GUI Interface', href: '/pages/appendix-gui.html' },
+        { label: 'Appendix 4: Interview Questions', href: '/pages/appendix-interview-questions.html' },
+        { label: 'Appendix 5: Product Mapping', href: '/pages/appendix-product-mapping.html' },
         { label: 'Appendix 6: Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
       ]
     },
@@ -246,8 +249,10 @@
         const linksList = document.createElement('ul');
         linksList.className = 'report-nav__links';
 
-        // Auto-open if current page is within this section
-        if (sectionActive) {
+        // Auto-open: Ch 5 (Conceptual Design) always starts open,
+        // other sections only open if user is on a page within them
+        const isConceptualDesign = section.label.includes('Conceptual Design');
+        if (isConceptualDesign || sectionActive) {
           sectionEl.classList.add('open');
           linksList.classList.add('open');
         }
@@ -256,9 +261,13 @@
         const pair = { sectionEl, linksList };
         sectionPairs.push(pair);
 
-        // Click ONLY opens (never closes). Use Collapse All to close.
+        // Click toggles open/close
         sectionEl.addEventListener('click', () => {
-          openSection(pair);
+          if (sectionEl.classList.contains('open')) {
+            closeSection(pair);
+          } else {
+            openSection(pair);
+          }
         });
 
         // Populate children

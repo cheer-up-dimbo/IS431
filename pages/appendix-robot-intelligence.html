@@ -23,6 +23,10 @@
     .fixture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; margin: 12px 0; }
     .fixture-item { display: flex; gap: 8px; align-items: baseline; font-size: 0.92rem; padding: 6px 10px; background: #f8f9fa; border-radius: 4px; }
     .fixture-item code { font-size: 0.85rem; white-space: nowrap; }
+    .video-grid-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+    .video-grid-4col .video-cell video { width: 100%; height: auto; border-radius: 6px; }
+    .video-grid-4col .video-cell sub { display: block; margin-top: 4px; text-align: center; font-size: 0.82rem; color: #555; }
+    @media (max-width: 800px) { .video-grid-4col { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
@@ -39,8 +43,144 @@
 
     <sl-divider></sl-divider>
 
-    <!-- A. FULL UNIT TEST BREAKDOWN -->
-    <h3>A. Full Unit Test Breakdown</h3>
+    <!-- A. DETAILED FEATURE EXPLORATION -->
+    <h3>A. Detailed Feature Exploration — 9 Iterations</h3>
+
+    <p>
+      Section 5.3.1.2 summarises the development journey in a table. This appendix provides
+      the full technical detail for each iteration — architectures tested, feature dimensions,
+      and the precise failure modes that motivated each transition.
+    </p>
+
+    <h4>Feature Visualisation Comparison</h4>
+    <p>Each video below shows the same boxing footage processed through the corresponding feature extraction method, illustrating the evolution from raw pixels to the final voxel+pose representation.</p>
+
+    <div class="video-grid-4col">
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/1_rgbd_baseline.mp4"></video>
+        <sub>1. RGBD Baseline</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/2_2d_skeleton.mp4"></video>
+        <sub>2. 2D Skeleton</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/3_3d_skeleton_rgbd.mp4"></video>
+        <sub>3. 3D Skeleton + RGBD</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/4_voxel_delta.mp4"></video>
+        <sub>4. Voxel Delta</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/5_rgbd_bbox_crop.mp4"></video>
+        <sub>5. RGBD Bbox Crop</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/6_segmentation_depth.mp4"></video>
+        <sub>6. Segmentation + Depth</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/7_zmask_grid_com.mp4"></video>
+        <sub>7. Z-Mask Grid</sub>
+      </div>
+      <div class="video-cell">
+        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/8_glove_color_tracking.mp4"></video>
+        <sub>8. Colour Tracking</sub>
+      </div>
+    </div>
+
+    <h4>Iteration 1: 2D Pose Estimation (YouTube + LSTM/GCN)</h4>
+    <p><strong>Goal:</strong> Validate the pipeline using publicly available YouTube boxing videos.</p>
+    <ul>
+      <li><strong>Features:</strong> 17 COCO keypoints via YOLO-Pose, encoded as 12-channel skeleton features (joint coordinates, bone vectors, temporal derivatives, bone motion)</li>
+      <li><strong>Models tested:</strong> LSTM (best on small dataset), AAGCN (~2.5M params, 10 GCN blocks with adaptive graph learning), ST-GCN, ST-GCN++</li>
+      <li><strong>Result:</strong> High accuracy on YouTube data, validating the pipeline concept</li>
+      <li><strong>Why it failed:</strong> YouTube filming angles did not match the robot-mounted camera perspective. The model could not transfer.</li>
+    </ul>
+
+    <h4>Iteration 2: 3D Pose Estimation (RealSense Depth Lifting)</h4>
+    <p><strong>Goal:</strong> Self-recorded D435i data with depth-based 3D skeleton reconstruction.</p>
+    <ul>
+      <li><strong>Features:</strong> 2D keypoints lifted to 3D using depth maps with skeleton constraints (arm Z-coordinate refinement, temporal interpolation)</li>
+      <li><strong>Models tested:</strong> AAGCN, MotionBERT (abandoned), PoseC3D</li>
+      <li><strong>Result:</strong> ~67% accuracy after extensive constraint tuning</li>
+      <li><strong>Why it failed:</strong> Boxing gloves occlude wrist keypoints during punches — exactly when detection matters most. Depth holes and fast motion blur compounded the problem.</li>
+    </ul>
+
+    <h4>Iteration 3: Raw RGBD Frames + Pretrained 3D CNNs</h4>
+    <p><strong>Goal:</strong> Bypass pose entirely — learn from raw pixels via transfer learning.</p>
+    <ul>
+      <li><strong>Features:</strong> 4-channel input (RGB + normalised depth), person-cropped to 112&times;112</li>
+      <li><strong>Models tested:</strong> Swin3D-B (~88M params, Kinetics-400 pretrained), MViT V2, R3D-18 (~33M params)</li>
+      <li><strong>Why it failed:</strong> 33&ndash;88M parameters, far too large for edge hardware. Batch size 2 on Colab, slow and unstable.</li>
+    </ul>
+
+    <h4>Iteration 4: RGBD + Segmentation + Causal Transformer</h4>
+    <p><strong>Goal:</strong> Efficient spatial encoding with temporal transformer reasoning.</p>
+    <ul>
+      <li><strong>Features:</strong> YOLO segmentation masks, EfficientNet-B2 encoder (frozen, 512-dim per frame)</li>
+      <li><strong>Architecture:</strong> CausalActionTransformer — 6 causal layers, 8 heads, ~3M trainable / ~35M total</li>
+      <li><strong>Innovation:</strong> Progressive prediction loss — classification at ALL timesteps, not just the final frame</li>
+      <li><strong>Why it failed:</strong> Still pixel-based, still required Colab for training.</li>
+    </ul>
+
+    <h4>Iteration 5: Depth Feature Engineering (Z-Mask)</h4>
+    <p><strong>Goal:</strong> Strip away RGB, focus on handcrafted depth features.</p>
+    <ul>
+      <li><strong>Features (1,156 dims/frame):</strong> 12&times;12 depth grid (144), RGB grid (432), centre of mass (2), velocity derivatives (578)</li>
+      <li><strong>Architecture:</strong> BoxingCAT — 1D conv stem, 4 causal transformer layers, self-supervised future prediction head</li>
+      <li><strong>Why it failed:</strong> 2D depth grid lost critical 3D spatial info. Hooks vs uppercuts indistinguishable.</li>
+    </ul>
+
+    <h4>Iteration 6: Voxel + Colour Tracking (~68%)</h4>
+    <p><strong>Goal:</strong> 3D voxel motion + explicit hand tracking via coloured gloves.</p>
+    <ul>
+      <li><strong>Features (1,749 dims/frame):</strong> 12&sup3; voxel delta (1,728), optical flow (2), glove colour tracking (18 dims — 3D positions, velocities, depth validity per hand), foreground ratio (1)</li>
+      <li><strong>Architecture:</strong> VoxelFlowModel (~1.2M params) — Conv3D voxel branch + MLP flow + MLP glove, concatenation fusion</li>
+      <li><strong>Result:</strong> ~68%. Multimodal combination outperformed either branch alone.</li>
+      <li><strong>Why it failed:</strong> Required coloured gloves (red/green). HSV tracking unreliable with variable lighting.</li>
+      <li><strong>Key insight:</strong> Confirmed voxels <em>need</em> hand/joint information to distinguish punch types.</li>
+    </ul>
+
+    <h4>Iteration 7: Voxel-Only Causal Transformer (80.6%)</h4>
+    <p><strong>Goal:</strong> Test whether voxels alone could be sufficient.</p>
+    <ul>
+      <li><strong>Features (55,296 dims/frame):</strong> 24&sup3; grid &times; 4 channels (occupancy delta + directional gradients dx, dy, dz)</li>
+      <li><strong>Architecture:</strong> CausalVoxelTransformerModel (~2M params) — Conv3D stem, 4-layer causal transformer</li>
+      <li><strong>Result:</strong> 80.6% — but 19/56 jabs misclassified as cross (34% error)</li>
+      <li><strong>Why it failed:</strong> Jab and cross produce identical "straight forward" voxel patterns. Directional gradients could not solve left/right confusion.</li>
+    </ul>
+
+    <h4>Iteration 7b: Voxel Optimisation for Real-Time</h4>
+    <p><strong>Goal:</strong> Reduce dimensions for real-time inference.</p>
+    <ul>
+      <li><strong>Changes:</strong> Grid 24&sup3; → 12&sup3; (55,296 → 17,280 dims). Multi-scale deltas (fast 67ms + slow 267ms). Channel_p90 normalisation.</li>
+      <li><strong>Impact:</strong> Dramatically faster extraction (~13cm per voxel, sufficient for punch trajectories). Established the 12&sup3; grid used in all subsequent iterations.</li>
+    </ul>
+
+    <h4>Iteration 8: Voxel + Pose Fusion — Breakthrough (97.3%)</h4>
+    <p><strong>Goal:</strong> Revisit pose as a lightweight complement to voxels.</p>
+    <ul>
+      <li><strong>Features (3,480 dims/frame):</strong> 12&sup3; &times; 2 channels voxel (3,456) + 24-dim YOLO pose. Gradients removed — pose makes them redundant (5&times; reduction).</li>
+      <li><strong>Key innovations:</strong> Confidence gating, pose dropout (30% clip + 20% joint), YOLO bbox masking of background people</li>
+      <li><strong>Result:</strong> 97.3% — eliminated left/right confusion entirely (19 errors → 0)</li>
+      <li><strong>Full circle:</strong> Pose from Iteration 1 returned as a complement, now tolerant of occlusion.</li>
+    </ul>
+
+    <h4>Iteration 9: Production Deployment (v11, 96.8%)</h4>
+    <p><strong>Goal:</strong> Jetson Orin Nano deployment + fix live inference issues.</p>
+    <ul>
+      <li><strong>Enhanced pose:</strong> 24 → 42 dimensions (added elbow angles, joint velocities, extension rates)</li>
+      <li><strong>Block fix:</strong> Annotations extended to full guard sequence. v10 had 97.3% but poor live blocks; v11 has 96.8% with correct detection.</li>
+      <li><strong>Training:</strong> Horizontal flip (doubles dataset), focal loss (γ=1.5), class-balanced sampling</li>
+      <li><strong>Deployment:</strong> TensorRT FP16, parallel worker threads, RollingFeatureBuffer with strict ordering</li>
+    </ul>
+
+    <sl-divider></sl-divider>
+
+    <!-- B. FULL UNIT TEST BREAKDOWN -->
+    <h3>B. Full Unit Test Breakdown</h3>
     <p>
       146 unit tests across 3 test files, supported by 12 shared pytest fixtures
       in <code>conftest.py</code>.
@@ -68,110 +208,35 @@
         </tr>
       </thead>
       <tbody>
-        <!-- test_punch_fusion.py -->
         <tr class="test-file-header">
           <td colspan="3"><code>test_punch_fusion.py</code> &mdash; 44 tests (sensor fusion)</td>
         </tr>
-        <tr>
-          <td>TestRingBuffer</td>
-          <td>7</td>
-          <td>Buffer eviction at max capacity, time-based expiry, pop_match retrieval</td>
-        </tr>
-        <tr>
-          <td>TestCVIMUFusion</td>
-          <td>3</td>
-          <td>Temporal matching within/outside &pm;500ms window, closest-first priority</td>
-        </tr>
-        <tr>
-          <td>TestPadConstraints</td>
-          <td>10</td>
-          <td>Each punch type only accepted on valid pads (jab&rarr;centre, left_hook&rarr;left, etc.)</td>
-        </tr>
-        <tr>
-          <td>TestReclassification</td>
-          <td>8</td>
-          <td>Secondary prediction fallback when primary violates pad constraint, confidence thresholds</td>
-        </tr>
-        <tr>
-          <td>TestExpiredEvents</td>
-          <td>4</td>
-          <td>CV and IMU events correctly discarded after timeout</td>
-        </tr>
-        <tr>
-          <td>TestDefenseClassification</td>
-          <td>8</td>
-          <td>Priority ordering: HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN</td>
-        </tr>
-        <tr>
-          <td>TestSessionStats</td>
-          <td>4</td>
-          <td>Punch accumulation, peak force tracking, defense statistics</td>
-        </tr>
+        <tr><td>TestRingBuffer</td><td>7</td><td>Buffer eviction at max capacity, time-based expiry, pop_match retrieval</td></tr>
+        <tr><td>TestCVIMUFusion</td><td>3</td><td>Temporal matching within/outside &pm;500ms window, closest-first priority</td></tr>
+        <tr><td>TestPadConstraints</td><td>10</td><td>Each punch type only accepted on valid pads (jab&rarr;centre, left_hook&rarr;left, etc.)</td></tr>
+        <tr><td>TestReclassification</td><td>8</td><td>Secondary prediction fallback when primary violates pad constraint</td></tr>
+        <tr><td>TestExpiredEvents</td><td>4</td><td>CV and IMU events correctly discarded after timeout</td></tr>
+        <tr><td>TestDefenseClassification</td><td>8</td><td>Priority ordering: HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN</td></tr>
+        <tr><td>TestSessionStats</td><td>4</td><td>Punch accumulation, peak force tracking, defense statistics</td></tr>
 
-        <!-- test_gamification.py -->
         <tr class="test-file-header">
           <td colspan="3"><code>test_gamification.py</code> &mdash; 30 tests (progression system)</td>
         </tr>
-        <tr>
-          <td>TestRankSystem</td>
-          <td>10</td>
-          <td>All 6 rank tiers (Novice&rarr;Elite), XP boundary conditions, rank transitions</td>
-        </tr>
-        <tr>
-          <td>TestSessionXP</td>
-          <td>7</td>
-          <td>Base XP per mode, completion bonus, difficulty multiplier, streak bonus, minimum floor</td>
-        </tr>
-        <tr>
-          <td>TestSessionScore</td>
-          <td>5</td>
-          <td>Perfect, zero, and partial score calculations, boundary edge cases</td>
-        </tr>
-        <tr>
-          <td>TestAchievements</td>
-          <td>5</td>
-          <td>Unlock conditions, duplicate prevention, achievement listing</td>
-        </tr>
-        <tr>
-          <td>TestLeaderboard</td>
-          <td>3</td>
-          <td>Ranking computation, tie-breaking rules, empty leaderboard handling</td>
-        </tr>
+        <tr><td>TestRankSystem</td><td>10</td><td>All 6 rank tiers (Novice&rarr;Elite), XP boundary conditions, rank transitions</td></tr>
+        <tr><td>TestSessionXP</td><td>7</td><td>Base XP per mode, completion bonus, difficulty multiplier, streak bonus, minimum floor</td></tr>
+        <tr><td>TestSessionScore</td><td>5</td><td>Perfect, zero, and partial score calculations, boundary edge cases</td></tr>
+        <tr><td>TestAchievements</td><td>5</td><td>Unlock conditions, duplicate prevention, achievement listing</td></tr>
+        <tr><td>TestLeaderboard</td><td>3</td><td>Ranking computation, tie-breaking rules, empty leaderboard handling</td></tr>
 
-        <!-- test_database.py -->
         <tr class="test-file-header">
           <td colspan="3"><code>test_database.py</code> &mdash; 45+ tests (data persistence)</td>
         </tr>
-        <tr>
-          <td>TestUserManagement</td>
-          <td>13</td>
-          <td>Create, duplicate prevention, password verify, get/list users, coach account type</td>
-        </tr>
-        <tr>
-          <td>TestPatternLock</td>
-          <td>5</td>
-          <td>Set/verify pattern (SHA-256), wrong pattern rejection, overwrite</td>
-        </tr>
-        <tr>
-          <td>TestGuestSessions</td>
-          <td>5</td>
-          <td>Create guest token, claim by registered user, double-claim prevention</td>
-        </tr>
-        <tr>
-          <td>TestPresets</td>
-          <td>7</td>
-          <td>CRUD operations, invalid field rejection, use count tracking, favourites</td>
-        </tr>
-        <tr>
-          <td>TestTrainingSessions</td>
-          <td>8</td>
-          <td>Save/retrieve sessions, mode filtering, event logging, config persistence</td>
-        </tr>
-        <tr>
-          <td>TestGamification</td>
-          <td>7</td>
-          <td>XP addition, rank progression, personal records, streaks, achievement persistence</td>
-        </tr>
+        <tr><td>TestUserManagement</td><td>13</td><td>Create, duplicate prevention, password verify, get/list users, coach account type</td></tr>
+        <tr><td>TestPatternLock</td><td>5</td><td>Set/verify pattern (SHA-256), wrong pattern rejection, overwrite</td></tr>
+        <tr><td>TestGuestSessions</td><td>5</td><td>Create guest token, claim by registered user, double-claim prevention</td></tr>
+        <tr><td>TestPresets</td><td>7</td><td>CRUD operations, invalid field rejection, use count tracking, favourites</td></tr>
+        <tr><td>TestTrainingSessions</td><td>8</td><td>Save/retrieve sessions, mode filtering, event logging, config persistence</td></tr>
+        <tr><td>TestGamification</td><td>7</td><td>XP addition, rank progression, personal records, streaks, achievement persistence</td></tr>
       </tbody>
     </table>
 
@@ -181,8 +246,8 @@
 
     <sl-divider></sl-divider>
 
-    <!-- B. REPOSITORY LINKS -->
-    <h3>B. Repository Links</h3>
+    <!-- C. REPOSITORY LINKS -->
+    <h3>C. Repository Links</h3>
 
     <div style="display:flex; flex-direction:column; gap:16px; max-width:600px; margin:16px auto;">
       <div style="display:flex; align-items:center; gap:16px; padding:14px 20px; border:1px solid #ddd; border-radius:8px;">
