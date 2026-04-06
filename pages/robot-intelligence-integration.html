@@ -197,31 +197,10 @@
         </tr>
         <tr style="font-weight:bold;">
           <td style="padding:8px; border:1px solid #ddd;">Total</td>
-          <td style="padding:8px; border:1px solid #ddd;">~2.5GB / 8GB</td>
+          <td style="padding:8px; border:1px solid #ddd;">~2.5GB / 16GB</td>
         </tr>
       </tbody>
     </table>
-
-    <div class="video-row two-up">
-      <div class="video-box">
-        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/inference_person_1.mp4"></video>
-        <sub>Person 1 — newer boxer, less consistent form</sub>
-      </div>
-      <div class="video-box">
-        <video autoplay loop muted playsinline src="../assets/robot_intelligence/cv/inference_person_2.mp4"></video>
-        <sub>Person 2 — trained boxer, cleaner technique</sub>
-      </div>
-    </div>
-
-    <p style="font-size:0.92rem; color:#444; margin-top:8px;">
-      Both participants were unseen during training. Person 1, newer to boxing, has less consistent form — some
-      punches blend together, making even human observers uncertain of the punch type. The model reflects this
-      ambiguity with lower confidence on combined movements. Person 2, a trained boxer with cleaner technique,
-      demonstrates the model predicting punch type reliably before the punch lands. In both cases, the model
-      struggles during punch retraction (not included in training annotations), which is effectively handled by
-      the IMU-based pad-constraint filtering described above — confirming that the CV + IMU fusion approach
-      compensates for this limitation.
-    </p>
 
     <sl-divider></sl-divider>
 
@@ -419,7 +398,7 @@
       <a href="robot-intelligence-cv.html">
         <sl-button variant="default" size="medium">
           <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-          Back: CV & Action Recognition
+          Back: CV & Action Prediction
         </sl-button>
       </a>
       <a href="robot-intelligence-software.html">
@@ -431,9 +410,9 @@
     </div>
 
     <!-- SCROLL TO TOP -->
-    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-      &uarr; Top
-    </button>
+    <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+      <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+    </sl-button>
 
   </div>
 </body>

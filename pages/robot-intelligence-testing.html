@@ -52,9 +52,6 @@
     <p>The showcase revealed real-world challenges that directly shaped the final system:</p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <caption style="caption-side:bottom; text-align:left; padding-top:8px; font-size:0.85rem; color:#666;">
-        Table: CDE Fair Issues and Fixes
-      </caption>
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Issue</th>
@@ -95,6 +92,9 @@
         </tr>
       </tbody>
     </table>
+    <p style="text-align:center; font-style:italic; font-size:0.9rem; color:#666; margin-top:8px;">
+      Table: CDE Fair &mdash; real-world issues and fixes that shaped the final system
+    </p>
 
     <p>
       These lessons directly shaped the final system. Most notably, colour tracking limitations
@@ -103,13 +103,13 @@
 
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; align-items:end;">
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="CDE Fair — ROS 2 Architecture" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="Figure: CDE Fair — ROS 2 Architecture" width="100%"></image-component>
       </div>
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/cv_pipeline.png" subtitle="CDE Fair — HSV CV Pipeline" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/cv_pipeline.png" subtitle="Figure: CDE Fair — HSV CV Pipeline" width="100%"></image-component>
       </div>
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/reaction_drill_flow.png" subtitle="Reaction Drill State Flow" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/cde_fair/reaction_drill_flow.png" subtitle="Figure: Reaction Drill State Flow" width="100%"></image-component>
       </div>
     </div>
 
@@ -197,16 +197,16 @@
 
     <div style="display:grid; grid-template-columns:2fr 3fr; gap:16px; margin:16px 0; align-items:center;">
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Teensy Simulator — manual impact injection" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Figure: Teensy Simulator — manual impact injection" width="100%"></image-component>
       </div>
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Preset configuration" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Figure: Preset configuration" width="100%"></image-component>
       </div>
     </div>
 
     <div class="video-row single" style="margin-top:12px;">
       <div class="video-box">
-        <video autoplay loop muted playsinline src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska" style="max-width:700px;"></video>
+        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska" style="max-width:700px;"></video>
         <sub>Teensy Simulator in action — injecting pad impacts and observing system response</sub>
       </div>
     </div>
@@ -277,10 +277,10 @@
 
     <div class="video-row two-up">
       <div class="video-box">
-        <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Confusion Matrix — 7/222 misclassifications" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Figure: Confusion Matrix — 7/222 misclassifications" width="100%"></image-component>
       </div>
       <div class="video-box">
-        <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Per-Class Accuracy — most classes above 96%" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Figure: Per-Class Accuracy — most classes above 96%" width="100%"></image-component>
       </div>
     </div>
 
@@ -296,7 +296,7 @@
       epoch 73 out of 133.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/training_overview.png" subtitle="Training Overview — convergence at epoch 73, minimal overfitting gap"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/training_overview.png" subtitle="Figure: Training Overview — convergence at epoch 73, minimal overfitting gap"></image-component>
 
     <h3>What the Model Learned (t-SNE Visualisation)</h3>
 
@@ -310,7 +310,7 @@
       match exactly the classes that confuse the model in the confusion matrix above.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="t-SNE Embeddings — each dot is a punch sample, same-colour clusters confirm discriminative learning" width="70%"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="Figure: t-SNE Embeddings — each dot is a punch sample, same-colour clusters confirm discriminative learning" width="70%"></image-component>
 
     <h3>Temporal Attention Patterns</h3>
 
@@ -325,7 +325,7 @@
       not just reacting to individual frames.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/attention_heatmap_layers.png" subtitle="Transformer Attention — early layers attend locally, later layers capture full punch trajectories"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/attention_heatmap_layers.png" subtitle="Figure: Transformer Attention — early layers attend locally, later layers capture full punch trajectories"></image-component>
 
     <sl-divider></sl-divider>
 
@@ -333,9 +333,6 @@
     <h2>5.3.4.7 Verification Summary</h2>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <caption style="caption-side:bottom; text-align:left; padding-top:8px; font-size:0.85rem; color:#666;">
-        Table: Robot Intelligence Requirements Verification Summary &mdash; all requirements met
-      </caption>
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Req</th>
@@ -378,7 +375,7 @@
           <td style="padding:8px; border:1px solid #ddd;">RI-5</td>
           <td style="padding:8px; border:1px solid #ddd;">On-device inference</td>
           <td style="padding:8px; border:1px solid #ddd;">Jetson deployment (CV + LLM simultaneous)</td>
-          <td style="padding:8px; border:1px solid #ddd;">All models fit in ~2.5GB of 8GB shared memory</td>
+          <td style="padding:8px; border:1px solid #ddd;">All models fit in ~2.5GB of 16GB shared memory</td>
           <td style="padding:8px; border:1px solid #ddd;">Pass</td>
         </tr>
         <tr>
@@ -397,6 +394,9 @@
         </tr>
       </tbody>
     </table>
+    <p style="text-align:center; font-style:italic; font-size:0.9rem; color:#666; margin-top:8px;">
+      Table: Requirements verification summary &mdash; all 7 requirements met
+    </p>
 
     <sl-divider></sl-divider>
 
@@ -455,9 +455,9 @@
     </div>
 
     <!-- SCROLL TO TOP -->
-    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-      &uarr; Top
-    </button>
+    <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+      <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+    </sl-button>
 
   </div>
 </body>

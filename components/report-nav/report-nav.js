@@ -67,7 +67,7 @@
           label: '5.3 Robot Intelligence',
           href: '/pages/robot-intelligence.html',
           children: [
-            { label: '5.3.1 CV & Action Recognition', href: '/pages/robot-intelligence-cv.html' },
+            { label: '5.3.1 CV & Action Prediction', href: '/pages/robot-intelligence-cv.html' },
             { label: '5.3.2 Intelligent Behaviour', href: '/pages/robot-intelligence-integration.html' },
             { label: '5.3.3 Dashboard & Analytics', href: '/pages/robot-intelligence-software.html' },
             { label: '5.3.4 Testing & Validation', href: '/pages/robot-intelligence-testing.html' },
