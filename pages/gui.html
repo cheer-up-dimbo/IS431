@@ -121,6 +121,8 @@
           </tr>
         </tbody>
       </table>
+
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI Requirements and Sources</p>
     </div>
 
     <sl-divider></sl-divider>
@@ -129,8 +131,10 @@
     <div>
       <h3>Training Modes</h3>
       <p>
-        The GUI organises all user-facing functionality into four categories. Each mode
-        addresses a different training objective identified during needs finding. Screenshots of each mode's selection interface are available in <a href="appendix-gui.html">Appendix 3</a>.
+        The GUI organises training into four modes, each addressing a different objective
+        identified during needs finding. A fifth tab covers system configuration.
+        Screenshots of each mode's selection interface are available in
+        <a href="appendix-gui.html">Appendix 3</a>.
       </p>
 
       <sl-tab-group>
@@ -150,13 +154,14 @@
             playback speed before starting. Post-session, an AI chat page offers feedback using a
             local language model, falling back to hardcoded responses if the model is unavailable.
           </p>
-          <p>
-            <strong>Free Training.</strong> An open, reactive session with no structured drills.
-            The robot responds to user pad hits with contextually appropriate counter-strikes,
-            creating a dynamic back-and-forth. After 5 seconds of inactivity, the robot returns
-            to its guard position. This mode is designed for users who want unstructured practice
-            without scoring or progression.
-          </p>
+          <div style="margin-top:12px;">
+            <image-component
+              tag="gui-homepage"
+              source="../assets/gui/screenshots/guest_welcome_page.png"
+              subtitle="Figure: Homepage showing the four training categories"
+              width="85%">
+            </image-component>
+          </div>
         </sl-tab-panel>
 
         <sl-tab-panel name="performance">
@@ -168,6 +173,14 @@
             response time. All results are stored per-user in SQLite and viewable through a
             tabbed history page.
           </p>
+          <div style="margin-top:12px;">
+            <image-component
+              tag="gui-performance"
+              source="../assets/gui/screenshots/performance_drills.png"
+              subtitle="Figure: Performance test selection (Power, Stamina, Reaction)"
+              width="85%">
+            </image-component>
+          </div>
         </sl-tab-panel>
 
         <sl-tab-panel name="sparring">
@@ -189,6 +202,13 @@
               width="85%">
             </image-component>
           </div>
+          <p>
+            <strong>Free Training.</strong> An open, reactive session with no structured drills.
+            The robot responds to user pad hits with contextually appropriate counter-strikes,
+            creating a dynamic back-and-forth. After 5 seconds of inactivity, the robot returns
+            to its guard position. This mode is designed for users who want unstructured practice
+            without scoring or progression.
+          </p>
         </sl-tab-panel>
 
         <sl-tab-panel name="others">
@@ -215,16 +235,16 @@
             configured work timer expires. Session results are stored per-participant for group
             review. The coach dashboard layout is shown in <a href="appendix-gui.html">Appendix 3</a>.
           </p>
+          <div style="margin-top:12px;">
+            <image-component
+              tag="gui-coach"
+              source="../assets/gui/screenshots/coach_welcome_page.png"
+              subtitle="Figure: Coach station dashboard with participant controls and preset selection"
+              width="85%">
+            </image-component>
+          </div>
         </sl-tab-panel>
       </sl-tab-group>
-      <div style="margin-top:20px;">
-        <image-component
-          tag="gui-homepage"
-          source="../assets/gui/screenshots/guest_welcome_page.png"
-          subtitle="Figure: Homepage showing the four training categories"
-          width="85%">
-        </image-component>
-      </div>
     </div>
 
     <sl-divider></sl-divider>

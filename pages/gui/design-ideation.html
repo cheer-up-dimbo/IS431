@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../../index.css">
+  <script type="module" src="../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
-  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <style>
     .page-nav-row {
       display: flex;
@@ -47,7 +47,7 @@
         support touchscreen interaction natively, and be learnable quickly enough to leave
         adequate time for feature development. Four options were evaluated.
       </p>
-      <table-component id="gui-framework-comparison"></table-component>
+      <table-component id="gui-framework-comparison" subtitle="Table: Framework Selection Evaluation"></table-component>
       <p>
         PySide6 was selected. It runs natively on the Jetson Nano, has mature touchscreen
         layout support, and builds on existing Python knowledge. The extensive Qt documentation
@@ -66,7 +66,7 @@
         must be reachable within a small number of interactions from the main menu, and that the
         interface must remain usable via both touchscreen and physical button input.
       </p>
-      <table-component id="gui-nav-concepts"></table-component>
+      <table-component id="gui-nav-concepts" subtitle="Table: Navigation Architecture Evaluation"></table-component>
       <div style="display:flex; justify-content:center; margin:24px 0;">
 <svg width="100%" viewBox="0 0 680 340" style="max-width:680px;" xmlns="http://www.w3.org/2000/svg">
   <text x="108" y="28" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="500" fill="currentColor">Flat menu</text>
@@ -144,7 +144,7 @@
         Multiple users share a single BoxBunny unit, so a data isolation strategy was needed
         to keep each user's training history private. Three strategies were evaluated.
       </p>
-      <table-component id="gui-data-isolation"></table-component>
+      <table-component id="gui-data-isolation" subtitle="Table: Data Isolation Strategy Evaluation"></table-component>
       <p>
         A per-user database file approach was selected. Each user's data is stored under
         <code>users/[username]/</code> in two SQLite files: one for combination training
@@ -164,57 +164,7 @@
         system should mirror how boxing coaches actually structure pad work.
       </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; width:20%;">Concept</th>
-            <th style="padding:10px; border:1px solid #ddd; width:40%;">Description</th>
-            <th style="padding:10px; border:1px solid #ddd; width:40%;">Reason for Decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Spaced Repetition (Anki-style)</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Schedule combos based on forgetting curves, inspired by the Ebbinghaus spacing
-              effect. Each combo would reappear at increasing intervals after successful recall.
-            </td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              While spaced practice benefits motor skill learning (Shea et al., 2000), the
-              Anki card-review model assumes discrete recall events. Boxing training is
-              session-based and continuous; users do not "recall" a combo in isolation but
-              execute it within a round. The scheduling model did not map to the session
-              structure.
-            </td>
-          </tr>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Random Rotation</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Present combos randomly from the current difficulty tier with no fixed order
-              or grouping.
-            </td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              No structured progression path. Users could repeatedly encounter combos they
-              have already mastered while rarely seeing new ones. No mastery tracking or
-              unlock mechanism.
-            </td>
-          </tr>
-          <tr style="background:#e8f5e9;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Group-Based Sequential Progression</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Combos are grouped by technique family. The system rotates through the current
-              group until a mastery threshold is met (average score of 3.0 out of 5.0 over the
-              last 5 sessions), then unlocks the next group. This mirrors how boxing coaches
-              structure pad work: drill a technique family until the boxer is comfortable, then
-              layer on the next.
-            </td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Provides clear progression, measurable mastery, and a structure that aligns with
-              real coaching practice. The threshold and window size are configurable.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <table-component id="gui-curriculum-concepts" subtitle="Table: Combo Curriculum Learning Approach Evaluation"></table-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -230,56 +180,7 @@
         sensors. Three software-side generation strategies were evaluated.
       </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; width:20%;">Concept</th>
-            <th style="padding:10px; border:1px solid #ddd; width:40%;">Description</th>
-            <th style="padding:10px; border:1px solid #ddd; width:40%;">Reason for Decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Hardcoded Sequences</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Pre-defined fixed combos stored in a list and cycled in order during sparring
-              rounds.
-            </td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Predictable after a few sessions. Users memorise the pattern and the training
-              value diminishes. Does not adapt to user weaknesses.
-            </td>
-          </tr>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Uniform Random Generation</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Each punch is generated independently with equal probability across all punch
-              types. No state or memory between punches.
-            </td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Produces sequences that lack natural boxing flow. A jab naturally leads to a
-              cross, not a random uppercut. The output feels mechanical rather than
-              stylistically coherent.
-            </td>
-          </tr>
-          <tr style="background:#e8f5e9;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Markov Chain with Style Matrices</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Each boxing style (Pressure Fighter, Counter Puncher, Infighter, Out-Boxer,
-              Random) defines a transition probability matrix over punch types. The next punch
-              depends on the current punch, producing naturalistic sequences. A weakness bias
-              parameter blends in the user's weakness profile over time, increasing the
-              probability of punches the user struggles with. A safety limit of six punches per
-              combo prevents excessively long sequences.
-            </td>
-            <td style="padding:10px; border:1px solid #ddd;">
-              Produces stylistically coherent, unpredictable sequences that adapt to the user.
-              Each style plays differently, adding variety across sessions. The Markov property
-              keeps implementation simple while capturing realistic punch transitions.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <table-component id="gui-sparring-concepts" subtitle="Table: Sparring Sequence Generation Evaluation"></table-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -323,32 +224,7 @@
         the robot from their phone without walking to the touchscreen between rounds.
         Three approaches were evaluated.
       </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; width:20%;">Concept</th>
-            <th style="padding:10px; border:1px solid #ddd; width:45%;">Description</th>
-            <th style="padding:10px; border:1px solid #ddd; width:35%;">Reason for Decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Native Mobile App</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Separate iOS and Android apps communicating with the robot over WiFi.</td>
-            <td style="padding:10px; border:1px solid #ddd;">Requires maintaining two codebases, App Store approval cycles, and ongoing updates. Overengineered for a local-network training robot.</td>
-          </tr>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Bluetooth Direct Control</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Phone connects via Bluetooth Low Energy for command-and-control.</td>
-            <td style="padding:10px; border:1px solid #ddd;">Limited range, complex pairing, cannot serve a rich analytics dashboard. Suitable only for simple remote triggers, not data visualization.</td>
-          </tr>
-          <tr style="background:#e8f5e9;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Local Web App via WiFi AP</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">The robot hosts its own WiFi access point. Users connect and access a Vue 3 dashboard through their phone browser. The dashboard shares the same SQLite database as the touchscreen GUI. Features include session history with letter grades, performance trend charts, achievement badges, AI coaching chat, remote training control, and robot height adjustment.</td>
-            <td style="padding:10px; border:1px solid #ddd;">No app installation required. Works on any phone with a browser. Data synchronized automatically through the shared database. The 100ms polling interval for remote commands provides near-instant response.</td>
-          </tr>
-        </tbody>
-      </table>
+      <table-component id="gui-dashboard-concepts" subtitle="Table: Phone Dashboard Companion Evaluation"></table-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -358,32 +234,20 @@
         The touchscreen authentication method needed to be usable while wearing boxing
         gloves, which rules out fine-motor input methods. The pattern lock interface is documented in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:10px; border:1px solid #ddd; width:20%;">Concept</th>
-            <th style="padding:10px; border:1px solid #ddd; width:45%;">Description</th>
-            <th style="padding:10px; border:1px solid #ddd; width:35%;">Reason for Decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Username/Password</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Standard text-based login requiring keyboard input on the touchscreen.</td>
-            <td style="padding:10px; border:1px solid #ddd;">Typing on a small touchscreen with boxing gloves is impractical. Acceptable for the phone dashboard but not as the primary touchscreen method.</td>
-          </tr>
-          <tr style="background:#ffebee;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Biometric</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">Fingerprint scanner or facial recognition for authentication.</td>
-            <td style="padding:10px; border:1px solid #ddd;">Requires additional hardware. Face recognition is unreliable with headgear and sweat. Fingerprint sensors do not function through gloves.</td>
-          </tr>
-          <tr style="background:#e8f5e9;">
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Pattern Lock + Password Fallback</strong></td>
-            <td style="padding:10px; border:1px solid #ddd;">A 3x3 grid pattern lock on the touchscreen with dot targets sized at 48px hit radius to accommodate gloved fingers. The pattern is SHA-256 hashed. Password login remains available on the phone dashboard for typed input.</td>
-            <td style="padding:10px; border:1px solid #ddd;">Large touch targets work reliably with gloves. Drawing a pattern is faster than typing. The dual-method approach matches each interface to its appropriate input modality.</td>
-          </tr>
-        </tbody>
-      </table>
+      <table-component id="gui-auth-concepts" subtitle="Table: Authentication Method Evaluation"></table-component>
+
+      <p>
+        The proficiency assessment presented during signup determines the user's initial
+        skill level and adjusts the default training tier accordingly.
+      </p>
+      <div style="margin-top:16px;">
+        <image-component
+          tag="gui-assessment"
+          source="../../assets/gui/screenshots/quick_assessment.png"
+          subtitle="Figure: Six-question proficiency assessment during user onboarding"
+          width="85%">
+        </image-component>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -435,19 +299,13 @@
     <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
   </sl-button>
 
-  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
-  <script>
-    (function() {
-      var origRender = gridjs.Grid.prototype.render;
-      gridjs.Grid.prototype.render = function(el) {
-        if (!el) return this;
-        return origRender.call(this, el);
-      };
-    })();
-  </script>
   <script type="module" src="../../components/table-component/table-component.js"></script>
   <script src="../../components/table-component/gui-framework-comparison.js"></script>
   <script src="../../components/table-component/gui-nav-concepts.js"></script>
   <script src="../../components/table-component/gui-data-isolation.js"></script>
+  <script src="../../components/table-component/gui-curriculum-concepts.js"></script>
+  <script src="../../components/table-component/gui-sparring-concepts.js"></script>
+  <script src="../../components/table-component/gui-dashboard-concepts.js"></script>
+  <script src="../../components/table-component/gui-auth-concepts.js"></script>
 </body>
 </html>
