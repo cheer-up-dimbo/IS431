@@ -13,22 +13,58 @@
   <script type="module" src="../../../components/video/video.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
-  <!-- Three.js import map (required for explode-viewer) -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/"
-    }
-  }
-  </script>
-  <!-- 3D Explode Viewer -->
-  <script type="module" src="../../../components/explode-viewer/explode-viewer.js"></script>
+  <!-- Google Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <style>
     .page-nav-row {
       display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
     }
+    /* Styling for the 3D Model Hotspot Buttons */
+    .Hotspot {
+      background: #3b82f6;
+      border-radius: 32px;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .Hotspot:not([data-visible]) {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .HotspotAnnotation {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+      color: #333;
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      left: calc(100% + 24px);
+      padding: 6px 10px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: max-content;
+    }
+    .HotspotAnnotation::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      width: 24px;
+      height: 2px;
+      background: #3b82f6;
+      transform: translateY(-50%);
+    }
+    model-viewer.hide-hotspots .Hotspot {
+      display: none !important;
+    }
   </style>
+  <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
 <body>
   <div class="content">
@@ -71,23 +107,71 @@
         <a href="design-ideation.html">Design &amp; Ideation</a>.
       </p>
 
-      <!-- 3D Model Viewer (display only, no explode) -->
-      <explode-viewer
-        src="../../../assets/3d_models/arm_joint_V5.glb"
-        alt="Interactive 3D Model: V5 Arm Joint Assembly — coaxial differential drivetrain with side-mounted Damiao motors, double-helical gear reduction, bevel gear coupling, stainless steel D-shaft, and screw/pin retention interfaces. Drag to orbit."
-        height="500"
-        explode-scale="0"
-        no-controls>
-      </explode-viewer>
-
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="image"></sl-icon>
-        <strong>Media Placeholder:</strong> Annotated top-down assembly view
-        (<code>Clean_Top_Down_Arm_assembly_View.png</code> in
-        <code>assets/Temp/</code>). See labelling guide below.<br>
-        <em>To add: annotate in SolidWorks/draw.io, save to
-        <code>assets/upper_mechanism/</code>.</em>
-      </sl-alert>
+      <!-- 3D Model Viewer with Hotspot Annotations -->
+      <div class="model-viewer-container" style="margin: 24px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+          <span style="font-size: 0.95rem; color: #555;">
+            <sl-icon name="info-circle" style="vertical-align: middle; margin-right: 4px;"></sl-icon>
+            Interact with the 3D model to explore the arm joint assembly. Toggle annotations to view key components.
+          </span>
+          <sl-button id="toggle-hotspots" size="small" variant="default" pill>Hide Annotations</sl-button>
+        </div>
+        <model-viewer
+          src="../../../assets/3d_models/arm_joint_V5.glb"
+          alt="Interactive 3D Model: V5 Arm Joint Assembly — Coaxial differential drivetrain with side-mounted Damiao motors, helical gear reduction, and bevel gear coupling."
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          tone-mapping="neutral"
+          shadow-intensity="0.66"
+          shadow-softness="1"
+          style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
+        >
+          <!-- 1. Motor 1 — Roll -->
+          <button class="Hotspot" slot="hotspot-motor1" data-position="-0.027009130254934774m 0.027992178471240803m -0.04305389864049759m" data-normal="0.18025513159793682m 0.9836198897605687m -1.3215802495993298e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Motor 1 — Roll (DM-J4310-2EC)</div>
+          </button>
+          <!-- 2. Motor 2 — Pitch -->
+          <button class="Hotspot" slot="hotspot-motor2" data-position="0.032742324634128746m 0.02847557348865756m -0.04155627676495496m" data-normal="0.06037839243513814m 0.9981755605738554m -1.34113708870663e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Motor 2 — Pitch (DM-J4310-2EC)</div>
+          </button>
+          <!-- 3. Central Gear Stack (3:1 Helical-Spur) -->
+          <button class="Hotspot" slot="hotspot-gear" data-position="0.0013267442323015508m 0.02330380535771693m -0.0030132951556644944m" data-normal="0.8478129181226903m 0.29563551787641623m -0.44024186129243953m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Central Gear Stack (3:1 Helical-Spur)</div>
+          </button>
+          <!-- 4. Bevel Gear Coupling -->
+          <button class="Hotspot" slot="hotspot-bevel" data-position="-0.0012330250149203835m 0.015137529120881288m 0.05579315541027723m" data-normal="-0.10509427200033826m 0.937739148535577m -0.33105963706935015m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Bevel Gear Coupling</div>
+          </button>
+          <!-- 5. Stainless Steel D-Shaft (6mm) -->
+          <button class="Hotspot" slot="hotspot-shaft" data-position="0.00003588621110451186m 0.0024999999441206455m 0.07403480349854283m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Stainless Steel D-Shaft (6mm)</div>
+          </button>
+          <div class="progress-bar hide" slot="progress-bar">
+              <div class="update-bar"></div>
+          </div>
+        </model-viewer>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Interactive 3D Model: V5 Coaxial Differential Arm Joint Assembly
+        </sub>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-hotspots');
+            const viewer = document.querySelector('model-viewer');
+            let hotspotsVisible = true;
+            toggleBtn.addEventListener('click', () => {
+              hotspotsVisible = !hotspotsVisible;
+              if (hotspotsVisible) {
+                viewer.classList.remove('hide-hotspots');
+                toggleBtn.textContent = 'Hide Annotations';
+              } else {
+                viewer.classList.add('hide-hotspots');
+                toggleBtn.textContent = 'Show Annotations';
+              }
+            });
+          });
+        </script>
+      </div>
 
     </div>
 
