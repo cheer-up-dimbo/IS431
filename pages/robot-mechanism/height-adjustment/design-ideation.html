@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Design Ideation — Height Adjustment</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+</head>
+<body>
+  <div class="content">
+    <a href="../height-adjustment.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Height Adjustment
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Design Ideation</h2>
+    <p>
+      This page documents the three height-adjustment concepts evaluated for BoxBunny to satisfy system-level requirement
+      <strong>RM-3 (Height Adjustability)</strong>, the rejection rationale for each alternative, and the selection of the final
+      <strong>manual screw jack with vertical linear guides</strong> architecture.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 1. DESIGN CONSTRAINTS -->
+    <div>
+      <h3>Design Constraints</h3>
+      <p>
+        The height adjustment system must vary the torso/head height by approximately <strong>300–400 mm</strong> to accommodate different
+        user heights, while:
+      </p>
+      <ul>
+        <li>Carrying the <strong>axial load</strong> of the upper structure (~20–25 kg including arms and padding)</li>
+        <li>Resisting <strong>lateral forces and overturning moments</strong> from punches</li>
+        <li>Remaining <strong>stiff and "non-bouncy"</strong> during training — once set, the height should not oscillate</li>
+        <li>Being <strong>safe and simple</strong> for users to adjust occasionally</li>
+        <li>Fitting within the available <strong>vertical envelope</strong> above the linear stage</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 2. CONCEPT 1 -->
+    <div>
+      <h3>Concept #1: Office Chair Mechanism + Vertical Linear Guide</h3>
+      <p>
+        The first concept adapted the <strong>office chair mechanism</strong>: a gas lift cylinder to carry the axial load, combined with vertical
+        linear guides at the back to resist lateral punching forces.
+      </p>
+
+      <image-component tag="image" source="../../../assets/report appendix b/17-height-concept1.png" subtitle="Figure: Required components and integration drawing for Concept #1."></image-component>
+
+      <h4>Advantages</h4>
+      <ul>
+        <li>Gas lifts are <strong>readily available and compact</strong></li>
+        <li>Can carry the <strong>static axial load</strong> of the robot mass</li>
+        <li>Vertical linear guides at the back can handle <strong>lateral loads and overturning moments</strong></li>
+      </ul>
+
+      <h4>Rejection Rationale</h4>
+      <ul>
+        <li>Gas cylinders are inherently <strong>compliant</strong>. Under repeated punches, this leads to <strong>vertical "bouncing"</strong> of the torso, reducing strike rigidity.</li>
+        <li>The internal gas spring force varies with stroke; stiffness is <strong>not easily tuned</strong>.</li>
+      </ul>
+      <p><strong>Conclusion:</strong> Rejected — Insufficient vertical stiffness.</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. CONCEPT 2 -->
+    <div>
+      <h3>Concept #2: Electric Gas Strut + Motorised Vertical Linear Guide</h3>
+      <p>
+        The second concept combined an <strong>electrically actuated mechanism</strong> for height control with a gas strut at the bottom to assist in carrying axial load.
+      </p>
+
+      <image-component tag="image" source="../../../assets/report appendix b/18-height-concept2.png" subtitle="Figure: Required components and integration drawing for Concept #2."></image-component>
+
+      <h4>Advantages</h4>
+      <ul>
+        <li>Allows <strong>push-button height adjustment</strong></li>
+        <li>The gas strut can reduce motor torque by <strong>counterbalancing</strong> part of the robot's weight</li>
+      </ul>
+
+      <h4>Rejection Rationale</h4>
+      <ul>
+        <li>Mechanically and electrically <strong>complex</strong>: coordinating motor drive, gas strut support, and guide loads is non-trivial.</li>
+        <li>Multiple elements share the load path, making <strong>stiffness and reliability harder to predict</strong>.</li>
+      </ul>
+      <p><strong>Conclusion:</strong> Rejected — Unnecessary complexity for an infrequent adjustment.</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. CONCEPT 3 -->
+    <div>
+      <h3>Concept #3: Screw Jack + Vertical Linear Guides (Selected)</h3>
+      <p>
+        The final concept uses a <strong>manual screw jack</strong> mounted on top of the linear stage, combined with <strong>vertical linear rails</strong> as primary guides.
+      </p>
+      <ul>
+        <li>The <strong>screw jack</strong> carries the axial load and provides precise height adjustment</li>
+        <li>Two <strong>vertical linear rails</strong> carry lateral forces and overturning moments from punches</li>
+      </ul>
+
+      <image-component tag="image" source="../../../assets/Lower_mechanism/8height adjustment - cad overview.png" subtitle="Figure: CAD overview of height adjustment component."></image-component>
+
+      <h4>Why This Concept Was Selected</h4>
+      <ul>
+        <li><strong>High axial stiffness:</strong> screw jacks are designed for heavy-duty industrial applications.</li>
+        <li><strong>Self-locking:</strong> non-backdrivable screw — height does not drift or bounce under impacts.</li>
+        <li><strong>Simple load path:</strong> axial loads go directly through the screw jack; lateral loads go through the rails.</li>
+        <li><strong>Robust and maintainable:</strong> standard industrial components with proven reliability.</li>
+      </ul>
+      <p><strong>Conclusion:</strong> Selected. Provides high holding stiffness, self-locking behaviour, and a clear separation of axial vs lateral support.</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="../height-adjustment.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back to Height Adjustment
+        </sl-button>
+      </a>
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          Next: Mechanical Design
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

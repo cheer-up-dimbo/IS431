@@ -202,6 +202,44 @@
     <p>Manual lifting was rejected as a long-term solution because, although simple, it becomes impractical and potentially unsafe as the robot grows in mass and complexity. A separate external trolley would solve movement, but it would do so outside the base subsystem, meaning portability would remain disconnected from the main design and would depend on extra equipment being available.</p>
     <p>The integrated rear-wheel plus handle tip-and-roll concept was selected because it allowed portability to become part of the base design itself. From a mechanical perspective, this was the most elegant solution. The wider rear portion of the trapezoidal base already provides the best location for transport-related hardware, and the tip-and-roll handling method is consistent with portable gym equipment and workshop machinery. This concept was therefore selected in principle because it preserves operational stability while improving deployment practicality.</p>
 
+    <h4>Gym-Bench &amp; Tilt Hand Trolley Inspiration</h4>
+    <p>
+      The transport strategy was initially inspired by <strong>commercial gym benches</strong>, which face a similar design challenge: they must be heavy and stable during use, yet easily moved by one person. Gym benches achieve this through rear-mounted wheels and a front handle, allowing the operator to tilt the bench backward and roll it. This tip-and-roll approach was adopted for BoxBunny because the passive wheels do not touch the floor during normal use, meaning they introduce no compliance when the robot is under load.
+    </p>
+    <p>
+      However, a pure gym-bench design is optimized for a low-profile structure where the user has to bend down to lift it from the front. BoxBunny is a tall, heavy assembly, making this low-lifting approach unergonomic. To address this, the design drew additional inspiration from a <strong>tilt hand trolley</strong>. By combining both concepts, the operator can use the robot's rigid vertical column for leverage to tilt the system backward onto its rear wheels, much like operating a hand trolley, enabling a single person to move the heavy robot efficiently and safely.
+    </p>
+    
+    <div style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; margin: 20px 0;">
+      <div style="flex: 1;">
+        <image-component
+          width="100%"
+          tag="image"
+          source="../../../assets/robot_mechanism/transportation wheels gym bench.png"
+          subtitle="Figure: Commercial gym bench tip-and-roll transport method.">
+        </image-component>
+      </div>
+      <div style="flex: 1;">
+        <image-component
+          width="51.5%"
+          tag="image"
+          source="../../../assets/robot_mechanism/tilt hand trolley.png"
+          subtitle="Figure: Tilt hand trolley providing leverage for taller, heavier loads.">
+        </image-component>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          Next: Mechanical Design
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">

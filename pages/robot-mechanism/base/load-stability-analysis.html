@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Base Load &amp; Stability Analysis</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .calc-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin: 20px 0;
+    }
+    .calc-header {
+      background: #f8f9fa;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e0e0e0;
+      font-weight: 600;
+      color: #333;
+    }
+    .calc-body {
+      padding: 16px;
+      font-size: 0.95rem;
+      color: #444;
+    }
+    .equation-box {
+      background: #f4f7fa;
+      padding: 12px;
+      text-align: center;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 1.05rem;
+      margin: 12px 0;
+    }
+    .equation-box.success {
+      background: #e8f5e9;
+      color: #1b5e20;
+      border: 1px solid #c8e6c9;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../base.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Base Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Load &amp; Stability Analysis</h2>
+    <p>
+      The load analysis for the base subsystem developed in two stages. The first stage occurred during the early Robotics Fair implementation, where the calculation was used to determine the most suitable <strong>position of the main robot body on the 1220 mm wooden board</strong>. The second stage developed into a more complete design-load philosophy for BoxBunny, distinguishing between repeated-service loads and conservative structural design loads.
+    </p>
+    <p>
+      This load-analysis framework later informed not only the base design, but also the rotation stage, lower mechanism, and height-adjustment subsystem.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. LOAD ANALYSIS PHILOSOPHY                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Punch Force Modelling &amp; Design Philosophy</h3>
+      <p>
+        A boxing punch does not apply a constant force over time. Instead, the force-time history is highly transient, with a short-duration peak lasting only a few milliseconds. Designing directly from the absolute instantaneous peak would be excessively conservative for many structural and actuation components. For BoxBunny, the adopted load philosophy therefore distinguishes between:
+      </p>
+      <ul>
+        <li>a <strong>characteristic training load</strong>, representing a strong but realistic punch during normal gym use, and</li>
+        <li>a <strong>structural design load</strong>, representing a conservative upper-bound event that the robot structure must survive without failure.</li>
+      </ul>
+
+      <div class="calc-card">
+        <div class="calc-header">Adopted Load Values</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">Based on literature reviews of punching biomechanics, the following values were adopted:</p>
+          <div class="equation-box">
+            F<sub>char</sub> = 1.8 kN<br>
+            F<sub>design</sub> = 1.5 &times; F<sub>char</sub> = 2.7 kN
+          </div>
+          <p style="margin-bottom: 0;">
+            The characteristic value of <strong>1.8 kN</strong> was selected as a strong but realistic punch for the target user group. The structural design load of <strong>2.7 kN</strong> was obtained by applying a factor of <strong>1.5</strong> to account for impact amplification, user variability, modelling simplifications, and manufacturing tolerances.
+          </p>
+        </div>
+      </div>
+
+      <p>This distinction maps onto:</p>
+      <ul>
+        <li><strong>Ultimate Limit State (ULS):</strong> structural integrity under rare, hard punches.</li>
+        <li><strong>Serviceability Limit State (SLS):</strong> repeated-use performance, wear, and normal training behaviour.</li>
+      </ul>
+      <p>
+        For the base subsystem, the critical case is the <strong>ULS structural design load</strong>, because the base must not tip or fail under a worst-credible strike.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. PHASE 1: WOODEN BOARD ANALYSIS                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Phase 1 Fair Implementation: Body Placement</h3>
+      <p>
+        During the first fair-stage implementation, the robot was mounted on a <strong>1220 mm &times; 580 mm wooden board</strong>. At that stage, the most important engineering question was where along the 1220 mm board length the main robot body should be positioned. This was treated as an overturning problem. When the robot is struck from the front, the most likely tipping mode is forward rotation about the front edge of the support region.
+      </p>
+
+      <div style="display: flex; flex-direction: column; align-items: center; margin: 24px 0;">
+        <div style="width: 80%; max-width: 600px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fff;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+            <defs>
+              <!-- Red Arrow for Overturning Forces/Moments -->
+              <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#d32f2f" />
+              </marker>
+              <!-- Blue Arrow for Restoring Forces/Moments -->
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#1976d2" />
+              </marker>
+              <!-- Dimension Line Arrows -->
+              <marker id="dim-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 10 0 L 0 5 L 10 10 z" fill="#757575" />
+              </marker>
+              <marker id="dim-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#757575" />
+              </marker>
+            </defs>
+
+            <rect width="100%" height="100%" fill="#ffffff" />
+            
+            <!-- Ground Line & Hatching -->
+            <line x1="50" y1="320" x2="550" y2="320" stroke="#9e9e9e" stroke-width="3" />
+            <path d="M 70 320 L 60 330 M 110 320 L 100 330 M 150 320 L 140 330 M 190 320 L 180 330 M 230 320 L 220 330 M 270 320 L 260 330 M 310 320 L 300 330 M 350 320 L 340 330 M 390 320 L 380 330 M 430 320 L 420 330 M 470 320 L 460 330 M 510 320 L 500 330 M 550 320 L 540 330" stroke="#9e9e9e" stroke-width="1.5" />
+
+            <!-- Simplified Robot Profile -->
+            <rect x="200" y="280" width="200" height="40" fill="#eceff1" stroke="#424242" stroke-width="2" rx="4"/>
+            <rect x="250" y="80" width="60" height="200" fill="#ffcc80" stroke="#f57c00" stroke-width="2" rx="6"/>
+            
+            <!-- CG Indicator -->
+            <g transform="translate(280, 160)">
+              <circle cx="0" cy="0" r="8" fill="none" stroke="#212121" stroke-width="1.5"/>
+              <path d="M -8 0 A 8 8 0 0 1 0 -8 L 0 0 Z" fill="#212121"/>
+              <path d="M 0 0 L 8 0 A 8 8 0 0 1 0 8 Z" fill="#212121"/>
+            </g>
+
+            <!-- Punch Force (F_punch) -->
+            <line x1="60" y1="100" x2="180" y2="100" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
+            <text x="80" y="90" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">punch</tspan></text>
+
+            <!-- Weight (W) -->
+            <line x1="280" y1="160" x2="280" y2="260" stroke="#1976d2" stroke-width="4" marker-end="url(#arrow-blue)" />
+            <text x="255" y="220" font-family="sans-serif" font-size="18" fill="#1976d2" font-weight="bold">W</text>
+
+            <!-- Dimensions -->
+            <!-- Height (h) -->
+            <line x1="120" y1="100" x2="120" y2="320" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
+            <text x="100" y="215" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">h</text>
+            <line x1="120" y1="100" x2="250" y2="100" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+            
+            <!-- Distance (b) -->
+            <line x1="280" y1="355" x2="400" y2="355" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
+            <text x="335" y="375" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">b</text>
+            <line x1="280" y1="260" x2="280" y2="365" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="400" y1="320" x2="400" y2="365" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
+
+            <!-- Pivot Point Highlight -->
+            <circle cx="400" cy="320" r="6" fill="#fbc02d" stroke="#f57f17" stroke-width="2"/>
+            <text x="415" y="335" font-family="sans-serif" font-size="14" fill="#f57f17" font-weight="bold">Pivot</text>
+            
+            <!-- Moments -->
+            <!-- Overturning Moment M_o (Clockwise) -->
+            <path d="M 330 250 A 100 100 0 0 1 470 250" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-red)" />
+            <text x="440" y="215" font-family="sans-serif" font-size="20" fill="#d32f2f" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">o</tspan></text>
+
+            <!-- Restoring Moment M_r (Anti-clockwise) -->
+            <path d="M 442 278 A 60 60 0 0 0 358 278" fill="none" stroke="#1976d2" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-blue)" />
+            <text x="375" y="245" font-family="sans-serif" font-size="20" fill="#1976d2" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">r</tspan></text>
+          </svg>
+        </div>
+        <sub style="display: block; margin-top: 12px; font-style: italic; color: #555; text-align: center;">
+          Figure: Free-Body Diagram for Base Stability Analysis (Overturning Moment vs. Restoring Moment).
+        </sub>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-header">Overturning &amp; Restoring Moments</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The forward punch creates an <strong>overturning moment</strong>:</p>
+          <div class="equation-box">
+            M<sub>OT</sub> = F<sub>design</sub> &times; h<sub>strike</sub>
+          </div>
+          <p>Opposing this is the <strong>restoring moment</strong> from the weight of the robot:</p>
+          <div class="equation-box">
+            M<sub>R</sub> = W &times; x<sub>CG</sub>
+          </div>
+          <p style="margin-bottom: 0;">
+            where <em>W</em> is the total system weight and <em>x<sub>CG</sub></em> is the horizontal distance from the front pivot edge to the centre of gravity.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        Shifting the robot body further rearward increases <em>x<sub>CG</sub></em>, which increases restoring moment and improves anti-tipping behaviour. However, shifting it too far rearward would reduce practical front clearance or complicate the layout. The fair-stage calculation therefore acted as a <strong>placement study</strong>, balancing restoring moment, user footwork space, and assembly practicality.
+      </p>
+      <p>
+        This early analysis established a principle that remained valid throughout later iterations: the base layout should be defined by <strong>overturning mechanics and user-space constraints</strong>, not by symmetry or convenience. It directly influenced the later decision to adopt a smaller-front / wider-rear welded trapezoidal base.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. FINAL BASE STABILITY ANALYSIS                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Stability Analysis of the Final Base</h3>
+      <p>
+        For the later welded-base design, the same stability logic was retained in a more formalised form. When a punch impacts the robot's upper body, two potential failure modes arise at the base: <strong>sliding</strong> (where the horizontal punch force exceeds static floor friction) and <strong>tipping</strong> (where the overturning moment exceeds the restoring moment). 
+      </p>
+      <p>
+        Tipping was selected as the <strong>governing failure mode</strong> because floor friction is highly variable (e.g., rubber mats, concrete, interlocking foam). A robot that is inherently stable against tipping through geometry and mass distribution alone will remain safe on any floor surface without relying on favourable friction.
+      </p>
+      
+      <div class="calc-card">
+        <div class="calc-header">Design Requirement</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The key design requirement is that the restoring moment must exceed the overturning moment by a sufficient margin:</p>
+          <div class="equation-box success">
+            M<sub>R</sub> / M<sub>OT</sub> &ge; 1.5
+          </div>
+          <p style="margin-bottom: 0;">
+            This expresses the requirement that the restoring moment exceed the overturning moment with a factor of safety of at least <strong>1.5</strong>.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        This factor of safety is consistent with the broader load-analysis philosophy adopted for BoxBunny: punching is impulsive, user-dependent, and not perfectly repeatable, so a conservative but practical design margin is appropriate. Floor friction was recognised as beneficial but treated only as a secondary effect. The base was required to remain upright through <strong>geometry and mass distribution alone</strong>.
+      </p>
+
+      <h4>Factor of Safety Justification</h4>
+      <p>
+        The moderate <strong>factor of safety of 1.5</strong> was explicitly selected to account for the following physical uncertainties:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:10px; border:1px solid #e0e0e0; text-align:left;">Uncertainty Source</th>
+            <th style="padding:10px; border:1px solid #e0e0e0; text-align:left;">Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Punch intensity variation</td>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Users range from beginners (~200 N) to experienced boxers (~1.5 kN)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Strike height variation</td>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Head strikes produce larger overturning lever arms than torso strikes</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Impact direction</td>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Off-axis punches (hooks, angled straights) introduce unpredictable lateral components</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Modelling simplifications</td>
+            <td style="padding:10px; border:1px solid #e0e0e0;">CG location estimated from CAD; actual mass distribution differs slightly after wiring and assembly</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Fabrication tolerances</td>
+            <td style="padding:10px; border:1px solid #e0e0e0;">Weld distortion, material variation, and assembly alignment affect actual pivot geometry</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Requirement Traceability</h4>
+      <p>
+        This overturning analysis verifies compliance with system-level requirement <strong>RM-1 (Structural Stability)</strong>: the robot must remain upright under worst-credible punching loads without relying on external anchoring. The analysis is also coupled to <strong>RM-7 (Portability)</strong>: adding ballast to increase the restoring moment directly increases the robot's transport mass. The trapezoidal base geometry optimises this trade-off by biasing the self-weight rearward rather than increasing total mass.
+      </p>
+
+      <h4>Implications for the Welded Base-Feet Design</h4>
+      <p>The transition from the wooden board to the welded trapezoidal steel base can be understood directly through the load analysis:</p>
+      <ol>
+        <li>The analysis showed that the base should provide stronger restoring leverage behind the centre of mass. This is why the final base became <strong>wider at the rear</strong> and <strong>narrower at the front</strong>.</li>
+        <li>It reinforced the importance of keeping the assembly's mass as low as practical to support a favourable low vertical mass concentration.</li>
+        <li>It clarified that the mounted plate and welded frame must be treated as part of the structural load path. Punch loads applied high on the robot must ultimately flow through the structure and into the floor without excessive compliance.</li>
+      </ol>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. PHASE 1 STABILITY CHECK (DETAILED)                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Detailed Stability Check: Phase 1 (Fair)</h3>
+      <p>
+        The objective of this analysis is to verify that the robot remains stable and does not tip over when subjected to a representative <strong>backward‑directed lateral punch force</strong> during operation (tipping backwards about the rear base edge).
+      </p>
+      <p><strong>Assumptions:</strong></p>
+      <ul>
+        <li>The applied punch force acts horizontally and is modelled in the backward direction.</li>
+        <li>The force is applied at the upper punching interface (worst-case lever arm).</li>
+        <li>The robot behaves as a rigid body during loading.</li>
+        <li>Ground contact is idealised as a single pivot edge at the rear of the base.</li>
+        <li>Friction effects are neglected in the primary stability check.</li>
+      </ul>
+
+      <div class="calc-card">
+        <div class="calc-header">Phase 1: Stability Check Parameters</div>
+        <div class="calc-body">
+          <ul style="margin: 0; padding-left: 20px;">
+            <li><strong>Total mass (m):</strong> 53 kg</li>
+            <li><strong>Weight (W):</strong> 53 &times; 9.81 = 519.93 N</li>
+            <li><strong>Design punch force (F):</strong> 2700 N</li>
+            <li><strong>Height of force application (h):</strong> 1100 mm (1.1 m)</li>
+            <li><strong>CoG offset (b):</strong> For the 1220 mm board, the CoG projection lay 492 mm from the front. Thus, the rear-edge CoG offset <em>b</em> = 1220 - 492 = <strong>728 mm (0.728 m)</strong>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-header">Phase 1: Required vs. Achieved Load Tolerance</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">To determine the maximum allowable backward-directed load at the target FoS (1.5):</p>
+          <div class="equation-box">
+            F<sub>back,allow</sub> = (W &times; b) / (FoS<sub>target</sub> &times; h)
+          </div>
+          <div class="equation-box">
+            F<sub>back,allow</sub> = (519.93 N &times; 0.728 m) / (1.5 &times; 1.1 m) &approx; <strong>229 N</strong>
+          </div>
+          <p style="margin-bottom: 0;">
+            This static limit of 229 N initially appears critically low compared to the 2.7 kN design load. However, a highly conservative static model assumes full horizontal load transfer at maximum height. In reality, a boxing punch is fundamentally a short-duration <strong>impulse</strong> (typically lasting 10–20 milliseconds), not a continuous static push. While the peak force reaches 2.7 kN, its duration provides insufficient kinetic energy to physically rotate the robot's CoG past the tipping pivot before the force dissipates. Supported by prototype observation, this geometry provided adequate margin to prevent observable tip-over during Fair operation.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. PHASE 2 FINAL STABILITY CHECK                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Detailed Stability Check: Phase 2 (Final)</h3>
+      <p>
+        The objective of the Phase 2 (Final) stability analysis is to confirm that the <strong>final base design and final assembled mass distribution</strong> provide sufficient resistance to tip‑over under the final design loading envelope.
+      </p>
+      <p>
+        The same moment‑equilibrium approach used in Phase 1 is retained for Phase 2. For the critical loading direction considered (backward tipping), the final robot is assumed to pivot about the rear base edge. Stability is assessed by comparing the overturning moment from a backward-directed lateral load applied at height against the restoring moment due to the robot weight acting through the CoG offset.
+      </p>
+
+      <div class="calc-card">
+        <div class="calc-header">Phase 2: Final Configurations</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;"><strong>Overturning Moment Calculation:</strong></p>
+          <div class="equation-box">
+            M<sub>o</sub> = F &times; h
+          </div>
+          <p>
+            For Phase 2, the backward-directed force magnitude used for tipping assessment reflects the final agreed credible operational case, while the higher structural design punch load remains the basis for strength sizing of components.
+          </p>
+          
+          <p><strong>Restoring Moment Calculation:</strong></p>
+          <div class="equation-box">
+            M<sub>r</sub> = W &times; b
+          </div>
+          <p style="margin-bottom: 0;">
+            The Phase 2 base design (with an <strong>increased system mass estimated at ~105 kg</strong>) significantly increases the restoring moment margin through a wider support polygon and a lower CoG compared to the Fair-stage prototype. The final build acceptance criterion remains <strong>FoS &ge; 1.5</strong> under the defined operational load case.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        Compared with the Fair-stage prototype, the final welded base provides vastly improved stability due to increased structural stiffness, more controlled mass placement, and a significantly more robust support polygon.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT/PREV SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Mechanical Design
+        </sl-button>
+      </a>
+      <a href="testing-evaluation.html">
+        <sl-button variant="default" size="medium">
+          Next: Testing &amp; Evaluation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

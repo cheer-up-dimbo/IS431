@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Rotation Design Ideation</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../rotation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Rotation Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Design Ideation</h2>
+    <p>
+      This page documents the conceptual selection for the rotation subsystem, determining the overall motion architecture, the central bearing type, and the actuation motor.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 1. MOTION AXIS SELECTION -->
+    <div>
+      <h3>1. Motion Axis Selection</h3>
+      <p>
+        Having to accomplish two motions (translation and rotation), a decision had to be made to either have both controlled within one mechanism (e.g., omnidirectional wheels) or decouple those axes into separate control systems.
+      </p>
+      
+      <p><strong>Omnidirectional Wheels</strong></p>
+      <p>
+        The omnidirectional wheel concept provides full planar mobility of the robot base. A single drive system enables translations in both the X and Y directions, as well as on-the-spot rotation, by appropriately commanding the individual wheel speeds. While attractive for general mobile robotics, it presents critical limitations for a punch-receiving boxing robot on typical gym flooring (mats, rubber tiles):
+      </p>
+      <ul>
+        <li>Wheels can sink slightly into the surface, changing the effective rolling radius and increasing rolling resistance.</li>
+        <li>The floor itself adds a compliant layer beneath the robot, amplifying pose creep under repeated impacts.</li>
+        <li>Small shifts accumulate over rounds, making it difficult to maintain a consistent stance reference relative to the user.</li>
+      </ul>
+
+      <p><strong>Decoupled Axes (Selected)</strong></p>
+      <p>
+        A design that explicitly decouples the primary motions (a linear rail for the forward–backward axis combined with a slewing bearing for rotation) sacrifices omnidirectional mobility but introduces significant advantages: high rotational stiffness, well-defined backlash, and high moment capacity, all independent of floor conditions. 
+      </p>
+
+      <image-component
+        width="90%" tag="image"
+        source="../../../assets/report appendix b/11-matrix-SingleSeparate Motion Control (Rotation).jpg"
+        subtitle="Table: Decision Matrix for Single/Separate Motion Control (Rotation)">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 2. BEARING SELECTION -->
+    <div>
+      <h3>2. Bearing Selection</h3>
+      <p>
+        The yaw rotation system must support the full BoxBunny robot mass (&approx; 20–25 kg), plus dynamic punching loads and overturning moments from the elevated torso and arms. Four bearing families were evaluated.
+      </p>
+      
+      <ul>
+        <li><strong>Lazy-Susan Bearing:</strong> Very low cost, but intended mainly for light axial loads with minimal preload. The noticeable play in tilt and rotation makes it unsuitable for precise yaw positioning or repeated impacts.</li>
+        <li><strong>Cross-Roller Slewing Ring:</strong> Very high tilting and rotational stiffness due to line contact. Excellent for combined loads, but generally more expensive and less readily available than ball-types. Higher performance than strictly required.</li>
+        <li><strong>Thrust Ball Slewing Rings:</strong> Optimised mainly for axial loads; not optimised for large overturning moments from an elevated torso without requiring additional complex bearings.</li>
+        <li><strong>Four-Point Contact Ball Slewing Ring (Selected):</strong> Designed to support combined axial, radial, and overturning moment loads. It can be preloaded to reduce internal clearance, and is widely available in standard sizes. It offers a perfect balance of load capacity, stiffness, availability, and cost.</li>
+      </ul>
+
+      <image-component
+        width="90%" tag="image"
+        source="../../../assets/report appendix b/14-matrix-Bearing Linear Rail.jpg"
+        subtitle="Table: Decision Matrix for Bearing in Yaw Rotation System">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. MOTOR SELECTION -->
+    <div>
+      <h3>3. Motor Selection</h3>
+      <p>
+        The yaw motor must rotate the full upper body about the vertical axis while resisting punching-induced moments. It must achieve a target speed of &approx;150&deg;/s with accurate, repeatable positioning and good disturbance rejection.
+      </p>
+
+      <ul>
+        <li><strong>Brushed DC Gearmotor:</strong> High torque at low output speed and very simple control. However, it lacks inherent position control, and gearbox backlash causes visible yaw "looseness" when the robot is punched.</li>
+        <li><strong>Closed-Loop Stepper (Hybrid Servo):</strong> Good low-speed torque and encoder feedback for correcting position errors. However, steppers have torque ripple and microstep non-linearity, producing small angle "cogging" that can be felt as chatter by the user.</li>
+        <li><strong>BLDC Servo Motor with Encoder (Selected):</strong> Smooth, sinusoidal torque production via field-oriented control (FOC) reduces cogging and vibration. Closed-loop position control provides high yaw accuracy and active disturbance rejection under punching.</li>
+      </ul>
+
+      <p>
+        For the yaw axis, user perception and stability are critical: the robot should rotate smoothly and feel "solid" under punches, without rattling or drifting. A BLDC Servo Motor is therefore chosen to provide controlled yaw motion and high positional stiffness.
+      </p>
+
+      <image-component
+        width="90%" tag="image"
+        source="../../../assets/report appendix b/16-matrix-Motor Yaw Rotation System.jpg"
+        subtitle="Table: Decision Matrix for Motor in Yaw Rotation System">
+      </image-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="../rotation.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back to Rotation
+        </sl-button>
+      </a>
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          Next: Mechanical Design
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

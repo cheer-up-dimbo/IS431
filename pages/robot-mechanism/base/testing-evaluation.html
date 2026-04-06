@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Base Testing &amp; Evaluation</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .is431-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+    .is431-table td, .is431-table th {
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../base.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Base Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Testing &amp; Evaluation</h2>
+    <p>
+      Following the right side of the V-Model framework, this page presents a consolidated subsystem-level test and verification matrix for the base subsystem. It evaluates the design against the original system requirements (<strong>RM-1, RM-2, RM-5, RM-7</strong>) and structural constraints, detailing what has been successfully validated through analysis and what remains for future physical testing.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. PERFORMANCE CRITERIA                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>1. Performance Criteria</h3>
+      <p>
+        The base subsystem is evaluated against the following performance criteria, derived from the system-level requirements:
+      </p>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;">
+        <thead>
+          <tr>
+            <th style="width: 15%;">ID</th>
+            <th style="width: 35%;">Criterion</th>
+            <th style="width: 50%;">Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RM-1</strong></td>
+            <td>Stability under punching loads</td>
+            <td>Remain upright under worst-credible punching loads (FoS &ge; 1.5)</td>
+          </tr>
+          <tr>
+            <td><strong>RM-2</strong></td>
+            <td>Preserve user footwork space</td>
+            <td>Zero foot contact with base during active stance and pivot drills</td>
+          </tr>
+          <tr>
+            <td><strong>RM-5</strong></td>
+            <td>Rigid mechanism mounting foundation</td>
+            <td>Provide a flat, rigid geometric datum for the mechanism stack</td>
+          </tr>
+          <tr>
+            <td><strong>RM-7</strong></td>
+            <td>Practical transport</td>
+            <td>Support 1-person tip-and-roll transport between locations</td>
+          </tr>
+          <tr>
+            <td><strong>N/A</strong></td>
+            <td>Long-term structural solution</td>
+            <td>Clear load path, suitable fabrication, effective corrosion mitigation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. TEST PROCEDURES                                    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>2. Test Procedures</h3>
+      
+      <h4>Test 1: Physical Tipping Test (RM-1)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Robot fully assembled and adjusted to maximum height extension.</li>
+        <li><strong>Procedure:</strong> Apply worst-case horizontal punch loads to the upper striking targets (head and torso).</li>
+        <li><strong>Success Criteria:</strong> The robot must remain upright without the base lifting or the system overturning.</li>
+      </ul>
+
+      <h4>Test 2: Footwork Clearance Assessment (RM-2)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Robot placed in normal operating environment.</li>
+        <li><strong>Procedure:</strong> User executes a full range of boxing footwork around the robot, including forward steps, backward retreats, and lateral pivots in both orthodox and southpaw stances.</li>
+        <li><strong>Success Criteria:</strong> Zero interference or contact between the user's feet and the robot's base.</li>
+      </ul>
+
+      <h4>Test 3: Transport &amp; Relocation Test (RM-7)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Robot fully assembled on typical gym flooring (e.g., rubber mats).</li>
+        <li><strong>Procedure:</strong> A single operator grips the vertical column, tilts the robot backward onto its rear transport wheels, and rolls it to a new location.</li>
+        <li><strong>Success Criteria:</strong> The robot can be safely and smoothly relocated by one person without requiring disassembly.</li>
+      </ul>
+
+      <h4>Test 4: Structural &amp; Mounting Inspection (RM-5)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Fabricated base-feet assembly.</li>
+        <li><strong>Procedure:</strong> Inspect the welded frame and mounted plate for rigidity, flatness, and application of corrosion protection (primer/paint/cavity wax). Verify against CAD mass properties.</li>
+        <li><strong>Success Criteria:</strong> Welded steel base provides a clear, rigid load path superior to early prototypes, with a low vertical centre of mass.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. RESULTS                                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>3. Results</h3>
+      <p>
+        At present, the base subsystem has been <strong>fully validated through physical testing</strong>, confirming its success in concept, geometry, structural stability, and practical portability.
+      </p>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;">
+        <thead>
+          <tr>
+            <th style="width: 15%;">ID</th>
+            <th style="width: 30%;">Criterion</th>
+            <th style="width: 40%;">Measured Result</th>
+            <th style="width: 15%;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RM-1</strong></td>
+            <td>Stability under punching loads</td>
+            <td>Remains completely stable under physical full-extension punch impacts. Validated analytical overturning model.</td>
+            <td><sl-badge variant="success" pill>Pass</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>RM-2</strong></td>
+            <td>Preserve user footwork space</td>
+            <td>Zero foot contact observed during orthodox and southpaw pivots. Trapezoidal geometry preserves front zone.</td>
+            <td><sl-badge variant="success" pill>Pass</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>RM-5</strong></td>
+            <td>Rigid mechanism mounting</td>
+            <td>Plate observed to be flat and rigid. Welded steel base clearly superior to temporary wooden board.</td>
+            <td><sl-badge variant="success" pill>Pass</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>RM-7</strong></td>
+            <td>Practical transport</td>
+            <td>Single operator successfully tilted and relocated the assembled robot.</td>
+            <td><sl-badge variant="success" pill>Pass</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>N/A</strong></td>
+            <td>Corrosion mitigation</td>
+            <td>Strategy defined and applied. Long-term performance pending field exposure.</td>
+            <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. CROSS-REFERENCES                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>4. Cross-References</h3>
+      <ul>
+        <li>
+          <strong><a href="../testing.html">Robot Mechanism — Verification Results</a></strong>
+          — System-level integration testing and the overall performance assessment against all RM requirements.
+        </li>
+        <li>
+          <strong><a href="../../robot-mechanism.html">5.2 Robot Mechanism</a></strong>
+          — Definitions of the system-level requirements (RM-1, RM-2, RM-5, RM-7) that this base subsystem satisfies.
+        </li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT/PREV SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="load-stability-analysis.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Load &amp; Stability Analysis
+        </sl-button>
+      </a>
+      <a href="../rotation.html">
+        <sl-button variant="default" size="medium">
+          Next: 5.2.2 Rotation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

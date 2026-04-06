@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Mechanical Design — Height Adjustment</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../height-adjustment.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Height Adjustment
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Mechanical Design</h2>
+    <p>
+      This page details the physical construction of the custom telescopic lift column — the separation of structural load paths, the materials selected, the Delrin bearing interfaces, and the gusseted joints where aluminium extrusion meets welded steel structure.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 1. DECOUPLED LOAD PATHS -->
+    <div>
+      <h3>1. Decoupled Load Paths: Lift vs Structure</h3>
+      <p>
+        The defining design principle of BoxBunny's height-adjustment subsystem is the <strong>separation of axial lifting from lateral structural support</strong>. During operation, it experiences two fundamentally different types of loading:
+      </p>
+      <ol>
+        <li><strong>Axial (vertical) load:</strong> The predictable, steady downward weight of everything above the column (torso frame, arms, padding, sensors).</li>
+        <li><strong>Lateral loads and overturning moments:</strong> Dynamic, impulsive horizontal forces transmitted from user punches.</li>
+      </ol>
+      <p>
+        If a single mechanism is required to handle both simultaneously, the design becomes significantly more complex and prone to failure. The key decision was to treat the screw jack as <strong>purely an axial lifting device</strong>, while all lateral forces are resisted by the surrounding <strong>telescopic column structure</strong>.
+      </p>
+      <p>
+        This separation prevents <strong>side-loading of the screw jack</strong>, which would otherwise reduce efficiency, accelerate wear, and create a high risk of the nut binding on the screw under lateral punch impact.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 2. COLUMN COMPONENTS & LAYOUT -->
+    <div>
+      <h3>2. Structural Layout &amp; Fabrication</h3>
+      <p>
+        The final concept behaves less like an exposed actuator and more like a <strong>guided structural mast</strong>. The telescopic column comprises four primary elements:
+      </p>
+      <table class="is431-table" style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr>
+            <th style="width:25%;">Component</th>
+            <th style="width:30%;">Material</th>
+            <th style="width:45%;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Moving inner member</td>
+            <td><strong>8080 aluminium extrusion</strong></td>
+            <td>Carries the upper body; slides vertically within the outer tube.</td>
+          </tr>
+          <tr>
+            <td>Guide surfaces</td>
+            <td><strong>Delrin (acetal) wear pads</strong></td>
+            <td>Low-friction sacrificial interface between inner and outer members.</td>
+          </tr>
+          <tr>
+            <td>Fixed outer sleeve</td>
+            <td><strong>Welded steel tube</strong></td>
+            <td>Provides structural envelope; resists lateral loads and overturning moments.</td>
+          </tr>
+          <tr>
+            <td>Axial lifting device</td>
+            <td><strong>HK2T screw jack</strong></td>
+            <td>Carries axial load; provides height adjustment; self-locking.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>SHS Wall Thickness (&ge; 6 mm)</h4>
+      <p>
+        Large SHS members in the height-adjustment column are specified with a minimum <strong>wall thickness of 6 mm</strong>. Thicker walls increase the second moment of area (reducing deflection under punch impacts), ensure full-penetration welds at plate-to-tube intersections, and provide a flat, distortion-free internal bearing surface for the Delrin wear pads.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. DETAILED INTERFACES -->
+    <div>
+      <h3>3. Delrin Bearings &amp; Gusseted Joints</h3>
+      
+      <h4>Delrin Bearing Interfaces</h4>
+      <p>
+        <strong>Delrin (acetal)</strong> wear pads are used as the bearing interface between the 8080 aluminium inner member and the steel outer tube. Delrin was selected because it provides a <strong>low friction coefficient</strong>, is <strong>self-lubricating</strong>, and offers <strong>sacrificial wear</strong> (so wear concentrates on the replaceable pads rather than the structural metals). The wear pads are positioned at the top and bottom of the outer tube, providing a wide moment arm for resisting tilting of the inner member.
+      </p>
+
+      <h4>Gusseted Aluminium-to-Steel Joints</h4>
+      <p>
+        Where the 8080 aluminium extrusion meets the welded steel structure, <strong>gusseted corner brackets</strong> are used to create robust, stiff connections. Because dissimilar metals cannot be easily welded, these bolted gussets provide a reliable joint that bridges across potential weld-distortion zones and distributes the large bending moments from punches over a wider area.
+      </p>
+
+      <h4>Fabrication Notes</h4>
+      <p>
+        A <strong>light-shock service factor of approximately 1.5</strong> was adopted to account for minor bumps and start-stop transients during height adjustment. Internal clearances between inner and outer members are tightly controlled to prevent jamming while maintaining acceptable play for smooth operation.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. FINAL DESIGN STATE -->
+    <div>
+      <h3>4. Final Design State</h3>
+      <p>
+        The transition from the early dual-linear-guide concept to the final custom telescopic column eliminated the tolerance sensitivity and parallelism issues of exposed rails. The final design provides a <strong>clean aesthetic</strong>—the screw jack operates safely inside the column, hidden from view and protected from external disturbances.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="design-ideation.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Design Ideation
+        </sl-button>
+      </a>
+      <a href="load-analysis.html">
+        <sl-button variant="default" size="medium">
+          Next: Load Analysis
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

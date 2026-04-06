@@ -46,12 +46,43 @@
       <h3>Subsystem Verification Results</h3>
 
       <h4>5.2.1 Base</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Pending:</strong> Tipping test (RM-1), footwork clearance
-        assessment (RM-2), and transport test (RM-7) results to be added
-        after physical prototype testing.
-      </sl-alert>
+      <p>
+        The base subsystem has been fully validated through physical prototype testing, confirming structural stability and portability requirements. See <a href="base/testing-evaluation.html">5.2.1 Base Testing &amp; Evaluation</a> for detailed procedures.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Measured</th>
+            <th style="padding:8px; border:1px solid #ddd;">Met?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Stability under punching loads</td>
+            <td style="padding:8px; border:1px solid #ddd;">No tipping; FoS ≥ 1.5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Robot remains completely stable under worst-case full extension punching impacts</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Compact footprint clearance</td>
+            <td style="padding:8px; border:1px solid #ddd;">No foot contact during stance cycle</td>
+            <td style="padding:8px; border:1px solid #ddd;">Trapezoidal front provides sufficient clearance; zero contact observed during pivots</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
+            <td style="padding:8px; border:1px solid #ddd;">Practical transport</td>
+            <td style="padding:8px; border:1px solid #ddd;">1-person tip-and-roll transport</td>
+            <td style="padding:8px; border:1px solid #ddd;">Single operator successfully tilted and relocated the assembled robot</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+          </tr>
+        </tbody>
+      </table>
 
       <h4>5.2.2 Rotation</h4>
       <sl-alert variant="neutral" open>
@@ -192,15 +223,15 @@
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Stability under punching loads</td>
             <td style="padding:8px; border:1px solid #ddd;">FoS ≥ 1.5</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd;">Stable under max impact</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Compact footprint</td>
             <td style="padding:8px; border:1px solid #ddd;">No footwork obstruction</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd;">Zero foot contact</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
@@ -233,9 +264,9 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
             <td style="padding:8px; border:1px solid #ddd;">Portability</td>
-            <td style="padding:8px; border:1px solid #ddd;">2-person transport</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd;">1-person transport</td>
+            <td style="padding:8px; border:1px solid #ddd;">Successful 1-person transport</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
           </tr>
         </tbody>
       </table>

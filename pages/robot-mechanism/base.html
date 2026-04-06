@@ -72,46 +72,166 @@
     <div>
       <h3>Design</h3>
       
+      <style>
+        /* Styling for the 3D Model Hotspot Buttons */
+        .Hotspot {
+          background: #3b82f6;
+          border-radius: 32px;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          cursor: pointer;
+          height: 16px;
+          width: 16px;
+          position: relative;
+          transition: all 0.2s ease;
+        }
+        .Hotspot:not([data-visible]) {
+          opacity: 0;
+          pointer-events: none;
+        }
+        .HotspotAnnotation {
+          background: #fff;
+          border-radius: 4px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          color: #333;
+          display: block;
+          font-size: 0.85rem;
+          font-weight: 600;
+          left: calc(100% + 24px);
+          padding: 6px 10px;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: max-content;
+        }
+        
+        /* Connecting line for the callout */
+        .HotspotAnnotation::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          right: 100%;
+          width: 24px;
+          height: 2px;
+          background: #3b82f6;
+          transform: translateY(-50%);
+        }
+        
+        /* AR Button Styling */
+        #ar-button {
+          background-color: white;
+          border-radius: 24px;
+          border: 1px solid #dadce0;
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+          padding: 8px 16px;
+          font-family: inherit;
+          font-weight: 500;
+          color: #1a73e8;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #ar-button:focus-visible { outline: 2px solid #1a73e8; }
+        #ar-prompt { position: absolute; bottom: 60px; right: 16px; display: none; }
+        
+        /* Hide Hotspots Toggle Class */
+        model-viewer.hide-hotspots .Hotspot {
+          display: none !important;
+        }
+      </style>
+
       <p>
-        The final base design is a <strong>welded trapezoidal base-feet assembly</strong> built from <strong>70 &times; 50 mm rectangular steel tubes (RHS) with 3 mm wall thickness</strong>, combined with a <strong>flat, rigid mounted steel plate</strong> and rear wheels intended for the transport system.
+        The final base design is a <strong>welded trapezoidal base-feet assembly</strong> built from <strong>rectangular steel tubes (RHS)</strong>, combined with a <strong>flat, rigid mounted steel plate</strong> and rear wheel brackets intended for transport system.
       </p>
 
       <div class="model-viewer-container" style="margin: 24px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+          <span style="font-size: 0.95rem; color: #555;">
+            <sl-icon name="info-circle" style="vertical-align: middle; margin-right: 4px;"></sl-icon>
+            Interact with the 3D model to explore its structure. Toggle annotations to view key components.
+          </span>
+          <sl-button id="toggle-hotspots" size="small" variant="default" pill>Hide Annotations</sl-button>
+        </div>
         <model-viewer
           src="../../assets/3d_models/weld_assem_base_feet.glb"
           alt="Interactive 3D Model: Welded Trapezoidal Base-Feet Assembly"
           camera-controls
           touch-action="pan-y"
           auto-rotate
-          shadow-intensity="1"
-          exposure="0.8"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          tone-mapping="neutral"
+          shadow-intensity="0.66"
+          shadow-softness="1"
           style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
-        ></model-viewer>
+        >
+          <button class="Hotspot" slot="hotspot-1" data-position="-0.1616935098954111m 0.03000000026077032m -0.5224578408236937m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Base Plate</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-2" data-position="0.19522006137044312m -0.007422558915625377m 0.03750000149011612m" data-normal="0m 0m 1m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Base Feet</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-3" data-position="0.28099998934849485m 0.011315854150448447m -0.6749486071947379m" data-normal="0.9999999999999943m -2.250732334031896e-9m -1.0660580753156821e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Wheel Brackets</div>
+          </button>
+          <div class="progress-bar hide" slot="progress-bar">
+              <div class="update-bar"></div>
+          </div>
+          <button slot="ar-button" id="ar-button">View in your space</button>
+          <div id="ar-prompt"><img src="https://modelviewer.dev/shared-assets/icons/hand.png"></div>
+        </model-viewer>
         <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
           Interactive 3D Model: Welded Trapezoidal Base-Feet Assembly
         </sub>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-hotspots');
+            const viewer = document.querySelector('model-viewer');
+            let hotspotsVisible = true;
+            
+            toggleBtn.addEventListener('click', () => {
+              hotspotsVisible = !hotspotsVisible;
+              if (hotspotsVisible) {
+                viewer.classList.remove('hide-hotspots');
+                toggleBtn.textContent = 'Hide Annotations';
+              } else {
+                viewer.classList.add('hide-hotspots');
+                toggleBtn.textContent = 'Show Annotations';
+              }
+            });
+          });
+        </script>
       </div>
 
-      <h4>Trapezoidal Footprint</h4>
-      <p><em>Stability + User Clearance</em></p>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Trapezoidal Footprint
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Stability + User Clearance</sl-badge>
+      </h4>
       <p>
         The most important geometric feature of the final design is that the base is <strong>narrower at the front and wider at the rear</strong>. This trapezoidal strategy reduces the amount of structure intruding into the boxer's immediate working zone (especially around the lead foot and pivot region), while increasing restoring leverage against forward tipping. The wider rear also creates integration space for lower-mechanism hardware and supports the later addition of rear wheel brackets and transport features.
       </p>
 
-      <h4>Low-profile Frame</h4>
-      <p><em>Lower CG + Reduced Obstruction</em></p>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Low-profile Frame
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Lower CG + Reduced Obstruction</sl-badge>
+      </h4>
       <p>
         The base is intentionally <strong>low profile</strong>. Keeping the main welded frame close to floor level reduces obstruction and helps keep the centre of mass of the full system low. The low coordinate of the current centre of mass is favourable, indicating that mass is concentrated close to the floor and supporting passive anti-tipping behaviour. While the exact support margin still depends on the final support polygon and coordinate reference, the low vertical mass placement is clearly beneficial.
       </p>
 
-      <h4>Rigid Mounted Plate</h4>
-      <p><em>Datum + Subsystem Alignment</em></p>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Rigid Mounted Plate
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Datum + Subsystem Alignment</sl-badge>
+      </h4>
       <p>
         The mounted plate in the current design is <strong>flat and rigid</strong>, providing a reliable geometric datum for the mechanism stack above. In mechanical terms, the base is therefore not only carrying load but also defining alignment for lower subsystems. This is especially important for the rotation mechanism and other components that depend on a consistent plate interface.
       </p>
 
-      <h4>Rear-wheel Transport</h4>
-      <p><em>Tip-and-Roll Portability</em></p>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Rear-wheel Transport
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Tip-and-Roll Portability</sl-badge>
+      </h4>
       <p>
         The final design also incorporates <strong>rear transport interfaces</strong> as part of the base-feet assembly, consistent with the intended <strong>tip-and-roll handling concept</strong>. Within the wider lower-mechanism architecture, these rear interfaces are designed to accommodate the wheel hardware and provide the structural connection points needed for the robot to be tilted and rolled during movement between locations. This is an important design feature because it means portability was considered from the base-design stage itself, rather than being treated later as an external add-on or temporary workaround.
       </p>
@@ -144,83 +264,6 @@
       <p>
         The primary validation method for the base was the <strong>overturning-moment check</strong>. The design punch force was converted into a forward tipping moment about the front edge of the support region, while the self-weight of the assembly provided a restoring moment through the centre of mass. The design requirement was that the restoring moment exceed the overturning moment with a factor of safety of at least <strong>1.5</strong>. This method was intentionally chosen because it is transparent, conservative, and directly tied to geometry and mass distribution. It avoids overreliance on favourable floor conditions or simulation assumptions. Floor friction was treated as a secondary benefit only, not as the main stabilising mechanism.
       </p>
-
-      <div style="display: flex; flex-direction: column; align-items: center; margin: 24px 0;">
-        <div style="width: 80%; max-width: 600px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fff;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
-            <defs>
-              <!-- Red Arrow for Overturning Forces/Moments -->
-              <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#d32f2f" />
-              </marker>
-              <!-- Blue Arrow for Restoring Forces/Moments -->
-              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#1976d2" />
-              </marker>
-              <!-- Dimension Line Arrows -->
-              <marker id="dim-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-                <path d="M 10 0 L 0 5 L 10 10 z" fill="#757575" />
-              </marker>
-              <marker id="dim-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#757575" />
-              </marker>
-            </defs>
-
-            <rect width="100%" height="100%" fill="#ffffff" />
-            
-            <!-- Ground Line & Hatching -->
-            <line x1="50" y1="320" x2="550" y2="320" stroke="#9e9e9e" stroke-width="3" />
-            <path d="M 70 320 L 60 330 M 110 320 L 100 330 M 150 320 L 140 330 M 190 320 L 180 330 M 230 320 L 220 330 M 270 320 L 260 330 M 310 320 L 300 330 M 350 320 L 340 330 M 390 320 L 380 330 M 430 320 L 420 330 M 470 320 L 460 330 M 510 320 L 500 330 M 550 320 L 540 330" stroke="#9e9e9e" stroke-width="1.5" />
-
-            <!-- Simplified Robot Profile -->
-            <rect x="200" y="280" width="200" height="40" fill="#eceff1" stroke="#424242" stroke-width="2" rx="4"/>
-            <rect x="250" y="80" width="60" height="200" fill="#ffcc80" stroke="#f57c00" stroke-width="2" rx="6"/>
-            
-            <!-- CG Indicator -->
-            <g transform="translate(280, 160)">
-              <circle cx="0" cy="0" r="8" fill="none" stroke="#212121" stroke-width="1.5"/>
-              <path d="M -8 0 A 8 8 0 0 1 0 -8 L 0 0 Z" fill="#212121"/>
-              <path d="M 0 0 L 8 0 A 8 8 0 0 1 0 8 Z" fill="#212121"/>
-            </g>
-
-            <!-- Punch Force (F_punch) -->
-            <line x1="60" y1="100" x2="180" y2="100" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
-            <text x="80" y="90" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">punch</tspan></text>
-
-            <!-- Weight (W) -->
-            <line x1="280" y1="160" x2="280" y2="260" stroke="#1976d2" stroke-width="4" marker-end="url(#arrow-blue)" />
-            <text x="255" y="220" font-family="sans-serif" font-size="18" fill="#1976d2" font-weight="bold">W</text>
-
-            <!-- Dimensions -->
-            <!-- Height (h) -->
-            <line x1="120" y1="100" x2="120" y2="320" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
-            <text x="100" y="215" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">h</text>
-            <line x1="120" y1="100" x2="250" y2="100" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
-            
-            <!-- Distance (b) -->
-            <line x1="280" y1="355" x2="400" y2="355" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
-            <text x="335" y="375" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">b</text>
-            <line x1="280" y1="260" x2="280" y2="365" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
-            <line x1="400" y1="320" x2="400" y2="365" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
-
-            <!-- Pivot Point Highlight -->
-            <circle cx="400" cy="320" r="6" fill="#fbc02d" stroke="#f57f17" stroke-width="2"/>
-            <text x="415" y="335" font-family="sans-serif" font-size="14" fill="#f57f17" font-weight="bold">Pivot</text>
-            
-            <!-- Moments -->
-            <!-- Overturning Moment M_o (Clockwise) -->
-            <path d="M 330 250 A 100 100 0 0 1 470 250" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-red)" />
-            <text x="440" y="215" font-family="sans-serif" font-size="20" fill="#d32f2f" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">o</tspan></text>
-
-            <!-- Restoring Moment M_r (Anti-clockwise) -->
-            <path d="M 442 278 A 60 60 0 0 0 358 278" fill="none" stroke="#1976d2" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-blue)" />
-            <text x="375" y="245" font-family="sans-serif" font-size="20" fill="#1976d2" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">r</tspan></text>
-          </svg>
-        </div>
-        <sub style="display: block; margin-top: 12px; font-style: italic; color: #555; text-align: center;">
-          Figure: Free-Body Diagram for Base Stability Analysis (Overturning Moment vs. Restoring Moment).
-        </sub>
-      </div>
 
       <p>
         At subsystem level, the following aspects are currently successful:
@@ -316,6 +359,11 @@
           <sl-icon name="gear" style="font-size: 2rem;"></sl-icon>
           <h3>Mechanical Design</h3>
           <p>Iterations, problems, and final design details</p>
+        </a>
+        <a href="base/load-stability-analysis.html" class="section-nav-card">
+          <sl-icon name="calculator" style="font-size: 2rem;"></sl-icon>
+          <h3>Load &amp; Stability Analysis</h3>
+          <p>Punch force modelling, Phase 1 vs Phase 2, dynamic vs static loads</p>
         </a>
         <a href="base/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="clipboard-check" style="font-size: 2rem;"></sl-icon>

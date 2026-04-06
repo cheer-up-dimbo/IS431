@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
   <script type="module" src="../../../components/image/image-component.js"></script>
+  <!-- Google Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <style>
     .is431-table th {
       background-color: #f8f9fa;
@@ -83,40 +85,9 @@
     <div>
       <h3>Portability &amp; Deployment</h3>
       <p>
-        BoxBunny must be moved between storage areas, fabrication workshops, and public demonstration venues. The transport strategy was driven by requirement <strong>RM-7 (Portability)</strong>: the base must allow transport by 1–2 persons between venues without compromising the planted operational stance.
+        BoxBunny must be moved between storage areas, fabrication workshops, and public demonstration venues. The transport strategy was driven by requirement <strong>RM-7 (Portability)</strong>: the base must allow transport by 1 person between locations without compromising the planted operational stance.
         The transport solution must not require disassembly of the robot and must function effectively on typical gym and corridor surfaces (e.g., rubber mats, concrete).
       </p>
-
-      <h4>Gym-Bench Inspiration</h4>
-      <p>
-        The transport strategy was inspired by <strong>commercial gym benches</strong>, which face a similar design challenge: they must be heavy and stable during use, yet easily moved by one person. Gym benches achieve this through rear-mounted wheels and a front handle, allowing the operator to tilt the bench backward and roll it. This tip-and-roll approach was adopted for BoxBunny because the wheels do not touch the floor during normal use, meaning they introduce no compliance when the robot is under load.
-      </p>
-
-      <h4>Transport Hardware</h4>
-      <p>
-        The base features two rear-mounted wheels located at the widest rear edge of the trapezoidal footprint:
-      </p>
-      <table class="is431-table" style="width:100%; border-collapse:collapse; margin:16px 0;">
-        <thead>
-          <tr>
-            <th style="width: 25%;">Component</th>
-            <th style="width: 25%;">Specification</th>
-            <th style="width: 50%;">Function</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Transport wheels</td>
-            <td><strong>RMNA100</strong> (100 mm diameter)</td>
-            <td>Smooth rolling on gym and corridor surfaces when tilted backward.</td>
-          </tr>
-          <tr>
-            <td>Wheel mounting pins</td>
-            <td><strong>KCLSBF12-62</strong></td>
-            <td>Secure axle retention; standard clevis-pin format for easy replacement.</td>
-          </tr>
-        </tbody>
-      </table>
 
       <h4>Planted vs Transport Stance</h4>
       <p>
@@ -124,7 +95,14 @@
       </p>
       <ul>
         <li>
-          <strong>Planted:</strong> During training, the base rests flat on the floor with its full trapezoidal footprint in contact with the surface, maximising friction and stability.
+          <strong>Planted:</strong> During training, the base rests flat on the floor with its full trapezoidal footprint in contact with the surface. Anti-slip pads were pasted at the bottom during assembly to maximise friction and stability.
+          <br><br>
+          <image-component
+            width="50%"
+            tag="image"
+            source="../../../assets/robot_mechanism/anti slip pad bottom.png"
+            subtitle="Figure: Anti-slip pads applied to the base to maximise floor friction and stability.">
+          </image-component>
         </li>
         <li>
           <strong>Passive Wheels:</strong> The transport wheels are positioned slightly elevated relative to the base feet. They do not contribute to the support polygon or introduce rolling compliance while flat.
@@ -133,8 +111,358 @@
           <strong>No Locks Required:</strong> This dual-mode behaviour eliminates the need for brake locks, deployment levers, or other complex mechanisms that could fail under punching impacts.
         </li>
       </ul>
+
+      <h4>Transport Hardware</h4>
+      <p>
+        The base features two rear-mounted wheels located at the widest rear edge of the trapezoidal footprint, with parts sourced from MISUMI:
+      </p>
+      <table class="is431-table" style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr>
+            <th style="width: 20%;">Component</th>
+            <th style="width: 20%;">Part Number</th>
+            <th style="width: 25%;">Material &amp; Dimensions</th>
+            <th style="width: 35%;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transport wheels</td>
+            <td><strong>RMNA100</strong></td>
+            <td>Rubber, &Oslash;100 mm</td>
+            <td>Smooth rolling on gym and corridor surfaces when tilted backward.</td>
+          </tr>
+          <tr>
+            <td>Wheel mounting pins</td>
+            <td><strong>KCLSBF12-62</strong></td>
+            <td>Stainless Steel (SUS304 eq.), &Oslash;12 mm &times; 62 mm</td>
+            <td>Secure axle retention; standard clevis-pin format for easy replacement.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Transport Load Capacity Check</h4>
+      <p>
+        To ensure the transport hardware does not fail during tip-and-roll handling, a worst-case load check was performed. The maximum structural stress occurs when the robot is tilted to its balance point, placing the entire system weight onto the two rear wheels and their welded brackets.
+      </p>
+      
+      <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin: 20px 0;">
+        <!-- Step 1 -->
+        <div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <div style="background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; color: #333;">
+            1. Wheel Load &amp; Factor of Safety
+          </div>
+          <div style="padding: 16px; font-size: 0.95rem; color: #444;">
+            <p style="margin-top: 0;">Assuming a fully assembled robot mass of <strong>105 kg</strong>, the total weight (<em>W</em>) is:</p>
+            <div style="background: #f4f7fa; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin: 12px 0;">
+              W = 105 kg &times; 9.81 m/s&sup2; &approx; <strong>1030 N</strong>
+            </div>
+            <p>When balanced entirely on the rear wheels, each wheel supports half the weight:</p>
+            <div style="background: #f4f7fa; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin: 12px 0;">
+              F<sub>wheel</sub> = 1030 N / 2 = <strong>515 N</strong>
+            </div>
+            <p style="margin-bottom: 0;">The MISUMI RMNA100 rubber wheels have an allowable static load of <strong>1200 N</strong> per wheel.</p>
+            <div style="background: #e8f5e9; color: #1b5e20; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin-top: 12px; border: 1px solid #c8e6c9;">
+              Factor of Safety (FoS) = 1200 N / 515 N &approx; <strong>2.33</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <div style="background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; color: #333;">
+            2. Clevis Pin Shear Stress
+          </div>
+          <div style="padding: 16px; font-size: 0.95rem; color: #444;">
+            <p style="margin-top: 0;">The 12 mm solid stainless steel pin is mounted in double shear. The effective shear area (<em>A<sub>shear</sub></em>) is twice the cross-sectional area:</p>
+            <div style="background: #f4f7fa; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin: 12px 0;">
+              A<sub>shear</sub> = 2 &times; (&pi; &times; 6&sup2;) &approx; <strong>226 mm&sup2;</strong>
+            </div>
+            <p>The shear stress (&tau;) on the pin is:</p>
+            <div style="background: #f4f7fa; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin: 12px 0;">
+              &tau; = 515 N / 226 mm&sup2; &approx; <strong>2.28 MPa</strong>
+            </div>
+            <p style="margin-bottom: 0;">With SUS304 stainless steel having a shear yield strength of approximately <strong>150 MPa</strong>, the pin is massively over-specified and immune to shear failure under these loads.</p>
+          </div>
+        </div>
+      </div>
+      <p>
+        This calculation confirms that both the 100 mm wheels and the welded steel mounting hardware are structurally sound for tilting and rolling the fully assembled robot without risk of yielding or wheel collapse.
+      </p>
     </div>
 
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. DESIGN ITERATIONS                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Design Iterations</h3>
+      
+      <h4>Phase 1: Early Robotics Fair implementation</h4>
+      <p>
+        The first implemented base configuration was used during the <strong>NUS CDE Robotics Fair in first half of semester</strong>. At this stage, the primary objective was safe and rapid deployment using materials that were immediately available. The robot was mounted on a <strong>1220 &times; 580 mm wooden board</strong>, which served as the initial support platform for the early exhibition-stage build.
+      </p>
+      
+      <style>
+        /* Styling for the 3D Model Hotspot Buttons */
+        .Hotspot {
+          background: #3b82f6;
+          border-radius: 32px;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          cursor: pointer;
+          height: 16px;
+          width: 16px;
+          position: relative;
+          transition: all 0.2s ease;
+        }
+        .Hotspot:not([data-visible]) {
+          opacity: 0;
+          pointer-events: none;
+        }
+        .HotspotAnnotation {
+          background: #fff;
+          border-radius: 4px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          color: #333;
+          display: block;
+          font-size: 0.85rem;
+          font-weight: 600;
+          left: calc(100% + 24px);
+          padding: 6px 10px;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: max-content;
+        }
+        /* Connecting line for the callout */
+        .HotspotAnnotation::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          right: 100%;
+          width: 24px;
+          height: 2px;
+          background: #3b82f6;
+          transform: translateY(-50%);
+        }
+        
+        /* AR Button Styling */
+        #ar-button {
+          background-color: white;
+          border-radius: 24px;
+          border: 1px solid #dadce0;
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+          padding: 8px 16px;
+          font-family: inherit;
+          font-weight: 500;
+          color: #1a73e8;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #ar-button:focus-visible { outline: 2px solid #1a73e8; }
+        #ar-prompt { position: absolute; bottom: 60px; right: 16px; display: none; }
+        
+        /* Hide Hotspots Toggle Class */
+        model-viewer.hide-hotspots .Hotspot {
+          display: none !important;
+        }
+      </style>
+
+      <div class="model-viewer-container" style="margin: 24px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+          <span style="font-size: 0.95rem; color: #555;">
+            <sl-icon name="info-circle" style="vertical-align: middle; margin-right: 4px;"></sl-icon>
+            Interact with the 3D model to explore its structure. Toggle annotations to view key components.
+          </span>
+          <sl-button id="toggle-hotspots" size="small" variant="default" pill>Hide Annotations</sl-button>
+        </div>
+        <model-viewer
+          src="../../../assets/3d_models/assem_bottom_FAB1_-_fair.glb"
+          alt="Interactive 3D Model: Early Robotics Fair Wooden Board Base"
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          tone-mapping="neutral"
+          shadow-intensity="1"
+          style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
+        >
+          <button class="Hotspot" slot="hotspot-1" data-position="-0.23456207333253998m 0m 0.4389745811830519m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Front</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-3" data-position="-0.19322473900974524m -4.440892098500626e-16m -0.6585687302447263m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Rear</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-4" data-position="0.05999999865889549m 0.6315939003038724m 0.018903914899427218m" data-normal="1m 0m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Main Body Structure</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-5" data-position="0.20435254565312633m 0m -0.2629294710660983m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Wooden Board</div>
+          </button>
+          <div class="progress-bar hide" slot="progress-bar">
+              <div class="update-bar"></div>
+          </div>
+          <button slot="ar-button" id="ar-button">View in your space</button>
+          <div id="ar-prompt"><img src="https://modelviewer.dev/shared-assets/icons/hand.png"></div>
+        </model-viewer>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Interactive 3D Model: Early Robotics Fair Wooden Board Base
+        </sub>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-hotspots');
+            const viewer = document.querySelector('model-viewer');
+            let hotspotsVisible = true;
+            
+            toggleBtn.addEventListener('click', () => {
+              hotspotsVisible = !hotspotsVisible;
+              if (hotspotsVisible) {
+                viewer.classList.remove('hide-hotspots');
+                toggleBtn.textContent = 'Hide Annotations';
+              } else {
+                viewer.classList.add('hide-hotspots');
+                toggleBtn.textContent = 'Show Annotations';
+              }
+            });
+          });
+        </script>
+      </div>
+
+      <p>
+        Although this wooden board was not intended to represent the final engineered base, it provided the first opportunity to assess the relationship between footprint, body placement, stability, and user working space. It allowed the robot to be assembled and demonstrated safely in public and gave the team an early reference point for space claim, support behaviour, and practical handling.
+      </p>
+      <p>
+        However, this arrangement had several limitations. The footprint was availability-driven rather than optimised, the load path into the floor was not intentionally structured, and the board occupied too much uniform plan area near the user. It also did not integrate naturally with wheel brackets, welded hardware, or a central mounting datum. This made it acceptable for early deployment, but not appropriate as a final engineered base.
+      </p>
+
+      <h4>Phase 2: Stability-driven rethinking of the footprint</h4>
+      <p>
+        Once the base was treated as an engineered subsystem rather than a temporary support, the key question became how the robot could remain stable without making the front working area too bulky for the user. This led to the shift toward a <strong>trapezoidal footprint</strong>. Instead of enlarging the base equally in all directions, the design narrowed the front and widened the rear. This was the most suitable mechanical compromise because the front remained compact where the user interacts most closely, while the rear gained support width where stability leverage is most useful.
+      </p>
+
+      <h4>Phase 3: Transition from flat platform to framed steel base</h4>
+      <p>
+        After the footprint logic was clarified, the next decision was how to realise it physically. A flat plate or board could provide area, but not a very clear structural load path. The project therefore moved toward a <strong>welded steel frame</strong> using rectangular hollow sections. This brought several mechanical advantages: better bending stiffness for the material used, clearer load transfer into the floor, easier bracket and subsystem integration, and a lower profile than a thick monolithic support. The chosen structural members were <strong>70&times;50 mm rectangular steel tubes with 3 mm wall thickness</strong>.
+      </p>
+      <p>
+        The section size provides enough depth to act as a true structural frame member while still remaining close to the floor. The 3 mm wall thickness is a balanced prototype-scale choice because it is thick enough to be practical and tolerant in welding, more robust near local bracket and mounting regions than lighter-gauge tube, and still avoids unnecessary mass and fabrication burden. This is a sensible middle-ground choice for a welded prototype base.
+      </p>
+      <image-component
+        width="70%"
+        tag="image"
+        source="../../../assets/robot_mechanism/phase3_steel_frame.png"
+        subtitle="Figure: Phase 3 - Transition to a welded steel hollow-section frame.">
+      </image-component>
+
+      <h4>Phase 4: Mounted plate as a structural datum</h4>
+      <p>
+        As the lower-mechanism stack matured, it became clear that the base did not only need to support weight; it also needed to define a geometrically reliable interface for the mechanisms above. This made the mounted plate critical. The mounted plate therefore had to be both sufficiently rigid not to flex significantly under subsystem loads and sufficiently flat not to induce misalignment into the rotation subsystem. To achieve this, the plate incorporates precise mounting holes for the rotation system to be directly secured. Additionally, the plate is screwed onto the steel tubes rather than welded; this modular attachment method allows for the easy integration of additional electronic component mounting plates. At the current stage, the mounted plate is confirmed to be <strong>flat and rigid</strong>, which is an important success in the mechanical-design process.
+      </p>
+      <image-component
+        width="70%"
+        tag="image"
+        source="../../../assets/robot_mechanism/phase4_mounted_plate.png"
+        subtitle="Figure: Phase 4 - Addition of the flat, rigid mounted plate.">
+      </image-component>
+
+      <h4>Phase 5: Integration of transport intent</h4>
+      <p>
+        The next iteration step was to incorporate the transport concept directly into the base rather than treating movement as an external logistics problem. This led to rear interfaces intended for wheel hardware and tip-and-roll handling. This decision is mechanically sensible because the wider rear already provides the best location for wheel integration, the rear is naturally farther from the user footwork zone, and moving the robot by tipping from the rear is compatible with portable gym-equipment handling logic.
+      </p>
+      <image-component
+        width="60%"
+        tag="image"
+        source="../../../assets/robot_mechanism/phase5_transport_wheels.png"
+        subtitle="Figure: Phase 5 - Integration of rear transport wheels.">
+      </image-component>
+
+      <h4>Phase 6: Durability and corrosion thinking</h4>
+      <p>
+        Once the welded steel base became the final direction, corrosion had to be treated as part of the base design. Early observations of rust on steel members showed that both interior and exterior surfaces needed realistic protection. A key insight was that interior and exterior corrosion conditions are fundamentally different: exterior surfaces are accessible and paintable, whereas interior hollow sections are inaccessible and more prone to trapped moisture. This led to a dual-path strategy, with interior sections relying on forgiving, penetrating protective coatings and exterior surfaces relying on mechanical cleaning, anticorrosion primer, and paint. This is good mechanical practice because it recognises the real maintenance limits of hollow welded steel structures. Consequently, professional priming and powder coating were explicitly budgeted and integrated directly into the fabrication process.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. FINAL DESIGN STATE                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>Final Design State</h3>
+      <p>The final base subsystem can therefore be summarised as follows:</p>
+      
+      <ul>
+        <li>it began as a <strong>1220 mm &times; 580 mm wooden-board prototype base</strong> for early fair deployment,</li>
+        <li>it evolved into a <strong>purpose-built welded trapezoidal steel frame</strong> after the need for better footwork clearance, clearer load paths, and more intentional subsystem integration became clear,</li>
+        <li>the final frame uses <strong>70 &times; 50 &times; 3 mm rectangular steel tubes</strong>,</li>
+        <li>the base keeps a <strong>narrower front and wider rear</strong> for user clearance and stability,</li>
+        <li>it incorporates a <strong>flat, rigid mounted plate</strong> as the geometric interface for the lower-mechanism stack,</li>
+        <li>it includes <strong>rear transport intent</strong>. </li>
+      </ul>
+
+      <image-component
+        width="80%"
+        tag="image"
+        source="../../../assets/robot_mechanism/final_assembly_cad.png"
+        subtitle="Figure: Final full assembly of the base subsystem.">
+      </image-component>
+
+      <h4>Hardware Component Specifications</h4>
+      <table class="is431-table" style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Component</th>
+            <th style="width: 30%;">Specification</th>
+            <th style="width: 45%;">Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Frame Tubing</td>
+            <td>70 &times; 50 &times; 3 mm RHS Mild Steel</td>
+            <td>Provides the main structural load path and resists overturning moments from punches.</td>
+          </tr>
+          <tr>
+            <td>Mounted Plate</td>
+            <td>Flat Rigid Steel Plate</td>
+            <td>Acts as a geometric datum and solid mounting interface for the lower-mechanism stack.</td>
+          </tr>
+          <tr>
+            <td>Transport Wheels</td>
+            <td>RMNA100 (Rubber, &Oslash;100 mm)</td>
+            <td>Enables smooth rolling on gym and corridor surfaces when the base is tilted backward.</td>
+          </tr>
+          <tr>
+            <td>Wheel Mounting Pins</td>
+            <td>KCLSBF12-62 (SUS304, &Oslash;12 mm)</td>
+            <td>Ensures secure axle retention; standard clevis-pin format allows for easy replacement.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT/PREV SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="design-ideation.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Design Ideation
+        </sl-button>
+      </a>
+      <a href="load-stability-analysis.html">
+        <sl-button variant="default" size="medium">
+          Next: Load &amp; Stability Analysis
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Rotation Testing &amp; Evaluation</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../rotation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Rotation Subsystem
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Testing &amp; Evaluation</h2>
+    <p>
+      Following the right side of the V-Model framework, this page presents the test and verification criteria for the rotation subsystem, evaluating the design against the original system requirement <strong>RM-4</strong>.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 1. PERFORMANCE CRITERIA -->
+    <div>
+      <h3>1. Performance Criteria</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;">
+        <thead>
+          <tr>
+            <th style="width: 15%;">ID</th>
+            <th style="width: 35%;">Criterion</th>
+            <th style="width: 50%;">Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RM-4</strong></td>
+            <td>Yaw angular velocity</td>
+            <td>Sustained angular velocity &ge; 150&deg;/s for rapid re-angling</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 2. TEST PROCEDURES -->
+    <div>
+      <h3>2. Test Procedures</h3>
+      
+      <h4>Test 1: Angular Velocity Measurement (RM-4)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Robot fully assembled to ensure rotation motor is moving the accurate real-world inertia.</li>
+        <li><strong>Procedure:</strong> Issue a 90&deg; step command to the yaw motor via the wireless interface. Measure the time-to-target using the encoder feedback logs.</li>
+        <li><strong>Success Criteria:</strong> The robot completes the 90&deg; rotation in &le; 0.6 seconds, confirming a sustained angular velocity of at least 150&deg;/s.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. RESULTS -->
+    <div>
+      <h3>3. Results</h3>
+      <sl-alert variant="neutral" open style="margin-top: 16px;">
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        <strong>Pending Physical Testing:</strong> Angular velocity measurement, belt compliance under reversal, and cam-follower contact validation results will be populated following physical prototype integration.
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. CROSS-REFERENCES -->
+    <div>
+      <h3>4. Cross-References</h3>
+      <ul>
+        <li>
+          <strong><a href="../testing.html">Robot Mechanism — Verification Results</a></strong>
+          — System-level integration testing and the overall performance assessment against all RM requirements.
+        </li>
+        <li>
+          <strong><a href="../../robot-mechanism.html">5.2 Robot Mechanism</a></strong>
+          — Definitions of the system-level requirement RM-4.
+        </li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="electrical-control.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Electrical &amp; Control
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

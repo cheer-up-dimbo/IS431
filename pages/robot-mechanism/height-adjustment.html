@@ -89,7 +89,10 @@
     <div>
       <h3>Design</h3>
 
-      <h4>Custom Telescopic Lift Column</h4>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Custom Telescopic Lift Column
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">400 mm Vertical Stroke</sl-badge>
+      </h4>
       <p>
         The final height-adjustment solution is a <strong>custom telescopic
         lift column actuated by a motorised travelling-nut screw jack</strong>.
@@ -103,7 +106,10 @@
         <li><strong>HK2T screw jack</strong> with travelling nut — axial lifting device</li>
       </ul>
 
-      <h4>Separation of Lift from Structure</h4>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Separation of Lift from Structure
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Axial vs Lateral Load Path</sl-badge>
+      </h4>
       <p>
         The key design decision is the <strong>separation of lift from
         structure</strong>. The screw jack is treated purely as an axial
@@ -130,7 +136,10 @@
         member.
       </p>
 
-      <h4>Fabrication Considerations</h4>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Fabrication Considerations
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Durability + Safety Margin</sl-badge>
+      </h4>
       <p>
         A <strong>light-shock service factor of approximately 1.5</strong> was
         adopted because the robot may be adjusted in public demo environments
@@ -140,7 +149,10 @@
         where aluminium extrusion met steel structure.
       </p>
 
-        <h4>Corrosion Protection Strategy</h4>
+        <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+          Corrosion Protection Strategy
+          <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Environmental Robustness</sl-badge>
+        </h4>
         <p>
           Rust was treated as a <strong>real design issue, not a cosmetic one</strong>. The robot operates in gym environments where humidity, sweat, and cleaning chemicals create a mildly corrosive atmosphere. Left unprotected, the mild steel structural members of the lifting column would develop surface rust rapidly, leading to progressive section loss and potential staining of gym floors.
         </p>
@@ -170,7 +182,10 @@
           This approach is borrowed from automotive and marine practice, where box-section chassis members are routinely treated with cavity wax to prevent internal corrosion.
         </p>
 
-      <h4>Low-Level Control</h4>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Low-Level Control
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Fail-Safe Actuation</sl-badge>
+      </h4>
       <p>
         The height adjustment is currently a <strong>motorised screw-jack
         system</strong>. The back-calculated motor speed requirement of
@@ -224,30 +239,30 @@
         the height-adjustment subsystem. Select a section to view its contents.
       </p>
       <div class="section-nav-grid">
-        <a href="height-adjustment/concept-generation.html" class="section-nav-card">
+        <a href="height-adjustment/design-ideation.html" class="section-nav-card">
           <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
-          <h3>Concept Generation &amp; Selection</h3>
-          <p>From fixed-height to telescopic lift-column, decision rationale</p>
+          <h3>Design Ideation</h3>
+          <p>Concept evaluation: gas cylinder, electric strut, manual screw jack</p>
         </a>
-        <a href="height-adjustment/lift-structure-separation.html" class="section-nav-card">
-          <sl-icon name="layers" style="font-size: 2rem;"></sl-icon>
-          <h3>Lift vs Structure Separation</h3>
-          <p>Load-path logic, evolution from linear-guide concept</p>
+        <a href="height-adjustment/mechanical-design.html" class="section-nav-card">
+          <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
+          <h3>Mechanical Design</h3>
+          <p>Telescopic column, lift vs structure separation, structural layout</p>
         </a>
-        <a href="height-adjustment/structural-layout.html" class="section-nav-card">
-          <sl-icon name="rulers" style="font-size: 2rem;"></sl-icon>
-          <h3>Structural Layout &amp; Fabrication</h3>
-          <p>SHS wall thickness, Delrin interfaces, gusseted joints</p>
-        </a>
-        <a href="height-adjustment/calculations-sizing.html" class="section-nav-card">
+        <a href="height-adjustment/load-analysis.html" class="section-nav-card">
           <sl-icon name="calculator" style="font-size: 2rem;"></sl-icon>
-          <h3>Calculations &amp; Sizing</h3>
-          <p>Lifting load, service factor, speed calculations, motor assessment</p>
+          <h3>Load Analysis</h3>
+          <p>Payload sizing, speed calculation, screw-jack specifications</p>
         </a>
         <a href="height-adjustment/electrical-control.html" class="section-nav-card">
           <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
           <h3>Electrical &amp; Control</h3>
           <p>MDDS10 motor driver, PWM control, self-locking safety, back-EMF management</p>
+        </a>
+        <a href="height-adjustment/testing-evaluation.html" class="section-nav-card">
+          <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
+          <h3>Testing &amp; Evaluation</h3>
+          <p>Performance criteria, test procedures, and verification results</p>
         </a>
       </div>
     </div>

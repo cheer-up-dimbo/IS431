@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Load Analysis — Height Adjustment</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .calc-card { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 20px 0; }
+    .calc-header { background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e0e0e0; font-weight: 600; color: #333; }
+    .calc-body { padding: 16px; font-size: 0.95rem; color: #444; }
+    .equation-box { background: #f4f7fa; padding: 12px; text-align: center; border-radius: 6px; font-family: monospace; font-size: 1.05rem; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../height-adjustment.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Height Adjustment
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Load Analysis &amp; Sizing</h2>
+    <p>
+      This page presents the engineering calculations that size the height-adjustment subsystem: from the payload and service factor to the screw-jack selection, linear speed requirement, and motor input specification.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 1. PAYLOAD & SERVICE FACTOR -->
+    <div>
+      <h3>1. Payload &amp; Service Factor</h3>
+      <p>
+        The estimated payload — the mass of everything above the height-adjustment column — is approximately <strong>10 kg</strong>. This includes the torso frame, arms, padding, sensors, and mounting hardware.
+      </p>
+
+      <div class="calc-card">
+        <div class="calc-header">Design Axial Load</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The base gravitational load (W) is calculated as:</p>
+          <div class="equation-box">
+            W<sub>payload</sub> = m &times; g = 10 kg &times; 9.81 m/s&sup2; &asymp; <strong>98.1 N</strong>
+          </div>
+          <p>A <strong>light-shock service factor (SF) of 1.5</strong> is applied to account for minor bumps, assembly weight uncertainty, and dynamic start/stop amplification:</p>
+          <div class="equation-box">
+            F<sub>design</sub> = W<sub>payload</sub> &times; SF = 98.1 N &times; 1.5 &asymp; <strong>147 N</strong>
+          </div>
+          <p style="margin-bottom: 0;">This is the design axial load for screw-jack selection. Lateral loads from punching are carried by the telescopic column, not the screw jack.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 2. STROKE & SPEED -->
+    <div>
+      <h3>2. Stroke &amp; Speed Requirement</h3>
+      
+      <div class="calc-card">
+        <div class="calc-header">Required Linear Speed</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The required vertical stroke is <strong>400 mm</strong>. The engineering target for adjustment time is approximately <strong>32 seconds</strong> over the full stroke. This yields a required linear speed:</p>
+          <div class="equation-box">
+            v<sub>linear</sub> = 400 mm / 32 s = <strong>12.5 mm/s</strong>
+          </div>
+          <p style="margin-bottom: 0;">This speed (equivalent to ~0.75 m/min) is practically sufficient for a setup-time operation between user rounds.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. SCREW JACK SELECTION -->
+    <div>
+      <h3>3. Screw Jack Selection (HK2T)</h3>
+      <p>
+        The <strong>HK2T travelling-nut screw jack</strong> was selected as the axial lifting device. In a travelling-nut configuration, the screw rotates while the nut moves linearly — the nut is connected directly to the moving inner member of the telescopic column.
+      </p>
+      <ul>
+        <li><strong>Design Load Capacity:</strong> Rated well above the 147 N design load, providing adequate margin for the payload plus service factor.</li>
+        <li><strong>Self-Locking:</strong> The screw thread lead angle is below the friction angle. The column inherently <strong>holds its position</strong> even without motor power. No external brake or locking mechanism is required.</li>
+        <li><strong>Safety:</strong> The self-locking property ensures the column does not bounce or back-drive under downward axial impact forces during training.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. MOTOR INPUT REQUIREMENT -->
+    <div>
+      <h3>4. Motor Input Requirement</h3>
+      
+      <div class="calc-card">
+        <div class="calc-header">Required Motor RPM</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">Based on the screw-jack lead and the required linear speed of 12.5 mm/s, the back-calculated motor speed requirement at the jack input shaft is approximately:</p>
+          <div class="equation-box">
+            n<sub>motor</sub> &asymp; <strong>800 rpm</strong>
+          </div>
+          <p style="margin-bottom: 0;">At 800 rpm, the motor torque requirement is modest because the screw-jack's internal worm gear provides significant torque multiplication. The motor-sizing logic therefore focuses on <strong>speed capability</strong> rather than raw torque.</p>
+        </div>
+      </div>
+
+      <h4>Requirement Traceability</h4>
+      <p>
+        These calculations verify that the mechanical design meets system-level requirement <strong>RM-3 (Height Adjustability)</strong>: accommodating users of different heights by providing a vertical adjustment range of at least 400 mm within an acceptable 32-second setup time, utilizing a safe, self-locking mechanism.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="mechanical-design.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Mechanical Design
+        </sl-button>
+      </a>
+      <a href="electrical-control.html">
+        <sl-button variant="default" size="medium">
+          Next: Electrical &amp; Control
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

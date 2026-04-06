@@ -16,6 +16,10 @@
   <script src="../../components/scroll-to-top/scroll-to-top.js"></script>
   <script src="../../components/table-component/table-component.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <style>
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -39,7 +43,11 @@
         re-angle to create new attack lines, defensive responses, and
         counter-punch opportunities. For BoxBunny, this required a dedicated
         yaw axis capable of rotating the upper structure on the spot while
-        remaining stable under repeated impact.
+        remaining stable under impact. The subsystem therefore had to be treated
+        as both a <strong>motion mechanism</strong> and a <strong>structural support interface</strong>.
+      </p>
+      <p>
+        The development of the rotation subsystem progressed through several major design stages. The earliest serious concept used a large geared slewing ring that combined structural support and direct drive. This was later refined into a smaller non-geared slewing ring with an external transmission, and then further developed into the current low-profile yaw module comprising a <strong>010.10.120 slewing bearing</strong>, an <strong>off-axis timing-belt drive</strong>, <strong>cam-follower edge supports</strong>, and integrated rear transport features. This final arrangement is more buildable, more appropriate to the realistic load case, and better integrated with the wider lower-mechanism architecture.
       </p>
     </div>
 
@@ -51,23 +59,19 @@
     <div>
       <h3>Requirements &amp; Considerations</h3>
       <p>
-        The rotation subsystem requirements were decomposed from the broader
-        footwork problem into two essential motions: forward-backward
-        translation and yaw rotation. The final architecture intentionally
-        decouples these two motions. The yaw mechanism must:
+        The rotation subsystem responds to system-level requirements <strong>RM-4</strong>
+        (<em>Yaw rotation</em>), <strong>RM-1</strong> (<em>Stability</em>), <strong>RM-2</strong>
+        (<em>Compact footprint</em>), and <strong>RM-7</strong> (<em>Portability</em>) defined in the
+        <a href="../robot-mechanism.html">Robot Mechanism</a> landing page, along with several subsystem-specific engineering considerations:
       </p>
       <ul>
-        <li>Hold commanded angle under impact (<strong>RM-1</strong>)</li>
-        <li>Provide moderate speed with good torque multiplication, targeting ~<strong>150°/s</strong> angular velocity (<strong>RM-4</strong>)</li>
-        <li>Remain compact near the boxer's working zone (<strong>RM-2</strong>)</li>
-        <li>Carry combined axial, radial, and overturning loads</li>
-        <li>Integrate at the <strong>bottom of the stack</strong> so the heaviest rotary support remains closest to the ground</li>
+        <li><strong>Yaw re-orientation:</strong> Provide yaw re-angling with a target angular velocity of approximately 150&deg;/s (25 rpm) to reproduce coach-like pivoting and angle changes during boxing drills.</li>
+        <li><strong>Stability under impact:</strong> Hold commanded angle and withstand combined axial, radial, and overturning loads from upper-body punches without structural failure.</li>
+        <li><strong>Compact and coherent packaging:</strong> Integrate at the bottom of the lower-mechanism stack to maximise overturning resistance without intruding into the boxer's footwork zone.</li>
+        <li><strong>Smooth torque transmission:</strong> Avoid slip, backlash, and poor controllability during positioning to ensure the motion feels deliberate and responsive.</li>
+        <li><strong>Manufacturability:</strong> Remain buildable and serviceable at prototype scale using accessible components, avoiding oversized or overly specialised parts.</li>
+        <li><strong>Portability integration:</strong> Coexist sensibly with the low-profile base and rear wheel transport logic without hindering tip-and-roll deployment.</li>
       </ul>
-      <p>
-        The decoupled yaw stage was justified over omnidirectional wheels
-        because floor-dependent wheel slip and pose creep are particularly
-        unsuitable for a punch-receiving training robot.
-      </p>
 
       <div class="video-row two-up">
         <div class="video-box">
@@ -89,18 +93,15 @@
     <div>
       <h3>Design</h3>
 
-      <h4>Final Architecture: Low-Profile Yaw Module</h4>
       <p>
-        The final rotation solution is a <strong>low-profile yaw module built
-        around a non-geared slewing ring bearing, external timing-belt drive,
-        perimeter support rollers, and integrated rear transport wheels</strong>.
+        The final rotation design is a <strong>low-profile yaw module</strong> built around a
+        <strong>010.10.120 non-geared slewing ring bearing</strong>, an <strong>external
+        timing-belt drive</strong>, <strong>cam-follower roller supports</strong> at the perimeter
+        of the rotating plate, and rear interfaces for transport integration. The motor is mounted off-axis on the fixed base, drives a small pulley, and transmits torque via an <strong>S8M timing belt</strong> to a larger pulley concentric with the rotating stage. The rotating top is additionally stabilised by discrete outboard cam followers, while the welded base members provide the fixed reaction structure for the bearing, motor, belt drive, and rear transport interfaces.
       </p>
-      <ul>
-        <li>At the centre: a circular rotating top plate supported by a <strong>010.10.120 slewing bearing</strong></li>
-        <li>Torque delivered by an off-axis motor through a <strong>timing belt</strong> with small pulley, larger driven pulley, and idler/tensioner</li>
-        <li>Around the outer edge: <strong>cam-follower roller assemblies</strong> for tilt stabilisation under off-axis punching</li>
-        <li>At the rear: <strong>RMNA100, 100 mm transport wheels</strong> on <strong>KCLSBF12-62 pins</strong> for tip-and-roll transport</li>
-      </ul>
+      <p>
+        A central design decision was that the yaw stage should act as a <strong>dedicated rotary support layer</strong>, rather than as part of a general wheel-based mobile platform. This is why the final lower mechanism uses <strong>decoupled axes</strong>, with yaw implemented by a slewing-based rotating stage and translation handled separately. That decision improved stiffness, repeatability, and resistance to floor-dependent slip.
+      </p>
 
       <image-component
         tag="image"
@@ -108,32 +109,65 @@
         subtitle="Figure: Focused CAD of rotational motion mechanism showing slewing bearing, drive system, and motor.">
       </image-component>
 
-      <h4>Design Evolution</h4>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Non-Geared Slewing Ring
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">High Stiffness + Compact</sl-badge>
+      </h4>
       <p>
-        The design passed through a major bearing-level revision. An earlier
-        concept considered a <strong>large geared slewing ring bearing
-        (011.25.400)</strong>, which would have combined structural support and
-        gear drive in a single component. Although structurally capable, it was
-        too heavy, too costly to ship, difficult to integrate, and demanding in
-        motor torque. The design shifted to the smaller, more practical
-        <strong>010.10.120 non-geared slewing ring</strong>.
-      </p>
-      <p>
-        This bearing change forced a second innovation: the drive system moved
-        to a <strong>modular external timing-belt transmission</strong>.
-        Compared with direct pinion drive, the belt allows the motor to remain
-        on the fixed base, offers flexible ratio tuning through pulley
-        selection, simplifies packaging, and supports smooth low-speed torque
-        transmission.
-      </p>
-      <p>
-        A third innovation was the addition of <strong>cam-follower edge
-        supports</strong>. Rather than forcing the central bearing alone to
-        resist all rocking effects, the system shares this task with discrete
-        perimeter rollers, increasing the effective support radius.
+        Another major design decision was the move away from the earlier <strong>large integrated geared slewing ring (011.25.400)</strong>. Although that concept was structurally strong, it was too heavy, too expensive, too difficult to handle, and too demanding in motor power relative to the actual needs of the robot. The final selected <strong>010.10.120 non-geared slewing ring</strong> still provides the required combined-load capacity, but with much better design appropriateness. This change also forced the drive system to become an explicitly designed subassembly rather than something inherited from the bearing.
       </p>
 
-      <h4>Electrical &amp; Control Architecture</h4>
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Modular Timing-Belt Drive
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Flexible Ratio Tuning</sl-badge>
+      </h4>
+      <p>
+        The timing-belt drive was selected because it gives <strong>positive torque transmission</strong>, keeps the motor on the fixed structure, offers flexible ratio selection through pulley sizing, and is easier to package into the welded base than a bulky direct-drive or integrated gear solution. In the current design, the timing-belt transmission converged to the following selected parameters:
+      </p>
+      
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem;">
+        <thead>
+          <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left;">Parameter</th>
+            <th style="padding: 12px; text-align: left;">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Belt series</td><td>S8M</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Pitch</td><td>8 mm</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Belt width</td><td>30 mm</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Small pulley teeth</td><td>20</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Large pulley teeth</td><td>60</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Speed ratio</td><td>1:3</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Approximate belt length</td><td>944 mm</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Centre distance</td><td>352.6 mm</td></tr>
+          <tr style="border-bottom: 1px solid #ddd;"><td>Small pulley speed</td><td>120 rpm</td></tr>
+        </tbody>
+      </table>
+      <p>
+        These values came from the timing-belt selection process and represent a practical balance between the ideal reduction target and the real packaging constraints of the current rotating-base geometry.
+      </p>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Cam-Follower Edge Supports
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Tilt Stabilisation</sl-badge>
+      </h4>
+      <p>
+        The outer <strong>cam-follower supports</strong> were added because the yaw stage is loaded not only by torque demand but also by plate-edge rocking under elevated off-axis punches. These supports do not replace the central slewing bearing; rather, they share the anti-tilt function by increasing the effective support radius of the rotating plate. This makes the stage feel more planted and reduces local rocking at the edge.
+      </p>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Rear Transport Integration
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Tip-and-Roll</sl-badge>
+      </h4>
+      <p>
+        The final design also incorporates <strong>rear transport interfaces</strong> as part of the wider lower-mechanism architecture. Within the full base assembly, these are intended to accommodate the rear-wheel hardware and provide the structural connection points needed for the robot to be tipped and rolled during movement between locations. From a mechanical perspective, locating these features at the rear is sensible because that region already provides the larger footprint, greater structural support, and more separation from the user's immediate footwork zone. However, because this transport function has not yet been physically tested, it should currently be treated as an <strong>integrated design provision</strong> rather than a fully verified operational capability.
+      </p>
+
+      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+        Electrical &amp; Control Architecture
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Wireless Command + CAN Bus</sl-badge>
+      </h4>
       <p>
         The rotation axis is driven by a <strong>Z55BLD400-24GU</strong>
         400 W BLDC motor with a 25:1 planetary gearbox, controlled via the
@@ -163,23 +197,85 @@
     <div>
       <h3>Validation</h3>
       <p>
-        The final rotation-base assembly satisfies the main subsystem
-        requirements in concept and integration. It preserves the
-        <strong>decoupled-axis architecture</strong>, keeps the yaw stage at the
-        <strong>bottom of the robot stack</strong>, and uses a
-        slewing-bearing-supported rotating plate capable of carrying combined
-        loads near the ground. The modular belt-drive arrangement remains
-        consistent with the requirement for a smooth, reduced, motorised yaw
-        axis targeting approximately <strong>150°/s</strong>.
+        At the current stage, the rotation subsystem has been validated partly through <strong>concept selection, load-path reasoning, and transmission calculations</strong>, and partly through the coherence of the realised CAD assembly. It has not yet been fully validated through all intended physical tests.
       </p>
       <p>
-        Current validation is strongest in <strong>concept evaluation, bearing
-        selection trade-off, CAD integration, and load-path reasoning</strong>.
-        Remaining verification work includes: physical plate-stiffness checks,
-        cam-follower contact validation, belt compliance under reversal, and
-        confirmation that transport-wheel geometry does not interfere with the
-        working footprint.
+        The most important completed success is that the final concept retains the correct <strong>system-level architecture</strong>: yaw and translation remain decoupled, the yaw stage stays at the bottom of the lower mechanism, and the main rotary support is based on a slewing-bearing approach capable of carrying combined loads. This means the subsystem is mechanically aligned with the realistic needs of a strike-receiving boxing robot rather than with a generic mobile-robot platform.
       </p>
+      <p>
+        The timing-belt transmission has also been validated to the extent that it has been sized through a structured engineering process rather than by approximation alone. The pulley ratio, belt series, belt width, centre distance, and belt length were all developed through real selection calculations. This gives confidence that the drive system is mechanically credible and manufacturable. However, the final selected <strong>3:1 pulley ratio</strong> is also known to be a packaging-driven compromise relative to the earlier ideal reduction target of about <strong>4.8:1</strong>, so the actual integrated yaw speed should still be measured physically to confirm that the system still achieves the desired re-angling performance.
+      </p>
+      <p>
+        The current design also succeeds in structural intent. The load path is clearly divided between:
+      </p>
+      <ul>
+        <li>the <strong>motor and belt</strong>, which provide controlled rotation,</li>
+        <li>the <strong>slewing bearing</strong>, which carries the main rotary support load,</li>
+        <li>the <strong>cam followers</strong>, which improve anti-rocking behaviour,</li>
+        <li>and the <strong>welded base</strong>, which closes reaction loads back into the floor.</li>
+      </ul>
+
+      <p>The main items that remain incomplete are:</p>
+      <ul>
+        <li>physical confirmation of the actual yaw speed and acceleration,</li>
+        <li>physical assessment of belt compliance, tooth-jump margin, and tension stability,</li>
+        <li>contact-stress and stiffness validation of the cam-follower supports,</li>
+        <li>and physical confirmation that the rear transport arrangement does not interfere with planted operation.</li>
+      </ul>
+
+      <p>A concise subsystem validation summary is given below.</p>
+      
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+        <thead>
+          <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left;">Aspect</th>
+            <th style="padding: 12px; text-align: left;">Current status</th>
+            <th style="padding: 12px; text-align: left;">Basis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Decoupled yaw-stage architecture</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">Selected as the most appropriate motion architecture for boxing use</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Slewing-bearing support concept</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">Combined-load capacity and stiffness logic are appropriate</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Geared large bearing as final concept</td>
+            <td style="padding: 12px;"><sl-badge variant="danger" pill>Fail as final solution</sl-badge></td>
+            <td style="padding: 12px;">Structurally capable but over-engineered in mass, cost, and power demand</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Non-geared slewing ring concept</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">Better fit-for-purpose engineering choice</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Timing-belt transmission sizing</td>
+            <td style="padding: 12px;">Pass (analysis)</td>
+            <td style="padding: 12px;">Belt, pulley, ratio, width, and centre distance selected through structured calculations</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Final 3:1 ratio vs ideal target</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Mechanically valid, but final yaw speed still requires integrated physical confirmation</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Cam-follower anti-tilt support</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Strong design logic, but physical stiffness/contact validation still needed</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Rear transport integration</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Good packaging logic, but tip-and-roll use not yet physically tested</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <sl-divider></sl-divider>
@@ -194,32 +290,47 @@
         the rotation subsystem. Select a section to view its contents.
       </p>
       <div class="section-nav-grid">
-        <a href="rotation/motion-axis-selection.html" class="section-nav-card">
-          <sl-icon name="signpost-split" style="font-size: 2rem;"></sl-icon>
-          <h3>Motion-Axis Selection</h3>
-          <p>Omnidirectional wheels vs decoupled axes, subsystem decomposition</p>
+        <a href="rotation/design-ideation.html" class="section-nav-card">
+          <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
+          <h3>Design Ideation</h3>
+          <p>Motion-axis, bearing, and motor selection matrices</p>
         </a>
-        <a href="rotation/bearing-selection.html" class="section-nav-card">
-          <sl-icon name="circle" style="font-size: 2rem;"></sl-icon>
-          <h3>Bearing Selection &amp; Iteration</h3>
-          <p>011.25.400 → 010.10.120 trade-off, decision matrix</p>
-        </a>
-        <a href="rotation/drive-architecture.html" class="section-nav-card">
-          <sl-icon name="gear-wide-connected" style="font-size: 2rem;"></sl-icon>
-          <h3>Drive Architecture</h3>
-          <p>Timing-belt selection, pulley sizing, torque path</p>
-        </a>
-        <a href="rotation/outboard-support.html" class="section-nav-card">
-          <sl-icon name="tools" style="font-size: 2rem;"></sl-icon>
-          <h3>Outboard Support &amp; Packaging</h3>
-          <p>Cam-follower supports, transport wheels, low-profile frame</p>
+        <a href="rotation/mechanical-design.html" class="section-nav-card">
+          <sl-icon name="gear" style="font-size: 2rem;"></sl-icon>
+          <h3>Mechanical Design</h3>
+          <p>Timing-belt configuration, gear reduction calculations, outboard support</p>
         </a>
         <a href="rotation/electrical-control.html" class="section-nav-card">
           <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
           <h3>Electrical &amp; Control</h3>
-          <p>BLDC servo motor, encoder feedback, PID cascade, communication interface</p>
+          <p>BLDC servo motor, encoder feedback, wireless command interface</p>
+        </a>
+        <a href="rotation/testing-evaluation.html" class="section-nav-card">
+          <sl-icon name="clipboard-check" style="font-size: 2rem;"></sl-icon>
+          <h3>Testing &amp; Evaluation</h3>
+          <p>Performance criteria, test procedures, and current results</p>
         </a>
       </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. NEXT SECTION NAVIGATION                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="base.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: 5.2.1 Base
+        </sl-button>
+      </a>
+      <a href="height-adjustment.html">
+        <sl-button variant="default" size="medium">
+          Next: 5.2.3 Height Adjustment
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
   </div>
 
