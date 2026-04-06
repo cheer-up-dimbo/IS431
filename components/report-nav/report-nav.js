@@ -28,10 +28,13 @@
       label: '2. Problem Clarification',
       href: '/index.html#problem-clarification',
       children: [
-        { label: '2.1 Background', href: '/index.html#background' },
-        { label: '2.2 Primary Research', href: '/index.html#primary-research' },
-        { label: '2.3 Secondary Research', href: '/index.html#secondary-research' },
-        { label: '2.4 Value Propositions', href: '/index.html#value-proposition' },
+        { label: '2.1 Domain Overview and Trends', href: '/index.html#domain-overview' },
+        { label: '2.2 Background', href: '/index.html#background' },
+        { label: '2.3 Primary Research: User Interviews/Surveys', href: '/index.html#primary-research' },
+        { label: '2.4 Secondary Research: Competitor Analysis', href: '/index.html#secondary-research' },
+        { label: '2.5 Value Proposition Canvas', href: '/index.html#value-proposition' },
+        { label: '2.5.1 Problem of Interest', href: '/index.html#problem-of-interest' },
+        { label: '2.5.2 Value Proposition Statement', href: '/index.html#value-proposition-statement' },
       ]
     },
     {
@@ -54,7 +57,15 @@
       label: '5. Conceptual Design',
       href: '/index.html#conceptual-design',
       children: [
-        { label: '5.1 GUI', href: '/pages/gui.html' },
+        {
+          label: '5.1 User Interface (GUI)',
+          href: '/pages/gui.html',
+          children: [
+            { label: '5.1.1 Design and Ideation', href: '/pages/gui/design-ideation.html' },
+            { label: '5.1.2 Implementation', href: '/pages/gui/implementation.html' },
+            { label: '5.1.3 Testing and Evaluation', href: '/pages/gui/testing-evaluation.html' },
+          ]
+        },
         {
           label: '5.2 Robot Mechanism',
           href: '/pages/robot-mechanism.html',
@@ -80,8 +91,15 @@
       ]
     },
     {
-      label: '6. Project Timeline',
-      href: '/index.html#project-timeline',
+      label: '6. Discussion and Future Work',
+      href: '/index.html#future-work',
+      children: [
+        { label: '6.1 Discussion', href: '/index.html#discussion' },
+        { label: '6.2 Current Limitations', href: '/index.html#limitations' },
+        { label: '6.3 Recommendations', href: '/index.html#recommendations' },
+        { label: '6.4 Remaining Test Plan', href: '/index.html#test-plan' },
+        { label: '6.5 Conclusion', href: '/index.html#conclusion' },
+      ]
     },
     {
       label: 'References',
@@ -91,12 +109,21 @@
       label: 'Appendices',
       href: '/index.html#appendices',
       children: [
-        { label: 'Appendix 1: Upper Mechanism', href: '/pages/appendix-upper.html' },
-        { label: 'Appendix 2: Lower Mechanism', href: '/pages/appendix-lower.html' },
-        { label: 'Appendix 3: GUI Interface', href: '/pages/appendix-gui.html' },
-        { label: 'Appendix 4: Interview Questions', href: '/pages/appendix-interview-questions.html' },
-        { label: 'Appendix 5: Product Mapping', href: '/pages/appendix-product-mapping.html' },
-        { label: 'Appendix 6: Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
+        { label: 'Appendix 1 - Upper Mechanism', href: '/pages/appendix-upper.html' },
+        { label: 'Appendix 2 - Lower Mechanism', href: '/pages/appendix-lower.html' },
+        { label: 'Appendix 3 - GUI Interface', href: '/pages/appendix-gui.html' },
+        { label: 'Appendix 4 - User Interview Questions', href: '/pages/appendix-interview-questions.html' },
+        { label: 'Appendix 5 - Product Needs Mapping', href: '/pages/appendix-product-mapping.html' },
+        { label: 'Appendix 6 - Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
+      ]
+    },
+    {
+      label: 'Annex',
+      href: '/index.html#annex-introduction',
+      children: [
+        { label: 'Annex: Extended Introduction', href: '/index.html#annex-introduction' },
+        { label: 'Annex: Extended Background', href: '/index.html#annex-background' },
+        { label: 'Annex: Product Needs Translation', href: '/index.html#annex-product-needs' },
       ]
     },
   ];
@@ -164,10 +191,19 @@
 
   function isActive(href) {
     const path = currentPath();
-    const hrefPath = href.split('#')[0];
+    const [hrefPath, hrefHash] = href.split('#');
     if (!hrefPath || hrefPath === '/') return false;
+
     // Exact match or trailing-slash equivalence
-    return path === hrefPath || path === hrefPath + '/';
+    const pathMatch = path === hrefPath || path === hrefPath + '/';
+    if (!pathMatch) return false;
+
+    // If target includes an anchor, require matching hash so only one index anchor is active.
+    if (hrefHash) {
+      return window.location.hash === '#' + hrefHash;
+    }
+
+    return true;
   }
 
   function isInSubsystem(parentHref) {
