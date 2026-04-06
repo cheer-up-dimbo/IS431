@@ -193,58 +193,184 @@
         structural rigidity, ensuring the upper body remains stable under dynamic boxing loads.
       </p>
 
-      <h4>Electrical &amp; Control Architecture</h4>
+      <h4>Electrical Architecture</h4>
       <p>
-        The robot mechanism employs a distributed control architecture where
-        parallel processing coordinates vision inference, sensor feedback, and
-        motor control in real time. The system adopts a layered approach:
+        The BoxBunny robot employs seven distinct actuator and sensing subsystems
+        distributed across three mechanical axes: base rotation, vertical height
+        adjustment, and left and right arm actuation. Each axis is served by a
+        dedicated motor, driver, and controller matched to its specific kinematic
+        and safety requirements. The complete system is unified under a dual-rail
+        power architecture that electrically isolates the high-current 24 V motor bus
+        from the 12 V logic rail hosting the compute and control subsystems.
       </p>
-      <ul>
-        <li>
-          <strong>ROS 2</strong> provides the modular, message-based framework
-          for higher-level perception, decision making, and user-interface
-          components running on the Jetson compute module.
-        </li>
-        <li>
-          <strong>micro-ROS / FreeRTOS</strong> provides lightweight,
-          deterministic task scheduling on microcontrollers (Teensy 4.0) for
-          low-latency motor control and sensor acquisition loops.
-        </li>
-      </ul>
+      <p>
+        The four arm joints at the shoulder and elbow of each arm are driven by
+        Damiao DM-J4310-2EC integrated brushless servo actuators, each rated at
+        24 V DC with a nominal output torque of 3 N·m and a peak of 7 N·m. An
+        internal 10:1 planetary gearbox combined with a 3:1 external spur gear
+        stage yields a 30:1 total reduction at the joint output shaft. Each
+        actuator incorporates dual 14-bit magnetic absolute encoders, one on the
+        motor side and one at the planetary output, enabling the internal digital
+        signal processor to accumulate multi-turn position across the full operating
+        range without requiring homing on power-up. The four actuators communicate
+        with the Teensy 4.0 microcontroller over a shared CAN 2.0B bus at 1 Mbps;
+        motor base identifiers are assigned as 0x01 to 0x04, and command frames
+        are transmitted at identifiers 0x101 to 0x104 respectively.
+      </p>
+      <p>
+        The vertical height axis is driven by a CHP-36GP-555 brushed DC gear motor
+        rated at 24 V with an integrated all-metal planetary gearbox at a 27:1
+        reduction ratio, yielding a no-load output speed of 440 RPM at the
+        screw-jack input shaft. The motor is controlled by a Cytron MDDS10 dual H-bridge
+        driver operating in Sign-Magnitude mode: a PWM signal on Pin 3 of the
+        Teensy 4.0 sets motor speed via the AN1 terminal, while a digital direction
+        signal on Pin 2 drives the DIG1 terminal. The HK2T screw-jack mechanism
+        converts the rotary output to linear actuation, and the lead-angle geometry
+        of the travelling nut provides inherent mechanical self-locking, ensuring
+        the column holds position under load without requiring motor power. A
+        RegenClamp V0.3 unit with a 10 &#8486;, 50 W wirewound brake resistor is
+        interposed between the 24 V bus and the MDDS10 to dissipate regenerative
+        back-EMF during hard-stop deceleration, limiting regen current to 2.65 A
+        and protecting the power supply from overvoltage excursions.
+      </p>
+      <p>
+        The base rotation axis is driven by a Z55BLD400-24GU brushless DC motor
+        rated at 400 W and 24 V, operating through a 5GU 26KB parallel-shaft
+        gearbox in series with a 3.5:1 belt-and-pulley stage, for a combined
+        system reduction ratio of 91:1. At the design operating point of 2275 RPM
+        motor speed, the output platform rotates at 150 degrees per second, drawing
+        approximately 33 W at steady state. Rotor position is measured by an
+        AS5047P 14-bit SPI magnetic encoder mounted on the output shaft. The motor
+        is driven by a ZBLD C20-800LRC CAN Modbus driver communicating at
+        125 kbps and commanded by an Arduino Uno R4 WiFi microcontroller. The
+        Arduino receives target angle and speed instructions from the Jetson Orin NX
+        over a WiFi UDP link and executes a 50 Hz PID control loop to track angular
+        position references within a hard-coded operating envelope of ±90 degrees.
+        A RegenClamp V0.3 unit is specified for this axis to manage regenerative
+        energy during rapid direction reversals, with a 5 &#8486;, 100 W resistor
+        recommended based on back-EMF analysis of the design operating condition.
+      </p>
+      <p>
+        Impact detection across the three foam padding zones is provided by four
+        InvenSense MPU6050 six-axis inertial measurement units embedded within the
+        padding structure. Each sensor communicates over I2C at 400 kHz. Because
+        the MPU6050 supports only two addresses per bus (0x68 and 0x69, selectable
+        via the AD0 pin), the Teensy 4.0's two independent hardware I2C peripherals
+        are both utilised: the primary bus (Wire, Pins 18 and 19) carries the
+        centre-body and left-body sensors, and the secondary bus (Wire1, Pins 17
+        and 16) carries the right-body and a reserved fourth sensor. All sensors
+        are configured for a full-scale accelerometer range of ±16g, providing a
+        maximum linear measurement of approximately 157 m/s² before saturation,
+        which is sufficient for the peak impact accelerations expected during
+        training operation.
+      </p>
 
       <image-component
         tag="image"
-        source="../assets/control_system/component_overview.png"
-        subtitle="Figure: Component overview showing power, data, and serial connections across all subsystems.">
+        source="../assets/system_architecture/system_power_overview.png"
+        subtitle="Figure: System power architecture — distribution from mains supply through motor drivers and regulators to all subsystem actuators and electronics.">
       </image-component>
 
+      <h4>Data Architecture</h4>
       <p>
-        A closed-loop PID cascade controller ensures smooth, safe motion under
-        dynamic boxing loads. The cascade implements three nested loops —
-        position (outermost), velocity, and current (innermost) — each
-        operating at progressively higher update rates to match the response
-        speed of the physical variable it controls. This structure enables the
-        mechanism to:
+        The system implements a two-tier hierarchical control architecture. The
+        upper tier resides on an NVIDIA Jetson Orin NX compute module running
+        ROS 2 Humble, which hosts the graphical control interface
+        (<code>unified_GUI_V4.py</code>), performs combat finite-state-machine
+        decision-making, sequences strike libraries, and processes impact detection
+        events. The lower tier resides on a Teensy 4.0 microcontroller executing a
+        deterministic 200 Hz unified control loop with a 5 ms period. Within each
+        cycle, the Teensy performs CAN motor command transmission and feedback
+        reception for the four arm actuators, PWM and direction signal output to the
+        Cytron MDDS10 height driver, I2C polling of all four MPU6050 inertial
+        sensors, and publication of a 21-element feedback payload to the Jetson
+        via a micro-ROS USB bridge. The payload carries motor positions at indices
+        0 to 3, motor phase currents at indices 4 to 7, a CAN receive frame count
+        at index 8, and three-axis acceleration readings for each of the four IMU
+        sensors at indices 9 to 20.
       </p>
-      <ul>
-        <li>Damp sudden impacts (user punches) and restore position smoothly</li>
-        <li>Limit torque when the user grabs or holds an arm</li>
-        <li>Prevent overcurrent and motor burnout during stall conditions</li>
-        <li>Compensate load spikes gradually without aggressive corrections</li>
-      </ul>
       <p>
-        Individual subsystem pages detail their specific electrical interfaces,
-        power budgets, communication buses, and low-level control strategies.
+        The arm actuator control loop operates in Position-Speed mode. The Jetson
+        publishes target joint positions and speed constraints at 100 Hz over the
+        ROS 2 topic <code>motor_commands</code>. The Teensy receives these targets
+        and transmits CAN command frames using a sparse edge-triggered protocol:
+        a frame is transmitted only when a target position changes by more than
+        0.01 rad relative to the previously commanded value, or when a 100 ms
+        keep-alive timeout expires. This strategy reduces average bus utilisation
+        from approximately 80 percent under continuous polling to under 15 percent
+        during typical sparring operation. The internal FOC controller within each
+        Damiao actuator independently manages torque regulation and trajectory
+        interpolation, closing the inner control loop at the actuator level without
+        requiring explicit torque commands from the host.
+      </p>
+      <p>
+        A hardware-level current watchdog running at 200 Hz on the Teensy provides
+        a last-resort safety layer for the arm motors. If any motor phase current
+        exceeds 3.0 A, all four actuators are immediately disabled and their target
+        positions are frozen at the last measured values. This watchdog operates
+        independently of the GUI and cannot be suppressed by software commands,
+        ensuring that mechanical failures or unexpected contact events do not result
+        in uncontrolled motor motion.
+      </p>
+      <p>
+        The base rotation axis employs a dedicated angle-tracking PID controller
+        running at 50 Hz on the Arduino Uno R4 WiFi. The controller receives
+        commands via WiFi UDP as absolute or relative angle targets and peak RPM
+        limits. At each control cycle, the angular error is computed as the
+        difference between the target and the current AS5047P encoder reading.
+        Proportional, integral, and derivative correction terms are summed and
+        saturated to the commanded peak RPM ceiling before being dispatched to the
+        ZBLD CAN Modbus driver. A ±1 degree dead zone prevents motor activation
+        on residual encoder noise when the platform is at rest near the target.
+        Hard position limits at ±90 degrees are enforced within the control law:
+        when the encoder reading exceeds a limit in the direction of commanded
+        motion, the output is zeroed and the target is clamped to the boundary;
+        motion away from the limit is always permitted, enabling recovery from a
+        boundary condition via any subsequent command. The inherent proportional
+        nature of the PID output provides soft-start acceleration on large set-point
+        changes, eliminating the discrete acceleration-ramp state machine used in
+        earlier firmware revisions, which had been found to trigger power supply
+        overcurrent protection at 1.58 A under abrupt speed commands.
+      </p>
+      <p>
+        The height axis operates under open-loop timed PWM control. The Jetson
+        publishes ascend, descend, or stop commands via the ROS 2 topic
+        <code>/robot/height_cmd</code>; the Teensy translates these into magnitude
+        and direction signals for the MDDS10 driver. Although the CHP-36GP-555
+        motor is equipped with an AB-phase Hall encoder, this feedback channel is
+        not utilised in the current implementation. Position tracking is managed
+        by the operator through timed command sequences, with the self-locking
+        screw-jack mechanism providing passive hold at any intermediate height
+        without motor power.
+      </p>
+      <p>
+        Impact sensing operates continuously within the 200 Hz Teensy loop. Raw
+        six-axis data from each MPU6050 is read via I2C in each cycle,
+        converted to SI units using the ±16g accelerometer scale factor of
+        2048 LSB per g, and packed into the micro-ROS feedback payload.
+        On the Jetson, the GUI processes all accumulated samples since the last
+        display refresh, computing the L2 vector magnitude across the three
+        acceleration axes for each sensor. When the magnitude of any sensor exceeds
+        a configurable threshold, the event is classified as a valid strike and
+        published to the ROS 2 topic <code>/robot/strike_detected</code> with the
+        sensor identifier, peak acceleration value, and event timestamp.
       </p>
 
       <image-component
         tag="image"
-        source="../assets/control_system/closed_loop.jpg"
-        subtitle="Figure: Closed-loop control block diagram for the robot mechanism.">
+        source="../assets/system_architecture/system_data_overview.png"
+        subtitle="Figure: System data architecture — communication buses (CAN, UART, I2C, ROS 2 topics) linking compute modules, microcontrollers, and peripheral sensors across all subsystems.">
       </image-component>
+
+      <p>
+        Individual subsystem pages detail the specific electrical interfaces,
+        power budgets, bus configurations, and control parameter derivations for
+        each axis.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
+
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 4. VERIFICATION PLAN (V-Model Right Side)              -->
