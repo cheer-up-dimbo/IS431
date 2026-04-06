@@ -18,6 +18,14 @@
       justify-content: space-between;
       margin: 32px 0 16px;
     }
+    code {
+      background: #f0f4f8;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.88em;
+      color: #1a7f37;
+    }
   </style>
 </head>
 <body>
@@ -30,12 +38,13 @@
     </a>
     <br>
 
-    <!-- 5.3.5 INTRO -->
     <h2>5.3.3 Dashboard & Analytics</h2>
 
     <p>
-      Beyond core intelligence, <strong>BoxBunny</strong> provides a software layer that transforms raw training data
-      into actionable insights, delivers AI coaching analysis, and enables convenient remote control.
+      Training data is only useful if users can see it, understand it, and act on it. This
+      section covers the software systems that turn raw session data into performance insights,
+      deliver AI-powered coaching analysis, and let users control the robot conveniently from
+      their phone &mdash; all without requiring internet access.
     </p>
 
     <sl-divider></sl-divider>
@@ -44,43 +53,46 @@
     <h2>5.3.3.1 Communication Architecture</h2>
 
     <p>
-      The system uses a 3-layer communication architecture connecting the desktop GUI, phone dashboard, and ROS 2 backend:
+      Three software layers connect the robot's ROS 2 backend, the desktop touchscreen GUI,
+      and the phone dashboard:
     </p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Layer</th>
-          <th style="padding:8px; border:1px solid #ddd;">From &rarr; To</th>
-          <th style="padding:8px; border:1px solid #ddd;">Method</th>
+          <th style="padding:8px; border:1px solid #ddd;">Connects</th>
+          <th style="padding:8px; border:1px solid #ddd;">How It Works</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">ROS Bridge</td>
-          <td style="padding:8px; border:1px solid #ddd;">GUI &harr; ROS Core</td>
-          <td style="padding:8px; border:1px solid #ddd;">QThread, Qt signals, async services</td>
+          <td style="padding:8px; border:1px solid #ddd;">GUI &harr; ROS 2 Nodes</td>
+          <td style="padding:8px; border:1px solid #ddd;">A background thread (QThread) subscribes to ROS topics and emits Qt signals, keeping the GUI responsive while receiving real-time data</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">IPC Files</td>
-          <td style="padding:8px; border:1px solid #ddd;">Dashboard &harr; GUI</td>
-          <td style="padding:8px; border:1px solid #ddd;">JSON files in <code>/tmp/</code>, 100ms polling</td>
+          <td style="padding:8px; border:1px solid #ddd;">Phone &harr; GUI</td>
+          <td style="padding:8px; border:1px solid #ddd;">The phone dashboard writes JSON command files to <code>/tmp/</code> which the GUI polls every 100ms &mdash; enabling remote control without direct network coupling</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">REST + WS</td>
-          <td style="padding:8px; border:1px solid #ddd;">Dashboard &harr; Backend</td>
-          <td style="padding:8px; border:1px solid #ddd;">HTTP API + WebSocket real-time</td>
+          <td style="padding:8px; border:1px solid #ddd;">REST + WebSocket</td>
+          <td style="padding:8px; border:1px solid #ddd;">Phone &harr; Server</td>
+          <td style="padding:8px; border:1px solid #ddd;">HTTP API for data queries, WebSocket for live session updates (punch counts, round progress) pushed in real time</td>
         </tr>
       </tbody>
     </table>
 
     <p>
-      The phone dashboard is accessible over the robot's WiFi access point. Users control
-      <strong>BoxBunny</strong> from their phone &mdash; no typing on a 7-inch touchscreen with boxing gloves,
-      no bending down, and natural mobile interaction for chatting with the AI coach.
+      The phone dashboard connects over the robot's own WiFi access point &mdash; users open it
+      on their phone while standing at the robot. This was a deliberate design choice: typing on
+      a 7-inch touchscreen with boxing gloves is impractical (confirmed during the
+      <a href="robot-intelligence-testing.html">CDE AI Fair</a>), so the phone provides a natural
+      interface for browsing stats, chatting with the AI coach, and configuring training sessions.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.svg" subtitle="Figure: GUI & Dashboard Communication Architecture"></image-component>
+    <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.svg" subtitle="Figure: GUI &amp; Dashboard Communication Architecture"></image-component>
 
     <sl-divider></sl-divider>
 
@@ -88,232 +100,368 @@
     <h2>5.3.3.2 Analytics & Performance Insights</h2>
 
     <p>
-      All training data flows through the system into meaningful user insights:
+      Every training session generates a wealth of data &mdash; punch types, force levels,
+      timing, movement patterns, defence outcomes. The analytics system organises this into
+      four layers of insight, from individual sessions to long-term progress:
     </p>
 
-    <ul>
-      <li>
-        <strong>Session-Level Analytics</strong>: Each session publishes a <strong>SessionPunchSummary</strong>
-        with 20+ fields &mdash; punch distribution by type, force levels, pad distribution, rounds completed,
-        punches per minute, max power, and movement metrics. Stored in per-user SQLite for long-term tracking.
-      </li>
-      <li>
-        <strong>Trend Analysis</strong>: Time-series analytics across four periods (7/30/90 days, all time) for
-        five metrics: volume, reaction time, power, defence rate, and stamina.
-      </li>
-      <li>
-        <strong>Peer Comparison</strong>: Population benchmarks by age, gender, and skill level across 6 metrics.
-        Tiers range from "Getting Started" (&lt;10th percentile) to "Elite" (&gt;90th).
-      </li>
-      <li>
-        <strong>Personal Records</strong>: All-time bests for power, stamina, and reaction time tracked in a
-        dedicated <strong>personal_records</strong> table and surfaced with the date achieved.
-      </li>
-      <li>
-        <strong>Sparring-Specific</strong>: Defence breakdown (blocks, slips, dodges, hits received) and weakness
-        profile revealing which punches the user struggles to defend &mdash; the same data driving the AI
-        sparring engine's targeting.
-      </li>
-    </ul>
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Insight Level</th>
+          <th style="padding:8px; border:1px solid #ddd;">What Users See</th>
+          <th style="padding:8px; border:1px solid #ddd;">Why It Matters</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Session Summary</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Punch distribution by type, force breakdown, rounds completed, punches per minute, max power, movement metrics</td>
+          <td style="padding:8px; border:1px solid #ddd;">Immediate feedback after every session &mdash; what went well, what needs work</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Trend Analysis</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Time-series charts across 7 days, 30 days, 90 days, or all time for volume, reaction time, power, defence rate, and stamina</td>
+          <td style="padding:8px; border:1px solid #ddd;">Track improvement over weeks and months &mdash; see if training is working</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Peer Comparison</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Population benchmarks segmented by age, gender, and skill level. Percentile tiers from "Getting Started" (&lt;10th) to "Elite" (&gt;90th)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Know where you stand relative to others at your level</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Personal Records</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">All-time bests for power, stamina, and reaction time with date achieved</td>
+          <td style="padding:8px; border:1px solid #ddd;">Motivation through personal milestones</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Sparring Breakdown</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Defence breakdown (blocks, slips, dodges, hits) and weakness profile by punch type</td>
+          <td style="padding:8px; border:1px solid #ddd;">Identifies defensive gaps &mdash; feeds back into the AI sparring engine's targeting</td>
+        </tr>
+      </tbody>
+    </table>
 
     <sl-divider></sl-divider>
 
-    <!-- 5.3.3.3 AI COACH ANALYSIS & TRAINING SUGGESTIONS -->
-    <h2>5.3.3.3 AI Coach Analysis & Training Suggestions</h2>
+    <!-- 5.3.3.3 AI COACH ANALYSIS -->
+    <h2>5.3.3.3 AI Coach on the Dashboard</h2>
 
-    <ul>
-      <li>
-        <strong>Post-Session Analysis</strong>: The LLM receives the full <strong>SessionPunchSummary</strong>
-        and generates a 2&ndash;3 paragraph analysis referencing specific metrics, weak areas, and improvement trends.
-      </li>
-      <li>
-        <strong>Actionable Drill Suggestions</strong>: The LLM outputs structured tags
-        (<code>[DRILL:Name|combo=1-2|rounds=2|work=60s|speed=Medium]</code>) parsed into clickable cards
-        that launch the suggested configuration with one tap.
-      </li>
-      <li>
-        <strong>Interactive AI Chat</strong>: Full-screen chat with word-by-word streaming (20ms/word).
-        Users ask technique questions, request training plans, or get stat explanations.
-        History is persisted with follow-up suggestions after each response.
-      </li>
-      <li>
-        <strong>Convenience Design</strong>: Users chat from their phone instead of the 7-inch touchscreen.
-        This was directly motivated by CDE AI Fair feedback where touchscreen typing was a friction point.
-      </li>
-    </ul>
+    <p>
+      The LLM coaching system (described in <a href="robot-intelligence-integration.html">Section 5.3.2</a>)
+      surfaces on the phone dashboard through two features:
+    </p>
+
+    <h3>Post-Session Analysis</h3>
+    <p>
+      After each training session, the dashboard sends the full session summary to the LLM,
+      which generates a 2&ndash;3 paragraph personalised analysis. The analysis references
+      specific numbers from the session (e.g., "your cross power dropped 15% in round 3")
+      and can suggest specific drills to address weaknesses. These suggestions appear as
+      tappable action cards &mdash; one tap loads the drill configuration and starts it on
+      the robot.
+    </p>
+
+    <h3>Interactive Chat</h3>
+    <p>
+      A full-screen chat interface lets users have ongoing conversations with the AI coach.
+      Responses stream word-by-word (20ms per word) for a natural feel. Users ask about
+      technique ("how do I improve my left hook?"), request custom training plans, or get
+      explanations of their statistics. Conversation history is persisted across sessions,
+      and follow-up suggestions appear after each response.
+    </p>
+    <p>
+      This was directly motivated by CDE AI Fair feedback &mdash; users wanted to interact
+      with the coach but typing on the 7-inch touchscreen was awkward. The phone dashboard
+      solves this with a natural mobile chat experience.
+    </p>
 
     <sl-divider></sl-divider>
 
     <!-- 5.3.3.4 PHONE DASHBOARD FEATURES -->
-    <h2>5.3.3.4 Phone Dashboard Features</h2>
+    <h2>5.3.3.4 Phone Dashboard</h2>
 
     <p>
-      The phone dashboard is a <strong>Vue 3</strong> SPA (Composition API, Pinia, Tailwind CSS, Chart.js)
-      served by a <strong>FastAPI</strong> backend. Key views:
+      Built with <strong>Vue 3</strong> (Composition API, Pinia state management, Tailwind CSS)
+      and <strong>Chart.js</strong> for data visualisation, served by a FastAPI backend. The
+      dashboard provides five main views:
     </p>
 
-    <ul>
-      <li>
-        <strong>Dashboard Home</strong>: XP progress ring, weekly goal with streak counter,
-        training heat map, quick stats with trend arrows, peer comparison bars,
-        recent session card, and AI coach quote of the day.
-      </li>
-      <li>
-        <strong>Performance</strong>: Trend charts across selectable periods for all 5 key metrics
-        with personal best callouts.
-      </li>
-      <li>
-        <strong>Training Remote</strong>: Quick preset grid for one-tap session start, navigation buttons
-        to remotely control the GUI, and press-and-hold height adjustment. Users configure their
-        session from their phone and walk to the robot ready to go.
-      </li>
-      <li>
-        <strong>Coach View</strong> (coach accounts only): Group circuit training dashboard &mdash;
-        manage participant rotation, view live stats, load presets, and review past sessions.
-      </li>
-    </ul>
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">View</th>
+          <th style="padding:8px; border:1px solid #ddd;">What It Shows</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Home</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">XP progress ring toward next rank, weekly goal with streak counter, quick stats with trend arrows, recent session card</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Performance</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Trend charts across selectable time periods (7/30/90 days, all time) for 5 key metrics, with personal bests</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Training Remote</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Preset grid for one-tap session start, remote GUI navigation, press-and-hold height control</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>AI Chat</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Coaching conversation with streaming responses, drill action cards, persistent history</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Profile</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">User profile with rank badge, personal settings, and account management</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Coach Station</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Group circuit training management (coach accounts only)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Key Dashboard Views</h3>
+
+    <p>
+      The AI Coach chat and Training Remote are the two most technically interesting views.
+      Both work over the robot's WiFi access point &mdash; the user's phone does not need to
+      be on the same network as the Jetson, it connects directly to the robot's own hotspot.
+    </p>
+
+    <div style="display:flex; justify-content:center; gap:16px; margin:16px 0;">
+      <div style="max-width:220px;">
+        <image-component tag="image" source="../assets/robot_intelligence/dashboard/ai_coach.jpg" subtitle="Figure: AI Coach chat" width="100%"></image-component>
+      </div>
+      <div style="max-width:220px;">
+        <image-component tag="image" source="../assets/robot_intelligence/dashboard/remote_control.jpg" subtitle="Figure: Training Remote" width="100%"></image-component>
+      </div>
+    </div>
+
+    <p>
+      <strong>AI Coach Chat:</strong> When the user sends a message, the phone dashboard
+      makes a REST call to the FastAPI backend on the Jetson. The backend builds the full
+      prompt (user message + session history + system prompt) and calls the LLM ROS service
+      <code>/boxbunny/llm/generate</code>. The LLM node runs inference on the Jetson's GPU
+      and returns the response, which the backend streams back to the phone word-by-word via
+      the API. If the LLM outputs drill suggestion tags
+      <code>[DRILL:Name|combo=1-2|rounds=2]</code>, the backend parses them into tappable
+      action cards &mdash; tapping one writes a command to <code>/tmp/</code> that the
+      touchscreen GUI picks up and launches the drill automatically.
+    </p>
+
+    <p>
+      <strong>Training Remote:</strong> The phone sends navigation and control commands to
+      the FastAPI backend, which writes them as JSON files to <code>/tmp/</code>. The
+      touchscreen GUI polls these files every 100ms and executes the commands &mdash;
+      navigating pages, starting sessions, or adjusting robot height. This IPC-file approach
+      means the phone never communicates directly with ROS; the GUI acts as the bridge.
+      Users can browse presets, configure a full training session, and start it from their
+      phone, then walk over to the robot with gloves on, ready to train.
+    </p>
+
+    <h3>Full Dashboard Walkthrough</h3>
+    <p>
+      The video below shows all dashboard views in action:
+    </p>
+
+    <div class="video-row single">
+      <div class="video-box">
+        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/dashboard/walkthrough.mp4" style="max-width:400px;"></video>
+        <sub>Phone dashboard walkthrough</sub>
+      </div>
+    </div>
 
     <sl-divider></sl-divider>
 
     <!-- 5.3.3.5 API & DATABASE DESIGN -->
     <h2>5.3.3.5 API & Database Design</h2>
 
-    <h3>FastAPI Backend (7 routers under <code>/api/</code>)</h3>
+    <p>
+      The phone dashboard communicates with the robot through a FastAPI backend running on the
+      Jetson. Seven API routers handle different aspects of the system:
+    </p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Router</th>
-          <th style="padding:8px; border:1px solid #ddd;">Key Endpoints</th>
           <th style="padding:8px; border:1px solid #ddd;">Purpose</th>
+          <th style="padding:8px; border:1px solid #ddd;">Key Detail</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">auth</td>
-          <td style="padding:8px; border:1px solid #ddd;">login, signup, pattern-login, profile</td>
-          <td style="padding:8px; border:1px solid #ddd;">JWT auth (7-day TTL) + SHA-256 pattern lock</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>auth</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Login, signup, profile management</td>
+          <td style="padding:8px; border:1px solid #ddd;">JWT tokens (7-day expiry) + SHA-256 pattern lock for gloved-hand auth</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">sessions</td>
-          <td style="padding:8px; border:1px solid #ddd;">current, history, trends, detail, raw</td>
-          <td style="padding:8px; border:1px solid #ddd;">Session data with pagination and mode filtering</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>sessions</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Session history, trends, detail views</td>
+          <td style="padding:8px; border:1px solid #ddd;">Paginated with mode filtering, raw sensor data export</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">gamification</td>
-          <td style="padding:8px; border:1px solid #ddd;">profile, achievements, leaderboard, benchmarks</td>
-          <td style="padding:8px; border:1px solid #ddd;">XP, ranks, badges, peer comparison</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>gamification</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">XP, ranks, achievements, benchmarks</td>
+          <td style="padding:8px; border:1px solid #ddd;">Population percentile comparison by demographics</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">chat</td>
-          <td style="padding:8px; border:1px solid #ddd;">status, message, history</td>
-          <td style="padding:8px; border:1px solid #ddd;">LLM coaching via ROS service bridge</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>chat</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">AI coach messaging</td>
+          <td style="padding:8px; border:1px solid #ddd;">Bridges to LLM ROS service, parses drill action tags</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">remote</td>
-          <td style="padding:8px; border:1px solid #ddd;">command, height, presets</td>
-          <td style="padding:8px; border:1px solid #ddd;">GUI remote control via IPC files</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>remote</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">GUI remote control, height adjustment</td>
+          <td style="padding:8px; border:1px solid #ddd;">Writes IPC command files for touchscreen navigation</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">presets</td>
-          <td style="padding:8px; border:1px solid #ddd;">list, create, update, delete, favourite</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>presets</strong></td>
           <td style="padding:8px; border:1px solid #ddd;">Training preset management</td>
+          <td style="padding:8px; border:1px solid #ddd;">Create, edit, favourite, track usage count</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">coach</td>
-          <td style="padding:8px; border:1px solid #ddd;">load-config, start/end-station, live, sessions</td>
-          <td style="padding:8px; border:1px solid #ddd;">Group training management (coach role)</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>coach</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Group training management</td>
+          <td style="padding:8px; border:1px solid #ddd;">Coach role required &mdash; station control, live participant stats</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>Two-Tier SQLite Database</h3>
-
-    <ul>
-      <li>
-        <strong>Main DB</strong> (<code>boxbunny_main.db</code>): Shared tables for users (password hash + pattern lock),
-        auth sessions, training presets, and coaching sessions.
-      </li>
-      <li>
-        <strong>Per-User DB</strong> (<code>users/{username}/boxbunny.db</code>): Isolated tables for training sessions,
-        events, combo progress, performance tests, sparring, weakness profiles, and gamification (XP, achievements, streaks, records).
-      </li>
-      <li>
-        <strong>Design rationale</strong>: Per-user databases provide data isolation, enable concurrent writes
-        without lock contention, and simplify backup and export.
-      </li>
-    </ul>
-
-    <h3>WebSocket</h3>
+    <h3>Two-Tier Database</h3>
 
     <p>
-      Real-time session updates via <code>ws://&lt;host&gt;:8080/ws</code> with events for session
-      started/stats/completed. Uses 30-second keepalive ping/pong and automatic reconnection with
-      exponential backoff (max 10 attempts) plus state sync on reconnect.
+      Data is stored in SQLite across two tiers, designed for privacy and scalability:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <tbody>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:140px;">Main DB</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">Shared across all users &mdash; accounts, authentication, training presets, coaching sessions. One file: <code>boxbunny_main.db</code></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Per-User DB</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">Isolated per user &mdash; training sessions, events, combo progress, performance tests, sparring data, weakness profiles, XP, achievements, streaks, personal records. One file per user: <code>users/{name}/boxbunny.db</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Per-user databases ensure complete data isolation (one user cannot access another's data),
+      avoid write lock contention during concurrent training, and simplify per-user data export
+      or backup.
+    </p>
+
+    <h3>Real-Time Updates</h3>
+    <p>
+      During active training, the phone dashboard receives live updates via WebSocket &mdash;
+      punch counts, round progress, and session state changes are pushed instantly rather than
+      requiring the user to refresh. The connection uses 30-second keepalive pings and
+      automatically reconnects with exponential backoff (up to 10 attempts) if dropped. On
+      reconnect, the server sends the last known state so the dashboard catches up without
+      missing data.
     </p>
 
     <sl-divider></sl-divider>
 
     <!-- 5.3.3.6 GAMIFICATION SYSTEM -->
-    <h2>5.3.3.6 Gamification System</h2>
+    <h2>5.3.3.6 Gamification</h2>
 
-    <h3>6 Rank Tiers</h3>
+    <p>
+      To encourage consistent training, the system tracks progress through ranks, achievements,
+      and streaks &mdash; giving users tangible goals beyond raw performance metrics.
+    </p>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+    <h3>Rank Progression</h3>
+    <p>
+      Users earn XP after every session and progress through 6 rank tiers:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Rank</th>
-          <th style="padding:8px; border:1px solid #ddd;">XP Threshold</th>
+          <th style="padding:8px; border:1px solid #ddd; text-align:center;">XP Required</th>
+          <th style="padding:8px; border:1px solid #ddd;">Typical User</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Novice</td>
-          <td style="padding:8px; border:1px solid #ddd;">0</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">0</td>
+          <td style="padding:8px; border:1px solid #ddd;">Just started</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Contender</td>
-          <td style="padding:8px; border:1px solid #ddd;">500</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">500</td>
+          <td style="padding:8px; border:1px solid #ddd;">Training regularly</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Fighter</td>
-          <td style="padding:8px; border:1px solid #ddd;">1,500</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">1,500</td>
+          <td style="padding:8px; border:1px solid #ddd;">Solid fundamentals</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Warrior</td>
-          <td style="padding:8px; border:1px solid #ddd;">4,000</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4,000</td>
+          <td style="padding:8px; border:1px solid #ddd;">Consistent and skilled</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Champion</td>
-          <td style="padding:8px; border:1px solid #ddd;">10,000</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">10,000</td>
+          <td style="padding:8px; border:1px solid #ddd;">High proficiency</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Elite</td>
-          <td style="padding:8px; border:1px solid #ddd;">25,000</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">25,000</td>
+          <td style="padding:8px; border:1px solid #ddd;">Top dedication</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>XP Calculation</h3>
-
     <p>
-      Base XP varies by mode (Training 50, Sparring 80, Free 30, Performance Tests 40) with bonuses for
-      completion and score. Difficulty multipliers: 1.0&times; Beginner, 1.3&times; Intermediate,
-      1.6&times; Advanced, 2.0&times; Elite. Minimum 10 XP per session.
+      XP earned per session depends on the training mode (sparring awards the most at 80 base XP),
+      session completion, performance score, and difficulty level (1.0&times; for beginner up to
+      2.0&times; for elite). Every session awards at least 10 XP to reward participation.
     </p>
 
-    <h3>12+ Achievements</h3>
-
-    <p>
-      Including "First Blood" (first session), "Century" (100 punches), "Speed Demon" (lightning reaction),
-      "Weekly Warrior" (7-day streak), and "Perfect Round" (100% accuracy). Each badge awarded only once.
-    </p>
-
-    <h3>Streaks & Goals</h3>
-
-    <p>
-      Daily training streak tracking with longest streak records. Configurable weekly goal
-      (default 3 sessions/week) with progress tracking.
+    <h3>Achievements &amp; Streaks</h3>
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Badge</th>
+          <th style="padding:8px; border:1px solid #ddd;">How to Unlock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>First Blood</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Complete your first training session</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Century</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Throw 100 punches in a single session</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Speed Demon</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Achieve a lightning-tier reaction time</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Weekly Warrior</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Maintain a 7-day training streak</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Perfect Round</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Score 100% accuracy on a full combo drill</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.92rem; color:#444;">
+      12+ badges in total, each awarded once. A daily streak counter tracks consecutive training
+      days with bonus XP multipliers, and users set a configurable weekly goal (default 3 sessions).
     </p>
 
     <sl-divider></sl-divider>
