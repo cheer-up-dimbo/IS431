@@ -30,8 +30,12 @@
     <h2>5.3.2 Intelligent Behaviour & Control</h2>
 
     <p>
-      This section covers the intelligent systems that enable BoxBunny to perceive, decide, and act in real
-      time — from sensor fusion and inference to adaptive sparring and AI coaching.
+      All intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on the Jetson,
+      communicating via custom message types and services. Each subsection below corresponds to
+      one or more ROS nodes that handle a specific aspect of the system &mdash; from fusing sensor
+      data to generating AI coaching tips. Together they form the decision-making layer between
+      the CV perception pipeline (<a href="robot-intelligence-cv.html">Section 5.3.1</a>) and the
+      dashboard and analytics layer (<a href="robot-intelligence-software.html">Section 5.3.3</a>).
     </p>
 
     <sl-divider></sl-divider>
@@ -79,40 +83,53 @@
     <!-- 5.3.2.2 REAL-TIME INFERENCE PIPELINE -->
     <h2>5.3.2.2 Real-Time Inference Pipeline</h2>
 
-    <h3>TensorRT Deployment</h3>
+    <h3>FPS Sensitivity &mdash; Why 30fps Matters</h3>
     <p>
-      Both the YOLO Pose model and the action recognition transformer are optimised with TensorRT FP16 on the
-      Jetson Orin Nano.
+      The action prediction model was trained on features extracted at a consistent 30fps. Its voxel
+      temporal deltas use 2-frame (67ms) and 8-frame (267ms) lookbacks &mdash; if the actual frame rate
+      drops below 30fps, these deltas span different real-world time intervals than what the model
+      learned, causing the model to misclassify punches. In other words, <strong>the action model's
+      accuracy is directly tied to maintaining 30fps</strong> &mdash; even a small drop degrades
+      predictions significantly.
     </p>
 
-    <h3>FPS Sensitivity</h3>
+    <h3>The YOLO Bottleneck &mdash; TensorRT Conversion</h3>
     <p>
-      Voxel temporal features use 2-frame (67ms) and 8-frame (267ms) lookback deltas at 30fps. If the frame
-      rate drops, these deltas span different real-world intervals, degrading accuracy. This drove the
-      TensorRT optimisation work — ensuring the pipeline meets the 33ms per-frame budget.
+      The single biggest deployment challenge was the YOLO Pose model. Running in its default
+      PyTorch format (<code>.pt</code>) on the Jetson, YOLO alone consumed most of the 33ms
+      per-frame budget, dragging the entire pipeline below 30fps. Because YOLO provides the
+      pose features that the action model depends on, this bottleneck meant the action model
+      was receiving features at inconsistent, lower frame rates &mdash; making it inaccurate
+      despite performing well on pre-recorded 30fps data.
+    </p>
+    <p>
+      Converting YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format with FP16 precision)
+      resolved this completely. TensorRT optimises the model's computation graph for the Jetson's
+      GPU architecture, fusing operations and eliminating overhead. This brought YOLO inference
+      down to ~16ms, well within the 33ms frame budget, allowing the full pipeline to sustain
+      a consistent 30fps. The action model immediately became accurate and reliable in live
+      deployment once this conversion was done &mdash; confirming that the accuracy issue was
+      never the model itself, but the inconsistent frame rate feeding it.
     </p>
 
     <h3>Offline &rarr; Live Inference Gap</h3>
     <p>
-      Models performing well on pre-recorded clips struggled in live deployment. Four issues were identified
-      and solved:
+      Beyond the YOLO bottleneck, three additional issues were solved to bridge the gap between
+      offline accuracy and live performance:
     </p>
     <ol>
       <li>
-        <strong>Processing bottleneck</strong> — voxel extraction and YOLO inference were sequential, causing
-        stale feature windows. Fix: parallelised into separate worker threads.
+        <strong>Sequential processing</strong> &mdash; voxel extraction and YOLO ran one after the other,
+        doubling per-frame time. Fix: parallelised into separate worker threads so they run concurrently.
       </li>
       <li>
-        <strong>Frame buffer issues</strong> — dropped frames created temporal discontinuities. Fix:
-        implemented a proper rolling feature buffer with FIFO queue and strict frame ordering.
+        <strong>Frame buffer discontinuities</strong> &mdash; dropped frames created gaps in the temporal
+        window. Fix: proper rolling feature buffer with FIFO queue and strict frame ordering.
       </li>
       <li>
-        <strong>YOLO as bottleneck</strong> — PyTorch YOLO consumed most of the 33ms budget on Jetson. Fix:
-        converted to a TensorRT engine, dramatically reducing inference time.
-      </li>
-      <li>
-        <strong>Effective FPS mismatch</strong> — trained at consistent 30fps but live pipeline ran at variable
-        rates. Fix: TensorRT optimisation of both models guaranteed consistent throughput.
+        <strong>Effective FPS mismatch</strong> &mdash; trained at consistent 30fps but live pipeline ran at
+        variable rates. Fix: TensorRT optimisation of both YOLO and the action model guaranteed consistent
+        throughput.
       </li>
     </ol>
 
@@ -208,8 +225,9 @@
     <h2>5.3.2.3 AI Sparring Engine</h2>
 
     <p>
-      Five AI opponent styles are implemented as Markov chain transition matrices, each with distinct
-      behavioural profiles:
+      The sparring system generates intelligent, adaptive robot behaviour during training sessions.
+      Five AI opponent styles are implemented as Markov chain transition matrices, each producing
+      distinct attack patterns:
     </p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
@@ -283,10 +301,99 @@
       rate, forcing continuous improvement on weak areas.
     </p>
 
+    <p style="font-size:0.92rem; color:#444;">
+      The user-facing sparring experience (style selection, session configuration, and results display)
+      is covered in the <a href="gui.html">GUI section (5.1)</a>. This section focuses on the
+      underlying intelligence that drives the robot's behaviour.
+    </p>
+
+    <h3>Defence Detection</h3>
     <p>
-      A free training mode provides reactive, unstructured practice via a pad-to-counter mapping (centre pad
-      &rarr; jab/cross, left pad &rarr; left hooks/uppercuts, right pad &rarr; right hooks/uppercuts, head
-      pad &rarr; jab/cross) with a 300ms counter cooldown and 5-second idle guard return.
+      When the robot attacks during sparring, the system must determine how the user responded.
+      Each robot punch opens a 500ms detection window, during which the <strong>punch_processor</strong>
+      classifies the user's response using a priority-based system:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Priority</th>
+          <th style="padding:8px; border:1px solid #ddd;">Response</th>
+          <th style="padding:8px; border:1px solid #ddd;">Detection Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">1</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Hit</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Arm IMU detects physical contact &mdash; the robot's punch landed</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Block</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">CV model detects block pose (confidence &ge; 0.3)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Slip</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Large displacement &mdash; user's bounding box moved &ge;40px laterally or &ge;0.15m in depth</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Dodge</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Moderate displacement &mdash; &ge;20px laterally or &ge;0.08m in depth</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Unknown</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">No detectable response within the 500ms window</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Defence results feed into the sparring analytics (defence rate, breakdown by type)
+      and the weakness tracking system, which uses them to target the user's weakest areas
+      in future sessions.
+    </p>
+
+    <h3>Free Training Mode</h3>
+    <p>
+      An unstructured practice mode where the robot reacts to the user's punches rather
+      than following a scripted sequence. When the user hits a pad, the robot responds with
+      a contextually appropriate counter-punch:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">User Hits</th>
+          <th style="padding:8px; border:1px solid #ddd;">Robot Responds With</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Centre pad</td>
+          <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Left pad</td>
+          <td style="padding:8px; border:1px solid #ddd;">Left Hook or Left Uppercut</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Right pad</td>
+          <td style="padding:8px; border:1px solid #ddd;">Right Hook or Right Uppercut</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Head pad</td>
+          <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      A 300ms cooldown prevents rapid-fire counters, and the robot returns to guard position
+      after 5 seconds of inactivity.
     </p>
 
     <sl-divider></sl-divider>
@@ -294,82 +401,209 @@
     <!-- 5.3.2.4 LLM COACH -->
     <h2>5.3.2.4 LLM Coach</h2>
 
-    <h3>Model & Deployment</h3>
     <p>
-      Qwen2.5-3B-Instruct, quantised to GGUF Q4_K_M (~2GB), running via llama-cpp-python with full GPU
-      offload. Inference completes in 0.5&ndash;2 seconds with a 2048-token context window and 128-token
-      generation limit.
+      A local AI coach runs entirely on the Jetson &mdash; no cloud, no internet &mdash; providing
+      personalised boxing guidance in three modes: real-time tips during training, post-session
+      analysis, and interactive chat via the phone dashboard.
     </p>
 
-    <h3>System Prompt & Coaching Modes</h3>
+    <h3>Why Local LLM?</h3>
     <p>
-      A 24-line embedded system prompt instructs the model to act as "BoxBunny AI Coach" with knowledge of
-      all 6 punch types, 5 boxing styles, and AIBA methodology. Tips are kept to 1&ndash;2 sentences in plain
-      text. Three prompt keys serve different contexts: real-time tips during active rounds, post-session
-      analysis, and interactive chat.
-    </p>
-    <p>
-      A standalone PySide6 chat GUI was built for iterative prompt tuning during development, featuring
-      streaming token display, model selection, and conversation history.
+      Cloud-based AI coaching would add network latency and require stable internet &mdash; neither
+      is guaranteed in a gym environment. Running the LLM on-device ensures instant responses,
+      zero dependency on external services, and complete privacy of training data. The challenge
+      was fitting a capable language model alongside the CV pipeline within the Jetson's 16GB
+      shared memory.
     </p>
 
-    <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM Tuning and Chat Interface"></image-component>
+    <h3>Model Selection &amp; Deployment</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <tbody>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:180px;">Model</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">Qwen2.5-3B-Instruct &mdash; chosen for instruction-following ability at small size</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Quantisation</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">GGUF Q4_K_M (~2GB) &mdash; fits alongside CV models in shared GPU memory</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Runtime</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">llama-cpp-python with full GPU offload</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Response time</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">0.5&ndash;2 seconds per response</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Context window</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">2,048 tokens</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Generation limit</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">128 tokens (prevents cut-off mid-sentence)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Three Coaching Modes</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Mode</th>
+          <th style="padding:8px; border:1px solid #ddd;">When</th>
+          <th style="padding:8px; border:1px solid #ddd;">What It Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Real-time tips</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Every ~18 seconds during active rounds</td>
+          <td style="padding:8px; border:1px solid #ddd;">1&ndash;2 sentence coaching tips based on recent punches, combo progress, and session stats. Displayed on the GUI's CoachTipBar widget.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Post-session analysis</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">After session completes</td>
+          <td style="padding:8px; border:1px solid #ddd;">2&ndash;3 paragraph detailed analysis referencing specific metrics (punch count, power trends, weak areas). Can suggest specific drills via structured tags.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Interactive chat</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Anytime via phone dashboard</td>
+          <td style="padding:8px; border:1px solid #ddd;">Full conversation with the AI coach. Users can ask technique questions, request training plans, or get explanations of their stats. Word-by-word streaming display.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The system also includes personality modes to keep interactions engaging &mdash; an
+      <strong>advice mode</strong> for motivational pep talks and encouragement, and a
+      <strong>Singlish mode</strong> that responds in Singaporean colloquial English, adding
+      local flavour to the coaching experience. These modes are selectable via the chat
+      interface and demonstrate the flexibility of the system prompt approach.
+    </p>
+
+    <h3>System Prompt Design</h3>
+    <p>
+      A 24-line embedded system prompt instructs the model to act as "BoxBunny AI Coach" with
+      knowledge of all 6 punch types and their codes, 5 boxing styles (European, Russian,
+      American, Cuban, hybrid), and AIBA methodology. The prompt enforces plain text output
+      (no markdown formatting) and adjusts advice depth to the user's skill level
+      (beginner/intermediate/advanced). Different system prompt keys are used for each of
+      the three coaching modes.
+    </p>
+
+    <h3>Inference Parameters &amp; Tuning</h3>
+    <p>
+      The following parameters were tuned during development to balance response quality,
+      speed, and coherence:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+          <th style="padding:8px; border:1px solid #ddd;">Value</th>
+          <th style="padding:8px; border:1px solid #ddd;">Why This Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Temperature</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">0.7</td>
+          <td style="padding:8px; border:1px solid #ddd;">Balances variety with coherence &mdash; lower values produced repetitive tips, higher values caused off-topic responses</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Max tokens</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">128</td>
+          <td style="padding:8px; border:1px solid #ddd;">Keeps real-time tips to 1&ndash;2 sentences &mdash; prevents mid-sentence cut-offs within the generation budget</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Context window</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2,048</td>
+          <td style="padding:8px; border:1px solid #ddd;">Large enough to fit system prompt + session stats + knowledge base context without exceeding memory</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">GPU layers</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">All (-1)</td>
+          <td style="padding:8px; border:1px solid #ddd;">Full GPU offload for fastest inference &mdash; CPU fallback too slow for real-time tips</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Inference timeout</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">20s</td>
+          <td style="padding:8px; border:1px solid #ddd;">If inference hangs (GPU contention, model issue), the system serves a fallback tip instead of waiting indefinitely</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      A standalone PySide6 chat GUI (<code>llm_chat_gui.py</code>) was built for iterative
+      prompt tuning. It supports streaming token display, model selection, configurable
+      system prompts, and sentence completion detection &mdash; used extensively to refine
+      coaching quality before deployment.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>
 
     <h3>Boxing Knowledge Base</h3>
     <p>
-      17 documents sourced from official AIBA manuals plus custom-written content, injected into the LLM
-      context for sport-specific terminology:
+      To ground the LLM's responses in real boxing expertise, 17 documents are injected into its
+      context during coaching analysis:
     </p>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
           <th style="padding:8px; border:1px solid #ddd;">Category</th>
-          <th style="padding:8px; border:1px solid #ddd;">Documents</th>
-          <th style="padding:8px; border:1px solid #ddd;">Source</th>
+          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Docs</th>
+          <th style="padding:8px; border:1px solid #ddd;">Content</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Techniques</td>
-          <td style="padding:8px; border:1px solid #ddd;">5</td>
-          <td style="padding:8px; border:1px solid #ddd;">Jab, cross, hooks, uppercuts, stance</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
+          <td style="padding:8px; border:1px solid #ddd;">Jab, cross, hooks, uppercuts, stance &amp; guard</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Defence</td>
-          <td style="padding:8px; border:1px solid #ddd;">3</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
           <td style="padding:8px; border:1px solid #ddd;">Blocking, slipping, footwork</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Combinations</td>
-          <td style="padding:8px; border:1px solid #ddd;">3</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
           <td style="padding:8px; border:1px solid #ddd;">Beginner to advanced progressions</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Training Plans</td>
-          <td style="padding:8px; border:1px solid #ddd;">2</td>
-          <td style="padding:8px; border:1px solid #ddd;">8-week programmes</td>
+          <td style="padding:8px; border:1px solid #ddd;">Training plans</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+          <td style="padding:8px; border:1px solid #ddd;">8-week beginner &amp; intermediate programmes</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Other</td>
-          <td style="padding:8px; border:1px solid #ddd;">4</td>
-          <td style="padding:8px; border:1px solid #ddd;">Conditioning, mistakes, coaching, FAQ</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
+          <td style="padding:8px; border:1px solid #ddd;">Conditioning, common mistakes, coaching, FAQ</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Reference</td>
-          <td style="padding:8px; border:1px solid #ddd;">2</td>
-          <td style="padding:8px; border:1px solid #ddd;">AIBA Coaches Manual, APB Manual</td>
+          <td style="padding:8px; border:1px solid #ddd;">Official references</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+          <td style="padding:8px; border:1px solid #ddd;">AIBA Coaches Manual (2015), APB Manual (2017)</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>Reliability</h3>
+    <h3>Reliability &amp; Fallback</h3>
     <p>
-      Short max_tokens (128), explicit brevity instructions, a 20-second inference timeout, and markdown
-      stripping ensure complete, clean responses. When the LLM is unavailable or times out, 65 pre-written
-      tips across 4 categories (technique, encouragement, correction, suggestion) are served instead. The
-      system attempts a model reload after 3 consecutive failures.
+      Several mechanisms ensure the coach never fails silently:
     </p>
+    <ul>
+      <li><strong>Response quality</strong> &mdash; 128-token limit prevents cut-offs, explicit "keep tips SHORT" instruction, markdown stripping removes formatting artifacts</li>
+      <li><strong>Timeout protection</strong> &mdash; 20-second hard timeout on a background thread prevents the coach from blocking the system</li>
+      <li><strong>Fallback tips</strong> &mdash; 65 pre-written tips across 4 categories (technique, encouragement, correction, suggestion) are served when the LLM is unavailable, the model file is missing, or GPU memory runs out</li>
+      <li><strong>Auto-recovery</strong> &mdash; the system tracks consecutive failures and attempts a model reload after 3 failures in a row</li>
+    </ul>
 
     <sl-divider></sl-divider>
 
@@ -377,18 +611,19 @@
     <h2>5.3.2.5 Session Management</h2>
 
     <p>
-      The <strong>session_manager</strong> node orchestrates the training session lifecycle through a 5-state
-      machine. The diagram below shows how each state triggers coordinated behaviour changes across IMU mode,
-      CV frame rate, robot control, and data collection.
+      Every other node on this page &mdash; fusion, inference, sparring, LLM &mdash; needs to know
+      whether a training session is active, resting, or idle. The <strong>session_manager</strong>
+      node is the single source of truth for this, coordinating all nodes through a 5-state machine:
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/ros/session_state_machine.svg" subtitle="Figure: Session State Machine — 5 states coordinating all system nodes"></image-component>
 
     <p>
-      The default cycle runs 3 rounds of 180s work + 60s rest, fully configurable. On session completion, a
-      SessionPunchSummary (20+ fields covering punch distribution, force, movement, defence, and sensor
-      statistics) is saved to the per-user SQLite database. Concurrent session protection forces a reset if a
-      new session is started while one is already active.
+      The default cycle runs 3 rounds of 180s work + 60s rest, but rounds, durations, and rest
+      periods are all configurable per session. When a session completes, a comprehensive summary
+      is saved to the user's database &mdash; capturing everything from punch counts and force
+      levels to movement patterns and defence rates. This data powers the trend analysis and
+      AI coach insights on the <a href="robot-intelligence-software.html">Dashboard</a>.
     </p>
 
     <sl-divider></sl-divider>
