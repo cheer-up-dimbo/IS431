@@ -104,7 +104,7 @@
       only the frames seen so far (causal inference). It also needs to handle the natural variation
       in punch speed: a fast jab and a slow hook look very different at any given point in their
       trajectory, so the model must be temporally flexible rather than relying on a fixed-length window.
-      This is why a <strong>causal Transformer</strong> architecture was chosen &mdash; its attention
+      This is why a <strong>causal Transformer</strong> architecture (Vaswani et al., 2017) was chosen &mdash; its attention
       mechanism can dynamically weigh recent and earlier frames to capture both fast and slow motions.
     </p>
 
@@ -271,7 +271,7 @@
 
     <h3>Pose Branch &mdash; Body Joint Tracking</h3>
     <p>
-      A YOLO pose estimation model (<code>yolo26n-pose.pt</code>) detects 7 upper-body joints
+      A YOLO pose estimation model (Jocher et al., 2023) detects 7 upper-body joints
       (nose, shoulders, elbows, wrists) from the RGB camera image. From these joint positions,
       42 features are computed: normalised coordinates, confidence scores, arm extension ratios,
       shoulder rotation, elbow bend angles, and joint velocities. The same YOLO model is used
