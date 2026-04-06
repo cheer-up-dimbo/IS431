@@ -12,8 +12,21 @@
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
   <script type="module" src="../../../components/image/image-component.js"></script>
   <style>
-    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; text-align: left; }
     .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+    .math-block {
+      background-color: #f8f9fa;
+      border-left: 4px solid #1a73e8;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.95rem;
+      color: #333;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
   </style>
   <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
@@ -29,122 +42,128 @@
 
     <h2>Mechanical Design</h2>
     <p>
-      This page documents the mechanical architecture, outboard structural support, and the gear reduction calculations that drive the yaw rotation stage.
+      The mechanical design of the rotation subsystem evolved through several iterations, each addressing a different engineering problem. The earliest concern was how to generate realistic yaw motion while keeping the robot stable under punching. Once the need for a dedicated yaw stage had been established, the design progressed through bearing selection, drive packaging, timing-belt sizing, and support refinement.
     </p>
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. DESIGN ITERATIONS                                  -->
-    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Phase 1 -->
     <div>
-      <h3>1. Design Iterations</h3>
+      <h3>Phase 1: Transition from geared to non-geared slewing ring</h3>
       <p>
-        The mechanical design of the rotation subsystem evolved through several iterations, each addressing a different engineering problem. The earliest concern was how to generate realistic yaw motion while keeping the robot structurally stable under punching. Once the need for a dedicated yaw stage was established, the design progressed through bearing selection, drive packaging, timing-belt sizing, and support refinement.
-      </p>
-
-      <h4>Phase 1: Initial integrated geared slewing-ring concept</h4>
-      <p>
-        The earliest serious concept used a <strong>large integrated geared slewing ring (011.25.400)</strong> with direct pinion drive. This was attractive because one component would provide both the rotary support and the drive interface. Structurally it was strong, but it proved too heavy, too difficult to handle, too costly, and too demanding in motor torque and power. It became clear that the yaw stage needed to be designed for <strong>appropriate capability</strong>, not maximum theoretical performance.
-      </p>
-
-      <h4>Phase 2: Transition to a smaller non-geared slewing ring</h4>
-      <p>
-        After the oversized geared concept was rejected, the design moved to the <strong>010.10.120 non-geared slewing ring</strong>. This separated the problem of <strong>load carrying</strong> from the problem of <strong>torque transmission</strong>. The bearing still provides the required combined-load support, but with far lower mass and much better handling at prototype scale, turning the yaw stage into a more modular subsystem.
-      </p>
-
-      <h4>Phase 2A: Inner-ring versus outer-ring rotation decision</h4>
-      <p>
-        After the non-geared slewing ring had been selected, a further integration question arose: whether the inner ring or the outer ring should be used as the driven rotating member.
+        The earliest serious concept used a <strong>large integrated geared slewing ring</strong>, specifically the <strong>011.25.400</strong> concept, with direct pinion drive. This was attractive because one component would provide both the rotary support and the drive interface. Structurally it was strong, but it proved too heavy, too costly, and too demanding in motor torque and power. It therefore became clear that the yaw stage needed to be designed for <strong>appropriate capability</strong>, not maximum theoretical performance.
       </p>
       <p>
-        Both options were mechanically possible, but they led to different packaging and structural consequences. Rotating the outer ring would push more of the rotating interface toward the perimeter of the base, increasing packaging difficulty for the external drive and potentially complicating the relationship between the rotating structure and the fixed support frame. In contrast, rotating the inner ring allowed the upper robot structure to be treated more naturally as a single controlled rotating body, with the outer ring remaining fixed to the welded base.
+        After the oversized geared concept was rejected, the design moved to the <strong>010.10.120 non-geared slewing ring</strong>. This separated the problem of <strong>load carrying</strong> from the problem of <strong>torque transmission</strong>. The bearing still provides the required combined-load support, but with far lower mass and much better handling at prototype scale. This was a major improvement because it turned the yaw stage into a more modular subsystem.
       </p>
-      <p>
-        The inner-ring-driven approach was therefore preferred because it provided a cleaner integration path for the timing-belt drive, reduced unnecessary outward bulk at the base perimeter, and simplified the structural relationship between the rotating top assembly and the fixed lower frame. This decision was not only about convenience; it helped make the final yaw stage more compact, more modular, and easier to integrate with the rest of the lower mechanism.
-      </p>
-
-      <h4>Phase 3: Fixed-base off-axis motor and external drive strategy</h4>
-      <p>
-        Once the non-geared bearing was selected, the drive strategy moved toward an <strong>off-axis motor mounted on the fixed base</strong>, driving the rotating stage through an external transmission. This keeps motor mass off the rotating structure, simplifies wiring, makes the drive easier to service, and fits more naturally into the welded-base architecture than a direct coaxial drive.
-      </p>
-
-      <h4>Phase 4: Timing-belt and pulley design</h4>
-      <p>
-        The timing-belt stage was then sized as a real engineered transmission. The drive used a 400 W BLDC motor with a 25:1 gearbox, outputting 120 rpm. Calculations established the pitch length, belt width, and a practical pulley ratio of 3:1 to accommodate geometric packaging constraints.
-      </p>
-
-      <h4>Phase 5: Outboard support and stability refinement</h4>
-      <p>
-        As the rotating stage matured, the next challenge was to improve edge stiffness under off-axis loading. This led to the addition of <strong>cam-follower rollers</strong> around the outer edge of the rotating top. These improve the effective support radius and reduce local rocking at the plate edge under elevated strikes. They do not replace the central bearing, but refine the way overturning effects are supported.
-      </p>
-
-      <image-component
-        width="80%" tag="image"
-        source="../../../assets/Lower_mechanism/9bottom integration - orientation movement.png"
-        subtitle="Figure: Outboard cam-follower supports increasing the effective moment arm against tilting.">
-      </image-component>
-
-      <h4>Phase 6: Final base-level packaging</h4>
-      <p>
-        The final rotation subsystem was packaged into the welded base as a <strong>load-bearing, transport-aware module</strong>. The bearing remains central, the drive remains off-axis on the fixed frame, the cam followers stabilise the rotating plate, and the rear transport integration is kept away from the user's main footwork zone. This turns the yaw stage from a simple rotary plate into a coherent structural layer of the whole robot.
-      </p>
-      
-      <image-component
-        width="80%" tag="image"
-        source="../../../assets/Lower_mechanism/5rotation motion - cad.png"
-        subtitle="Figure: Final base-level packaging of the rotational motion mechanism showing the slewing bearing, drive system, and low-profile frame.">
-      </image-component>
+      <div style="display: flex; gap: 16px; align-items: flex-start; margin-top: 24px;">
+        <div style="flex: 1;">
+          <image-component
+            tag="image"
+            source="../../../assets/robot_mechanism/large geared slewing drive system.png"
+            subtitle="Figure: Initial integrated geared slewing-ring concept">
+          </image-component>
+        </div>
+        <div style="flex: 1;">
+          <image-component
+            width="81%"
+            tag="image"
+            source="../../../assets/robot_mechanism/small nongeared slewing.png"
+            subtitle="Figure: Smaller non-geared slewing ring concept">
+          </image-component>
+        </div>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. FINAL DESIGN STATE                                 -->
-    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Phase 2 -->
     <div>
-      <h3>2. Final Design State</h3>
-      <p>The final rotation subsystem can therefore be summarised as follows:</p>
+      <h3>Phase 2: Fixed-base off-axis drive with inner-ring rotation</h3>
+      <p>
+      The non-geared bearing simplified load carrying, but required a drive strategy. An <strong>off-axis motor on the fixed base</strong> driving through an <strong>external timing-belt transmission</strong> was chosen over coaxial drive because it:
+      </p>
       <ul>
-        <li>it is a <strong>low-profile yaw module</strong> operating on <strong>decoupled axes</strong>,</li>
-        <li>it uses a <strong>010.10.120 non-geared slewing ring</strong> to support combined loads,</li>
-        <li>torque is transmitted via a <strong>modular timing-belt drive</strong> (3:1 ratio, S8M belt),</li>
-        <li><strong>cam-follower edge supports</strong> provide additional tilt stabilisation under off-axis punches,</li>
-        <li>and it is packaged into a <strong>welded base frame</strong> with integrated rear transport wheels.</li>
+      <li>Keeps motor mass off the rotating structure, reducing inertia and simplifying wiring</li>
+      <li>Avoids the complexity and routing challenges of a hollow central shaft</li>
+      <li>Maintains a low-profile base that doesn't obstruct footwork</li>
+      <li>Packages cleaner around the base periphery</li>
+      <li><strong>Acts as a mechanical fuse:</strong> permits elastic give after the gearhead to protect the motor from shock loads</li>
+      <li><strong>Tolerates mounting clearances:</strong> is more forgiving of fabricated base tolerances than a rigid gear mesh</li>
       </ul>
+      <p>
+      The inner ring was driven rather than the outer ring because driving the outer ring would push rotating interfaces outward, complicating packaging and increasing base perimeter bulk. The inner-ring solution treats the upper robot structure as a single controlled rotating body while keeping the outer ring fixed to the base, resulting in a cleaner mechanical load path, a more concentric rotating assembly, and optimised torque availability under loads.
+      </p>
+    </div>
 
-      <h4>Hardware Component Specifications</h4>
-      <table class="is431-table" style="width:100%; border-collapse:collapse; margin:16px 0;">
-        <thead>
-          <tr>
-            <th style="width: 25%;">Component</th>
-            <th style="width: 30%;">Specification</th>
-            <th style="width: 45%;">Function</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Yaw Bearing</td>
-            <td>010.10.120 Slewing Ring</td>
-            <td>Provides primary axial, radial, and moment support for the upper body.</td>
-          </tr>
-          <tr>
-            <td>Drive Motor</td>
-            <td>Z55BLD400-24GU (400 W BLDC, 25:1)</td>
-            <td>Generates necessary torque for yaw rotation and dynamic disturbance rejection.</td>
-          </tr>
-          <tr>
-            <td>Transmission</td>
-            <td>S8M Timing Belt (30 mm width)</td>
-            <td>Transmits motor torque to the rotating platform with minimal backlash.</td>
-          </tr>
-          <tr>
-            <td>Tilt Support</td>
-            <td>Cam-Follower Roller Bearings</td>
-            <td>Increases the effective support radius to resist off-axis punching moments.</td>
-          </tr>
-        </tbody>
-      </table>
+    <sl-divider></sl-divider>
+
+    <!-- Phase 3 -->
+    <div>
+      <h3>Phase 3: Timing-Belt and Pulley Design</h3>
+      <p>
+        The selection of the timing-belt pulleys influenced the mechanical design of the base directly, rather than only affecting the transmission ratio. Once the drive converged to an S8M system with a 20-tooth motor pulley, 70-tooth driven pulley, 32 mm belt width, and an inter-shaft distance of approximately 289.0 mm, these parameters fixed the spatial envelope of the yaw-drive system and therefore constrained the layout of the welded base.
+      </p>
+      <p>
+        The base had to provide sufficient radial clearance for the driven pulley, a correctly positioned and sufficiently stiff motor-mounting region, and adequate width and rigidity to maintain shaft parallelism and belt alignment under load. In this way, the pulley selection shaped not only rotational performance, but also the geometry, stiffness, packaging, and serviceability of the base structure itself. This manifested in several key base-design consequences:
+      </p>
+      <ul>
+        <li><strong>Height Profile:</strong> The height profile of the welded base feet was directly influenced by the height of the pulleys and the required clearance for the 32 mm wide belt, ensuring the system remained low-profile.</li>
+        <li><strong>Drive System Position:</strong> The pulley dimensions and belt routing requirements dictated positioning the drive system above the base plate rather than below it, keeping it accessible and clear of floor debris.</li>
+        <li><strong>Motor Mounting and Centre Distance:</strong> The calculated inter-shaft distance (289.0 mm) determined the exact motor mounting hole placements. The base required a dedicated, highly stiff motor-mount region at this specific radius from the rotating axis, and the surrounding welded members had to be spaced to leave enough room for installation, belt tensioning, and maintenance access.</li>
+        <li><strong>Off-Axis Drive Reinforcement:</strong> Because the pulley system became relatively large, it made more mechanical sense to keep the motor fixed on the stationary base instead of attaching it to the rotating structure. This kept the motor mass off the rotating stage, significantly lowered the rotating inertia, simplified the wiring, and allowed the heavy base frame to act as the natural reaction structure for both belt tension and motor torque.</li>
+      </ul>
+      <div style="margin-top: 20px; text-align: left;">
+        <a href="timing-belt-selection.html">
+          <sl-button variant="primary" outline>
+            <sl-icon slot="prefix" name="calculator"></sl-icon>
+            View Detailed Timing Belt Calculations
+          </sl-button>
+        </a>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- Phase 4 -->
+    <div>
+      <h3>Phase 4: Outboard support and stability refinement</h3>
+      <p>
+        As the rotating stage matured, the next challenge was to improve edge stiffness under off-axis loading (particularly hooks and angled straights). This led to the addition of <strong>discrete perimeter cam-follower roller assemblies</strong>. Cam followers are stud-type roller bearings mounted at equally spaced positions around the outer edge of the rotating platform, rolling against a machined track on the fixed base structure. They do not replace the central bearing, but rather refine the way overturning effects are supported:
+      </p>
+      <ul>
+        <li><strong>Tilt stabilisation:</strong> The cam followers prevent the platform from tilting under off-axis loads. When a punch creates a rocking moment, the opposite cam follower engages its track and reacts the tilt force.</li>
+        <li><strong>Increased effective support radius:</strong> By placing the cam followers at a larger radius than the slewing bearing, the effective moment arm for tilt resistance is increased, significantly reducing the reaction forces on each individual element.</li>
+        <li><strong>Load sharing:</strong> Static and dynamic loads are distributed between the central bearing and the perimeter supports, extending bearing life and avoiding the need for a massively oversized central bearing.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- Phase 5 -->
+    <div>
+      <h3>Phase 5: Final base-level mechanical stacking</h3>
+      <p>
+        The final rotation subsystem was then packaged into the welded base as a <strong>load-bearing, transport-aware module</strong>. The bearing remains central, the drive remains off-axis on the fixed frame, the cam followers stabilise the rotating plate, and the rear transport integration is kept away from the user's main footwork zone. This is what turns the yaw stage from a simple rotary plate into a coherent structural layer of the whole robot.
+      </p>
+      <p>
+        This is achieved by packaging the stage within a <strong>low-profile welded steel frame</strong> that serves multiple functions:
+      </p>
+      <ul>
+        <li><strong>Bearing &amp; Motor Mount:</strong> Ensures proper alignment and load transfer for the slewing ring, while holding the BLDC servo motor at the precise centre distance for belt tension.</li>
+        <li><strong>Cam-follower Track &amp; Belt Routing:</strong> Provides the bearing surface for the perimeter rollers and clear pathways for belt installation and adjustment.</li>
+      </ul>
+      <p>
+        Keeping this frame as low-profile as possible ensures the slewing bearing remains near the ground (where it can best resist overturning moments) and preserves vertical space for the height-adjustment column above. Furthermore, the integration was designed so that all fasteners are accessible from above or the sides, allowing the rotation module to be serviced without full robot disassembly.
+      </p>
+      <image-component
+        tag="image"
+        source="../../../assets/robot_mechanism/rotating base section view.png"
+        subtitle="Figure: Section view of the rotational base highlighting the stacked mechanical arrangement.">
+      </image-component>
+      <p>
+        Understanding this physical stack is critical because it dictates how forces flow through the system. When a punch lands on the elevated upper body, the resulting overturning moments and radial forces must be transmitted down through this exact mechanical arrangement: from the central slewing bearing and outboard cam-followers, through the drive components, and ultimately into the welded base. The next section, <strong>Load Analysis</strong>, details how these structural loads and drive-side torques were quantified to ensure the mechanism remains both safe and responsive under worst-case boxing conditions.
+      </p>
     </div>
 
     <sl-divider></sl-divider>

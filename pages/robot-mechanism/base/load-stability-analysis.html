@@ -237,7 +237,7 @@
         <div class="calc-body">
           <p style="margin-top: 0;">The key design requirement is that the restoring moment must exceed the overturning moment by a sufficient margin:</p>
           <div class="equation-box success">
-            M<sub>R</sub> / M<sub>OT</sub> &ge; 1.5
+            FoS = M<sub>R</sub> / M<sub>OT</sub> &ge; 1.5
           </div>
           <p style="margin-bottom: 0;">
             This expresses the requirement that the restoring moment exceed the overturning moment with a factor of safety of at least <strong>1.5</strong>.
@@ -331,6 +331,22 @@
       </div>
 
       <div class="calc-card">
+        <div class="calc-header">Phase 1: Required CoG Offset &amp; Footprint Length</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">To ensure the robot remains stable without tipping over, the required horizontal distance between the CoG and the rear pivot edge (<em>b<sub>min</sub></em>) is determined from moment equilibrium and the target factor of safety (FoS &ge; 1.5):</p>
+          <div class="equation-box">
+            b<sub>min</sub> = (FoS<sub>target</sub> &times; F<sub>back</sub> &times; h) / W
+          </div>
+          <p>To convert this into a minimum board footprint length (<em>L<sub>min</sub></em>) for a rear-edge pivot, we use the CAD-measured CoG position from the front edge (<em>x<sub>CoG,front</sub></em> = 0.492 m):</p>
+          <div class="equation-box">
+            L<sub>min</sub> = x<sub>CoG,front</sub> + b<sub>min</sub><br>
+            L<sub>min</sub> = 0.492 + (1.5 &times; 1.1 / 519.93) &times; F<sub>back</sub> &approx; 0.492 + 0.00317 &times; F<sub>back</sub>
+          </div>
+          <p style="margin-bottom: 0;">If the measured backward-directed operational load is approximately 229 N, then <em>L<sub>min</sub></em> &approx; 1.22 m, which precisely matched the 1220 mm Fair-stage board length used.</p>
+        </div>
+      </div>
+
+      <div class="calc-card">
         <div class="calc-header">Phase 1: Required vs. Achieved Load Tolerance</div>
         <div class="calc-body">
           <p style="margin-top: 0;">To determine the maximum allowable backward-directed load at the target FoS (1.5):</p>
@@ -341,7 +357,7 @@
             F<sub>back,allow</sub> = (519.93 N &times; 0.728 m) / (1.5 &times; 1.1 m) &approx; <strong>229 N</strong>
           </div>
           <p style="margin-bottom: 0;">
-            This static limit of 229 N initially appears critically low compared to the 2.7 kN design load. However, a highly conservative static model assumes full horizontal load transfer at maximum height. In reality, a boxing punch is fundamentally a short-duration <strong>impulse</strong> (typically lasting 10–20 milliseconds), not a continuous static push. While the peak force reaches 2.7 kN, its duration provides insufficient kinetic energy to physically rotate the robot's CoG past the tipping pivot before the force dissipates. Supported by prototype observation, this geometry provided adequate margin to prevent observable tip-over during Fair operation.
+            This static continuous limit of 229 N initially appears low compared to the <strong>1.35 kN operational dynamic load</strong>. However, a static model assumes a continuous push. In reality, a boxing punch is fundamentally a short-duration <strong>impulse</strong> (lasting ~15 milliseconds). A 1.35 kN peak force applied over 15 ms transfers less kinetic energy than a 229 N continuous force applied over a tenth of a second. Because the punch dissipates long before it can physically accelerate the robot's CoG past the tipping pivot, this geometry successfully prevented tip-over during Fair operation.
           </p>
         </div>
       </div>
@@ -369,12 +385,16 @@
             M<sub>o</sub> = F &times; h
           </div>
           <p>
-            For Phase 2, the backward-directed force magnitude used for tipping assessment reflects the final agreed credible operational case, while the higher structural design punch load remains the basis for strength sizing of components.
+            For Phase 2, the backward-directed force magnitude used for tipping assessment reflects the <strong>1.35 kN operational dynamic punch</strong>. As proven in Phase 1, the dynamic impulse of this strike is comfortably absorbed by the base. With the final mass increasing to ~105 kg, the equivalent continuous static tipping threshold is massively increased, meaning it remains safely immune to the 1.35 kN impulse.
           </p>
           
           <p><strong>Restoring Moment Calculation:</strong></p>
           <div class="equation-box">
             M<sub>r</sub> = W &times; b
+          </div>
+          <p><strong>Factor of Safety:</strong></p>
+          <div class="equation-box success">
+            FoS = M<sub>r</sub> / M<sub>o</sub> &ge; 1.5
           </div>
           <p style="margin-bottom: 0;">
             The Phase 2 base design (with an <strong>increased system mass estimated at ~105 kg</strong>) significantly increases the restoring moment margin through a wider support polygon and a lower CoG compared to the Fair-stage prototype. The final build acceptance criterion remains <strong>FoS &ge; 1.5</strong> under the defined operational load case.
@@ -385,6 +405,14 @@
       <p>
         Compared with the Fair-stage prototype, the final welded base provides vastly improved stability due to increased structural stiffness, more controlled mass placement, and a significantly more robust support polygon.
       </p>
+
+      <h4>Remaining Analytical Gaps</h4>
+      <ul>
+        <li>Continuous updating of the final centre of mass as more hardware is installed.</li>
+        <li>Verification of the tipping calculation using the exact support polygon of the final welded base-feet assembly.</li>
+        <li>Confirmation that the tip-and-roll transport mode does not compromise stability during handling.</li>
+        <li>Comparison of the analytical tipping model against experimental behaviour for full-system confirmation.</li>
+      </ul>
     </div>
 
     <sl-divider></sl-divider>

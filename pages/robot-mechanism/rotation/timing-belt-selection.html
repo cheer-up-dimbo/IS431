@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Timing Belt System Selection</title>
+  <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
+  <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <style>
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; text-align: left; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+    .math-block {
+      background-color: #f8f9fa;
+      border-left: 4px solid #1a73e8;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.95rem;
+      color: #333;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../rotation.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Rotation Subsystem
+      </sl-button>
+    </a>
+    <br>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="margin: 0;">Timing Belt System Selection</h2>
+      <a href="mechanical-design.html" title="Close and return to Mechanical Design">
+        <sl-icon-button name="x-lg" style="font-size: 1.5rem; color: #555;"></sl-icon-button>
+      </a>
+    </div>
+    <br>
+
+    <p>
+      This section documents the rigorous industrial-style selection process used to define the timing-belt transmission. The geometric and packaging constraints established here directly governed the final layout, motor mounting, and structural profile of the base.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Motor Specifications</h3>
+      <p>
+        The drive calculations and hardware selection were based on motor parameters from a standard 400 W ZD-series unit with a 5GU25KB gearbox. This motor was chosen as it is a readily available school inventory item that provides substantial low-speed torque.
+      </p>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="width: 40%;">Parameter</th>
+            <th>Specification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Model</strong></td><td>755BLD 400-24GU, 5GU, 25KB</td></tr>
+          <tr><td><strong>Rated Power</strong></td><td>400 W (24 V)</td></tr>
+          <tr><td><strong>Rated Speed</strong></td><td>3000 RPM (before gear reduction)</td></tr>
+          <tr><td><strong>Gearhead</strong></td><td>5GU25KB with a <strong>1:25 Gear Ratio</strong></td></tr>
+          <tr><td><strong>Output Shaft Speed</strong></td><td>120 RPM (after gear reduction)</td></tr>
+          <tr><td><strong>Output Torque</strong></td><td>32 Nm (Allowance Torque: 20.0 Nm)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Torque Analysis Requirements</h3>
+      <p>The rotating base is subject to three primary torque components: belt resistance/deformation, steady conformal rotation against friction, and holding/stall torque. The drive system must generate sufficient startup torque to reliably overcome:</p>
+      <ul>
+        <li>Acceleration and deceleration of the heavy horizontal structure.</li>
+        <li>Low-velocity positioning demands.</li>
+        <li>Deceleration and resistance during sudden contact scenarios (punches).</li>
+      </ul>
+      <p>Estimates place the maximum stall rotation torque at approximately ~102 Nm. The motor's 30 Nm allowance torque multiplied by the timing belt's transmission ratio ensures these operational demands are comfortably met.</p>
+
+      <h3>Belt vs Gear Drive Rationale</h3>
+      <p>A timing belt was explicitly chosen over a direct gear drive because it provides several mechanical advantages in a punch-receiving environment:</p>
+      <ul>
+        <li><strong>Mechanical Fuse:</strong> The belt permits elastic give under shock loads, protecting the motor and gearhead from catastrophic damage.</li>
+        <li><strong>Tolerance Forgiveness:</strong> It tolerates upper-spec clearances and is much more forgiving of motor mounting tolerances on a welded frame than a rigid gear mesh.</li>
+        <li><strong>Cost &amp; Maintenance:</strong> Lower reflected costs and easier replacement of parts without full teardowns.</li>
+      </ul>
+
+      <h3>Tooth Profile Selection</h3>
+      <p>Before standardising on the S8M series, different tooth profiles were evaluated:</p>
+      <ul>
+        <li><strong>AT-Series (e.g., AT5/AT10):</strong> Designed for high-precision system control with a trapezoidal profile. While ideal for exact positioning, it is less optimal for absorbing impulsive shock loads.</li>
+        <li><strong>HTD / S8M Series:</strong> Designed for high-torque, heavy-duty applications. This profile was selected because it offers large modular stiffness and superior shock absorption, matching the dynamic punching environment.</li>
+      </ul>
+
+      <h3>Step 1: Required Speed Ratio</h3>
+      <p>The original yaw-speed target was approximately 25 RPM. Using the 120 RPM output from the motor gearbox, the ideal required kinematic ratio was calculated as:</p>
+      <div class="math-block">i = n<sub>in</sub> / n<sub>out</sub> = 120 / 25 = 4.8
+i = Z<sub>large</sub> / Z<sub>small</sub> &approx; 4.8</div>
+      <p>This established a target reduction of <strong>4.8:1</strong> for the belt stage.</p>
+
+      <h3>Step 2: Design Power</h3>
+      <p>The belt must be sized not just for the motor's nominal power, but for the design power (P<sub>d</sub>) using an overload service factor (K<sub>s</sub>) of 2.2 to account for start/stop transients and the impulsive nature of punch resistance:</p>
+      <div class="math-block">P<sub>d</sub> = P<sub>t</sub> &times; K<sub>s</sub> = 400 W &times; 2.2 = 880 W = 0.88 kW</div>
+
+      <h3>Step 3: Belt Series Selection</h3>
+      <p>
+        Candidate series from standard Misumi selection guides (H, S8M, P8M600, MTS8M, UP8M, EV5GT) were evaluated. The <strong>S8M series</strong> was selected because its 8 mm pitch provides excellent high-torque transmission capabilities while remaining flexible enough for the required wrap angles in our spatial envelope.
+      </p>
+
+      <h3>Step 4: Pulley Selection &amp; Final Ratio</h3>
+      <p>
+        Based on the allowable minimum number of teeth at 120 RPM for the S8M series to prevent extreme bending stress on the belt, a <strong>20-tooth small pulley</strong> was selected. For the large pulley, physical packaging constraints inside the 110 mm inner ring dimension of the slewing bearing mandated a <strong>70-tooth pulley</strong> to match the slewing-bearing inner-ring geometry and allow screw-through fastening into the threaded mounting holes.
+      </p>
+      <div class="math-block">Small Pulley (20T) Pitch Diameter: d<sub>p</sub> = (8 &times; 20) / &pi; = 50.93 mm
+Large Pulley (70T) Pitch Diameter: D<sub>p</sub> = (8 &times; 70) / &pi; = 178.25 mm
+
+Final Speed Ratio: <strong>1:3.5</strong> (Revised from 4.8:1 due to spatial constraints)</div>
+
+      <h3>Step 5: Belt Length &amp; Centre Distance</h3>
+      <p>With an approximate initial desired centre distance (C') estimated at 286.18 mm (which incorporates a 30 mm assembly allowance), the theoretical belt length (L<sub>p</sub>') was computed:</p>
+      <div class="math-block">L<sub>p</sub>' = 2C' + [&pi;(D<sub>p</sub> + d<sub>p</sub>) / 2] + [(D<sub>p</sub> - d<sub>p</sub>)<sup>2</sup> / 4C']
+L<sub>p</sub>' = 2(286.18) + [&pi;(178.25 + 50.93) / 2] + [(178.25 - 50.93)<sup>2</sup> / 4(286.18)]
+L<sub>p</sub>' &approx; 946.5 mm</div>
+      <p>
+        To align with standard off-the-shelf belt sizes, a standard belt length of <strong>952 mm</strong> was selected from the catalogue. The final corrected centre distance (C) was then established based on this belt:
+      </p>
+      <div class="math-block">b = 2L<sub>p</sub> - &pi;(D<sub>p</sub> + d<sub>p</sub>) = 2(952) - &pi;(178.25 + 50.93) = 1184.0
+C = [b + &radic;(b<sup>2</sup> - 8(D<sub>p</sub> - d<sub>p</sub>)<sup>2</sup>)] / 8 = <strong>289.0 mm</strong></div>
+      <p>This final 289.0 mm dimension strictly dictated the mounting hole placement for the motor on the welded base.</p>
+
+      <h3>Step 6: Belt Width</h3>
+      <p>
+        The required belt width (B<sub>w</sub>) is calculated using the design power (P<sub>d</sub>), reference transmission capacity (P<sub>o</sub> = 1.176 kW), engagement correction coefficient (K<sub>m</sub> = 1), and reference belt width (W<sub>p</sub> = 60 mm).
+      </p>
+      <div class="math-block">B<sub>w</sub> = [ P<sub>d</sub> / (P<sub>o</sub> &times; K<sub>m</sub>) ] &times; W<sub>p</sub>
+B<sub>w</sub> = [ 0.88 / (1.176 &times; 1) ] &times; 60 = 44.89 mm
+&rarr; Final selected hardware belt width: <strong>32 mm</strong></div>
+      <p>The 32 mm width ensures that the belt can handle impulse loads without shearing teeth, but it also forced the base height profile to accommodate this clearance requirement.</p>
+
+      <h3>Final Transmission Specifications</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th>Parameter</th>
+            <th>Selected Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Belt Series</td><td>S8M</td></tr>
+          <tr><td>Pitch</td><td>8 mm</td></tr>
+          <tr><td>Belt Width</td><td>32 mm</td></tr>
+          <tr><td>Small Pulley Teeth</td><td>20</td></tr>
+          <tr><td>Large Pulley Teeth</td><td>70 (fits inner ring mounting holes)</td></tr>
+          <tr><td>Speed Ratio</td><td>1:3.5</td></tr>
+          <tr><td>Approx. Belt Length</td><td>~952 mm</td></tr>
+          <tr><td>Centre Distance</td><td>289.0 mm</td></tr>
+          <tr><td>Small Pulley RPM</td><td>120 RPM</td></tr>
+          <tr><td>Output RPM</td><td>34.3 RPM (205.7&deg;/s)</td></tr>
+          <tr><td><strong>Worst Case Scenario</strong></td><td>Straight strike at 45&deg; angle point</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Tooth Skip Under Shock Mitigation</h3>
+      <p>A critical risk in belt-driven systems is "tooth skip." If a user delivers a hard strike while the base is actively accelerating, maintaining low-velocity positioning, or reversing, the impulse can cause the belt to jump teeth if not properly constrained. To mitigate this risk without requiring excessive static belt tension (which could cause binding and instability), the design incorporates:</p>
+      <ul>
+        <li>An appropriate high-torque belt pitch (8 mm S8M).</li>
+        <li>A wider 32 mm belt profile to distribute the shear load across more cord material.</li>
+        <li>A large 70-tooth driven pulley to maximise the wrap angle and number of engaged teeth.</li>
+        <li>A highly rigid motor mount plate to prevent the centre distance from flexing under shock tension.</li>
+        <li>Software acceleration profile limits to prevent self-induced belt skipping.</li>
+      </ul>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- NEXT SECTION NAVIGATION -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+      <a href="load-analysis.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Load Analysis
+        </sl-button>
+      </a>
+      <a href="electrical-control.html">
+        <sl-button variant="default" size="medium">
+          Next: Electrical &amp; Control
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Settings"></sl-icon>
+  </sl-button>
+</body>
+</html>

@@ -17,6 +17,7 @@
   <script src="../../components/table-component/table-component.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <script src="/components/report-nav/report-nav.js" defer></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
 <body>
   <div class="content">
@@ -34,12 +35,19 @@
     <div id="height-adjustment-subsystem">
       <h2>5.2.3 Height Adjustment</h2>
       <p>
-        The height-adjustment subsystem enables BoxBunny to accommodate users
-        of different heights without compromising the robot's rigidity during
-        training. From the user's perspective, the workflow is straightforward:
-        select a suitable target height, the robot adjusts vertically, and it
-        must then remain stable throughout operation without visible wobble,
-        jamming, or misalignment.
+        The height-adjustment subsystem allows BoxBunny to accommodate users of
+        different heights while preserving the robot's structural rigidity
+        during operation. From a user perspective, the intended workflow is simple:
+        the user selects a suitable training height, the robot adjusts vertically,
+        and the robot must then remain stable throughout the session without visible
+        wobble, jamming, or loss of alignment. Unlike a simple positioning stand,
+        however, the height-adjustment stage lies directly beneath the main striking
+        body of the robot. This means it must act not only as a lifting mechanism,
+        but also as part of the structural load path that carries punching-induced
+        lateral forces and overturning moments down into the rest of the robot.
+      </p>
+      <p>
+        The development of the subsystem progressed through several stages. Early ideas included fixed-height configurations, manually adjustable mast concepts, commercial telescopic columns, and a rear-linear-guide plus screw-jack arrangement. These concept stages gradually clarified the most important engineering principle: <strong>vertical lifting and lateral structural resistance should be separated in function</strong>, even if they are integrated into one mechanical assembly. This insight ultimately led to the final concept of a <strong>custom telescopic lift column actuated by a motorised travelling-nut screw jack</strong>, where the screw jack provides axial lift and the surrounding column structure resists side loading.
       </p>
     </div>
 
@@ -51,35 +59,126 @@
     <div>
       <h3>Requirements &amp; Considerations</h3>
       <p>
-        The user need for height adaptability was translated into three
-        subsystem-level requirements, cascading from the system-level
-        requirement <strong>RM-3</strong>:
+        The height-adjustment subsystem responds to system-level requirement <strong>RM-3</strong>
+        (<em>Provide &ge; 400 mm vertical stroke</em>), along with several subsystem-specific
+        engineering considerations:
       </p>
-      <ol>
-        <li>
-          Provide a <strong>400 mm vertical stroke</strong> so head and torso
-          target zones can be repositioned across the intended user height
-          range.
-        </li>
-        <li>
-          Adjustment must be practically fast for setup use — the engineering
-          target is approximately <strong>32 seconds over the 400 mm
-          stroke</strong> (≈ 0.75 m/min), constrained by the selected
-          screw-jack architecture.
-        </li>
-        <li>
-          Preserve structural performance under boxing-related disturbances.
-          The height-adjustment system sits directly within a major load path
-          beneath the upper body, so vertical actuation and lateral load
-          resistance must be treated as <strong>separate functions</strong>.
-        </li>
-      </ol>
+      <ul>
+        <li><strong>Vertical stroke:</strong> Provide a minimum stroke of 400 mm to reposition the head and torso targets across a meaningful user height range, preserving anatomically credible target alignment.</li>
+        <li><strong>Practical setup speed:</strong> Adjust vertically in a reasonable time for gym and demo setup. The engineering target is approximately 32 seconds over the full 400 mm stroke (&approx; 0.75 m/min). The ideal user preference of ~10 seconds is aspirational but constrained by the current actuator choice.</li>
+        <li><strong>Structural separation:</strong> Do not compromise the robot's ability to resist punching disturbances. The lifting actuator must be isolated from lateral punching loads to avoid side-loading, binding, and wear.</li>
+        <li><strong>Robustness &amp; safety:</strong> Operate safely in public demo or workshop conditions where minor bumps and start-stop transients are realistic (requiring a light-shock service factor of ~1.5). The mechanism must be self-locking to prevent back-driving under load.</li>
+        <li><strong>Manufacturability:</strong> Remain robust at prototype scale by avoiding excessive part count, tolerance stack-up, and overly delicate guide hardware.</li>
+      </ul>
 
-      <image-component
-        tag="image"
-        source="../../assets/Lower_mechanism/8height adjustment - cad overview.png"
-        subtitle="Figure: (a) CAD overview of height adjustment component; (b) focused CAD of screw jack and vertical linear guides.">
-      </image-component>
+      <style>
+        /* Styling for the 3D Model Hotspot Buttons */
+        .Hotspot {
+          background: #3b82f6;
+          border-radius: 32px;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          cursor: pointer;
+          height: 16px;
+          width: 16px;
+          position: relative;
+          transition: all 0.2s ease;
+        }
+        .Hotspot:not([data-visible]) { opacity: 0; pointer-events: none; }
+        .HotspotAnnotation {
+          background: #fff;
+          border-radius: 4px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          color: #333;
+          display: block;
+          font-size: 0.85rem;
+          font-weight: 600;
+          left: calc(100% + 24px);
+          padding: 6px 10px;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: max-content;
+        }
+        .HotspotAnnotation::before {
+          content: ""; position: absolute; top: 50%; right: 100%;
+          width: 24px; height: 2px; background: #3b82f6; transform: translateY(-50%);
+        }
+        #ar-button { background-color: white; border-radius: 24px; border: 1px solid #dadce0; position: absolute; bottom: 16px; right: 16px; padding: 8px 16px; font-family: inherit; font-weight: 500; color: #1a73e8; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        #ar-button:focus-visible { outline: 2px solid #1a73e8; }
+        #ar-prompt { position: absolute; bottom: 60px; right: 16px; display: none; }
+        model-viewer.hide-hotspots .Hotspot { display: none !important; }
+      </style>
+
+      <div class="model-viewer-container" style="margin: 24px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+          <span style="font-size: 0.95rem; color: #555;">
+            <sl-icon name="info-circle" style="vertical-align: middle; margin-right: 4px;"></sl-icon>
+            Interact with the 3D model to explore its structure. Toggle annotations to view key components.
+          </span>
+          <sl-button id="toggle-hotspots" size="small" variant="default" pill>Hide Annotations</sl-button>
+        </div>
+        <model-viewer
+          src="../../assets/3d_models/v7_fab_assem_rotating_mass.glb"
+          alt="Interactive 3D Model: Height Adjustment Component"
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          tone-mapping="neutral"
+          shadow-intensity="1"
+          exposure="0.8"
+          style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
+        >
+          <button class="Hotspot" slot="hotspot-1" data-position="0.06399999931454659m 0.9730446492471212m 0.018933598782491682m" data-normal="1m 0m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Wear Pads</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-2" data-position="0.15799806857683332m 0.2712305628311149m 0.03056398824881457m" data-normal="0.9999999999999911m -1.6091448851880818e-18m -1.3435883843274954e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Screw Jack</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-3" data-position="0.03999029897225962m 1.0927330353419094m 0.0023961210232632466m" data-normal="0.9998425194902294m -2.384391344544152e-9m 0.017746442444347584m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Moving Inner Member</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-4" data-position="0.05999999865888826m 0.6825780622052913m 0.025861992239348656m" data-normal="1m 0m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Outer Sleeve</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-5" data-position="0.15799806525822066m 0.3078965216079666m 0.005864365346941982m" data-normal="0.9999999999999911m -1.6091448851880818e-18m -1.3435883843274954e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Mount</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-6" data-position="0.157998073850331m 0.25859286420419536m 0.06981334598925108m" data-normal="0.9999999999999911m -1.6091448851880818e-18m -1.3435883843274954e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Travelling Nut</div>
+          </button>
+          <div class="progress-bar hide" slot="progress-bar">
+              <div class="update-bar"></div>
+          </div>
+          <button slot="ar-button" id="ar-button">View in your space</button>
+          <div id="ar-prompt"><img src="https://modelviewer.dev/shared-assets/icons/hand.png"></div>
+        </model-viewer>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Interactive 3D Model: Height adjustment component.
+        </sub>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-hotspots');
+            const viewer = document.querySelector('model-viewer');
+            let hotspotsVisible = true;
+            
+            if(toggleBtn && viewer) {
+              toggleBtn.addEventListener('click', () => {
+                hotspotsVisible = !hotspotsVisible;
+                if (hotspotsVisible) {
+                  viewer.classList.remove('hide-hotspots');
+                  toggleBtn.textContent = 'Hide Annotations';
+                } else {
+                  viewer.classList.add('hide-hotspots');
+                  toggleBtn.textContent = 'Show Annotations';
+                }
+              });
+            }
+          });
+        </script>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -95,16 +194,21 @@
         <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">400 mm Vertical Stroke</sl-badge>
       </h4>
       <p>
-        The final height-adjustment solution is a <strong>custom telescopic
-        lift column actuated by a motorised travelling-nut screw jack</strong>.
-        This subsystem combines a structural guiding column with a dedicated
-        axial lifting mechanism:
+        The final height-adjustment system consists of two coupled sub-assemblies:
+        a <strong>mechanical structure</strong> in the form of a telescopic lift column,
+        and a <strong>motorised screw-jack mechanism</strong> that drives the vertical motion.
       </p>
+      <p>The structural portion of the design comprises:</p>
       <ul>
-        <li><strong>8080 aluminium extrusion</strong> — moving inner member</li>
-        <li><strong>Delrin wear pads</strong> — sacrificial low-friction guide surfaces</li>
-        <li><strong>Welded steel outer tube with integrated plate</strong> — fixed sleeve</li>
-        <li><strong>HK2T screw jack</strong> with travelling nut — axial lifting device</li>
+        <li>an <strong>8080 aluminium extrusion</strong> as the moving inner member,</li>
+        <li><strong>Delrin wear pads</strong> acting as low-friction sacrificial guide interfaces,</li>
+        <li>and a <strong>welded steel outer tube with integrated plate</strong> forming the fixed sleeve of the telescopic column.</li>
+      </ul>
+      <p>The actuation portion comprises:</p>
+      <ul>
+        <li>the <strong>travelling nut</strong> of the screw jack,</li>
+        <li>the <strong>HK2T screw jack</strong> itself,</li>
+        <li>and a dedicated <strong>screw jack&ndash;to&ndash;8080 mount</strong> that transforms the jack's axial motion into the vertical movement of the inner column.</li>
       </ul>
 
       <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
@@ -112,29 +216,21 @@
         <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Axial vs Lateral Load Path</sl-badge>
       </h4>
       <p>
-        The key design decision is the <strong>separation of lift from
-        structure</strong>. The screw jack is treated purely as an axial
-        lifting device, operating mainly in compression. Lateral forces and
-        overturning moments — especially those from punching — are resisted by
-        the surrounding telescopic column. This prevents side-loading of the
-        screw jack, which would otherwise reduce efficiency, increase wear, and
-        create binding risk. The final concept therefore behaves less like an
-        exposed actuator and more like a <strong>guided structural
-        mast</strong>.
+        The most important design feature is the <strong>separation of functions between lift and structure</strong>. 
+        In the final concept, the screw jack is treated purely as an axial lifting device, operating mainly in compression. 
+        Lateral loads and overturning moments caused by punching are not intended to be carried by the screw. Instead, 
+        they are reacted through the 8080 inner column, across the Delrin guides, into the welded outer tube, and then 
+        into the lower support structure. This prevents side-loading of the screw jack, which would otherwise reduce 
+        efficiency, increase wear, and create binding risk. The subsystem was not selected simply because it could move 
+        the robot body up and down, but because it could do so <strong>without weakening the robot's resistance to operational loads</strong>.
       </p>
 
       <h4>Design Evolution</h4>
       <p>
-        An earlier concept used <strong>two vertical linear rails at the rear
-        with a lift carriage plate</strong>, with the screw jack near the
-        centreline and a compliant interface for misalignment tolerance. That
-        concept established the correct engineering principle but introduced
-        too many precision-mounted components and tolerance sensitivity.
-        Commercial off-the-shelf telescopic columns were also considered, but
-        their side-load capability under boxing disturbances was uncertain.
-        The project moved toward a custom telescopic column using SHS-based
-        steel structure, Delrin bearing interfaces, and a modular 8080 inner
-        member.
+        An earlier concept used two vertical linear rails at the rear with a lift carriage plate, with the screw jack near the centreline and a compliant interface for misalignment tolerance. That concept established the correct engineering principle but introduced too many precision-mounted components, alignment sensitivity, and tolerance stack-up.
+      </p>
+      <p>
+        Commercial off-the-shelf telescopic columns were also considered, but their side-load capability under boxing disturbances was uncertain. The project moved toward a custom telescopic column. This was not a change in structural logic from the rail concept, but an improvement in implementation—consolidating the guide function into one robust structural assembly.
       </p>
 
       <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
@@ -142,12 +238,12 @@
         <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Durability + Safety Margin</sl-badge>
       </h4>
       <p>
-        A <strong>light-shock service factor of approximately 1.5</strong> was
-        adopted because the robot may be adjusted in public demo environments
-        with minor bumps and start-stop transients. Large SHS members were
-        kept at <strong>≥ 6 mm wall thickness</strong>, welded plates were
-        sized to avoid distortion, and gusseted corner brackets were preferred
-        where aluminium extrusion met steel structure.
+        As the design matured, fabrication realism became more important. Large SHS members were
+        kept at <strong>&ge; 6 mm wall thickness</strong>, welded plates were
+        sized to avoid distortion, and gusseted corner brackets were favoured
+        where aluminium extrusion met steel platework to reduce joint flex. These details matter 
+        because the final performance of the subsystem depends not only on the actuator, but 
+        also on whether the surrounding structure preserves alignment under load.
       </p>
 
         <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
@@ -205,27 +301,69 @@
     <div>
       <h3>Validation</h3>
       <p>
-        The final height-adjustment concept satisfies the main functional
-        requirements. The architecture provides the required
-        <strong>400 mm stroke</strong>, and the current motion target of
-        approximately <strong>32 seconds full stroke</strong> is consistent
-        with the screw-jack input speed and motor-sizing logic.
+        At the current stage, the height-adjustment subsystem has been validated partly through <strong>concept selection, packaging logic, and load-path reasoning</strong>, and partly through the coherence of the final mechanical assembly. It has not yet been fully closed through every intended physical validation test.
       </p>
       <p>
-        The most important subsystem requirement — decoupling vertical lifting
-        from lateral structural support — is satisfied by the final load path:
-        vertical load passes through the screw-jack drive chain, while lateral
-        punching loads are routed through the telescopic column into the outer
-        welded structure and then into the base.
+        The most important subsystem-level success is that the final design satisfies the core structural requirement: the lifting mechanism is decoupled from the lateral load-bearing path. Compared with the earlier rear-linear-guide concept, the telescopic lift column reduces part count, simplifies alignment, and consolidates the load path into fewer, better-integrated structural members. Compared with commercial lift columns, it provides much higher confidence that side loads from punches are being treated appropriately for a boxing robot application.
       </p>
       <p>
-        Current validation is strongest at the level of <strong>CAD packaging,
-        stroke confirmation, concept selection logic, and load-path
-        integrity</strong>. Remaining verification work includes: quantitative
-        column deflection under lateral loading, repeated-cycle Delrin wear
-        testing, and motor-control validation against the aspirational
-        10-second user preference.
+        The architecture also meets the <strong>400 mm stroke requirement</strong>, and the current movement target of approximately <strong>32 seconds for full stroke</strong> is consistent with the inferred jack-speed requirement and the current actuation logic. This means the subsystem is functionally adequate for the current prototype, even if it does not yet achieve the more desirable 10-second user-experience target.
       </p>
+      <p>
+        The main gaps in validation are: quantitative measurement of column deflection under lateral load, long-term wear monitoring of the Delrin interfaces, full repeated-cycle testing of the telescopic stage, and confirmation of whether future motor revisions can move the stroke time closer to the ideal target.
+      </p>
+
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; margin-top: 16px;">
+        <thead>
+          <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left;">Aspect</th>
+            <th style="padding: 12px; text-align: left;">Current status</th>
+            <th style="padding: 12px; text-align: left;">Basis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">400 mm stroke provision</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">Final concept sized around full required stroke</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Separation of lifting and structural functions</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">Core design principle achieved</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Telescopic column as guide structure</td>
+            <td style="padding: 12px;">Pass</td>
+            <td style="padding: 12px;">Cleaner load path and lower part count than earlier rail-based design</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Current actuation speed (~32 s full stroke)</td>
+            <td style="padding: 12px;">Pass (functional)</td>
+            <td style="padding: 12px;">Meets present implementation target</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Ideal user preference (~10 s full stroke)</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Desired but not achieved with current screw-jack arrangement</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Commercial off-the-shelf lift columns</td>
+            <td style="padding: 12px;"><sl-badge variant="danger" pill>Fail as final solution</sl-badge></td>
+            <td style="padding: 12px;">Side-load confidence insufficient for boxing use</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Long-term Delrin wear and stiffness</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Strong concept logic, but long-term physical validation still needed</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Full repeated-cycle and backlash testing</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">Further testing required</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <sl-divider></sl-divider>

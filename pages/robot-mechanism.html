@@ -68,6 +68,14 @@
           mechanism, enabling jabs, hooks, and uppercuts.
         </li>
       </ol>
+    <p>
+      <strong>Note on Project Scope:</strong> While full footwork movement technically requires 
+      both linear (forward-backward) and rotational (yaw) movement, the project was scoped down 
+      to ensure high-quality execution within our timeframe. The mechanical development was branched 
+      into two main phases: <strong>Phase 1</strong> handles static stability and the height adjustment 
+      subsystem, while <strong>Phase 2</strong> focuses on the rotation subsystem. Consequently, linear 
+      movement has been scoped out of the current mechanical prototype.
+    </p>
       <p>
         These functions were decomposed from the broader project goals
         established in the problem clarification and design methodology phases.
@@ -173,20 +181,16 @@
       </div>
 
       <ol>
-        <li><strong>Trapezoidal Base</strong> — welded steel platform providing stability and portability</li>
-        <li><strong>Slewing-Ring Yaw Stage</strong> — low-profile rotation module at the stack base</li>
-        <li><strong>Ball-Screw Linear Slide</strong> — forward–backward translation above the yaw stage, expanding the reachable target footprint</li>
-        <li><strong>Telescopic Height-Adjustment Column</strong> — motorised screw-jack column with structural guiding</li>
-        <li><strong>Upper Body</strong> — torso, head, and 2-DOF coaxial striking arms with multi-layer padding</li>
+        <li><strong>Trapezoidal Base</strong> : welded steel platform providing stability and portability</li>
+        <li><strong>Rotation Yaw Stage</strong> : low-profile rotation module at the stack base</li>
+        <li><strong>Telescopic Height-Adjustment Column</strong> : motorised screw-jack column with structural guiding</li>
+        <li><strong>Upper Body</strong> : torso, head, and 2-DOF coaxial striking arms with multi-layer padding</li>
       </ol>
       <p>
-        The linear motion axis (ball-screw-driven sliding table on dual linear
-        rails) sits above the rotation stage. This configuration was chosen
-        because it significantly increases the reachable footprint of target
-        positions for the same base size, compared to placing rotation above
-        linear motion. All translational and rotational footwork axes are fully
-        motorised for programmable, repeatable training sequences, while height
-        adjustment uses a self-locking screw jack for safety.
+        The rotational footwork axis is fully motorised for programmable, repeatable 
+        training sequences, allowing the robot to dynamically pivot and present changing attack lines. 
+        Meanwhile, the height adjustment uses a self-locking manual screw jack for safety and 
+        structural rigidity, ensuring the upper body remains stable under dynamic boxing loads.
       </p>
 
       <h4>Electrical &amp; Control Architecture</h4>

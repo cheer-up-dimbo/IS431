@@ -36,6 +36,9 @@
     <!-- 1. PERFORMANCE CRITERIA -->
     <div>
       <h3>1. Performance Criteria</h3>
+      <p>
+        The rotation subsystem is evaluated against the following performance criteria, derived from the system-level requirements and drive-side specifications:
+      </p>
       <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;">
         <thead>
           <tr>
@@ -49,6 +52,21 @@
             <td><strong>RM-4</strong></td>
             <td>Yaw angular velocity</td>
             <td>Sustained angular velocity &ge; 150&deg;/s for rapid re-angling</td>
+          </tr>
+          <tr>
+            <td><strong>RM-1</strong></td>
+            <td>Position hold &amp; disturbance rejection</td>
+            <td>&le; 5&deg; overshoot under 50 N lateral punch, return within 500 ms</td>
+          </tr>
+          <tr>
+            <td><strong>ROT-1</strong></td>
+            <td>Transmission &amp; support integrity</td>
+            <td>Zero tooth-skip under shock load/reversal; stable belt tension; cam-followers maintain contact</td>
+          </tr>
+          <tr>
+            <td><strong>ROT-2</strong></td>
+            <td>Communication reliability</td>
+            <td>Command frame loss rate &lt; 1% over 1000 frames via WiFi UDP</td>
           </tr>
         </tbody>
       </table>
@@ -66,6 +84,34 @@
         <li><strong>Procedure:</strong> Issue a 90&deg; step command to the yaw motor via the wireless interface. Measure the time-to-target using the encoder feedback logs.</li>
         <li><strong>Success Criteria:</strong> The robot completes the 90&deg; rotation in &le; 0.6 seconds, confirming a sustained angular velocity of at least 150&deg;/s.</li>
       </ul>
+
+      <h4>Test 2: Position Hold &amp; Disturbance Rejection (RM-1)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Robot powered on and holding a commanded zero-degree yaw angle.</li>
+        <li><strong>Procedure:</strong> Apply a 50 N lateral punch to the upper padding. Record the yaw axis angular deviation using the AS5047P encoder logs.</li>
+        <li><strong>Success Criteria:</strong> Maximum angular deflection &le; 5&deg;, with the system returning to the commanded position within 500 ms without extended oscillation.</li>
+      </ul>
+
+      <h4>Test 3: Transmission &amp; Outboard Support Integrity (ROT-1)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Assembled timing belt drive system and cam-follower supports.</li>
+        <li><strong>Procedure:</strong> Command rapid acceleration and direction reversals. Apply off-axis loads (hooks) to the torso.</li>
+        <li><strong>Success Criteria:</strong> Zero observed tooth-skip on the S8M belt. Cam followers maintain contact with the track, preventing visible plate tilt without binding or overconstraint.</li>
+      </ul>
+
+      <h4>Test 4: Communication Reliability (ROT-2)</h4>
+      <ul>
+        <li><strong>Setup:</strong> Arduino Uno R4 WiFi connected to the local network alongside the Jetson host.</li>
+        <li><strong>Procedure:</strong> Transmit 1,000 sequential yaw command frames via UDP at the target 20 Hz GUI refresh rate.</li>
+        <li><strong>Success Criteria:</strong> Frame loss rate &lt; 1%.</li>
+      </ul>
+      
+      <image-component
+        width="80%"
+        tag="image"
+        source="../../../assets/robot_mechanism/timing belt drive system assembled.png"
+        subtitle="Figure: Assembled timing belt drive system ready for transmission integrity testing.">
+      </image-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -73,9 +119,48 @@
     <!-- 3. RESULTS -->
     <div>
       <h3>3. Results</h3>
+      <p>
+        At present, the rotation subsystem has been validated primarily through <strong>concept selection, load-path reasoning, and transmission calculations</strong>. Physical validation testing is pending.
+      </p>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="width: 15%;">ID</th>
+            <th style="width: 30%;">Criterion</th>
+            <th style="width: 40%;">Measured Result</th>
+            <th style="width: 15%;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RM-4</strong></td>
+            <td>Yaw angular velocity</td>
+            <td>Pending physical measurement. (Analysis indicates max 34.3 rpm / 205.7&deg;/s capability).</td>
+            <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>RM-1</strong></td>
+            <td>Position hold</td>
+            <td>Pending physical measurement under lateral strike.</td>
+            <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>ROT-1</strong></td>
+            <td>Transmission &amp; support integrity</td>
+            <td>Pending physical validation under dynamic shock and reversal loads.</td>
+            <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td><strong>ROT-2</strong></td>
+            <td>Communication reliability</td>
+            <td>Pending wireless UDP packet-loss tracking.</td>
+            <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <sl-alert variant="neutral" open style="margin-top: 16px;">
         <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Pending Physical Testing:</strong> Angular velocity measurement, belt compliance under reversal, and cam-follower contact validation results will be populated following physical prototype integration.
+        <strong>Pending Physical Testing:</strong> The remaining partial statuses will be updated following physical prototype integration and execution of the test procedures above.
       </sl-alert>
     </div>
 

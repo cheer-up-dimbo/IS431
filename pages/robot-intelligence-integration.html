@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: 5.3.4 Intelligent Behaviour & Control</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="/components/report-nav/report-nav.js" defer></script>
+  <style>
+    .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="robot-intelligence.html" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Robot Intelligence
+      </sl-button>
+    </a>
+    <br>
+
+    <!-- 5.3.4 INTRO -->
+    <h1>5.3.4 Intelligent Behaviour & Control</h1>
+
+    <p>
+      This section covers the intelligent systems that enable BoxBunny to perceive, decide, and act in real
+      time — from sensor fusion and inference to adaptive sparring and AI coaching.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.4.1 CV + IMU SENSOR FUSION -->
+    <h2>5.3.4.1 CV + IMU Sensor Fusion</h2>
+
+    <p>
+      The <code>punch_processor</code> node bridges perception and confirmed action by fusing computer vision
+      predictions with IMU pad impact data.
+    </p>
+
+    <h3>Fusion Algorithm</h3>
+    <p>
+      When an IMU pad impact is detected (acceleration exceeding 5.0 m/s&sup2; after gravity calibration), the
+      node queries the CV prediction ring buffer within a &pm;500ms temporal window. Frame-count voting selects
+      the dominant prediction type (most frames, not highest confidence), and the result is emitted as a
+      <code>ConfirmedPunch</code> with both CV confidence and IMU force data.
+    </p>
+
+    <h3>Pad-Constraint Filtering</h3>
+    <p>
+      Each pad accepts only biomechanically valid punch types:
+    </p>
+    <ul>
+      <li><strong>Centre pad</strong> — jab and cross only</li>
+      <li><strong>Left pad</strong> — left hook and left uppercut only</li>
+      <li><strong>Right pad</strong> — right hook and right uppercut only</li>
+      <li><strong>Head pad</strong> — any punch type</li>
+    </ul>
+    <p>
+      If the primary CV prediction violates the constraint, secondary predictions are checked with a minimum
+      confidence threshold of 0.25.
+    </p>
+
+    <h3>Fallbacks</h3>
+    <p>
+      <strong>CV-only mode:</strong> &ge;3 consecutive frames at &ge;0.6 confidence, emitted with a 0.3
+      penalty — ensures punches are still registered even if the IMU sensor fails.<br>
+      <strong>IMU-only mode:</strong> default 0.3 confidence, punch type inferred from pad location — ensures
+      punches are still registered even if the camera feed is degraded.<br>
+      These fallback paths ensure the system degrades gracefully if either sensor fails.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/ros/fusion_pipeline.png" subtitle="Figure: CV + IMU Sensor Fusion Pipeline"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.4.2 REAL-TIME INFERENCE PIPELINE -->
+    <h2>5.3.4.2 Real-Time Inference Pipeline</h2>
+
+    <h3>TensorRT Deployment</h3>
+    <p>
+      Both the YOLO Pose model and the action recognition transformer are optimised with TensorRT FP16 on the
+      Jetson Orin Nano.
+    </p>
+
+    <h3>FPS Sensitivity</h3>
+    <p>
+      The voxel temporal features use 2-frame (67ms) and 8-frame (267ms) lookback deltas computed at 30fps. If
+      the frame rate drops, these deltas span different real-world time intervals, degrading classification
+      accuracy. This sensitivity drove the TensorRT optimisation work — ensuring the pipeline consistently meets
+      the 33ms per-frame budget.
+    </p>
+
+    <h3>Offline &rarr; Live Inference Gap</h3>
+    <p>
+      A major engineering challenge was that models performing well on pre-recorded clips struggled in live
+      deployment. Four specific issues were identified and solved:
+    </p>
+    <ol>
+      <li>
+        <strong>Processing bottleneck</strong> — voxel extraction and YOLO inference were sequential, causing
+        the model to receive stale feature windows. Fix: parallelised into separate worker threads.
+      </li>
+      <li>
+        <strong>Frame buffer issues</strong> — dropped frames created temporal discontinuities in the rolling
+        window. Fix: implemented a proper <code>RollingFeatureBuffer</code> with FIFO queue and strict frame
+        ordering.
+      </li>
+      <li>
+        <strong>YOLO as bottleneck</strong> — PyTorch YOLO consumed most of the 33ms frame budget on Jetson.
+        Fix: converted YOLO to a TensorRT engine (<code>.engine</code> format), dramatically reducing inference
+        time.
+      </li>
+      <li>
+        <strong>Effective FPS mismatch</strong> — the model was trained at consistent 30fps but the live
+        pipeline ran at variable rates. Fix: TensorRT optimisation of both models guaranteed consistent
+        throughput.
+      </li>
+    </ol>
+
+    <h3>Latency Breakdown</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Component</th>
+          <th style="padding:8px; border:1px solid #ddd;">Latency</th>
+          <th style="padding:8px; border:1px solid #ddd;">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
+          <td style="padding:8px; border:1px solid #ddd;">~16ms</td>
+          <td style="padding:8px; border:1px solid #ddd;">On GPU, single frame</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Depth &rarr; voxel extraction</td>
+          <td style="padding:8px; border:1px solid #ddd;">~10ms</td>
+          <td style="padding:8px; border:1px solid #ddd;">Background subtraction + voxelisation</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">YOLO + voxel in parallel</td>
+          <td style="padding:8px; border:1px solid #ddd;">~16ms</td>
+          <td style="padding:8px; border:1px solid #ddd;">Separate threads, limited by slower</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Model forward pass</td>
+          <td style="padding:8px; border:1px solid #ddd;">~8ms</td>
+          <td style="padding:8px; border:1px solid #ddd;">730K trainable params, d=192</td>
+        </tr>
+        <tr style="font-weight:bold;">
+          <td style="padding:8px; border:1px solid #ddd;">Total per frame</td>
+          <td style="padding:8px; border:1px solid #ddd;">~24ms</td>
+          <td style="padding:8px; border:1px solid #ddd;">42fps theoretical, 30fps practical</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Post-Processing</h3>
+    <p>
+      Raw model outputs pass through three stages: <strong>EMA smoothing</strong> (&alpha;=0.35) to reduce
+      frame-to-frame jitter, a <strong>hysteresis gate</strong> (12% confidence margin) to prevent oscillation
+      between classes, and a <strong>state machine</strong> requiring minimum 2 frames to enter an action,
+      minimum 3 frames hold, sustain confidence &ge;0.78, with block requiring 4 consecutive frames.
+    </p>
+
+    <h3>Adaptive Frame Rate</h3>
+    <p>
+      The <code>cv_node</code> runs at 30fps during active training sessions but drops to ~6fps when the
+      session is idle, freeing GPU headroom for LLM inference during rest periods.
+    </p>
+
+    <h3>GPU Memory Management</h3>
+    <p>
+      TensorRT action model (~200MB) + TensorRT YOLO (~150MB) + Qwen2.5-3B LLM (~2GB) + frame buffers
+      (~100MB) = ~2.5GB simultaneous, comfortably within the 8GB shared LPDDR5 memory.
+    </p>
+
+    <div class="video-row two-up">
+      <div class="video-box">
+        <video controls src="../assets/robot_intelligence/cv/inference_person_1.mp4"></video>
+        <sub>Final model inference — Person 1 (training participant)</sub>
+      </div>
+      <div class="video-box">
+        <video controls src="../assets/robot_intelligence/cv/inference_person_2.mp4"></video>
+        <sub>Final model inference — Person 2 (unseen during training)</sub>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.4.3 AI SPARRING ENGINE -->
+    <h2>5.3.4.3 AI Sparring Engine</h2>
+
+    <p>
+      Five AI opponent styles are implemented as Markov chain transition matrices, each with distinct
+      behavioural profiles:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Style</th>
+          <th style="padding:8px; border:1px solid #ddd;">Behaviour Profile</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Boxer</td>
+          <td style="padding:8px; border:1px solid #ddd;">Technical, balanced. Mixes all punch types with clean transitions, moderate attack frequency.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Brawler</td>
+          <td style="padding:8px; border:1px solid #ddd;">Aggressive, predictable. Heavy on hooks and crosses, short gaps between attacks.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Counter-Puncher</td>
+          <td style="padding:8px; border:1px solid #ddd;">Reactive, patient. Low base attack frequency, spikes after user punches with quick jab/cross counters.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Pressure</td>
+          <td style="padding:8px; border:1px solid #ddd;">Relentless, overwhelming. Very high frequency, minimal gaps, all punch types. Tests defensive endurance.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Switch</td>
+          <td style="padding:8px; border:1px solid #ddd;">Unpredictable. Rotates between the other 4 styles every ~20 seconds. Requires continuous adaptation.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Difficulty Scaling (3 levels)</h3>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+          <th style="padding:8px; border:1px solid #ddd;">Easy</th>
+          <th style="padding:8px; border:1px solid #ddd;">Medium</th>
+          <th style="padding:8px; border:1px solid #ddd;">Hard</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Attack interval</td>
+          <td style="padding:8px; border:1px solid #ddd;">2.0s</td>
+          <td style="padding:8px; border:1px solid #ddd;">1.2s</td>
+          <td style="padding:8px; border:1px solid #ddd;">0.7s</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Counter-punch probability</td>
+          <td style="padding:8px; border:1px solid #ddd;">30%</td>
+          <td style="padding:8px; border:1px solid #ddd;">50%</td>
+          <td style="padding:8px; border:1px solid #ddd;">80%</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">Arm speed</td>
+          <td style="padding:8px; border:1px solid #ddd;">8 rad/s</td>
+          <td style="padding:8px; border:1px solid #ddd;">15 rad/s</td>
+          <td style="padding:8px; border:1px solid #ddd;">25 rad/s</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Weakness Tracking</h3>
+    <p>
+      The <code>sparring_weakness_profile</code> table persistently tracks per-punch-type defence success rates
+      across sessions. The AI biases its attacks toward punch types where the user has the lowest defence rate,
+      forcing continuous improvement on weak areas.
+    </p>
+
+    <h3>Free Training Mode</h3>
+    <p>
+      A pad-to-counter mapping (centre pad &rarr; jab/cross, left pad &rarr; left hooks/uppercuts, right pad
+      &rarr; right hooks/uppercuts, head pad &rarr; jab/cross) with a 300ms counter cooldown and 5-second idle
+      guard return provides reactive, unstructured practice.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.4.4 LLM COACH -->
+    <h2>5.3.4.4 LLM Coach — Architecture & Tuning</h2>
+
+    <h3>Model</h3>
+    <p>
+      Qwen2.5-3B-Instruct (instruction-tuned for following coaching prompts), quantised to GGUF Q4_K_M (~2GB),
+      running via <code>llama-cpp-python</code> with full GPU offload (<code>n_gpu_layers=-1</code>). Inference
+      typically completes in 0.5&ndash;2 seconds with a 2048-token context window and 128-token generation limit.
+    </p>
+
+    <h3>System Prompt Design</h3>
+    <p>
+      A 24-line embedded system prompt in <code>llm_node.py</code> instructs the model to:
+    </p>
+    <ul>
+      <li>Act as "BoxBunny AI Coach" with AIBA manual knowledge</li>
+      <li>Know all 6 punch types and their codes (1=jab through 6=right uppercut)</li>
+      <li>Understand 5 boxing styles (European, Russian, American, Cuban, hybrid)</li>
+      <li>Adjust advice to the user's skill level (beginner/intermediate/advanced)</li>
+      <li>Keep real-time tips to 1&ndash;2 sentences</li>
+      <li>Output plain text only (no markdown formatting)</li>
+    </ul>
+    <p>
+      Different system prompt keys are used for different contexts: real-time coaching tips during active
+      sessions, post-session analysis, and interactive chat.
+    </p>
+
+    <h3>Tuning Interface</h3>
+    <p>
+      A standalone PySide6 chat GUI (<code>llm_chat_gui.py</code>) was built specifically for iterative prompt
+      tuning during development. It features streaming token display (showing text appearing word by word),
+      model selection from a configuration file, configurable system prompts, full conversation history, and
+      sentence completion mode. This tool was used extensively to refine the coaching prompt wording and test
+      coaching quality across different session contexts.
+    </p>
+
+    <h3>Boxing Knowledge Base</h3>
+    <p>
+      17 documents in <code>data/boxing_knowledge/</code> across 8 categories, sourced from the official AIBA
+      Coaches Manual (AIBA, 2015), the APB Professional Coaches Manual (AIBA, 2017), plus custom-written
+      documentation covering technique descriptions (jab, cross, hooks, uppercuts, stance and guard), defensive
+      manuals (blocking, parrying, slipping, footwork), combination progressions (beginner to advanced), 8-week
+      training programmes, conditioning guides, and common mistakes. An additional comprehensive knowledge base
+      (<code>boxing_knowledge.txt</code>, 100+ lines) covers orthodox stance, all punch mechanics, defensive
+      techniques, and AIBA training stages. This knowledge is injected into the LLM context during coaching
+      analysis for sport-specific terminology and methodology.
+    </p>
+
+    <h3>Preventing Cut-Off Responses</h3>
+    <p>
+      Several mechanisms ensure complete responses: short <code>max_tokens</code> (128) to stay within budget,
+      explicit system prompt instruction ("keep tips SHORT — 1&ndash;2 sentences"), 20-second inference timeout
+      with hard thread termination, markdown stripping (<code>**bold**</code>, <code>*italic*</code>,
+      <code># headers</code>), and sentence completion detection.
+    </p>
+
+    <h3>Fallback System</h3>
+    <p>
+      65 pre-written tips in 4 categories (technique, encouragement, correction, suggestion) are used when the
+      LLM is unavailable, the model file is missing, GPU runs out of memory, or inference times out. The system
+      tracks consecutive failures and attempts a model reload after 3 consecutive failures.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM Tuning and Chat Interface"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.4.5 SESSION MANAGEMENT -->
+    <h2>5.3.4.5 Session Management</h2>
+
+    <p>
+      The <code>session_manager</code> node orchestrates the entire training session lifecycle through a
+      5-state machine:
+    </p>
+
+    <h3>States</h3>
+    <p>
+      IDLE &rarr; COUNTDOWN (3 seconds) &rarr; ACTIVE &rarr; REST &rarr; COMPLETE &rarr; auto-reset to IDLE
+      (3 seconds).
+    </p>
+
+    <h3>Per-State Side Effects</h3>
+    <p>
+      Each state transition triggers coordinated changes across all nodes:
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">State</th>
+          <th style="padding:8px; border:1px solid #ddd;">Behaviour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">IDLE</td>
+          <td style="padding:8px; border:1px solid #ddd;">IMU in navigation mode, CV at ~6fps, robot disabled</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">COUNTDOWN</td>
+          <td style="padding:8px; border:1px solid #ddd;">IMU switches to training mode (200ms grace period), auto-height adjustment (once), round start signal to robot</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">ACTIVE</td>
+          <td style="padding:8px; border:1px solid #ddd;">CV at 30fps, data collection active (ConfirmedPunch, DefenseEvent, UserTracking logged), autosave every 10 seconds</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">REST</td>
+          <td style="padding:8px; border:1px solid #ddd;">IMU maintained in training mode, CV drops to idle rate, data collection pauses</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;">COMPLETE</td>
+          <td style="padding:8px; border:1px solid #ddd;">Final save to per-user SQLite database, publish SessionPunchSummary (20+ fields covering punch distribution, force, movement, defence, sensor pipeline statistics), auto-reset to IDLE</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Round cycling is fully configurable: default 3 rounds &times; 180 seconds work + 60 seconds rest.
+      Concurrent session protection forces a reset if <code>StartSession</code> is called while not in IDLE
+      state.
+    </p>
+
+    <sl-divider></sl-divider>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="robot-intelligence-cv.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: CV & Action Recognition
+        </sl-button>
+      </a>
+      <a href="robot-intelligence-software.html">
+        <sl-button variant="default" size="medium">
+          Next: Dashboard & Analytics
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      &uarr; Top
+    </button>
+
+  </div>
+</body>
+</html>
