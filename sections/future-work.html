@@ -1,34 +1,186 @@
     <div id="future-work">
-      <h2>6. Future Work (Zakir, Elgin, Jeanette, Yogeeswaran)</h2>
+      <h2>6. Discussion and Future Work (Zakir, Elgin, Jeanette, Yogeeswaran)</h2>
+    </div>
+
+    <div id="discussion">
+      <h3>6.1 Discussion</h3>
+      <p>
+        <strong style="color:#1565c0;">User Interface.</strong>
+        The GUI passed all five functional requirements (GUI-1 through GUI-5),
+        including multi-user data isolation, real-time session display, and
+        hardware-independent development. The phone dashboard was developed
+        as a companion interface after the CDE AI Fair revealed that
+        touchscreen interaction with gloved hands was impractical.
+      </p>
+      <p>
+        <strong style="color:#2e7d32;">Upper Mechanism.</strong>
+        The 2-DOF coaxial differential arms, multi-layer padding with IMU
+        sensing, and the CAN bus motor control architecture were validated
+        through iterative prototyping. Arm strike speed (RM-5) and IMU
+        impact detection rate (RM-6) are pending verification with the
+        fully integrated prototype.
+      </p>
+      <p>
+        <strong style="color:#e65100;">Lower Mechanism.</strong>
+        The base passed stability testing (RM-1) with a factor of safety
+        exceeding 1.5, and single-person portability (RM-7) was confirmed.
+        Height adjustment stroke (RM-3) and yaw angular velocity (RM-4) are
+        defined but pending verification. System integration tests
+        (coordinated motion, loaded sparring, power budget) require the
+        completed prototype.
+      </p>
+      <p>
+        <strong style="color:#7b1fa2;">Robot Intelligence.</strong>
+        The CV pipeline exceeded its 90% accuracy target (RI-3, 96.8%) and
+        met the 150 ms end-to-end latency requirement (RI-2, ~120 ms). All
+        five AI sparring styles (RI-6) and the local LLM coaching system
+        (RI-7) were validated through live deployment at the CDE AI Fair.
+        The fair also drove key iterations: nearest-person tracking replaced
+        background clutter filtering, and the transformer-based model
+        replaced the original HSV colour tracking approach.
+      </p>
+    </div>
+
+    <div id="limitations">
+      <h3>6.2 Current Limitations</h3>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.93rem;">
+        <thead>
+          <tr style="background:#f8f9fa;">
+            <th style="padding:10px 14px; border:1px solid #ccc; text-align:left; width:18%;">Subsystem</th>
+            <th style="padding:10px 14px; border:1px solid #ccc; text-align:left; width:30%;">Limitation</th>
+            <th style="padding:10px 14px; border:1px solid #ccc; text-align:left;">Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #1565c0;"><strong>User Interface</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">No formal usability testing with target users</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">GUI was validated functionally and at showcases, but structured user studies with boxers of varying skill levels have not been conducted</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #2e7d32;" rowspan="2"><strong>Upper Mechanism</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Fixed head-torso pad separation (30 cm)</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Anatomical head-torso gap varies 26 to 33 cm across the 150 to 190 cm user range; fixed spacing is a compromise</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Pending arm strike speed verification (RM-5)</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">90-degree strike in 0.25 s or less has not been measured on the integrated prototype</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #e65100;"><strong>Lower Mechanism</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">No linear forward/backward movement</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Robot cannot advance or retreat to maintain realistic sparring distance; limits footwork simulation</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="3"><strong>Robot Intelligence</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Single-camera viewpoint dependency</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Model is tightly coupled to the training camera angle; different viewpoints require re-recording the dataset</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Block class underrepresentation (66.7% accuracy, n=6)</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Defensive pose classification is less reliable than offensive punches due to limited training samples</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">LLM coaching depth (3B model, 128-token cap)</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Adequate for real-time 1 to 2 sentence tips, but post-session analysis lacks depth and specificity</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="recommendations">
+      <h3>6.3 Recommendations for Future Work</h3>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.93rem;">
+        <thead>
+          <tr style="background:#f8f9fa;">
+            <th style="padding:10px 14px; border:1px solid #ccc; text-align:left; width:18%;">Area</th>
+            <th style="padding:10px 14px; border:1px solid #ccc; text-align:left; width:30%;">Recommendation</th>
+            <th style="padding:10px 14px; border:1px solid #ccc; text-align:left;">Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #1565c0;"><strong>User Interface</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Conduct structured user testing with boxers</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Formal usability studies across beginner, intermediate, and advanced boxers would validate training effectiveness and identify UX improvements</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #2e7d32;" rowspan="2"><strong>Upper Mechanism</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Variable head-torso pad separation</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">A secondary actuator or adjustable rail would scale the head-torso spacing with user height (26 to 33 cm), improving anatomical accuracy</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">TPU lattice padding replacement</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">A single-piece TPU honeycomb print could replace the foam, spring, and PLA mount, reducing part count and providing tuneable dampening (Di Caprio et al., 2025)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #e65100;"><strong>Lower Mechanism</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Add linear translation (forward/backward axis)</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Enables the robot to maintain or close distance, replicating a real opponent's ring movement and creating pressure-based training scenarios</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="2"><strong>Robot Intelligence</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Expand block training data and add multi-camera support</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">More varied blocking samples would improve the 66.7% block accuracy. A second camera would resolve viewpoint ambiguity between similar punches</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Upgrade LLM to a larger quantised model</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">A 7B or 8B parameter model (still quantised to fit on-device) would generate richer post-session analysis and more specific drill suggestions</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #555;"><strong>System-Level</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Complete pending RM-3, RM-4, RM-5, RM-6 verification</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Height stroke, yaw velocity, strike speed, and impact detection tests are defined but require the fully integrated prototype</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div id="test-plan">
-      <h3>6.1 Test Plan</h3>
-      <p>This section summarises the subsystem testing approach across mechanical, sensing, vision, control, and user interaction.
-        A full test plan will be finalised once the hardware is confirmed. Testing each stage separately ensures the system is validated
-        under realistic conditions and refined for safety, reliability, and responsiveness.</p>
+      <h3>6.4 Remaining Test Plan</h3>
+      <p>
+        The table below summarises the subsystem and system-level tests that
+        are defined but pending execution at the time of writing. These tests
+        will be completed once the full prototype is assembled.
+      </p>
       <table-component subtitle="Table 19: Test Plan">
         <div id="table-subsystem-validation"></div>
       </table-component>
     </div>
 
-    <div id="project-plan">
-      <h3>6.2 Project Plan</h3>
-      <p>This section outlines the key milestones and overall timeline for
-    fabrication, subsystem testing, user testing, and full prototype assembly.
-    Buffer periods are included based on past project experience to accommodate
-    potential delays and ensure adequate time for troubleshooting and
-    refinement.</p>
-      <image-component
-        tag="image"
-        source="assets/future_work/important_milestone.png"
-        subtitle="Figure 26: Important Milestones">
-      </image-component>
-      <br>
-
-      <image-component
-        tag="image"
-        source="assets/future_work/overview_project_plan.png"
-        subtitle="Figure 27: Overview of Project Plan">
-      </image-component>
+    <div id="conclusion">
+      <h3>6.5 Conclusion</h3>
+      <p>
+        <strong>Project Outcome.</strong>
+        BoxBunny addresses the gap identified in Chapter 2: no existing
+        product consolidates adaptive fight intelligence, structured skill
+        progression, realistic sparring, modular hardware, and performance
+        analytics into a single platform. Of the 19 verification criteria
+        defined across all subsystems, 15 have been verified and passed, with
+        four mechanism-level requirements (RM-3 to RM-6) pending full
+        prototype integration.
+      </p>
+      <p>
+        <strong>Subsystem Contributions.</strong>
+        The <strong style="color:#1565c0;">User Interface</strong> delivers
+        four training modes, multi-user accounts, and a phone dashboard
+        across 24 GUI pages and 10 Vue views. The
+        <strong style="color:#2e7d32;">Upper Mechanism</strong> provides
+        2-DOF coaxial differential arms with impact-sensing padding. The
+        <strong style="color:#e65100;">Lower Mechanism</strong> provides a
+        stable base (FoS exceeding 1.5), yaw rotation, and screw-jack height
+        adjustment. The
+        <strong style="color:#7b1fa2;">Robot Intelligence</strong> layer
+        achieves 96.8% punch classification at 30 fps with CV+IMU sensor
+        fusion and on-device LLM coaching.
+      </p>
+      <p>
+        <strong>Key Technical Contributions.</strong>
+        The CV+IMU fusion pipeline for robust punch classification, the
+        Markov-chain sparring engine with weakness-biased opponent AI, and
+        the integrated on-device architecture that runs the full training
+        stack without internet connectivity.
+      </p>
     </div>
