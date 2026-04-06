@@ -28,87 +28,298 @@
 
     <h2>Design Ideation</h2>
     <p>
-      This page documents the conceptual selection for the rotation subsystem, determining the overall motion architecture, the central bearing type, and the actuation motor.
+      The ideation process for the rotation subsystem was not treated as a
+      single component-selection exercise. Instead, it progressed through a
+      sequence of design questions, where each stage of the yaw system was
+      compared against the most important needs of BoxBunny: realistic
+      re-angling behaviour, positional stiffness under punching, compact
+      packaging, manufacturability at prototype scale, and practical
+      integration with the wider lower mechanism. To make those trade-offs
+      explicit, <strong>selection matrices</strong> were used as a decision-support tool.
+    </p>
+    <p>
+      In this subsystem, the role of the selection matrix was not simply to
+      identify the "best" component numerically. Rather, it was used to
+      structure the progression from <strong>system-level motion architecture</strong> down
+      to <strong>bearing selection</strong>, then to <strong>drive-transmission strategy</strong>, and
+      finally to <strong>supporting refinements for stability and deployment</strong>. Each
+      matrix narrowed the solution space and informed the next stage of design
+      refinement.
     </p>
 
     <sl-divider></sl-divider>
 
-    <!-- 1. MOTION AXIS SELECTION -->
+    <!-- 1. ROTARY SUPPORT / BEARING CONCEPT -->
     <div>
-      <h3>1. Motion Axis Selection</h3>
+      <h3>1. Rotary Support / Bearing Concept</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Combined axial/radial/moment capacity</th>
+            <th>Rotational stiffness</th>
+            <th>Availability / cost</th>
+            <th>Ease of integration</th>
+            <th>Suitability for punching environment</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Lazy-Susan / turntable bearing</td>
+            <td>Low</td>
+            <td>Low</td>
+            <td>High</td>
+            <td>High</td>
+            <td>Poor</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Cross-roller bearing</td>
+            <td>Excellent</td>
+            <td>Excellent</td>
+            <td>Poor</td>
+            <td>Moderate</td>
+            <td>High</td>
+            <td><sl-badge variant="neutral">Not selected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Four-point contact slewing ring</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
-        Having to accomplish two motions (translation and rotation), a decision had to be made to either have both controlled within one mechanism (e.g., omnidirectional wheels) or decouple those axes into separate control systems.
+        This matrix was used to decide the <strong>type of rotary support</strong> for the
+        yaw stage. The lazy-Susan option was rejected because it is too loose
+        and too weak in overturning resistance. A cross-roller bearing was
+        attractive in stiffness but less favourable in cost and accessibility.
+        The <strong>four-point contact slewing ring</strong> was selected because it provides
+        the best balance of structural performance, prototype practicality, and
+        appropriate stiffness for the punching environment.
       </p>
-      
-      <p><strong>Omnidirectional Wheels</strong></p>
-      <p>
-        The omnidirectional wheel concept provides full planar mobility of the robot base. A single drive system enables translations in both the X and Y directions, as well as on-the-spot rotation, by appropriately commanding the individual wheel speeds. While attractive for general mobile robotics, it presents critical limitations for a punch-receiving boxing robot on typical gym flooring (mats, rubber tiles):
-      </p>
-      <ul>
-        <li>Wheels can sink slightly into the surface, changing the effective rolling radius and increasing rolling resistance.</li>
-        <li>The floor itself adds a compliant layer beneath the robot, amplifying pose creep under repeated impacts.</li>
-        <li>Small shifts accumulate over rounds, making it difficult to maintain a consistent stance reference relative to the user.</li>
-      </ul>
-
-      <p><strong>Decoupled Axes (Selected)</strong></p>
-      <p>
-        A design that explicitly decouples the primary motions (a linear rail for the forward–backward axis combined with a slewing bearing for rotation) sacrifices omnidirectional mobility but introduces significant advantages: high rotational stiffness, well-defined backlash, and high moment capacity, all independent of floor conditions. 
-      </p>
-
-      <image-component
-        width="90%" tag="image"
-        source="../../../assets/report appendix b/11-matrix-SingleSeparate Motion Control (Rotation).jpg"
-        subtitle="Table: Decision Matrix for Single/Separate Motion Control (Rotation)">
-      </image-component>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- 2. BEARING SELECTION -->
+    <!-- 2. GEARED VS NON-GEARED SLEWING-RING STRATEGY -->
     <div>
-      <h3>2. Bearing Selection</h3>
+      <h3>2. Geared vs Non-Geared Slewing-Ring Strategy</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Structural capacity</th>
+            <th>Mass</th>
+            <th>Cost / shipping</th>
+            <th>Ease of handling</th>
+            <th>Motor power demand</th>
+            <th>Design appropriateness</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Geared slewing ring (011.25.400)</td>
+            <td>Excellent</td>
+            <td>Very poor</td>
+            <td>Very poor</td>
+            <td>Poor</td>
+            <td>Poor</td>
+            <td>Poor</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Non-geared slewing ring (010.10.120)</td>
+            <td>Adequate</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
-        The yaw rotation system must support the full BoxBunny robot mass (&approx; 20–25 kg), plus dynamic punching loads and overturning moments from the elevated torso and arms. Four bearing families were evaluated.
+        This matrix captured the most important refinement in the design
+        journey. The geared slewing ring was structurally excellent but far too
+        heavy, costly, and power-hungry relative to the robot's real needs. The
+        <strong>010.10.120 non-geared slewing ring</strong> was selected because it satisfies
+        realistic load requirements while greatly improving manufacturability
+        and design appropriateness. This marks the point where the design
+        shifted clearly from <strong>maximum capability</strong> to <strong>fit-for-purpose
+        engineering</strong>.
       </p>
-      
-      <ul>
-        <li><strong>Lazy-Susan Bearing:</strong> Very low cost, but intended mainly for light axial loads with minimal preload. The noticeable play in tilt and rotation makes it unsuitable for precise yaw positioning or repeated impacts.</li>
-        <li><strong>Cross-Roller Slewing Ring:</strong> Very high tilting and rotational stiffness due to line contact. Excellent for combined loads, but generally more expensive and less readily available than ball-types. Higher performance than strictly required.</li>
-        <li><strong>Thrust Ball Slewing Rings:</strong> Optimised mainly for axial loads; not optimised for large overturning moments from an elevated torso without requiring additional complex bearings.</li>
-        <li><strong>Four-Point Contact Ball Slewing Ring (Selected):</strong> Designed to support combined axial, radial, and overturning moment loads. It can be preloaded to reduce internal clearance, and is widely available in standard sizes. It offers a perfect balance of load capacity, stiffness, availability, and cost.</li>
-      </ul>
-
-      <image-component
-        width="90%" tag="image"
-        source="../../../assets/report appendix b/14-matrix-Bearing Linear Rail.jpg"
-        subtitle="Table: Decision Matrix for Bearing in Yaw Rotation System">
-      </image-component>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- 3. MOTOR SELECTION -->
+    <!-- 3. ROTATION DRIVE-TRANSMISSION STRATEGY -->
     <div>
-      <h3>3. Motor Selection</h3>
+      <h3>3. Rotation Drive-Transmission Strategy</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Positive torque transmission</th>
+            <th>Packaging simplicity</th>
+            <th>Ratio flexibility</th>
+            <th>Fabrication tolerance</th>
+            <th>Serviceability</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Direct pinion on external gear</td>
+            <td>High</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="warning">Early concept only</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Friction-drive / wheel-drive concept</td>
+            <td>Low</td>
+            <td>High</td>
+            <td>Low</td>
+            <td>Poor</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Timing-belt drive to inner rotating surface</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Once the non-geared bearing had been selected, the drive system had to
+        become a separately designed subassembly. The <strong>timing-belt drive</strong> was
+        selected because it preserves positive torque transmission while
+        improving packaging flexibility, allowing the motor to remain on the
+        fixed structure and the ratio to be tuned through pulley selection. Crucially, 
+        the belt acts as a <strong>mechanical fuse</strong>, permitting elastic give under shock punches 
+        to protect the motor's gearbox, and is highly forgiving of fabricated mounting tolerances. 
+        This made it the most buildable and maintainable solution for the welded-base architecture.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 4. OUTBOARD SUPPORT AND DEPLOYMENT REFINEMENT -->
+    <div>
+      <h3>4. Outboard Support and Deployment Refinement</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Edge stability under overturning</th>
+            <th>Added part count</th>
+            <th>Packaging cleanliness</th>
+            <th>Transport compatibility</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Central bearing only</td>
+            <td>Moderate</td>
+            <td>High</td>
+            <td>High</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="warning">Not preferred alone</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Ring of many support rollers</td>
+            <td>High</td>
+            <td>Poor</td>
+            <td>Poor</td>
+            <td>Poor</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Discrete cam-follower supports + rear transport wheels</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        This final matrix was used to refine the subsystem beyond its minimum
+        working form. The selected approach used <strong>discrete cam-follower
+        supports</strong> to improve edge stability without excessive part count,
+        together with <strong>rear transport integration</strong> to ensure the module
+        remained practical for workshop and demo handling. This is where the
+        rotation subsystem matured from a pure motion axis into a more complete
+        base module.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5. MOTOR SELECTION -->
+    <div>
+      <h3>5. Motor Selection</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Low-speed torque</th>
+            <th>Position control &amp; accuracy</th>
+            <th>Disturbance rejection</th>
+            <th>Motion smoothness</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Brushed DC gearmotor</td>
+            <td>High</td>
+            <td>Poor (backlash)</td>
+            <td>Poor</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Closed-loop stepper (hybrid servo)</td>
+            <td>High</td>
+            <td>High</td>
+            <td>Moderate</td>
+            <td>Poor (cogging/ripple)</td>
+            <td><sl-badge variant="neutral">Not selected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>BLDC servo motor with encoder</td>
+            <td>High</td>
+            <td>Excellent</td>
+            <td>Excellent</td>
+            <td>Excellent (FOC)</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
         The yaw motor must rotate the full upper body about the vertical axis while resisting punching-induced moments. It must achieve a target speed of &approx;150&deg;/s with accurate, repeatable positioning and good disturbance rejection.
       </p>
-
-      <ul>
-        <li><strong>Brushed DC Gearmotor:</strong> High torque at low output speed and very simple control. However, it lacks inherent position control, and gearbox backlash causes visible yaw "looseness" when the robot is punched.</li>
-        <li><strong>Closed-Loop Stepper (Hybrid Servo):</strong> Good low-speed torque and encoder feedback for correcting position errors. However, steppers have torque ripple and microstep non-linearity, producing small angle "cogging" that can be felt as chatter by the user.</li>
-        <li><strong>BLDC Servo Motor with Encoder (Selected):</strong> Smooth, sinusoidal torque production via field-oriented control (FOC) reduces cogging and vibration. Closed-loop position control provides high yaw accuracy and active disturbance rejection under punching.</li>
-      </ul>
-
       <p>
-        For the yaw axis, user perception and stability are critical: the robot should rotate smoothly and feel "solid" under punches, without rattling or drifting. A BLDC Servo Motor is therefore chosen to provide controlled yaw motion and high positional stiffness.
+        For the yaw axis, user perception and stability are critical: the robot should rotate smoothly and feel "solid" under punches, without rattling or drifting. While <strong>brushed DC gearmotors</strong> and <strong>closed-loop steppers</strong> can meet basic torque needs, their drawbacks in backlash and torque ripple make them less suitable. A <strong>BLDC servo motor with encoder</strong> was therefore chosen because it provides smooth, sinusoidal torque production, high positional stiffness, and active disturbance rejection.
       </p>
-
-      <image-component
-        width="90%" tag="image"
-        source="../../../assets/report appendix b/16-matrix-Motor Yaw Rotation System.jpg"
-        subtitle="Table: Decision Matrix for Motor in Yaw Rotation System">
-      </image-component>
     </div>
 
     <sl-divider></sl-divider>

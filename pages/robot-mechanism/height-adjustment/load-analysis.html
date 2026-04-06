@@ -40,7 +40,7 @@
     <div>
       <h3>1. Payload &amp; Service Factor</h3>
       <p>
-        The estimated payload — the mass of everything above the height-adjustment column — is approximately <strong>10 kg</strong>. This includes the torso frame, arms, padding, sensors, and mounting hardware.
+        The estimated payload &mdash; the mass of everything above the height-adjustment column (torso, arms, upper frame, and attached components) &mdash; is approximately <strong>15 kg</strong>.
       </p>
 
       <div class="calc-card">
@@ -48,11 +48,15 @@
         <div class="calc-body">
           <p style="margin-top: 0;">The base gravitational load (W) is calculated as:</p>
           <div class="equation-box">
-            W<sub>payload</sub> = m &times; g = 10 kg &times; 9.81 m/s&sup2; &asymp; <strong>98.1 N</strong>
+            W = m<sub>upper</sub> &times; g = 15 kg &times; 9.81 m/s&sup2; &asymp; <strong>147.15 N</strong>
           </div>
-          <p>A <strong>light-shock service factor (SF) of 1.5</strong> is applied to account for minor bumps, assembly weight uncertainty, and dynamic start/stop amplification:</p>
+          <p>A <strong>service factor (FoS) of 1.5</strong> is applied to account for modelling uncertainty, future attachments, and minor dynamic effects during height adjustment:</p>
           <div class="equation-box">
-            F<sub>design</sub> = W<sub>payload</sub> &times; SF = 98.1 N &times; 1.5 &asymp; <strong>147 N</strong>
+            F<sub>jack,design</sub> = W &times; FoS = 147.15 N &times; 1.5 &asymp; <strong>220.7 N</strong>
+          </div>
+          <p>In "kg-equivalent" terms, this represents:</p>
+          <div class="equation-box">
+            m<sub>equiv</sub> = F<sub>jack,design</sub> / g = 220.7 / 9.81 &asymp; <strong>22.5 kg</strong>
           </div>
           <p style="margin-bottom: 0;">This is the design axial load for screw-jack selection. Lateral loads from punching are carried by the telescopic column, not the screw jack.</p>
         </div>
@@ -61,9 +65,33 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 2. STROKE & SPEED -->
+    <!-- 2. LATERAL LOADS & MOMENTS -->
     <div>
-      <h3>2. Stroke &amp; Speed Requirement</h3>
+      <h3>2. Lateral Loads &amp; Moments</h3>
+      <p>
+        Punches applied to the head or torso generate lateral forces and overturning moments on the upper carriage. The structural design punch load (<strong>F<sub>design</sub> = 2.7 kN</strong>) is used to size the components against these forces.
+      </p>
+      <div class="calc-card">
+        <div class="calc-header">Guide Rail Loading</div>
+        <div class="calc-body">
+          <p style="margin-top: 0;">The lateral reaction carried by the rear vertical guides is approximated as the full punch force in the worst-case direction:</p>
+          <div class="equation-box">
+            F<sub>lat</sub> &asymp; F<sub>design</sub> = <strong>2.7 kN</strong>
+          </div>
+          <p>The resulting overturning moment about the guide rail supports is:</p>
+          <div class="equation-box">
+            M<sub>guide</sub> = F<sub>design</sub> &times; e
+          </div>
+          <p style="margin-bottom: 0;">where <em>e</em> is the horizontal offset between the line of action of the punch and the guide rail plane. These loads size the guide rail cross-section, bearings, and bolt shear interfaces.</p>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- 3. STROKE & SPEED -->
+    <div>
+      <h3>3. Stroke &amp; Speed Requirement</h3>
       
       <div class="calc-card">
         <div class="calc-header">Required Linear Speed</div>
@@ -79,24 +107,24 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 3. SCREW JACK SELECTION -->
+    <!-- 4. SCREW JACK SELECTION -->
     <div>
-      <h3>3. Screw Jack Selection (HK2T)</h3>
+      <h3>4. Screw Jack Selection (HK2T)</h3>
       <p>
-        The <strong>HK2T travelling-nut screw jack</strong> was selected as the axial lifting device. In a travelling-nut configuration, the screw rotates while the nut moves linearly — the nut is connected directly to the moving inner member of the telescopic column.
+        The <strong>HK2T travelling-nut manual screw jack</strong> was selected as the axial lifting device. In a travelling-nut configuration, the screw rotates while the nut moves linearly &mdash; the nut is connected directly to the moving inner member of the telescopic column.
       </p>
       <ul>
-        <li><strong>Design Load Capacity:</strong> Rated well above the 147 N design load, providing adequate margin for the payload plus service factor.</li>
-        <li><strong>Self-Locking:</strong> The screw thread lead angle is below the friction angle. The column inherently <strong>holds its position</strong> even without motor power. No external brake or locking mechanism is required.</li>
+        <li><strong>Design Load Capacity:</strong> Commercially available screw jacks are typically rated in the kilonewton range. A jack rated for &ge; 1 kN easily exceeds the <strong>0.22 kN</strong> (220.7 N) design load by a large margin, providing immense implicit safety against eccentricities and long-term wear.</li>
+        <li><strong>Self-Locking:</strong> The screw thread lead angle is below the friction angle. The column inherently <strong>holds its position</strong> even without motor power, making it non-backdrivable under the 15 kg payload.</li>
         <li><strong>Safety:</strong> The self-locking property ensures the column does not bounce or back-drive under downward axial impact forces during training.</li>
       </ul>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- 4. MOTOR INPUT REQUIREMENT -->
+    <!-- 5. MOTOR INPUT REQUIREMENT -->
     <div>
-      <h3>4. Motor Input Requirement</h3>
+      <h3>5. Motor Input Requirement</h3>
       
       <div class="calc-card">
         <div class="calc-header">Required Motor RPM</div>
@@ -113,6 +141,13 @@
       <p>
         These calculations verify that the mechanical design meets system-level requirement <strong>RM-3 (Height Adjustability)</strong>: accommodating users of different heights by providing a vertical adjustment range of at least 400 mm within an acceptable 32-second setup time, utilizing a safe, self-locking mechanism.
       </p>
+
+      <h4>Remaining Analytical Gaps</h4>
+      <ul>
+        <li>Quantitative measurement of column deflection under lateral punching loads.</li>
+        <li>Repeated-cycle wear testing of the Delrin bearing interfaces.</li>
+        <li>Motor-control validation against the aspirational 10-second full-stroke user preference.</li>
+      </ul>
     </div>
 
     <sl-divider></sl-divider>

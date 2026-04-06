@@ -17,32 +17,6 @@ finally to **supporting refinements for stability and deployment**. Each
 matrix narrowed the solution space and informed the next stage of design
 refinement.
 
-**Concept selection matrix: lower-mechanism motion architecture**
-
-  -------------------------------------------------------------------------------------------------------------------
-  **Concept**             **Positional   **Motion   **Floor      **Integration   **Manufacturability**   **Final
-                          stiffness      realism    dependence / with other                              decision**
-                          under impact** for boxing slip risk**  subsystems**                            
-                                         drills**                                                        
-  ----------------------- -------------- ---------- ------------ --------------- ----------------------- ------------
-  Omnidirectional-wheel   Moderate       High in    Poor         Moderate        Moderate                Rejected
-  base                                   theory                                                          
-
-  Differential-drive      Low to         Poor to    Poor         Moderate        High                    Rejected
-  mobile base             moderate       moderate                                                        
-
-  Decoupled yaw stage +   High           High       High         High            High                    Selected
-  linear stage                                                                                           
-  -------------------------------------------------------------------------------------------------------------------
-
-This matrix was used to choose the **overall motion philosophy** of the
-lower mechanism. Wheel-based solutions were rejected because they
-introduce floor dependence, pose drift, and poorer stiffness under
-repeated impacts. The **decoupled yaw stage plus linear stage** was
-selected because it best matched the actual use case: it allows the
-rotation axis to be designed specifically for combined loading while
-preserving repeatable motion geometry.
-
 **Concept selection matrix: rotary support / bearing concept**
 
   -----------------------------------------------------------------------------------------------------------------
@@ -151,9 +125,3 @@ together with **rear transport integration** to ensure the module
 remained practical for workshop and demo handling. This is where the
 rotation subsystem matured from a pure motion axis into a more complete
 base module.
-
-Overall, the matrices made the rotation design more disciplined. They
-helped move the subsystem step-by-step from motion architecture, to
-bearing concept, to transmission method, to support refinement,
-producing a final yaw module that is more coherent with the way BoxBunny
-is intended to be built and used.

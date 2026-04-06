@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Design Ideation — Height Adjustment</title>
+  <title>IS-431: Height Adjustment Design Ideation</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../../../index.css">
-  <link rel="stylesheet" href="../../../components/table-of-content/table-of-content.css">
-  <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; text-align: left; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -25,104 +28,221 @@
 
     <h2>Design Ideation</h2>
     <p>
-      This page documents the three height-adjustment concepts evaluated for BoxBunny to satisfy system-level requirement
-      <strong>RM-3 (Height Adjustability)</strong>, the rejection rationale for each alternative, and the selection of the final
-      <strong>manual screw jack with vertical linear guides</strong> architecture.
+      The ideation process for height adjustment was not treated as a single
+      component-selection exercise. Instead, it progressed through a sequence
+      of design questions, where each stage of the subsystem was compared
+      against the most important needs of BoxBunny: sufficient stroke,
+      structural stiffness under punching, compact packaging,
+      manufacturability at prototype scale, and practical usability. To make
+      those trade-offs explicit, <strong>selection matrices</strong> were used as a
+      decision-support tool.
+    </p>
+    <p>
+      In this subsystem, the role of the selection matrix was not simply to
+      identify the "best" mechanism numerically. Rather, it was used to
+      structure the design progression from <strong>basic adjustability concepts</strong>,
+      to <strong>guide-and-actuator separation</strong>, to the final <strong>integrated
+      telescopic column architecture</strong>. Each matrix narrowed the solution
+      space and made the design trade-offs explicit.
     </p>
 
     <sl-divider></sl-divider>
 
-    <!-- 1. DESIGN CONSTRAINTS -->
+    <!-- 1. HIGH-LEVEL HEIGHT-ADJUSTMENT CONCEPT -->
     <div>
-      <h3>Design Constraints</h3>
+      <h3>1. High-Level Height-Adjustment Concept</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>User adjustability</th>
+            <th>Structural rigidity under punch loads</th>
+            <th>Complexity</th>
+            <th>Packaging</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fixed-height body</td>
+            <td>None</td>
+            <td>High</td>
+            <td>Low</td>
+            <td>High</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Manual telescopic mast</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>Low</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Commercial lift column</td>
+            <td>High</td>
+            <td>Uncertain</td>
+            <td>Low</td>
+            <td>High</td>
+            <td><sl-badge variant="neutral">Not selected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Guided lift column + screw jack</td>
+            <td>High</td>
+            <td>High</td>
+            <td>Moderate</td>
+            <td>High</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
-        The height adjustment system must vary the torso/head height by approximately <strong>300–400 mm</strong> to accommodate different
-        user heights, while:
+        This first matrix was used to decide the <strong>overall adjustment
+        philosophy</strong>. A fixed-height body was rejected immediately because it
+        could not accommodate different users. A manually adjustable mast would
+        reduce electrical complexity, but it would compromise ease of use and
+        would not give clean, repeatable setup positioning. Commercial lift
+        columns were attractive because of their integrated packaging, but their
+        side-load capability under boxing disturbances was too uncertain.
       </p>
-      <ul>
-        <li>Carrying the <strong>axial load</strong> of the upper structure (~20–25 kg including arms and padding)</li>
-        <li>Resisting <strong>lateral forces and overturning moments</strong> from punches</li>
-        <li>Remaining <strong>stiff and "non-bouncy"</strong> during training — once set, the height should not oscillate</li>
-        <li>Being <strong>safe and simple</strong> for users to adjust occasionally</li>
-        <li>Fitting within the available <strong>vertical envelope</strong> above the linear stage</li>
-      </ul>
+      <p>
+        The <strong>guided lift column plus screw jack</strong> direction was selected
+        because it was the only concept that directly addressed both the user's
+        need for adjustability and the robot's need for structural stability
+        under punch loading. This was the first point at which the subsystem
+        moved beyond simple height change and became a true structural design
+        problem.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- 2. CONCEPT 1 -->
+    <!-- 2. GUIDE STRATEGY -->
     <div>
-      <h3>Concept #1: Office Chair Mechanism + Vertical Linear Guide</h3>
+      <h3>2. Guide Strategy</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Lateral stiffness</th>
+            <th>Part count</th>
+            <th>Tolerance sensitivity</th>
+            <th>Serviceability</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dual rear linear guides + carriage</td>
+            <td>High</td>
+            <td>Poor</td>
+            <td>Poor</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="warning">Early concept</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Telescopic guided column</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Actuator-only guidance</td>
+            <td>Poor</td>
+            <td>High</td>
+            <td>High</td>
+            <td>Poor</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
-        The first concept adapted the <strong>office chair mechanism</strong>: a gas lift cylinder to carry the axial load, combined with vertical
-        linear guides at the back to resist lateral punching forces.
+        This matrix was used to decide how the subsystem should react
+        punching-induced side loads. The early dual-linear-guide concept was
+        mechanically sound and played an important role in clarifying the
+        load-path logic. It offered good stiffness, but it relied on many
+        precision-mounted components and introduced alignment sensitivity and
+        potential failure points. An actuator-only guidance concept was rejected
+        because it would side-load the screw and compromise reliability.
       </p>
-
-      <image-component tag="image" source="../../../assets/report appendix b/17-height-concept1.png" subtitle="Figure: Required components and integration drawing for Concept #1."></image-component>
-
-      <h4>Advantages</h4>
-      <ul>
-        <li>Gas lifts are <strong>readily available and compact</strong></li>
-        <li>Can carry the <strong>static axial load</strong> of the robot mass</li>
-        <li>Vertical linear guides at the back can handle <strong>lateral loads and overturning moments</strong></li>
-      </ul>
-
-      <h4>Rejection Rationale</h4>
-      <ul>
-        <li>Gas cylinders are inherently <strong>compliant</strong>. Under repeated punches, this leads to <strong>vertical "bouncing"</strong> of the torso, reducing strike rigidity.</li>
-        <li>The internal gas spring force varies with stroke; stiffness is <strong>not easily tuned</strong>.</li>
-      </ul>
-      <p><strong>Conclusion:</strong> Rejected — Insufficient vertical stiffness.</p>
+      <p>
+        The <strong>telescopic guided column</strong> was selected because it preserved the
+        same fundamental structural logic as the rear-linear-guide concept, but
+        implemented it with fewer parts, a cleaner load path, and lower
+        tolerance sensitivity. This was one of the most important design
+        refinements in the subsystem.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
 
-    <!-- 3. CONCEPT 2 -->
+    <!-- 3. ACTUATOR STRATEGY -->
     <div>
-      <h3>Concept #2: Electric Gas Strut + Motorised Vertical Linear Guide</h3>
+      <h3>3. Actuator Strategy</h3>
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>Axial load capacity</th>
+            <th>Self-holding / fail-safe behaviour</th>
+            <th>Integration with guide structure</th>
+            <th>Complexity</th>
+            <th>Final decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Gas spring / gas lift</td>
+            <td>Moderate</td>
+            <td>Poor</td>
+            <td>Poor</td>
+            <td>Low</td>
+            <td><sl-badge variant="danger">Rejected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Powered linear actuator column</td>
+            <td>Moderate to high</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>Low</td>
+            <td><sl-badge variant="neutral">Not selected</sl-badge></td>
+          </tr>
+          <tr>
+            <td>Screw jack with travelling nut</td>
+            <td>High</td>
+            <td>High</td>
+            <td>High</td>
+            <td>Moderate</td>
+            <td><sl-badge variant="success">Selected</sl-badge></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
-        The second concept combined an <strong>electrically actuated mechanism</strong> for height control with a gas strut at the bottom to assist in carrying axial load.
+        This matrix focused on the actual lifting device. Gas-spring-based
+        concepts were rejected because they behave like spring-damper systems
+        and are structurally too compliant for a robot that receives impact.
+        Commercial powered lift columns remained attractive, but again suffered
+        from uncertainty in side-load behaviour and less explicit control over
+        load-path design.
       </p>
-
-      <image-component tag="image" source="../../../assets/report appendix b/18-height-concept2.png" subtitle="Figure: Required components and integration drawing for Concept #2."></image-component>
-
-      <h4>Advantages</h4>
-      <ul>
-        <li>Allows <strong>push-button height adjustment</strong></li>
-        <li>The gas strut can reduce motor torque by <strong>counterbalancing</strong> part of the robot's weight</li>
-      </ul>
-
-      <h4>Rejection Rationale</h4>
-      <ul>
-        <li>Mechanically and electrically <strong>complex</strong>: coordinating motor drive, gas strut support, and guide loads is non-trivial.</li>
-        <li>Multiple elements share the load path, making <strong>stiffness and reliability harder to predict</strong>.</li>
-      </ul>
-      <p><strong>Conclusion:</strong> Rejected — Unnecessary complexity for an infrequent adjustment.</p>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- 4. CONCEPT 3 -->
-    <div>
-      <h3>Concept #3: Screw Jack + Vertical Linear Guides (Selected)</h3>
       <p>
-        The final concept uses a <strong>manual screw jack</strong> mounted on top of the linear stage, combined with <strong>vertical linear rails</strong> as primary guides.
+        The <strong>travelling-nut screw jack</strong> was selected because it provides a
+        strong axial support mechanism, has inherent self-holding behaviour, and
+        integrates naturally with a guide structure that resists lateral loads
+        separately. This matched the desired fail-safe and load-separation
+        philosophy of the subsystem.
       </p>
-      <ul>
-        <li>The <strong>screw jack</strong> carries the axial load and provides precise height adjustment</li>
-        <li>Two <strong>vertical linear rails</strong> carry lateral forces and overturning moments from punches</li>
-      </ul>
-
-      <image-component tag="image" source="../../../assets/Lower_mechanism/8height adjustment - cad overview.png" subtitle="Figure: CAD overview of height adjustment component."></image-component>
-
-      <h4>Why This Concept Was Selected</h4>
-      <ul>
-        <li><strong>High axial stiffness:</strong> screw jacks are designed for heavy-duty industrial applications.</li>
-        <li><strong>Self-locking:</strong> non-backdrivable screw — height does not drift or bounce under impacts.</li>
-        <li><strong>Simple load path:</strong> axial loads go directly through the screw jack; lateral loads go through the rails.</li>
-        <li><strong>Robust and maintainable:</strong> standard industrial components with proven reliability.</li>
-      </ul>
-      <p><strong>Conclusion:</strong> Selected. Provides high holding stiffness, self-locking behaviour, and a clear separation of axial vs lateral support.</p>
+      <p>
+        The final design is a custom-machined telescopic column with an integrated
+        lead screw and travelling nut. The inner column is guided by linear
+        bearings that run on the outer column, while the lead screw is driven
+        by a stepper motor at the base. This design provides a compact, robust,
+        and user-friendly height adjustment mechanism that meets the unique
+        demands of BoxBunny's punching interactions.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
