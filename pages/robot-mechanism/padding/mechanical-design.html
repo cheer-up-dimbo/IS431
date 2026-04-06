@@ -124,8 +124,8 @@
         dimensionless ratios:
       </p>
       <ul>
-        <li><strong>r<sub>head</sub> = 0.92</strong> (chin height / stature, midpoint of 0.87 to 0.92 range)</li>
-        <li><strong>r<sub>torso</sub> = 0.72</strong> (xiphoid height / stature, midpoint of 0.70 to 0.75 range)</li>
+        <li><strong>r<sub>head</sub> = 0.875</strong> (chin height / stature, midpoint of the 0.87 to 0.88 range)</li>
+        <li><strong>r<sub>torso</sub> = 0.70</strong> (xiphoid height / stature, midpoint of the 0.68 to 0.72 range)</li>
       </ul>
 
       <h4>Design Envelope</h4>
@@ -145,29 +145,29 @@
         <tbody>
           <tr>
             <td><strong>Head strike height</strong></td>
-            <td>138 cm</td>
-            <td>175 cm</td>
+            <td>131 cm</td>
+            <td>166 cm</td>
           </tr>
           <tr>
             <td><strong>Torso strike height</strong></td>
-            <td>108 cm</td>
-            <td>137 cm</td>
+            <td>105 cm</td>
+            <td>133 cm</td>
           </tr>
           <tr>
             <td><strong>Head-torso separation</strong></td>
-            <td>30 cm</td>
-            <td>38 cm</td>
+            <td>26 cm</td>
+            <td>33 cm</td>
           </tr>
         </tbody>
       </table>
 
       <p>
-        The head-torso separation varies from approximately 30 cm (shorter
-        users) to 38 cm (taller users), with a mean of approximately 34 cm.
+        The head-torso separation varies from approximately 26 cm (shorter
+        users) to 33 cm (taller users), with a mean of approximately 30 cm.
         Because the screw jack moves both pads as a unit, the robot adopts a
-        fixed vertical separation of 34 cm between the head and torso pad
-        centres. The total vertical travel required is 175 cm minus 138 cm =
-        37 cm for the head target, which falls within the screw jack's 400 mm
+        fixed vertical separation of 30 cm between the head and torso pad
+        centres. The total vertical travel required is 166 cm minus 131 cm =
+        35 cm for the head target, which falls within the screw jack's 400 mm
         stroke.
       </p>
 
@@ -187,18 +187,18 @@
           <!-- Head strike zone (chin) -->
           <line x1="60" y1="75" x2="170" y2="75" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
           <rect x="155" y="66" width="60" height="18" rx="3" fill="#e53935"/>
-          <text x="185" y="79" text-anchor="middle" fill="white" font-size="10" font-weight="bold">138 cm</text>
+          <text x="185" y="79" text-anchor="middle" fill="white" font-size="10" font-weight="bold">131 cm</text>
 
           <!-- Torso strike zone (xiphoid) -->
           <line x1="60" y1="133" x2="170" y2="133" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
           <rect x="155" y="124" width="60" height="18" rx="3" fill="#2e7d32"/>
-          <text x="185" y="137" text-anchor="middle" fill="white" font-size="10" font-weight="bold">108 cm</text>
+          <text x="185" y="137" text-anchor="middle" fill="white" font-size="10" font-weight="bold">105 cm</text>
 
           <!-- Separation annotation -->
           <line x1="55" y1="75" x2="55" y2="133" stroke="#555" stroke-width="1"/>
           <line x1="50" y1="75" x2="60" y2="75" stroke="#555" stroke-width="1"/>
           <line x1="50" y1="133" x2="60" y2="133" stroke="#555" stroke-width="1"/>
-          <text x="48" y="108" text-anchor="end" fill="#555" font-size="9">30 cm</text>
+          <text x="48" y="108" text-anchor="end" fill="#555" font-size="9">26 cm</text>
 
           <!-- Ground line and height label -->
           <line x1="80" y1="290" x2="160" y2="290" stroke="#999" stroke-width="1"/>
@@ -220,18 +220,18 @@
           <!-- Head strike zone (chin) -->
           <line x1="310" y1="55" x2="435" y2="55" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
           <rect x="420" y="46" width="60" height="18" rx="3" fill="#e53935"/>
-          <text x="450" y="59" text-anchor="middle" fill="white" font-size="10" font-weight="bold">175 cm</text>
+          <text x="450" y="59" text-anchor="middle" fill="white" font-size="10" font-weight="bold">166 cm</text>
 
           <!-- Torso strike zone (xiphoid) -->
           <line x1="310" y1="120" x2="435" y2="120" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
           <rect x="420" y="111" width="60" height="18" rx="3" fill="#2e7d32"/>
-          <text x="450" y="124" text-anchor="middle" fill="white" font-size="10" font-weight="bold">137 cm</text>
+          <text x="450" y="124" text-anchor="middle" fill="white" font-size="10" font-weight="bold">133 cm</text>
 
           <!-- Separation annotation -->
           <line x1="305" y1="55" x2="305" y2="120" stroke="#555" stroke-width="1"/>
           <line x1="300" y1="55" x2="310" y2="55" stroke="#555" stroke-width="1"/>
           <line x1="300" y1="120" x2="310" y2="120" stroke="#555" stroke-width="1"/>
-          <text x="298" y="92" text-anchor="end" fill="#555" font-size="9">38 cm</text>
+          <text x="298" y="92" text-anchor="end" fill="#555" font-size="9">33 cm</text>
 
           <!-- Ground line and height label -->
           <line x1="335" y1="290" x2="425" y2="290" stroke="#999" stroke-width="1"/>
@@ -243,7 +243,7 @@
 
           <!-- Centre annotation: fixed 34 cm -->
           <rect x="210" y="155" width="100" height="40" rx="6" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
-          <text x="260" y="173" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">Fixed: 34 cm</text>
+          <text x="260" y="173" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">Fixed: 30 cm</text>
           <text x="260" y="187" text-anchor="middle" fill="#777" font-size="9">(design mean)</text>
 
           <!-- Legend -->
@@ -259,9 +259,9 @@
 
       <h4>Zone-Based Pad Sizing</h4>
       <p>
-        The fixed 34 cm separation is the mean of the anatomical range
-        (30 to 38 cm). For shorter users, the actual head-torso gap is
-        smaller than 34 cm, so the pads overlap slightly in coverage. For
+        The fixed 30 cm separation is the mean of the anatomical range
+        (26 to 33 cm). For shorter users, the actual head-torso gap is
+        smaller than 30 cm, so the pads overlap slightly in coverage. For
         taller users, the gap is larger, leaving a small uncovered region
         between pads. To accommodate this variation without adding mechanical
         complexity, the pads are designed as vertically extended zones rather
@@ -562,11 +562,11 @@
     <div>
       <h3>Future Work: Variable Head-Torso Ratio</h3>
       <p>
-        The current design uses a fixed 34 cm head-torso separation derived
+        The current design uses a fixed 30 cm head-torso separation derived
         from mean anthropometric proportions. In practice, the ratio between
         head and torso height is not constant across statures: shorter
         individuals tend to have a proportionally smaller head-torso gap than
-        taller individuals (approximately 30 cm at 150 cm versus 38 cm at
+        taller individuals (approximately 26 cm at 150 cm versus 33 cm at
         190 cm). A future revision could introduce a second degree of freedom,
         for example a secondary linear actuator or adjustable mounting rail,
         to allow the head-torso spacing to scale with user height. This would
