@@ -9,10 +9,14 @@
   // ─── Base Path (derived from this script's URL) ────────────────────
   // Script lives at {base}/components/report-nav/report-nav.js
   // so we strip that suffix to get the site root URL.
+  //
+  // BASE      = full origin + path prefix, e.g. "https://user.github.io/IS431"
+  // BASE_PATH = just the path prefix,       e.g. "/IS431"  (empty on live server)
   const _script = document.currentScript;
   const BASE = _script
     ? _script.src.replace(/\/components\/report-nav\/report-nav\.js.*$/, '')
     : '';
+  const BASE_PATH = BASE ? new URL(BASE).pathname.replace(/\/$/, '') : '';
 
   // ─── Navigation Structure ───────────────────────────────────────────
   const NAV_TREE = [
@@ -144,10 +148,16 @@
   };
 
   // ─── Helpers ────────────────────────────────────────────────────────
+  // Returns the current pathname with the BASE_PATH prefix stripped.
+  // e.g. on GitHub Pages: "/IS431/pages/gui.html" → "/pages/gui.html"
   function currentPath() {
-    return window.location.pathname;
+    const p = window.location.pathname;
+    return BASE_PATH && p.startsWith(BASE_PATH)
+      ? p.slice(BASE_PATH.length) || '/'
+      : p;
   }
 
+  // Build a full href from a root-relative path like "/pages/gui.html".
   function resolveHref(href) {
     return BASE + href;
   }
@@ -156,11 +166,11 @@
     const path = currentPath();
     const hrefPath = href.split('#')[0];
     if (!hrefPath || hrefPath === '/') return false;
-    return path.endsWith(hrefPath) || path === hrefPath;
+    // Exact match or trailing-slash equivalence
+    return path === hrefPath || path === hrefPath + '/';
   }
 
   function isInSubsystem(parentHref) {
-    const path = currentPath();
     const parentPath = parentHref.split('#')[0];
     if (isActive(parentHref)) return true;
     const subpages = SUBSYSTEM_SUBPAGES[parentPath];
