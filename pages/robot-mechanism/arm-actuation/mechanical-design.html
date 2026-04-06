@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Mechanical Design — Upper Mechanism</title>
+  <title>IS-431: 5.2.5.2 Mechanical Design — Arm Actuation</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -76,13 +76,13 @@
     </a>
     <br>
 
-    <h2>Mechanical Design</h2>
+    <h2>5.2.5.2 Mechanical Design</h2>
     <p>
       This section presents the structural and dynamic analysis of the
       Coaxial Differential 2-DOF joint, covering
-      <strong>Drivetrain Logic</strong> (gear reduction,
+      Drivetrain Logic (gear reduction,
       kinematics, and helical profile rationale) and
-      <strong>Material Science &amp; Structural Hardening</strong>
+      Material Science and Structural Hardening
       (the transition from FDM polymers to a hybrid steel-Delrin
       interface).
     </p>
@@ -91,19 +91,19 @@
     <!-- 1. FINAL JOINT DESIGN                                  -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Final Joint Design — Coaxial Differential with Side-Mounted Motors</h3>
+      <h3>5.2.5.2.1 Final Joint Design — Coaxial Differential with Side-Mounted Motors</h3>
       <p>
         The selection of the Damiao DM-J4310-2EC motors informed the final
         mechanical architecture: two motors mounted
-        <strong>side-by-side horizontally</strong> at the base of the arm,
+        side-by-side horizontally at the base of the arm,
         each driving a pinion gear that meshes with a central
-        <strong>coaxial gear stack</strong>. This drivetrain arrangement
+        coaxial gear stack. This drivetrain arrangement
         provides the 3:1 gear reduction while keeping both motors at the
         pivot point for mass centralisation. Motor 1's gear path connects
         through a bevel gear to drive the pitch axis (inner shaft), while
         Motor 2's gear path drives the roll axis (outer housing). Both
         motors are positioned proximally to achieve the
-        <strong>mass centralisation</strong> strategy detailed in
+        mass centralisation strategy detailed in
         <a href="design-ideation.html">Design &amp; Ideation</a>.
       </p>
 
@@ -181,18 +181,18 @@
     <!-- 2. DRIVETRAIN LOGIC                                    -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Drivetrain Logic</h3>
+      <h3>5.2.5.2.2 Drivetrain Logic</h3>
       <p>
         The gear reduction and kinematic derivation are presented as a
         unified system because the differential coupling between the
         two axes means that gear properties directly affect the kinematic
-        equations — and vice versa.
+        equations, and vice versa.
       </p>
 
       <h4>3:1 Helical-Spur Gear Reduction</h4>
       <p>
         Each motor drives the central gear stack through a
-        <strong>3:1 reduction</strong>: the motor must rotate 3 full
+        3:1 reduction: the motor must rotate 3 full
         revolutions (1080&deg; / 18.84 rad) to produce 1 full revolution
         (360&deg; / 6.28 rad) at the output. This reduction delivers
         3&times; the motor's native torque at the joint, while reducing
@@ -202,141 +202,133 @@
         <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
         <strong>Configuration Requirement:</strong> The Damiao motors must
         operate with <strong>Multi-Turn Encoders (2EC) enabled</strong>.
-        Without multi-turn mode, the encoder wraps at 360&deg;, preventing
-        the motor from commanding the 1080&deg; rotation required for full
-        joint travel.
+        Without 2EC multi-turn tracking enabled, the motor's internal position
+        register is bounded to a single 360&deg; range. Since the 3:1 external
+        gear requires the motor output shaft to rotate 1080&deg; for full joint
+        travel, multi-turn mode is mandatory.
       </sl-alert>
 
       <h4>Helical Gear Profile — Overlap Ratio &amp; Torsional Rigidity</h4>
       <p>
-        The selection of a <strong>helical gear profile</strong> (as
+        The selection of a helical gear profile (as
         opposed to straight-cut spur gears) was not solely motivated by
         backlash reduction. The angled tooth profile provides a
-        significantly higher <strong>contact ratio (overlap ratio)</strong>
-        — the average number of teeth simultaneously in mesh. For the
+        significantly higher contact ratio (overlap ratio),
+        defined as the average number of teeth simultaneously in mesh. For the
         selected helical geometry, this ratio exceeds 1.5, meaning that at
         any given instant, at least one-and-a-half tooth pairs share the
         transmitted load.
       </p>
       <p>
         This property is critical for the boxing application. During a
-        <strong>snap-back command</strong> (proportional retraction from
+        snap-back command (proportional retraction from
         the strike apex), the motors undergo rapid direction reversal,
-        generating an <strong>impulse torque</strong> that propagates
+        generating an impulse torque that propagates
         through the gear train. With straight-cut spur gears (overlap
         ratio &asymp; 1.0), this impulse would be borne by a single tooth
-        pair — concentrating stress and accelerating fatigue in
+        pair, concentrating stress and accelerating fatigue in
         3D-printed PLA teeth. The helical profile distributes this impulse
         across multiple tooth pairs, increasing the drivetrain's
-        <strong>torsional rigidity</strong> and extending the fatigue
+        torsional rigidity and extending the fatigue
         life of the 3D-printed gears under repeated high-velocity
         sparring cycles.
       </p>
 
-      <!-- ─── Technical Callout: Kinematics (Validated 2026-04-02) ─── -->
+      <!-- ─── Technical Callout: Kinematics ─── -->
       <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Closed-Form Kinematic Equations
-          <span style="font-weight:normal; font-size:0.85em; color:#059669;">(Validated 2026-04-02)</span>
-        </h4>
+        <h4 style="margin-top:0; color:#1e40af;">Closed-Form Kinematic Equations</h4>
         <p>
           The following equations define the relationship between the
           raw motor encoder space (m<sub>r</sub>&nbsp;=&nbsp;roll motor,
           m<sub>p</sub>&nbsp;=&nbsp;pitch motor) and the joint output
           space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>). The
           model uses three calibrated sign parameters:
-        </p>
-        <ul>
-          <li><strong>s<sub>r</sub></strong> — roll motor sign (&plusmn;1)</li>
-          <li><strong>s<sub>p</sub></strong> — pitch motor sign (&plusmn;1)</li>
-          <li><strong>c</strong> — bevel gear coupling direction (&plusmn;1)</li>
-        </ul>
-        <p>
-          These are determined by the
+          <em>s<sub>r</sub></em> (roll motor sign, &plusmn;1),
+          <em>s<sub>p</sub></em> (pitch motor sign, &plusmn;1),
+          and <em>c</em> (bevel gear coupling direction, &plusmn;1).
+          These parameters are determined by the
           <a href="#calibration-probe">4-test calibration probe</a>
-          and account for mirror symmetry between left/right arms and
-          bevel gear mounting orientation.
+          and account for mirror symmetry between left and right arms as
+          well as bevel gear mounting orientation.
         </p>
 
-        <h5>Motor &rarr; Joint (Forward Conversion)</h5>
-        <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
-          &theta;<sub>roll</sub> = s<sub>r</sub> &middot;
-          (m<sub>r</sub> &minus; o<sub>r</sub>) / G
-          &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
-          &theta;<sub>pitch</sub> = s<sub>p</sub> &middot;
-          [(m<sub>p</sub> &minus; o<sub>p</sub>) + c &middot;
-          (m<sub>r</sub> &minus; o<sub>r</sub>)] / G
-          &nbsp;&nbsp;&nbsp;(Eq. 2)
-        </p>
-        <p>
-          where G&nbsp;=&nbsp;3 (helical-spur gear reduction) and
-          o<sub>r</sub>, o<sub>p</sub> are the calibrated home offsets.
-        </p>
-        <p>
-          <strong>Eq. 2</strong> reveals the differential coupling: pitch
-          depends on the <em>sum</em> of the pitch motor displacement and
-          a coupling-weighted roll motor displacement. When both motors
-          rotate in the same direction, the coupling term cancels the
-          bevel walking — this is the
-          <strong>pure roll</strong> condition.
-        </p>
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer; font-weight:600; color:#1e40af; font-size:0.95rem; user-select:none;">
+            Show full equations
+          </summary>
+          <div style="margin-top:12px;">
 
-        <h5>Joint &rarr; Motor (Inverse Conversion)</h5>
-        <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
-          &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> / s<sub>r</sub>)
-          &middot; G, &nbsp;&nbsp;
-          m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
-          &nbsp;&nbsp;&nbsp;(Eq. 3)<br><br>
-          m<sub>p</sub> = [(&theta;<sub>pitch</sub> / s<sub>p</sub>)
-          &middot; G &minus; c &middot; &Delta;<sub>r</sub>]
-          + o<sub>p</sub>
-          &nbsp;&nbsp;&nbsp;(Eq. 4)
-        </p>
-        <p>
-          <strong>Eq. 4</strong> is the firmware's primary command
-          equation. The subtraction of <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em>
-          is the <strong>software decoupling term</strong>
-          that cancels the parasitic walking effect in real-time.
-        </p>
+            <h5>Motor &rarr; Joint (Forward Conversion)</h5>
+            <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
+              &theta;<sub>roll</sub> = s<sub>r</sub> &middot;
+              (m<sub>r</sub> &minus; o<sub>r</sub>) / G
+              &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
+              &theta;<sub>pitch</sub> = s<sub>p</sub> &middot;
+              [(m<sub>p</sub> &minus; o<sub>p</sub>) + c &middot;
+              (m<sub>r</sub> &minus; o<sub>r</sub>)] / G
+              &nbsp;&nbsp;&nbsp;(Eq. 2)
+            </p>
+            <p>
+              where G&nbsp;=&nbsp;3 (helical-spur gear reduction) and
+              o<sub>r</sub>, o<sub>p</sub> are the calibrated home offsets.
+            </p>
+            <p>
+              Eq. 2 reveals the differential coupling: pitch
+              depends on the <em>sum</em> of the pitch motor displacement and
+              a coupling-weighted roll motor displacement. When both motors
+              rotate in the same direction, the coupling term cancels the
+              bevel walking; this is the
+              pure roll condition.
+            </p>
 
-        <h5>Forward Kinematics (Rotation-Around-Arm-Axis Model)</h5>
-        <p>
-          At &theta;<sub>pitch</sub>&nbsp;=&nbsp;0, the arm points
-          straight outward (perpendicular to the body). The arm body
-          rotates around this tube axis, so the <strong>pitch swing plane
-          rotates with the body</strong>. This produces:
-        </p>
-        <p style="font-family: serif; font-size: 1.10rem; text-align: center;">
-          d<sub>x</sub> = s<sub>x</sub> &middot; cos(&theta;<sub>pitch</sub>)<br>
-          d<sub>y</sub> = sin(&theta;<sub>pitch</sub>) &middot; cos(&theta;<sub>roll</sub>)<br>
-          d<sub>z</sub> = sin(&theta;<sub>pitch</sub>) &middot; sin(&theta;<sub>roll</sub>)
-        </p>
-        <p>
-          where s<sub>x</sub>&nbsp;=&nbsp;&minus;1 (left arm) or
-          +1 (right arm). The Z-component
-          sin(&theta;<sub>pitch</sub>)&middot;sin(&theta;<sub>roll</sub>)
-          correctly models the physical observation that <strong>both CW
-          and CCW body rotation with bevel walking cause the arm to tilt
-          upward</strong>.
-        </p>
+            <h5>Joint &rarr; Motor (Inverse Conversion)</h5>
+            <p style="font-family: serif; font-size: 1.15rem; text-align: center;">
+              &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> / s<sub>r</sub>)
+              &middot; G, &nbsp;&nbsp;
+              m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
+              &nbsp;&nbsp;&nbsp;(Eq. 3)<br><br>
+              m<sub>p</sub> = [(&theta;<sub>pitch</sub> / s<sub>p</sub>)
+              &middot; G &minus; c &middot; &Delta;<sub>r</sub>]
+              + o<sub>p</sub>
+              &nbsp;&nbsp;&nbsp;(Eq. 4)
+            </p>
+            <p>
+              Eq. 4 is the firmware's primary command
+              equation. The subtraction of <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em>
+              is the software decoupling term
+              that cancels the parasitic walking effect in real-time.
+            </p>
 
-        <h5>Inverse Kinematics (3D Target &rarr; Joint Space)</h5>
-        <p>
-          Given a target position <strong>t</strong> and shoulder
-          position <strong>s</strong>:
-        </p>
-        <p style="font-family: serif; font-size: 1.10rem; text-align: center;">
-          d&#x20D7; = (t &minus; s) / |t &minus; s|<br><br>
-          &theta;<sub>pitch</sub> = arccos(d<sub>x</sub> &middot; s<sub>x</sub>)<br>
-          &theta;<sub>roll</sub> = atan2(d<sub>z</sub>,&nbsp;d<sub>y</sub>)
-          &nbsp;&nbsp;(if sin(&theta;<sub>pitch</sub>) &ne; 0)
-        </p>
+            <h5>Forward Kinematics (Rotation-Around-Arm-Axis Model)</h5>
+            <p>
+              At &theta;<sub>pitch</sub>&nbsp;=&nbsp;0, the arm points
+              straight outward (perpendicular to the body). The arm body
+              rotates around this tube axis, so the pitch swing plane
+              rotates with the body. This produces:
+            </p>
+            <p style="font-family: serif; font-size: 1.10rem; text-align: center;">
+              d<sub>x</sub> = s<sub>x</sub> &middot; cos(&theta;<sub>pitch</sub>)<br>
+              d<sub>y</sub> = sin(&theta;<sub>pitch</sub>) &middot; cos(&theta;<sub>roll</sub>)<br>
+              d<sub>z</sub> = sin(&theta;<sub>pitch</sub>) &middot; sin(&theta;<sub>roll</sub>)
+            </p>
+            <p>
+              where s<sub>x</sub>&nbsp;=&nbsp;&minus;1 (left arm) or
+              +1 (right arm). The Z-component
+              sin(&theta;<sub>pitch</sub>)&middot;sin(&theta;<sub>roll</sub>)
+              correctly models the physical observation that both CW
+              and CCW body rotation with bevel walking cause the arm to tilt
+              upward.
+            </p>
+
+          </div>
+        </details>
       </div>
 
       <h4 id="calibration-probe">Calibration Probe &amp; Validated Results</h4>
       <p>
-        The motor diagnostic probe (<code>motor_probe.py</code>)
+        A dedicated motor diagnostic script, <code>motor_probe.py</code>,
         systematically determines all three sign parameters for each arm.
-        The operator stands <strong>in front of the robot</strong> for
+        The operator stands in front of the robot for
         all tests on both arms:
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
@@ -394,30 +386,25 @@
         When the roll motor rotates while the pitch motor is held
         stationary, the bevel gear inside the housing "walks" around the
         driving gear. This produces an automatic pitch change proportional
-        to the housing's angular displacement — characterised by the
-        coupling parameter <strong>c</strong>.
+        to the housing's angular displacement, characterised by the
+        coupling parameter <em>c</em>.
       </p>
       <p>
-        <strong>To achieve pure roll</strong>, the firmware commands both
+        To achieve pure roll, the firmware commands both
         motors to move in the <em>same direction</em> at identical
         speeds. The coupling term in Eq.&nbsp;4 enforces this
         automatically. Conversely, this walking effect is
-        <strong>intentionally exploited</strong> during jab windups,
+        intentionally exploited during jab windups,
         where opposite-direction motor commands produce a "rearing"
         motion that lifts the arm before the downward strike
         (see <a href="troubleshooting.html">Tactical Walking</a>).
       </p>
 
-      <h4>Joint-Space Pitch Clamping (Decoupling Dilemma — Resolved)</h4>
       <p>
-        Due to the differential coupling, it is mathematically impossible
-        to enforce safe pitch limits using static independent motor
-        bounds. The resolution: the <code>homing_tab.py</code> firmware
-        converts motor targets to joint space, clamps pitch to the
-        calibrated structural limits
-        [pitch<sub>lower</sub>,&nbsp;pitch<sub>upper</sub>], then
-        converts back to motor positions via Eq.&nbsp;3–4 with full
-        coupling compensation. The roll motor remains unrestricted.
+        The enforcement of safe pitch limits requires joint-space clamping
+        rather than static independent motor bounds, owing to the differential
+        coupling. The firmware implementation is documented in
+        <a href="troubleshooting.html">Troubleshooting — Joint-Space Pitch Clamping</a>.
       </p>
     </div>
 
@@ -427,18 +414,18 @@
     <!-- 3. MATERIAL SCIENCE & STRUCTURAL HARDENING             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Material Science &amp; Structural Hardening</h3>
+      <h3>5.2.5.2.3 Material Science &amp; Structural Hardening</h3>
       <p>
-        The fair-day structural failures and the subsequent engineering
-        response are documented as a material science transition — from a
-        pure FDM polymer assembly to a <strong>hybrid interface</strong>
+        The CDE Fair structural failures and the subsequent engineering
+        response are documented as a material science transition, from a
+        pure FDM polymer assembly to a hybrid interface
         combining metallic and polymer components, each selected for its
         specific mechanical properties.
       </p>
 
-      <h4>Fair-Day Structural Failures — Root-Cause Analysis</h4>
+      <h4>CDE Fair Structural Failures &mdash; Root-Cause Analysis</h4>
       <p>
-        During the project fair demonstration, two critical failure modes
+        During the CDE Fair demonstration, two critical failure modes
         were observed:
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
@@ -455,13 +442,13 @@
             <td style="padding:10px; border:1px solid #ddd;"><strong>Shaft fracture</strong></td>
             <td style="padding:10px; border:1px solid #ddd;">Motor-to-gear and gear-to-bevel interfaces</td>
             <td style="padding:10px; border:1px solid #ddd;">PLA shafts failed under dynamic torsional loading during direction reversals</td>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Shear stress</strong> at the D-flat interface — PLA exhibits acceptable tensile strength but poor shear resistance along FDM layer lines</td>
+            <td style="padding:10px; border:1px solid #ddd;">Shear stress at the D-flat interface — PLA exhibits acceptable tensile strength but poor shear resistance along FDM layer lines</td>
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;"><strong>Arm proximity impact</strong></td>
             <td style="padding:10px; border:1px solid #ddd;">Arm housing structure</td>
             <td style="padding:10px; border:1px solid #ddd;">Arms mounted too close to the sparring partner, causing unintended impacts to the arm body rather than padded targets</td>
-            <td style="padding:10px; border:1px solid #ddd;"><strong>Impact bending</strong> loads on non-reinforced housing walls</td>
+            <td style="padding:10px; border:1px solid #ddd;">Impact bending loads on non-reinforced housing walls</td>
           </tr>
         </tbody>
       </table>
@@ -474,8 +461,8 @@
 
       <h4>The Hybrid Interface Solution</h4>
       <p>
-        The post-fair revision replaced the monolithic PLA drivetrain
-        interface with a <strong>three-material hybrid assembly</strong>,
+        The post-CDE-Fair revision replaced the monolithic PLA drivetrain
+        interface with a three-material hybrid assembly,
         assigning each material to the stress mode it is best suited to
         resist:
       </p>
@@ -497,7 +484,7 @@
               <td style="padding:10px; border:1px solid #c5cee0;">Central shaft (6 mm)</td>
               <td style="padding:10px; border:1px solid #c5cee0;"><strong>Stainless Steel</strong></td>
               <td style="padding:10px; border:1px solid #c5cee0;">Torsion / Shear</td>
-              <td style="padding:10px; border:1px solid #c5cee0;">High shear strength (&gt; 200 MPa); transmits the full motor torque without deformation at the D-flat interface</td>
+              <td style="padding:10px; border:1px solid #c5cee0;">The D-flat profile provides a positive mechanical interlock between the shaft and the gear bore, eliminating the relative rotation that caused FDM layer-line delamination. Stainless steel's inherent torsional rigidity ensures zero angular compliance at the shaft-gear interface, directly addressing the shear failure mode observed in the original PLA shaft</td>
             </tr>
             <tr>
               <td style="padding:10px; border:1px solid #c5cee0;">Alignment pin (2 mm)</td>
@@ -515,7 +502,7 @@
               <td style="padding:10px; border:1px solid #c5cee0;">Housing &amp; gears</td>
               <td style="padding:10px; border:1px solid #c5cee0;"><strong>PLA (FDM)</strong></td>
               <td style="padding:10px; border:1px solid #c5cee0;">Compression / Structure</td>
-              <td style="padding:10px; border:1px solid #c5cee0;">Acceptable compressive strength for housing walls; rapid prototyping iteration capability; load-bearing walls thickened post-fair</td>
+              <td style="padding:10px; border:1px solid #c5cee0;">Acceptable compressive strength for housing walls; rapid prototyping iteration capability; load-bearing walls thickened post-CDE-Fair</td>
             </tr>
           </tbody>
         </table>
@@ -523,32 +510,171 @@
 
       <p>
         The key engineering insight was that the PLA shafts did not fail
-        in <em>tension</em> (PLA's strongest mode) — they failed in
-        <strong>shear</strong> at the D-flat motor interface, where
+        in <em>tension</em> (PLA's strongest mode); they failed in
+        shear at the D-flat motor interface, where
         torsional loads caused delamination along the FDM layer lines.
         The solution was not simply "replace plastic with metal," but to
-        assign <strong>each material to the stress mode it resists
-        best</strong>: stainless steel for torsional rigidity, Delrin for
+        assign each material to the stress mode it resists
+        best: stainless steel for torsional rigidity, Delrin for
         vibration damping, and PLA retained only for structural housing
         where compressive loads dominate.
       </p>
 
+      <!-- ─── Material Analysis: FDM Filament Selection ─── -->
+      <h4>FDM Filament Selection for Gear Components</h4>
+      <p>
+        The mechanical integrity of the coaxial differential joint is
+        fundamentally bounded by the material properties of its 3D-printed
+        gears and housing. The following table evaluates candidate FDM
+        filaments against the four properties most critical to gear
+        performance in this application: stiffness (resistance to tooth
+        deflection), impact toughness (survival of reversal shocks), wear
+        resistance, and thermal stability.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.9rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Material</th>
+            <th style="padding:8px; border:1px solid #ddd;">Stiffness (Modulus)</th>
+            <th style="padding:8px; border:1px solid #ddd;">Impact</th>
+            <th style="padding:8px; border:1px solid #ddd;">Wear</th>
+            <th style="padding:8px; border:1px solid #ddd;">Heat Deflection</th>
+            <th style="padding:8px; border:1px solid #ddd;">Print Difficulty</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>PLA</strong></td>
+            <td style="padding:8px; border:1px solid #ddd;">Very High (~3.5 GPa)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Low (brittle)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Low</td>
+            <td style="padding:8px; border:1px solid #ddd;">~55&deg;C</td>
+            <td style="padding:8px; border:1px solid #ddd;">Very Easy</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>PLA-CF</strong></td>
+            <td style="padding:8px; border:1px solid #ddd;">Extremely High</td>
+            <td style="padding:8px; border:1px solid #ddd;">Very Low (brittle)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate</td>
+            <td style="padding:8px; border:1px solid #ddd;">~55&deg;C</td>
+            <td style="padding:8px; border:1px solid #ddd;">Easy (hardened nozzle required)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>PETG</strong></td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate (~2.0 GPa)</td>
+            <td style="padding:8px; border:1px solid #ddd;">High (ductile)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Low</td>
+            <td style="padding:8px; border:1px solid #ddd;">~75&deg;C</td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>PETG-CF</strong></td>
+            <td style="padding:8px; border:1px solid #ddd;">High (~2.0 GPa)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate</td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate</td>
+            <td style="padding:8px; border:1px solid #ddd;">~80&deg;C</td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate (hardened nozzle required)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>PA6 Nylon</strong></td>
+            <td style="padding:8px; border:1px solid #ddd;">Moderate&ndash;High</td>
+            <td style="padding:8px; border:1px solid #ddd;">Very High</td>
+            <td style="padding:8px; border:1px solid #ddd;">Very High (self-lubricating)</td>
+            <td style="padding:8px; border:1px solid #ddd;">~85&deg;C</td>
+            <td style="padding:8px; border:1px solid #ddd;">Difficult (hygroscopic, warping)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ─── Technical Callout: CF filament properties ─── -->
+      <div style="background:#f4f7fa; border-left:4px solid #f59e0b; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#92400e;">Note on Carbon-Fibre FDM Filaments (PLA-CF, PETG-CF)</h4>
+        <p>
+          Carbon-fibre variants of FDM filaments are marketed as high-stiffness
+          alternatives to their base polymers. However, the reinforcement
+          mechanism in FDM filament is fundamentally different from that in
+          continuous-fibre or woven composites:
+        </p>
+        <p>
+          FDM-grade CF filament contains short chopped fibres (typically
+          &lt;200 &micro;m), randomly oriented within the polymer matrix.
+          These fibres do not form a continuous load-bearing network, and
+          the resulting in-plane stiffness gains are marginal
+          (approximately 10 to 20 percent relative to the base polymer),
+          compared to the orders-of-magnitude improvement observed in
+          woven or continuous-fibre composites.
+        </p>
+        <p>
+          Furthermore, the rigid fibre ends act as crack initiation sites
+          under dynamic loading. Fibre inclusions also prevent adequate
+          polymer chain fusion between successive printed layers, thereby
+          reducing inter-layer bond strength and rendering the part
+          significantly more brittle across the Z-axis than its non-CF
+          counterpart.
+        </p>
+        <p>
+          The net effect for gear applications is that CF variants offer
+          marginally higher in-plane stiffness (beneficial for tooth
+          profile accuracy) but substantially reduced impact toughness and
+          inter-layer strength. For gear teeth subjected to repeated
+          reversal shocks, this trade-off is unfavourable. Plain PLA
+          offers higher stiffness than PETG-CF at the component level
+          (3.5 GPa versus approximately 2.0 GPa) and prints with
+          significantly better layer adhesion, making it the preferred
+          choice for gear teeth.
+        </p>
+      </div>
+
+      <!-- ─── Final Material Strategy ─── -->
+      <div style="background:#f0f7f0; border-left:4px solid #82b366; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h4 style="margin-top:0; color:#2d6a2d;">Selected Material Strategy: PLA Gears + PETG Housing</h4>
+        <table style="width:100%; border-collapse:collapse; margin:8px 0;">
+          <thead>
+            <tr style="background:#d5e8d4;">
+              <th style="padding:8px; border:1px solid #82b366; text-align:left;">Component</th>
+              <th style="padding:8px; border:1px solid #82b366; text-align:left;">Material</th>
+              <th style="padding:8px; border:1px solid #82b366; text-align:left;">Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:8px; border:1px solid #82b366;">Gear teeth</td>
+              <td style="padding:8px; border:1px solid #82b366;"><strong>PLA</strong></td>
+              <td style="padding:8px; border:1px solid #82b366;">Highest stiffness for meshing precision; brittleness mitigated by current-limit safety system</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #82b366;">Structural housing</td>
+              <td style="padding:8px; border:1px solid #82b366;"><strong>PETG</strong> (where thermal margin allows)</td>
+              <td style="padding:8px; border:1px solid #82b366;">Ductility for impact absorption; ~20&deg;C higher thermal ceiling than PLA for sustained operation</td>
+            </tr>
+            <tr>
+              <td style="padding:8px; border:1px solid #82b366;">Not recommended</td>
+              <td style="padding:8px; border:1px solid #82b366;">PLA-CF, PETG-CF</td>
+              <td style="padding:8px; border:1px solid #82b366;">Carbon-fibre addition increases brittleness and inter-layer weakness without meaningful stiffness benefit for gear components</td>
+            </tr>
+          </tbody>
+        </table>
+        <sl-alert variant="warning" open style="margin-top:12px;">
+          <sl-icon slot="icon" name="thermometer-half"></sl-icon>
+          <strong>PLA Thermal Monitor:</strong> PLA glass transition temperature
+          is approximately 55&ndash;60&deg;C. Sustained high-duty-cycle operation
+          risks thermal softening of gear teeth. Monitor motor casing temperatures;
+          if they approach 40&deg;C in proximity to printed components, PETG
+          substitution for gear teeth should be evaluated.
+        </sl-alert>
+      </div>
+
       <h4>Supplementary Structural Revisions</h4>
-      <ol>
-        <li>
-          <strong>Reduced intermediate printed couplings:</strong>
-          The number of 3D-printed parts in the torque path between the
-          motor and the gear stack was minimised, reducing the number of
-          potential shear-failure interfaces and improving rotational
-          alignment.
-        </li>
-        <li>
-          <strong>Thickened load-bearing walls:</strong> Housing walls
-          and gear mount flanges were increased in cross-section to raise
-          the second moment of area, improving resistance to bending
-          loads from off-axis impacts.
-        </li>
-      </ol>
+      <p>
+        Two supplementary structural modifications were implemented in
+        the post-CDE-Fair revision. First, the number of intermediate
+        3D-printed couplings in the torque path between the motor and
+        the gear stack was reduced, thereby minimising the number of
+        potential shear-failure interfaces and improving rotational
+        alignment. Second, the cross-sections of the housing walls and
+        gear mount flanges were increased to raise the second moment of
+        area, improving resistance to bending loads from off-axis impacts.
+      </p>
 
       <image-component
         tag="image"

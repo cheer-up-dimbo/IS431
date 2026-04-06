@@ -55,7 +55,7 @@
             { label: 'Verification Results', href: '/pages/robot-mechanism/testing.html' },
           ]
         },
-        { label: '5.3 Robot Intelligence', href: '/index.html#robot-intelligence' },
+        { label: '5.3 Robot Intelligence', href: '/pages/robot-intelligence.html' },
       ]
     },
     {

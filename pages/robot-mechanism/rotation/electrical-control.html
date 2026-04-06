@@ -11,6 +11,7 @@
   <script type="module" src="../../../components/image/image-component.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../../../components/lightbox/lightbox.js" defer></script>
   <script src="/components/report-nav/report-nav.js" defer></script>
 </head>
 <body>
@@ -73,10 +74,11 @@
     <div>
       <h3>Motor Specification</h3>
       <p>
-        The base rotation uses a <strong>Z55BLD400-24GU</strong> 400 W
-        BLDC motor with a 25:1 planetary gearbox, controlled via the
-        <strong>ZBLD C20-800LRC</strong> CAN motor driver. The motor
-        provides high torque at low speed &mdash; ideal for the
+        The base rotation uses a Z55BLD400-24GU 400 W
+        BLDC motor with a 26:1 integrated gearbox and a 3.5:1 (70:20 tooth)
+        belt stage, yielding a 91:1 total drive ratio, controlled via the
+        ZBLD C20-800LRC CAN motor driver. The motor
+        provides high torque at low speed, making it well-suited for the
         timing-belt-driven yaw stage, which requires smooth re-angling
         under the inertia of the full upper structure.
       </p>
@@ -94,7 +96,7 @@
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">Gearbox</td>
-            <td style="padding:8px; border:1px solid #ddd;">25:1 planetary</td>
+            <td style="padding:8px; border:1px solid #ddd;">26:1 integrated gearbox + 3.5:1 (70:20) belt stage = 91:1 total</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">Driver</td>
@@ -118,76 +120,137 @@
 
     <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. CONTROL ARCHITECTURE                                -->
-    <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Control Architecture</h3>
       <p>
-        The base rotation controller is an <strong>Arduino Uno R4
-        WiFi</strong>, operating as a <strong>separate controller</strong>
-        from the Teensy 4.0 that manages the arm motors. Communication
-        with the Jetson host uses <strong>WiFi UDP</strong> rather than
-        a physical cable.
+        The base rotation controller is an Arduino Uno R4
+        WiFi, operating as a separate controller from the Teensy 4.0
+        that manages the arm motors. Communication with the Jetson host uses
+        WiFi UDP, eliminating physical cable routing through
+        the rotating base joint. The CAN bus for the base motor operates at
+        125 kbps (versus 1 Mbps for the arm motors),
+        necessitating a separate bus.
       </p>
 
-      <!-- ─── Architecture Diagram (ASCII) ─── -->
-      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Signal Flow</h4>
-        <pre style="font-family: 'Courier New', monospace; font-size:0.9rem; line-height:1.6; margin:0;">
-Jetson Orin NX                    Arduino Uno R4 WiFi
-   V4 GUI  ─── WiFi (UDP) ───►  UDP listener
-                                      │
-                                 CAN (125 kbps)
-                                      │
-                                 Z55BLD400 Motor
-                                      │
-                                 AS5047P Encoder (SPI)
-        </pre>
-      </div>
+      <!-- D2-generated diagram: data_control_base.d2 → data_control_base.svg -->
+      <image-component
+        tag="image"
+        source="../../../assets/system_architecture/data_control_base.png"
+        subtitle="Figure: Data flow for base rotation control. Angle commands travel from the Jetson V4 GUI over WiFi UDP to the Arduino Uno R4 WiFi. The Arduino issues a speed command over CAN (125 kbps) to the ZBLD C20-800LRC driver, which commutates the Z55BLD400 BLDC motor. The AS5047P encoder returns current shaft angle to the Arduino via SPI. Firmware enforces ±90° position limits. Source: data_control_base.d2.">
+      </image-component>
+
+      <h4>Command Protocol</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Command</th>
+            <th style="padding:8px; border:1px solid #ddd;">Format</th>
+            <th style="padding:8px; border:1px solid #ddd;">Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Step left</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>L:deg</code></td>
+            <td style="padding:8px; border:1px solid #ddd;">Decrements target angle by <em>deg</em> degrees</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Step right</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>R:deg</code></td>
+            <td style="padding:8px; border:1px solid #ddd;">Increments target angle by <em>deg</em> degrees</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Go to absolute</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>GO:deg</code></td>
+            <td style="padding:8px; border:1px solid #ddd;">Sets target to <em>deg</em> degrees (absolute)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Set peak RPM</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>PEAK:rpm</code></td>
+            <td style="padding:8px; border:1px solid #ddd;">Sets the maximum motor speed cap</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Validated Test Results</h4>
+      <p>
+        The base rotation controller was validated through seven controlled
+        manoeuvres, confirming stable settling and correct limit enforcement:
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Test</th>
+            <th style="padding:8px; border:1px solid #ddd;">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">L:15 &times; 7 steps (0&deg; to &minus;90&deg;)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Each step settled at target &plusmn;1&deg;; steady current 0.24&ndash;0.26A</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Limit at &minus;90.2&deg;</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor stopped; limit held; no further motion toward boundary</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Recovery from &minus;90&deg; (R:15)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor returned to &minus;75&deg;; return-direction always permitted</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GO:0 from &minus;75&deg;</td>
+            <td style="padding:8px; border:1px solid #ddd;">Smooth return to 0&deg; in approximately 2.5s</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">R:15 &times; 8 steps (0&deg; to +89.5&deg;)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Each step settled correctly at commanded target</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GO:0 from +60&deg;</td>
+            <td style="padding:8px; border:1px solid #ddd;">Smooth return; peak current 0.6A during fast traverse</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Limit enforcement at +90&deg;</td>
+            <td style="padding:8px; border:1px solid #ddd;">Rightward motion blocked; leftward return permitted</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <sl-alert variant="primary" open>
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        <strong>Empirical Power at 150&deg;/s:</strong> Measured steady-state
+        current is 1.43&ndash;1.55A (33&ndash;36W) at 2275 RPM target. The PID
+        controller's proportional output provides inherent soft-start;
+        pre-PID testing under direct speed-command triggered a PSU
+        overcurrent trip at 1.58A. The PID architecture eliminates this
+        risk via the configured Peak RPM ceiling.
+      </sl-alert>
 
       <h4>Design Rationale</h4>
-      <ol>
-        <li>
-          <strong>CAN baud mismatch:</strong> The Z55BLD400 driver operates
-          at <strong>125 kbps</strong>; the Damiao arm motors use
-          <strong>1 Mbps</strong>. Placing both on the same CAN bus would
-          require firmware complexity for dual-baud switching. Separate
-          buses eliminate this entirely.
-        </li>
-        <li>
-          <strong>Wireless eliminates cable fatigue:</strong> A USB cable
-          routed through the rotating base joint would experience
-          continuous twist/flex and eventually fail. WiFi UDP removes this
-          failure mode.
-        </li>
-        <li>
-          <strong>Independent failure domain:</strong> Base rotation is
-          decoupled from arm control; either can fail without affecting the
-          other. The Arduino can be power-cycled without disturbing the
-          Teensy or the Damiao motor CAN bus.
-        </li>
-        <li>
-          <strong>Already validated:</strong> Encoder + CAN motor code was
-          validated on the Arduino R4 during isolated bench testing before
-          integration.
-        </li>
-      </ol>
+      <p>
+        The Z55BLD400 driver operates at 125 kbps, whereas the Damiao arm
+        motors use 1 Mbps; separate buses eliminate firmware complexity for
+        dual-baud switching. A wireless WiFi UDP link was chosen to eliminate
+        cable fatigue: a physical cable routed through the rotating base joint
+        would experience continuous twist and flex, eventually failing.
+        Base rotation is additionally decoupled from arm control as an
+        independent failure domain, such that either subsystem can be
+        power-cycled without disturbing the other.
+      </p>
     </div>
-
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 4. POWER INTEGRATION                                   -->
+    <!-- 3. POWER INTEGRATION                                   -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Power Integration</h3>
       <p>
-        The Z55BLD400 motor is connected to the <strong>24V motor
-        bus</strong> via the distribution busbar, alongside the arm
+        The Z55BLD400 motor is connected to the 24V motor
+        bus via the distribution busbar, alongside the arm
         motors and height motor. The Arduino controller is powered from
-        the <strong>isolated 12V logic rail</strong> through a
-        <strong>LM2596-based 12V&rarr;5V buck converter</strong>
+        the isolated 12V logic rail through a
+        HW-140 buck converter module (LM2596-based, 12V &rarr; 6V)
         (&ge;1 A), ensuring motor bus OVP events do not reset the
         base rotation controller.
       </p>
@@ -204,7 +267,7 @@ Jetson Orin NX                    Arduino Uno R4 WiFi
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">Arduino R4 WiFi</td>
-            <td style="padding:8px; border:1px solid #ddd;">5V (from 12V buck)</td>
+            <td style="padding:8px; border:1px solid #ddd;">6V VIN (from HW-140 buck converter)</td>
             <td style="padding:8px; border:1px solid #ddd;">~300 mA</td>
             <td style="padding:8px; border:1px solid #ddd;">WiFi active + logic</td>
           </tr>
@@ -222,12 +285,25 @@ Jetson Orin NX                    Arduino Uno R4 WiFi
           </tr>
           <tr style="background:#f9fafb; font-weight:bold;">
             <td style="padding:8px; border:1px solid #ddd;">Total from PSU</td>
-            <td style="padding:8px; border:1px solid #ddd;">5V</td>
+            <td style="padding:8px; border:1px solid #ddd;">12V via HW-140 (6V VIN)</td>
             <td style="padding:8px; border:1px solid #ddd;">~400 mA</td>
             <td style="padding:8px; border:1px solid #ddd;">2 W nominal</td>
           </tr>
         </tbody>
       </table>
+
+      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
+        <img src="../../../assets/system_architecture/power_base.png"
+             alt="Base rotation power subsystem"
+             data-zoom
+             title="Click to enlarge"
+             style="width:100%; min-width:400px; max-width:800px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
+        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
+          Base rotation power subsystem: Z55BLD400 BLDC motor on the 24V bus via
+          ZBLD C20-800LRC CAN driver, with RegenClamp V0.3 protection. Arduino R4 WiFi
+          powered independently from the 12V logic rail via LM2596-based buck converter.
+        </div>
+      </div>
 
       <sl-alert variant="warning" open>
         <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
@@ -244,19 +320,20 @@ Jetson Orin NX                    Arduino Uno R4 WiFi
       <sl-alert variant="danger" open>
         <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
         <strong>RegenClamp Required:</strong> The Z55BLD400 is a 400 W
-        BLDC motor with a 25:1 gearbox &mdash; back-EMF during rapid
+        BLDC motor with a 26:1 integrated gearbox and 3.5:1 belt stage (91:1 total); back-EMF during rapid
         deceleration will spike the 24V bus, potentially triggering the
         same OVP failure documented for the
         <a href="../height-adjustment/electrical-control.html">height
-        motor</a>. A third <strong>RegenClamp V0.3</strong> unit should
-        be installed between the busbar and the ZBLD driver.
+        motor</a>. A RegenClamp V0.3 unit must be installed between
+        the distribution busbar and the ZBLD driver before the system
+        is operated under load.
       </sl-alert>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. VERIFICATION TARGETS                                -->
+    <!-- 4. VERIFICATION TARGETS                                -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Verification Targets</h3>

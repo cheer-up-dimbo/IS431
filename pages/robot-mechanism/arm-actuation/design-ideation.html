@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Design &amp; Ideation — Upper Mechanism</title>
+  <title>IS-431: 5.2.5.1 Design &amp; Ideation — Arm Actuation</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -30,7 +30,7 @@
     </a>
     <br>
 
-    <h2>Design &amp; Ideation</h2>
+    <h2>5.2.5.1 Design &amp; Ideation</h2>
     <p>
       This section traces the iterative design process that led to the final
       Coaxial Differential 2-DOF joint mechanism. The narrative follows the
@@ -46,7 +46,7 @@
     <!-- 1. DEGREES OF MOTION ANALYSIS                          -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Degrees of Motion Analysis</h3>
+      <h3>5.2.5.1.1 Degrees of Motion Analysis</h3>
       <p>
         Industrial robotic arms are typically engineered with six or more
         degrees of freedom to achieve arbitrary end-effector positioning.
@@ -56,24 +56,18 @@
         potential failure points.
       </p>
       <p>
-        A systematic analysis of the required strike motions — derived from
+        A systematic analysis of the required strike motions, derived from
         the padwork research documented in the
-        <a href="../arm-actuation.html">Arm Actuation overview</a> —
+        <a href="../arm-actuation.html">Arm Actuation overview</a>,
         identified that all target strikes (jab, hook, uppercut) can be
         decomposed into combinations of exactly two rotational degrees of
-        freedom about the wrist joint:
+        freedom about the wrist joint. The first degree of freedom is
+        pitch (vertical tilting), which produces the downward jab motion
+        and the upward component of the uppercut. The second is roll
+        (axial rotation), which produces the lateral sweeping motion
+        required for the hook and the horizontal component of the
+        uppercut.
       </p>
-      <ul>
-        <li>
-          <strong>Pitch</strong> (vertical tilting): Produces the downward
-          jab motion and the upward component of the uppercut.
-        </li>
-        <li>
-          <strong>Roll</strong> (axial rotation): Produces the lateral
-          sweeping motion required for the hook and the horizontal component
-          of the uppercut.
-        </li>
-      </ul>
       <p>
         This finding established a fundamental design constraint: the
         mechanism must provide precisely two motorised degrees of freedom.
@@ -88,7 +82,7 @@
     <!-- 2. JOINT CONCEPT SELECTION                             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Joint Concept Selection</h3>
+      <h3>5.2.5.1.2 Joint Concept Selection</h3>
       <p>
         Three candidate joint configurations were generated and evaluated
         against four weighted criteria: training fidelity, mechanical
@@ -114,14 +108,14 @@
         motor by mounting training sticks on both ends of a rotating shaft
         (a "windmill" configuration). However, analysis revealed a critical
         fidelity failure: in the neutral position, the extended uppercut
-        component would directly obstruct the liver strike zone —
+        component would directly obstruct the liver strike zone,
         preventing the user from accessing a primary training target.
       </p>
 
       <h4>Concept 3: 2-DOF Coaxial Differential (Selected)</h4>
       <p>
-        The selected concept employs a <strong>2-Degrees-of-Freedom
-        coaxial differential mechanism</strong> using only two motors per
+        The selected concept employs a 2-Degrees-of-Freedom
+        coaxial differential mechanism using only two motors per
         arm. By combining coordinated pitch and roll rotations, this single
         mechanism reproduces all required strike patterns from a compact
         form factor. The concept scored highest across all four evaluation
@@ -133,8 +127,8 @@
       <h4>Proximal Motor Mounting — Avoiding Weight on Moving Parts</h4>
       <p>
         A critical design constraint for the coaxial configuration is that
-        <strong>no motors or heavy components may be mounted on the moving
-        arm itself</strong>. In a high-velocity striking mechanism, any
+        no motors or heavy components may be mounted on the moving
+        arm itself. In a high-velocity striking mechanism, any
         additional mass on the rotating arm directly increases the torque
         required to achieve target punch speeds and amplifies the impact
         forces transmitted back through the 3D-printed drivetrain during
@@ -142,61 +136,22 @@
       </p>
       <p>
         The coaxial gear-rail architecture solves this by mounting both
-        motors <strong>side-by-side at the stationary base</strong> of the
-        arm assembly. Each motor drives a pinion gear into the central
-        coaxial gear stack, transmitting torque to the arm without adding
-        any weight to the moving structure. The result is an arm assembly
-        composed only of lightweight 3D-printed gears, a training stick,
-        and padding — keeping the rotating mass to a minimum and ensuring
-        the mechanism can achieve the required strike velocities within
-        the motor's torque envelope.
+        motors side-by-side at the stationary base of the arm assembly.
+        Each motor drives a pinion gear into the central coaxial gear
+        stack, transmitting torque to the arm without adding any weight
+        to the moving structure. The result is an arm assembly composed
+        only of lightweight 3D-printed gears, a training stick, and
+        padding, keeping the rotating mass to a minimum and ensuring the
+        mechanism can achieve the required strike velocities within the
+        motor's torque envelope.
       </p>
 
-      <!-- ─── Technical Callout: Inverse Kinematics (Validated 2026-04-02) ─── -->
-      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Technical Callout — Inverse Kinematic Equations
-          <span style="font-weight:normal; font-size:0.85em; color:#059669;">(Validated 2026-04-02)</span>
-        </h4>
-        <p>
-          The coaxial differential coupling creates a non-trivial
-          relationship between the raw motor space
-          (m<sub>r</sub>&nbsp;=&nbsp;roll motor,
-          m<sub>p</sub>&nbsp;=&nbsp;pitch motor) and the joint
-          output space (&theta;<sub>pitch</sub>, &theta;<sub>roll</sub>).
-          The closed-form inverse conversion that the firmware evaluates
-          on every control cycle is:
-        </p>
-        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 16px 0;">
-          &Delta;<sub>r</sub> = (&theta;<sub>roll</sub> /
-          s<sub>r</sub>) &middot; G, &nbsp;&nbsp;
-          m<sub>r</sub> = &Delta;<sub>r</sub> + o<sub>r</sub>
-          &nbsp;&nbsp;&nbsp;(Eq. 1)<br><br>
-          m<sub>p</sub> = [(&theta;<sub>pitch</sub> /
-          s<sub>p</sub>) &middot; G &minus; c &middot;
-          &Delta;<sub>r</sub>] + o<sub>p</sub>
-          &nbsp;&nbsp;&nbsp;(Eq. 2)
-        </p>
-        <p>
-          where G&nbsp;=&nbsp;3 (3:1 helical-spur reduction),
-          o<sub>r</sub>/o<sub>p</sub> are calibrated home offsets,
-          s<sub>r</sub>/s<sub>p</sub> are directional signs (&plusmn;1),
-          and <strong>c</strong> is the bevel gear coupling parameter
-          (&plusmn;1). The critical insight is in <strong>Eq. 2</strong>:
-          the subtraction of
-          <em>c&nbsp;&middot;&nbsp;&Delta;<sub>r</sub></em> is the
-          <strong>software decoupling term</strong> that compensates for
-          the "walking bevel" effect. Because the bevel gear is housed
-          inside the roll-driven outer housing, any roll rotation carries
-          the pitch mechanism with it. This term cancels that parasitic
-          coupling in real-time.
-        </p>
-        <p style="font-size: 0.9rem; color: #555;">
-          Full kinematic derivations, the forward kinematics
-          (Motor &rarr; Joint space), the rotation-around-arm-axis 3D FK
-          model, and the 4-test calibration probe are presented in
-          <a href="mechanical-design.html">Mechanical Design</a>.
-        </p>
-      </div>
+      <p>
+        The closed-form kinematic equations governing motor-to-joint space
+        conversion, including the software decoupling term for the bevel
+        coupling effect, are derived in full in
+        <a href="mechanical-design.html">§5.2.5.2.2 Drivetrain Logic</a>.
+      </p>
 
     </div>
 
@@ -206,7 +161,7 @@
     <!-- 3. INTERIM JOINT DESIGN — 2-DOF VALIDATION             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Interim Joint Design — 2-DOF Concept Validation</h3>
+      <h3>5.2.5.1.3 Interim Joint Design — 2-DOF Concept Validation</h3>
       <p>
         With the 2-DOF coaxial differential selected, the next step was to
         validate the concept through physical prototyping. Inspiration for
@@ -223,7 +178,7 @@
         Using SolidWorks, a parametric 3D model was created and iteratively
         refined through multiple design revisions. Each iteration addressed
         assembly constraints that became apparent only after physical
-        prototyping — demonstrating that geometric fit alone is
+        prototyping, demonstrating that geometric fit alone is
         insufficient; the method of connection and assembly sequence must
         be considered as a first-order design criterion for 3D-printed
         mechanisms.
@@ -256,7 +211,7 @@
       <p>
         The final SolidWorks iteration was fabricated using PLA FDM
         printing. The physical prototype confirmed that the two degrees
-        of freedom — pitch and roll — were sufficient to replicate all
+        of freedom (pitch and roll) were sufficient to replicate all
         three target strike types (jab, hook, uppercut) when operated
         manually, validating the 2-DOF concept selection.
       </p>
@@ -268,18 +223,18 @@
     <!-- 4. POST-INTERIM DESIGN REVIEW                          -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>Post-Interim Design Review</h3>
+      <h3>5.2.5.1.4 Post-Interim Design Review</h3>
       <p>
         During the interim presentation, the examining panel raised two
         critical concerns regarding the gear-rail mechanism:
-        <strong>backlash</strong> and <strong>impact-induced damage</strong>.
+        backlash and impact-induced damage.
         Both were addressed through targeted design modifications before
         proceeding to the final concept.
       </p>
 
       <h4>Backlash Mitigation</h4>
       <p>
-        Backlash — the angular play between mating gear teeth — introduces
+        Backlash, defined as the angular play between mating gear teeth, introduces
         a dead zone during direction reversals, degrading positional
         repeatability. For a high-velocity striking mechanism where rapid
         bidirectional motion is fundamental, this represents a critical
@@ -323,16 +278,16 @@
         servo motors for joint actuation. During testing, repeated sparring
         impacts transmitted directly through the drivetrain caused
         progressive wear and eventual fracture of the servo motors' internal
-        reduction gears — rendering the prototype inoperable.
+        reduction gears, rendering the prototype inoperable.
       </p>
       <p>
         This failure mode established a critical requirement: the selected
-        motor must be capable of <strong>absorbing external torque without
-        mechanical damage</strong>. Brushless DC (BLDC) motors satisfy this
+        motor must be capable of absorbing external torque without
+        mechanical damage. Brushless DC (BLDC) motors satisfy this
         requirement because they do not rely on internal reduction gears and
         can freely spin (back-drive) when external force is applied.
         However, the application simultaneously demands precise rotational
-        position control with closed-loop feedback — capabilities that
+        position control with closed-loop feedback, capabilities that
         standard ESC-controlled BLDC motors do not provide. This dual
         requirement (impact resilience + position control) directly motivated
         the motor selection journey documented in
