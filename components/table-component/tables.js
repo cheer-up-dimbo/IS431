@@ -424,15 +424,8 @@ new gridjs.Grid({
   ]
 }).render(document.getElementById("table-subsystem-validation"));
 
- // Robot Intelligence Table
-  new gridjs.Grid({
-    columns: ["Parameter", "Specification", "Rationale"],
-    data: [
-      ["System Latency", "≤ 100 ms", "Ensures minimal delay between user motion and robot reaction"],
-      ["Reaction Time", "≈ 150 ms", "Matches average human defensive response time"],
-      ["Minimum Frame Rate", "≥ 7 FPS", "Maintains smooth tracking for reliable pose estimation"],
-    ],
-  }).render(document.getElementById("table-robot-intelligence"));
+ // Robot Intelligence Table — replaced by inline HTML table in robot-intelligence.html
+  // (Old Grid.js definition removed to prevent console errors)
 
   // Foam Specifications Table 1 (Measured)
 new gridjs.Grid({
