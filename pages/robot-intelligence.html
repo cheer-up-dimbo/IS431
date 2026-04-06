@@ -204,11 +204,17 @@
     <div id="system-architecture">
       <h3>System Architecture</h3>
       <p>
-        The system runs on an NVIDIA Jetson Orin NX, hosting 12 ROS 2 Humble nodes
-        that communicate via 21 custom message types and 6 services.
+        The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
+        (Robot Operating System 2) &mdash; an industry-standard framework for building robotics
+        software as a network of independent, communicating processes called nodes. ROS 2 was
+        chosen because it provides reliable real-time messaging between components, allows each
+        subsystem (CV, fusion, sparring, LLM) to be developed and tested independently, and is
+        the standard for robotics projects requiring sensor integration and motor control.
       </p>
-
-      <p>The primary data flow follows four stages:</p>
+      <p>
+        The system consists of 12 nodes communicating via 21 custom message types and 6 services.
+        The primary data flow follows four stages:
+      </p>
       <ul style="margin:8px 0 16px; line-height:1.7;">
         <li><strong>Capture</strong> &mdash; Intel RealSense D435i streams depth + RGB frames</li>
         <li><strong>Perception</strong> &mdash; <span class="node-tag">cv_node</span> runs YOLO pose estimation and 3D voxel extraction in parallel, feeding a transformer-based action classifier</li>

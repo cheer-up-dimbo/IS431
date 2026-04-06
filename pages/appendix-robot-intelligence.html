@@ -90,92 +90,78 @@
       </div>
     </div>
 
-    <h4>Iteration 1: 2D Pose Estimation (YouTube + LSTM/GCN)</h4>
-    <p><strong>Goal:</strong> Validate the pipeline using publicly available YouTube boxing videos.</p>
-    <ul>
-      <li><strong>Features:</strong> 17 COCO keypoints via YOLO-Pose, encoded as 12-channel skeleton features (joint coordinates, bone vectors, temporal derivatives, bone motion)</li>
-      <li><strong>Models tested:</strong> LSTM (best on small dataset), AAGCN (~2.5M params, 10 GCN blocks with adaptive graph learning), ST-GCN, ST-GCN++</li>
-      <li><strong>Result:</strong> High accuracy on YouTube data, validating the pipeline concept</li>
-      <li><strong>Why it failed:</strong> YouTube filming angles did not match the robot-mounted camera perspective. The model could not transfer.</li>
-    </ul>
-
-    <h4>Iteration 2: 3D Pose Estimation (RealSense Depth Lifting)</h4>
-    <p><strong>Goal:</strong> Self-recorded D435i data with depth-based 3D skeleton reconstruction.</p>
-    <ul>
-      <li><strong>Features:</strong> 2D keypoints lifted to 3D using depth maps with skeleton constraints (arm Z-coordinate refinement, temporal interpolation)</li>
-      <li><strong>Models tested:</strong> AAGCN, MotionBERT (abandoned), PoseC3D</li>
-      <li><strong>Result:</strong> ~67% accuracy after extensive constraint tuning</li>
-      <li><strong>Why it failed:</strong> Boxing gloves occlude wrist keypoints during punches — exactly when detection matters most. Depth holes and fast motion blur compounded the problem.</li>
-    </ul>
-
-    <h4>Iteration 3: Raw RGBD Frames + Pretrained 3D CNNs</h4>
-    <p><strong>Goal:</strong> Bypass pose entirely — learn from raw pixels via transfer learning.</p>
-    <ul>
-      <li><strong>Features:</strong> 4-channel input (RGB + normalised depth), person-cropped to 112&times;112</li>
-      <li><strong>Models tested:</strong> Swin3D-B (~88M params, Kinetics-400 pretrained), MViT V2, R3D-18 (~33M params)</li>
-      <li><strong>Why it failed:</strong> 33&ndash;88M parameters, far too large for edge hardware. Batch size 2 on Colab, slow and unstable.</li>
-    </ul>
-
-    <h4>Iteration 4: RGBD + Segmentation + Causal Transformer</h4>
-    <p><strong>Goal:</strong> Efficient spatial encoding with temporal transformer reasoning.</p>
-    <ul>
-      <li><strong>Features:</strong> YOLO segmentation masks, EfficientNet-B2 encoder (frozen, 512-dim per frame)</li>
-      <li><strong>Architecture:</strong> CausalActionTransformer — 6 causal layers, 8 heads, ~3M trainable / ~35M total</li>
-      <li><strong>Innovation:</strong> Progressive prediction loss — classification at ALL timesteps, not just the final frame</li>
-      <li><strong>Why it failed:</strong> Still pixel-based, still required Colab for training.</li>
-    </ul>
-
-    <h4>Iteration 5: Depth Feature Engineering (Z-Mask)</h4>
-    <p><strong>Goal:</strong> Strip away RGB, focus on handcrafted depth features.</p>
-    <ul>
-      <li><strong>Features (1,156 dims/frame):</strong> 12&times;12 depth grid (144), RGB grid (432), centre of mass (2), velocity derivatives (578)</li>
-      <li><strong>Architecture:</strong> BoxingCAT — 1D conv stem, 4 causal transformer layers, self-supervised future prediction head</li>
-      <li><strong>Why it failed:</strong> 2D depth grid lost critical 3D spatial info. Hooks vs uppercuts indistinguishable.</li>
-    </ul>
-
-    <h4>Iteration 6: Voxel + Colour Tracking (~68%)</h4>
-    <p><strong>Goal:</strong> 3D voxel motion + explicit hand tracking via coloured gloves.</p>
-    <ul>
-      <li><strong>Features (1,749 dims/frame):</strong> 12&sup3; voxel delta (1,728), optical flow (2), glove colour tracking (18 dims — 3D positions, velocities, depth validity per hand), foreground ratio (1)</li>
-      <li><strong>Architecture:</strong> VoxelFlowModel (~1.2M params) — Conv3D voxel branch + MLP flow + MLP glove, concatenation fusion</li>
-      <li><strong>Result:</strong> ~68%. Multimodal combination outperformed either branch alone.</li>
-      <li><strong>Why it failed:</strong> Required coloured gloves (red/green). HSV tracking unreliable with variable lighting.</li>
-      <li><strong>Key insight:</strong> Confirmed voxels <em>need</em> hand/joint information to distinguish punch types.</li>
-    </ul>
-
-    <h4>Iteration 7: Voxel-Only Causal Transformer (80.6%)</h4>
-    <p><strong>Goal:</strong> Test whether voxels alone could be sufficient.</p>
-    <ul>
-      <li><strong>Features (55,296 dims/frame):</strong> 24&sup3; grid &times; 4 channels (occupancy delta + directional gradients dx, dy, dz)</li>
-      <li><strong>Architecture:</strong> CausalVoxelTransformerModel (~2M params) — Conv3D stem, 4-layer causal transformer</li>
-      <li><strong>Result:</strong> 80.6% — but 19/56 jabs misclassified as cross (34% error)</li>
-      <li><strong>Why it failed:</strong> Jab and cross produce identical "straight forward" voxel patterns. Directional gradients could not solve left/right confusion.</li>
-    </ul>
-
-    <h4>Iteration 7b: Voxel Optimisation for Real-Time</h4>
-    <p><strong>Goal:</strong> Reduce dimensions for real-time inference.</p>
-    <ul>
-      <li><strong>Changes:</strong> Grid 24&sup3; → 12&sup3; (55,296 → 17,280 dims). Multi-scale deltas (fast 67ms + slow 267ms). Channel_p90 normalisation.</li>
-      <li><strong>Impact:</strong> Dramatically faster extraction (~13cm per voxel, sufficient for punch trajectories). Established the 12&sup3; grid used in all subsequent iterations.</li>
-    </ul>
-
-    <h4>Iteration 8: Voxel + Pose Fusion — Breakthrough (97.3%)</h4>
-    <p><strong>Goal:</strong> Revisit pose as a lightweight complement to voxels.</p>
-    <ul>
-      <li><strong>Features (3,480 dims/frame):</strong> 12&sup3; &times; 2 channels voxel (3,456) + 24-dim YOLO pose. Gradients removed — pose makes them redundant (5&times; reduction).</li>
-      <li><strong>Key innovations:</strong> Confidence gating, pose dropout (30% clip + 20% joint), YOLO bbox masking of background people</li>
-      <li><strong>Result:</strong> 97.3% — eliminated left/right confusion entirely (19 errors → 0)</li>
-      <li><strong>Full circle:</strong> Pose from Iteration 1 returned as a complement, now tolerant of occlusion.</li>
-    </ul>
-
-    <h4>Iteration 9: Production Deployment (v11, 96.8%)</h4>
-    <p><strong>Goal:</strong> Jetson Orin Nano deployment + fix live inference issues.</p>
-    <ul>
-      <li><strong>Enhanced pose:</strong> 24 → 42 dimensions (added elbow angles, joint velocities, extension rates)</li>
-      <li><strong>Block fix:</strong> Annotations extended to full guard sequence. v10 had 97.3% but poor live blocks; v11 has 96.8% with correct detection.</li>
-      <li><strong>Training:</strong> Horizontal flip (doubles dataset), focal loss (γ=1.5), class-balanced sampling</li>
-      <li><strong>Deployment:</strong> TensorRT FP16, parallel worker threads, RollingFeatureBuffer with strict ordering</li>
-    </ul>
+    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.88rem;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd; text-align:center; width:30px;">#</th>
+          <th style="padding:8px; border:1px solid #ddd; width:180px;">Approach</th>
+          <th style="padding:8px; border:1px solid #ddd;">Features &amp; Architecture</th>
+          <th style="padding:8px; border:1px solid #ddd; width:160px;">Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">1</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>2D Pose + LSTM/GCN</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">17 COCO keypoints via YOLO-Pose, 12-channel skeleton features. Models: LSTM, AAGCN (~2.5M params), ST-GCN, ST-GCN++</td>
+          <td style="padding:8px; border:1px solid #ddd;">Pipeline validated. <span style="color:#c62828;">Training data angles did not match robot camera.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>3D Pose</strong> (depth lifting)</td>
+          <td style="padding:8px; border:1px solid #ddd;">2D keypoints lifted to 3D via depth maps with skeleton constraints. Models: AAGCN, MotionBERT, PoseC3D</td>
+          <td style="padding:8px; border:1px solid #ddd;">~67%. <span style="color:#c62828;">Glove occlusion blocks wrists at punch extension.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Raw RGBD + 3D CNNs</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">4-channel input (RGB + depth), 112&times;112 crops. Models: Swin3D-B (~88M), MViT V2, R3D-18 (~33M)</td>
+          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">33&ndash;88M params, too large for edge. Batch size 2 on Colab.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>RGBD + Segmentation + Causal Transformer</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">YOLO segmentation + frozen EfficientNet-B2 (512-dim). CausalActionTransformer: 6 layers, 8 heads, ~3M trainable / ~35M total. Progressive prediction loss at all timesteps.</td>
+          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">Still pixel-based, still required Colab.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Z-Mask</strong> (depth grid)</td>
+          <td style="padding:8px; border:1px solid #ddd;">1,156 dims/frame: 12&times;12 depth grid, RGB grid, centre of mass, velocity derivatives. BoxingCAT: 1D conv + 4 causal transformer layers + future prediction head.</td>
+          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">2D grid lost 3D spatial info. Hooks vs uppercuts indistinguishable.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">6</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Colour Tracking</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">1,749 dims/frame: 12&sup3; voxel delta + optical flow + glove colour tracking (18 dims). VoxelFlowModel (~1.2M): Conv3D + MLP branches, concatenation fusion.</td>
+          <td style="padding:8px; border:1px solid #ddd;">~68%. <span style="color:#c62828;">Required coloured gloves. HSV unreliable.</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">7</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel-Only Transformer</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">55,296 dims/frame: 24&sup3; grid &times; 4 channels (delta + directional gradients). CausalVoxelTransformerModel (~2M): Conv3D stem, 4-layer causal transformer.</td>
+          <td style="padding:8px; border:1px solid #ddd;">80.6%. <span style="color:#c62828;">19/56 jabs &rarr; cross (34% L/R error).</span> <span style="color:#e65100;">Insight: need pose for L/R.</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">7b</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel Optimisation</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Grid 24&sup3; &rarr; 12&sup3; (55,296 &rarr; 17,280 dims). Multi-scale deltas (67ms + 267ms). Channel_p90 normalisation.</td>
+          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#2e7d32;">Real-time capable. Established 12&sup3; grid for all subsequent iterations.</span></td>
+        </tr>
+        <tr style="background:#e8f5e9;">
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>8</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Pose Fusion</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">3,480 dims/frame: 12&sup3; &times; 2ch voxel (3,456) + 24-dim YOLO pose. Gradients removed (5&times; reduction). Confidence gating, pose dropout (30% clip + 20% joint).</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">97.3% &mdash; Breakthrough.</strong> L/R confusion eliminated. Full circle &mdash; pose returned.</td>
+        </tr>
+        <tr style="background:#e8f5e9;">
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>9</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Production (v11)</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Pose expanded to 42 dims. Block annotation fix. Horizontal flip augmentation. TensorRT FP16, parallel threads, RollingFeatureBuffer.</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">96.8% &mdash; Deployed.</strong> Correct live block detection.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <sl-divider></sl-divider>
 
