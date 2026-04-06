@@ -152,7 +152,7 @@
         </div>
         <div class="arch-layer arch-l4">
           <h4>Integration Layer</h4>
-          <p>CV interface (file-based handshake), Robot arm control (ROS / serial)</p>
+          <p>GuiBridge (ROS 2 QThread bridge), CV interface (ROS topics + file-based fallback), Robot arm control (ROS command topics), Phone dashboard (shared SQLite + JSON command file)</p>
         </div>
         <div class="arch-layer arch-l5">
           <h4>Data Layer</h4>
@@ -170,6 +170,64 @@
       </p>
 
       <table-component id="gui-integration-specs"></table-component>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>ROS 2 Integration</h3>
+      <p>
+        The GUI communicates with the broader BoxBunny system through a GuiBridge class
+        that spawns a background QThread running a ROS 2 node. ROS topic callbacks on the
+        worker thread emit Qt Signals, which are automatically marshalled to the GUI's main
+        thread for safe widget updates. This architecture allows real-time punch
+        confirmations, drill progress updates, session state changes, and coaching tips to
+        flow into the interface without blocking the UI event loop.
+      </p>
+      <p>
+        When ROS 2 is unavailable (for example, during UI development on a laptop without
+        the full robotics stack), the bridge degrades gracefully: all signals are suppressed,
+        service calls return failure immediately, and the GUI runs in standalone mode using
+        mock interfaces. This preserved the ability to develop and test the entire GUI
+        independently of hardware throughout the project.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Phone Dashboard</h3>
+      <p>
+        A companion web dashboard was implemented to give users access to their training
+        data from their phone. The dashboard is a Vue 3 single-page application served by a
+        lightweight backend running on the same Jetson. Users connect to the robot's WiFi
+        access point and open the dashboard in their phone browser.
+      </p>
+      <p>
+        The dashboard reads from the same SQLite databases as the touchscreen GUI, providing
+        a synchronized view of session history, performance trends, achievement progress, and
+        combo mastery. Users can also start training sessions remotely, adjust robot height,
+        manage presets, and chat with the AI coach. Remote commands are written as JSON to a
+        shared file that the GUI polls every 100 ms, providing near-instant responsiveness
+        without requiring a direct socket connection between the dashboard and the GUI process.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Gamification System</h3>
+      <p>
+        A gamification layer was added to sustain user motivation across sessions. Experience
+        points (XP) are awarded per training session based on the training mode, session
+        completion percentage, performance score, and current training streak. Users progress
+        through six ranks: Novice, Contender, Fighter, Warrior, Champion, and Elite, each
+        requiring increasing XP thresholds.
+      </p>
+      <p>
+        Twelve achievement badges track specific milestones such as first completed session
+        (First Blood), 100 total punches (Century), fastest reaction time (Speed Demon), and
+        highest defense rate (Iron Chin). A daily training streak counter encourages
+        consistency, with bonus XP multipliers applied during active streaks. Personal records
+        for power, stamina, and reaction metrics are tracked and surfaced on the dashboard.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -410,6 +468,52 @@
         fallback was implemented as a design decision rather than an error state, since the
         Jetson Nano's 4 GB of RAM makes model availability uncertain.
       </p>
+
+      <h4>Notable Bug Fixes</h4>
+
+      <sl-details summary="Lambda signal bug: Qt boolean argument override">
+        <p>
+          Qt's <code>clicked</code> signal passes a boolean <code>checked</code> argument
+          that silently overrides default parameter values in connected lambda functions.
+          Navigation buttons would receive <code>False</code> as the page index instead of
+          the intended constant.
+        </p>
+        <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto; font-size:0.85rem;">
+# Bug: clicked signal passes checked=False, overriding page_index
+button.clicked.connect(lambda page_index=PageIndex.HOMEPAGE: self.navigate_to(page_index))
+
+# Fix: capture the signal argument explicitly
+button.clicked.connect(lambda checked, pi=PageIndex.HOMEPAGE: self.navigate_to(pi))</pre>
+      </sl-details>
+
+      <sl-details summary="Stylesheet override: min-height blocking setFixedSize()">
+        <p>
+          PySide6 stylesheet properties <code>min-height</code> and <code>min-width</code>
+          override programmatic <code>setFixedSize()</code> calls. Pages requiring precise
+          sizing had their dimensions silently overridden by inherited stylesheets.
+        </p>
+        <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto; font-size:0.85rem;">
+# Set min dimensions to 1px so setFixedSize() takes effect
+widget.setStyleSheet("min-width: 1px; min-height: 1px;")
+widget.setFixedSize(target_width, target_height)
+
+# Pages bypassing ButtonNavigationMixin size overrides:
+class CustomPage(ButtonNavigationMixin, QWidget):
+    SKIP_NAV_SETUP = True</pre>
+      </sl-details>
+
+      <sl-details summary="Database score scale mismatch">
+        <p>
+          The combo scoring system migrated from a 0-1 scale to a 0-5 scale, but the SQLite
+          CHECK constraint still enforced the old range, causing constraint violations on
+          scores above 1.0.
+        </p>
+        <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto; font-size:0.85rem;">
+# Old: CHECK(score BETWEEN 0 AND 1)
+# New: CHECK(score BETWEEN 0 AND 5)
+# Required recreating the database with corrected schema
+# Existing data migrated: new_score = old_score * 5.0</pre>
+      </sl-details>
     </div>
 
     <sl-divider></sl-divider>

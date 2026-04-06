@@ -14,7 +14,8 @@ if (guiIterationsEl) {
       ['Iteration 3', 'Weeks 6-8 (Jan-Feb)', 'Sparring mode, proficiency assessment', 'Markov chain combo generation working, 6-question proficiency checklist producing level classification'],
       ['Iteration 4', 'Weeks 9-11 (Feb-Mar)', 'Performance testing modes, sensor integration', 'Power/Stamina/Reaction tests functional, multi-mode serial protocol working'],
       ['Iteration 5', 'Weeks 12-13 (Mar)', 'Navigation stack, AI coaching integration, polish', 'Automatic back button history, LLM fallback architecture in place'],
-      ['Iteration 6', 'Weeks 14-15 (Apr)', 'User management, validation testing', 'Login/signup flow, per-user data isolation, full functional validation pass completed']
+      ['Iteration 6', 'Weeks 14-15 (Apr)', 'User management, validation testing', 'Login/signup flow, per-user data isolation, full functional validation pass completed'],
+      ['Iteration 7', 'Weeks 16-18 (Apr)', 'ROS 2 integration, phone dashboard, design system overhaul', 'GuiBridge connecting GUI to ROS nodes, Vue 3 phone dashboard via WiFi AP, centralized theme system, pattern lock authentication, coach station, free training mode']
     ],
     search: false,
     sort: false,

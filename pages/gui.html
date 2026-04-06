@@ -137,6 +137,7 @@
         <sl-tab slot="nav" panel="performance">Performance</sl-tab>
         <sl-tab slot="nav" panel="sparring">Sparring</sl-tab>
         <sl-tab slot="nav" panel="others">Others</sl-tab>
+        <sl-tab slot="nav" panel="coach">Coach Station</sl-tab>
 
         <sl-tab-panel name="training">
           <p>
@@ -147,6 +148,13 @@
             A configurable session setup lets users choose round count, work time, rest time, and
             playback speed before starting. Post-session, an AI chat page offers feedback using a
             local language model, falling back to hardcoded responses if the model is unavailable.
+          </p>
+          <p>
+            <strong>Free Training.</strong> An open, reactive session with no structured drills.
+            The robot responds to user pad hits with contextually appropriate counter-strikes,
+            creating a dynamic back-and-forth. After 5 seconds of inactivity, the robot returns
+            to its guard position. This mode is designed for users who want unstructured practice
+            without scoring or progression.
           </p>
         </sl-tab-panel>
 
@@ -165,9 +173,12 @@
           <p>
             <strong>Markov chain combo generation.</strong> Sparring mode generates punch sequences
             procedurally, weighted by the user's weakness profile so that the robot targets areas
-            where the user needs the most practice. This mode is available to all proficiency levels
-            and is designed for users who want less predictable, more reactive training compared to
-            the structured combo curriculum.
+            where the user needs the most practice. Five AI opponent styles are available: Boxer
+            (balanced, technical), Brawler (aggressive, power-heavy), Counter-Puncher (reactive,
+            waits for the user to commit), Pressure (relentless, minimal rest), and Switch
+            (cycles between styles unpredictably). This mode is available to all proficiency
+            levels and is designed for users who want less predictable, more reactive training
+            compared to the structured combo curriculum.
           </p>
         </sl-tab-panel>
 
@@ -177,6 +188,23 @@
             settings including the AI chat toggle, computer vision toggle, and performance test
             entry points. It also houses the user management page where accounts can be viewed
             and deleted.
+          </p>
+          <p>
+            The Others page also provides access to a pattern lock setup (3x3 grid authentication
+            designed for gloved-hand input) and a QR code for connecting a phone to the robot's
+            WiFi-hosted companion dashboard.
+          </p>
+        </sl-tab-panel>
+
+        <sl-tab-panel name="coach">
+          <p>
+            <strong>Group circuit training.</strong> Coach Station allows a coach to manage
+            multiple participants rotating through the boxing station. The coach sets a
+            participant count (up to 30), optionally selects a training preset, and starts the
+            session. Each participant begins their turn by hitting the centre pad or tapping
+            the on-screen GO button. The system auto-advances to the next participant after the
+            configured work timer expires. Session results are stored per-participant for group
+            review.
           </p>
         </sl-tab-panel>
       </sl-tab-group>
@@ -188,15 +216,17 @@
     <div>
       <h3>Design Summary</h3>
       <p>
-        The GUI was built in PySide6 (Qt for Python) targeting an NVIDIA Jetson Nano 4GB
-        running Ubuntu 20.04 LTS. The original display was a 7-inch touchscreen at 1024x600,
-        later upgraded to a 10.1-inch capacitive display at 1280x800 following user testing
-        observations. The application uses a layered architecture separating presentation,
-        application logic, business logic, integration, and data concerns. The integration
-        layer abstracts all hardware communication behind mock interfaces, which allowed the
-        full GUI to be developed and tested on a Windows laptop before any physical hardware
-        was available. The system was built over six iterations from December 2024 to April 2025.
-        Detailed design decisions are documented in the sub-pages below.
+        The GUI was built in PySide6 (Qt for Python) targeting an NVIDIA Jetson Orin NX
+        running Ubuntu 20.04 LTS with ROS 2 Humble. The original display was a 7-inch
+        touchscreen at 1024x600, later upgraded to a 10.1-inch capacitive display at 1280x800
+        following user testing observations. The application uses a five-layer architecture
+        separating presentation, application logic, business logic, integration, and data
+        concerns. The integration layer connects the GUI to ROS 2 nodes via a QThread-based
+        bridge, enabling real-time data flow for punch detection, drill progress, and coaching
+        tips. A phone-accessible companion dashboard (Vue 3 web app) shares the same user
+        database and serves over the robot's WiFi access point, allowing users to view
+        analytics, start training remotely, and chat with the AI coach from their phone.
+        The system was built over seven iterations from December 2024 to April 2025.
       </p>
     </div>
 
@@ -225,17 +255,17 @@
         <a href="gui/design-ideation.html" class="section-nav-card">
           <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
           <h3>Design and Ideation</h3>
-          <p>Framework selection, navigation concepts, data strategy, display hardware</p>
+          <p>Framework selection, navigation concepts, data strategy, phone dashboard, authentication, design system, display hardware</p>
         </a>
         <a href="gui/implementation.html" class="section-nav-card">
           <sl-icon name="code-square" style="font-size: 2rem;"></sl-icon>
           <h3>Implementation</h3>
-          <p>Six iterations, layered architecture, key engineering decisions</p>
+          <p>Seven iterations, layered architecture, ROS 2 integration, phone dashboard, key engineering decisions</p>
         </a>
         <a href="gui/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
           <h3>Testing and Evaluation</h3>
-          <p>Functional testing, user testing, limitations</p>
+          <p>Functional testing, user testing, requirements verification</p>
         </a>
       </div>
     </div>

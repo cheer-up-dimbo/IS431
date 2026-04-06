@@ -268,6 +268,52 @@
         The spring must support the foam horizontally with minimal static sag.
         The governing formula is:
       </p>
+
+      <h4>Initial Spring Specification (Sag Prevention)</h4>
+      <p>
+        Before the box housing was introduced, the spring needed to support the
+        padding assembly against gravity while the robot arm moved. The initial design
+        assumed the end-effector assembly (foam layers, leather covering, and anti-vibration
+        mounts) weighed approximately 1 kg. Under this assumption, the minimum spring force
+        to prevent sag was:
+      </p>
+      <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
+        F<sub>sag</sub> = m &times; g = 1.0 &times; 9.81 = 9.81 N
+      </p>
+      <p>
+        With a spring rate of k = 8 N/mm, the static deflection under the assembly's
+        own weight would be:
+      </p>
+      <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
+        x<sub>sag</sub> = F / k = 9.81 / 8 = 1.23 mm
+      </p>
+      <p>
+        This small deflection was acceptable, providing confidence that a k = 8 N/mm
+        spring would hold the padding securely without noticeable droop.
+      </p>
+
+      <h4>Revised Mass Estimate</h4>
+      <p>
+        During prototyping, the actual end-effector assembly (foam, covering, and mounts)
+        was weighed and found to be significantly lighter than estimated, at approximately
+        150 to 200 g rather than the assumed 1 kg. With a mass of 0.175 kg (midpoint
+        estimate):
+      </p>
+      <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
+        F<sub>sag</sub> = 0.175 &times; 9.81 = 1.72 N
+      </p>
+      <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
+        x<sub>sag</sub> = 1.72 / 8 = 0.21 mm
+      </p>
+      <p>
+        The sag under the actual assembly weight is negligible (0.21 mm). This confirmed
+        that the k = 8 N/mm spring was significantly over-specified for sag prevention alone.
+        This finding, combined with the introduction of the box housing in Iteration 4
+        which eliminated sag as a concern entirely, motivated a reframing of the spring
+        selection criteria toward shock absorption.
+      </p>
+
+      <h4>Reframed Spring Selection: Shock Absorption</h4>
       <p>
         With the box housing introduced in Iteration 4, the spring no longer needs to support the padding assembly against gravity. Sag is eliminated by the rigid enclosure. This shifts the spring's primary role to shock absorption: the spring should be soft enough to compress meaningfully under a punch, absorbing impact energy before it reaches the robot's frame and internal electronics.
       </p>
@@ -277,9 +323,9 @@
       <p>
         Using Hooke's Law (F = k * x), the compression under a 500 N punch with the current spring rate of k = 8 N/mm is:
       </p>
-      <div class="calc-block">
-        <code>x = F / k = 500 / 8 = 62.5 mm</code>
-      </div>
+      <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
+        x = F / k = 500 / 8 = 62.5 mm
+      </p>
       <p>
         This compression is close to the spring's working range, providing meaningful energy absorption without bottoming out. The spring deflects enough to cushion the impact perceptibly, reducing the force transmitted to the robot frame.
       </p>
