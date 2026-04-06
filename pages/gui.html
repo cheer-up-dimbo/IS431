@@ -130,7 +130,7 @@
       <h3>Training Modes</h3>
       <p>
         The GUI organises all user-facing functionality into four categories. Each mode
-        addresses a different training objective identified during needs finding.
+        addresses a different training objective identified during needs finding. Screenshots of each mode's selection interface are available in <a href="appendix-gui.html">Appendix 3</a>.
       </p>
 
       <sl-tab-group>
@@ -181,6 +181,14 @@
             levels and is designed for users who want less predictable, more reactive training
             compared to the structured combo curriculum.
           </p>
+          <div style="margin-top:12px;">
+            <image-component
+              tag="gui-sparring"
+              source="../assets/gui/screenshots/sparring_drill.png"
+              subtitle="Figure: Sparring style selection with descriptions"
+              width="85%">
+            </image-component>
+          </div>
         </sl-tab-panel>
 
         <sl-tab-panel name="others">
@@ -205,10 +213,18 @@
             session. Each participant begins their turn by hitting the centre pad or tapping
             the on-screen GO button. The system auto-advances to the next participant after the
             configured work timer expires. Session results are stored per-participant for group
-            review.
+            review. The coach dashboard layout is shown in <a href="appendix-gui.html">Appendix 3</a>.
           </p>
         </sl-tab-panel>
       </sl-tab-group>
+      <div style="margin-top:20px;">
+        <image-component
+          tag="gui-homepage"
+          source="../assets/gui/screenshots/guest_welcome_page.png"
+          subtitle="Figure: Homepage showing the four training categories"
+          width="85%">
+        </image-component>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -229,6 +245,28 @@
         analytics, start training remotely, and chat with the AI coach from their phone.
         The system was built over seven iterations from December 2024 to April 2025.
       </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Interface Walkthrough</h3>
+      <p>
+        The video below demonstrates the complete user flow: account creation,
+        proficiency assessment, technique drills with session configuration,
+        sparring mode, free training, performance tests, session history, and
+        settings.
+      </p>
+      <div style="text-align:center; margin:16px 0;">
+        <video controls width="100%" style="max-width:800px; border-radius:8px;">
+          <source src="../assets/gui/screenshots/GUI_navigation.mkv" type="video/x-matroska">
+          <source src="../assets/gui/screenshots/GUI_navigation.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <p style="font-style:italic; color:#666; margin-top:8px; font-size:0.9rem;">
+          Video: Complete GUI navigation walkthrough (2 min)
+        </p>
+      </div>
     </div>
 
     <sl-divider></sl-divider>

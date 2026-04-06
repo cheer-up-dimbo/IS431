@@ -227,7 +227,7 @@
         (First Blood), 100 total punches (Century), fastest reaction time (Speed Demon), and
         highest defense rate (Iron Chin). A daily training streak counter encourages
         consistency, with bonus XP multipliers applied during active streaks. Personal records
-        for power, stamina, and reaction metrics are tracked and surfaced on the dashboard.
+        for power, stamina, and reaction metrics are tracked and surfaced on the dashboard. The session history interface consolidating all training types is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
     </div>
 
@@ -398,7 +398,7 @@
         shots and text labels for defensive movements (slip, block, roll). A combo is considered
         mastered when the user has completed at least five sessions with an average score of 3.0
         out of 5.0 or above. Progress is tracked per-user in the SQLite database and persists
-        across sessions.
+        across sessions. The self-select sequence builder interface is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
 
       <table-component id="gui-combo-notation"></table-component>
@@ -411,7 +411,7 @@
         transition probability matrix over punch types. Starting from a "start" state, the
         system picks the next punch based on weighted probabilities, continuing until an "end"
         state is reached or a safety limit of six punches per combo is hit. Sparring is
-        available to all proficiency levels.
+        available to all proficiency levels. The style selection interface is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
 
       <p>
@@ -467,7 +467,7 @@
         via llama-cpp-python). On hardware where the model cannot be loaded (insufficient memory
         or missing model file), the system falls back to hardcoded template responses. This
         fallback was implemented as a design decision rather than an error state, since the
-        Jetson Nano's 4 GB of RAM makes model availability uncertain.
+        Jetson Nano's 4 GB of RAM makes model availability uncertain. The coaching chat interface is shown in <a href="../appendix-gui.html">Appendix 3</a>.
       </p>
 
       <h4>Notable Bug Fixes</h4>
