@@ -13,8 +13,11 @@
   <script src="/components/report-nav/report-nav.js" defer></script>
   <script type="module" src="../../../components/image/image-component.js"></script>
   <style>
+    .table-responsive { overflow-x: auto; margin-bottom: 16px; }
     .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; text-align: left; }
-    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
+    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: middle; }
+    .is431-table img { max-width: 140px; border-radius: 6px; border: 1px solid #ddd; display: block; }
+    .img-placeholder { width: 140px; height: 80px; background: #f4f7fa; border: 1px dashed #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.8rem; font-style: italic; }
   </style>
 </head>
 <body>
@@ -29,8 +32,8 @@
 
     <h2>Design Ideation</h2>
     <p>
-      The ideation process for height adjustment was not treated as a single
-      component-selection exercise. Instead, it progressed through a sequence
+      The ideation process for height adjustment was not treated as single
+      component-selection process. Instead, it progressed through a sequence
       of design questions, where each stage of the subsystem was compared
       against the most important needs of BoxBunny: sufficient stroke,
       structural stiffness under punching, compact packaging,
@@ -39,8 +42,7 @@
       decision-support tool.
     </p>
     <p>
-      In this subsystem, the role of the selection matrix was not simply to
-      identify the "best" mechanism numerically. Rather, it was used to
+      In this subsystem, the role of the selection matrix was used to
       structure the design progression from <strong>basic adjustability concepts</strong>,
       to <strong>guide-and-actuator separation</strong>, to the final <strong>integrated
       telescopic column architecture</strong>. Each matrix narrowed the solution
@@ -52,52 +54,54 @@
     <!-- 1. HIGH-LEVEL HEIGHT-ADJUSTMENT CONCEPT -->
     <div>
       <h3>1. High-Level Height-Adjustment Concept</h3>
-      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
-        <thead>
-          <tr>
-            <th>Concept</th>
-            <th>User adjustability</th>
-            <th>Structural rigidity under punch loads</th>
-            <th>Complexity</th>
-            <th>Packaging</th>
-            <th>Final decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Fixed-height body</td>
-            <td>None</td>
-            <td>High</td>
-            <td>Low</td>
-            <td>High</td>
-            <td><sl-badge variant="danger">Rejected</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Manual telescopic mast</td>
-            <td>Moderate</td>
-            <td>Moderate</td>
-            <td>Low</td>
-            <td>Moderate</td>
-            <td><sl-badge variant="danger">Rejected</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Commercial lift column</td>
-            <td>High</td>
-            <td>Uncertain</td>
-            <td>Low</td>
-            <td>High</td>
-            <td><sl-badge variant="neutral">Not selected</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Guided lift column + screw jack</td>
-            <td>High</td>
-            <td>High</td>
-            <td>Moderate</td>
-            <td>High</td>
-            <td><sl-badge variant="success">Selected</sl-badge></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="is431-table" style="width: 100%; border-collapse: collapse; min-width: 800px;">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>User adjustability</th>
+              <th>Structural rigidity under punch loads</th>
+              <th>Complexity</th>
+              <th>Packaging</th>
+              <th>Final decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fixed-height body</td>
+              <td>None</td>
+              <td>High</td>
+              <td>Low</td>
+              <td>High</td>
+              <td><sl-badge variant="danger">Rejected</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Manual telescopic mast</td>
+              <td>Moderate</td>
+              <td>Moderate</td>
+              <td>Low</td>
+              <td>Moderate</td>
+              <td><sl-badge variant="danger">Rejected</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Commercial lift column</td>
+              <td>High</td>
+              <td>Uncertain</td>
+              <td>Low</td>
+              <td>High</td>
+              <td><sl-badge variant="neutral">Not selected</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Guided lift column + screw jack</td>
+              <td>High</td>
+              <td>High</td>
+              <td>Moderate</td>
+              <td>High</td>
+              <td><sl-badge variant="success">Selected</sl-badge></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p>
         This first matrix was used to decide the <strong>overall adjustment
         philosophy</strong>. A fixed-height body was rejected immediately because it
@@ -122,44 +126,46 @@
     <!-- 2. GUIDE STRATEGY -->
     <div>
       <h3>2. Guide Strategy</h3>
-      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
-        <thead>
-          <tr>
-            <th>Concept</th>
-            <th>Lateral stiffness</th>
-            <th>Part count</th>
-            <th>Tolerance sensitivity</th>
-            <th>Serviceability</th>
-            <th>Final decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Dual rear linear guides + carriage</td>
-            <td>High</td>
-            <td>Poor</td>
-            <td>Poor</td>
-            <td>Moderate</td>
-            <td><sl-badge variant="warning">Early concept</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Telescopic guided column</td>
-            <td>High</td>
-            <td>High</td>
-            <td>High</td>
-            <td>High</td>
-            <td><sl-badge variant="success">Selected</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Actuator-only guidance</td>
-            <td>Poor</td>
-            <td>High</td>
-            <td>High</td>
-            <td>Poor</td>
-            <td><sl-badge variant="danger">Rejected</sl-badge></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="is431-table" style="width: 100%; border-collapse: collapse; min-width: 800px;">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Lateral stiffness</th>
+              <th>Part count</th>
+              <th>Tolerance sensitivity</th>
+              <th>Serviceability</th>
+              <th>Final decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dual rear linear guides + carriage</td>
+              <td>High</td>
+              <td>Poor</td>
+              <td>Poor</td>
+              <td>Moderate</td>
+              <td><sl-badge variant="warning">Early concept</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Telescopic guided column</td>
+              <td>High</td>
+              <td>High</td>
+              <td>High</td>
+              <td>High</td>
+              <td><sl-badge variant="success">Selected</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Actuator-only guidance</td>
+              <td>Poor</td>
+              <td>High</td>
+              <td>High</td>
+              <td>Poor</td>
+              <td><sl-badge variant="danger">Rejected</sl-badge></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p>
         This matrix was used to decide how the subsystem should react
         punching-induced side loads. The early dual-linear-guide concept was
@@ -183,44 +189,50 @@
     <!-- 3. ACTUATOR STRATEGY -->
     <div>
       <h3>3. Actuator Strategy</h3>
-      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
-        <thead>
-          <tr>
-            <th>Concept</th>
-            <th>Axial load capacity</th>
-            <th>Self-holding / fail-safe behaviour</th>
-            <th>Integration with guide structure</th>
-            <th>Complexity</th>
-            <th>Final decision</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Gas spring / gas lift</td>
-            <td>Moderate</td>
-            <td>Poor</td>
-            <td>Poor</td>
-            <td>Low</td>
-            <td><sl-badge variant="danger">Rejected</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Powered linear actuator column</td>
-            <td>Moderate to high</td>
-            <td>Moderate</td>
-            <td>Moderate</td>
-            <td>Low</td>
-            <td><sl-badge variant="neutral">Not selected</sl-badge></td>
-          </tr>
-          <tr>
-            <td>Screw jack with travelling nut</td>
-            <td>High</td>
-            <td>High</td>
-            <td>High</td>
-            <td>Moderate</td>
-            <td><sl-badge variant="success">Selected</sl-badge></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="is431-table" style="width: 100%; border-collapse: collapse; min-width: 800px;">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Visual</th>
+              <th>Axial load capacity</th>
+              <th>Self-holding / fail-safe behaviour</th>
+              <th>Integration with guide structure</th>
+              <th>Complexity</th>
+              <th>Final decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Gas spring / gas lift</td>
+              <td><img src="../../../assets/report appendix b/17-height-concept1.png" alt="Gas lift" /></td>
+              <td>Moderate</td>
+              <td>Poor</td>
+              <td>Poor</td>
+              <td>Low</td>
+              <td><sl-badge variant="danger">Rejected</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Powered linear actuator column</td>
+              <td><img src="../../../assets/report appendix b/18-height-concept2.png" alt="Electric linear actuator" /></td>
+              <td>Moderate to high</td>
+              <td>Moderate</td>
+              <td>Moderate</td>
+              <td>Low</td>
+              <td><sl-badge variant="neutral">Not selected</sl-badge></td>
+            </tr>
+            <tr>
+              <td>Screw jack with travelling nut</td>
+              <td><img src="../../../assets/robot_mechanism/screw jack w nut.png" alt="Screw jack with travelling nut" /></td>
+              <td>High</td>
+              <td>High</td>
+              <td>High</td>
+              <td>Moderate</td>
+              <td><sl-badge variant="success">Selected</sl-badge></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p>
         This matrix focused on the actual lifting device. Gas-spring-based
         concepts were rejected because they behave like spring-damper systems
@@ -237,11 +249,11 @@
         philosophy of the subsystem.
       </p>
       <p>
-        The final design is a custom-machined telescopic column with an integrated
-        lead screw and travelling nut. The inner column is guided by linear
-        bearings that run on the outer column, while the lead screw is driven
-        by a stepper motor at the base. This design provides a compact, robust,
-        and user-friendly height adjustment mechanism that meets the unique
+        The final design is a custom telescopic column housing an integrated HK2T 
+        travelling-nut screw jack. The inner aluminium extrusion is guided by <strong>Delrin 
+        wear pads</strong> that run against the outer steel column, while the screw jack is driven 
+        by a <strong>24V DC gear motor</strong>. This decoupled design provides a compact, robust, 
+        and safe height adjustment mechanism that meets the unique
         demands of BoxBunny's punching interactions.
       </p>
     </div>

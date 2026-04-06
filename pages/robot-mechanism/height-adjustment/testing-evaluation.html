@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Testing &amp; Evaluation — Height Adjustment</title>
+  <title>IS-431: Height Adjustment Testing &amp; Evaluation</title>
   <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
   <link rel="stylesheet" href="../../../index.css">
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
-  <style>
-    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
-    .is431-table td, .is431-table th { padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; }
-  </style>
   <script src="/components/report-nav/report-nav.js" defer></script>
+  <script type="module" src="../../../components/image/image-component.js"></script>
+  <style>
+    .table-responsive { overflow-x: auto; margin-bottom: 16px; }
+    .is431-table { width: 100%; border-collapse: collapse; min-width: 800px; margin-bottom: 1rem; }
+    .is431-table th { background-color: #f8f9fa; font-weight: 600; color: #333; text-align: left; padding: 12px; border: 1px solid #e0e0e0; }
+    .is431-table td { padding: 12px; border: 1px solid #e0e0e0; vertical-align: middle; }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -28,81 +31,133 @@
 
     <h2>Testing &amp; Evaluation</h2>
     <p>
-      Following the right side of the V-Model framework, this page presents the test and verification criteria for the height adjustment subsystem, evaluating the design against the original system requirement <strong>RM-3</strong> and structural impact expectations.
+      Below is the consolidated subsystem-level verification and test matrix for the height-adjustment mechanism. This matrix summarises how each core requirement and design decision has been evaluated to date.
     </p>
 
     <sl-divider></sl-divider>
 
-    <!-- 1. PERFORMANCE CRITERIA -->
-    <div>
-      <h3>1. Performance Criteria</h3>
-      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;">
+    <h3>Design Verification and Test Summary</h3>
+    <div class="table-responsive">
+      <table class="is431-table">
         <thead>
           <tr>
-            <th style="width: 15%;">ID</th>
-            <th style="width: 35%;">Criterion</th>
-            <th style="width: 50%;">Target</th>
+            <th>Requirement / check</th>
+            <th>Verification method</th>
+            <th>Result</th>
+            <th>Status</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>RM-3</strong></td>
-            <td>Height adjustment stroke &amp; Actuation time</td>
-            <td>Provide &ge; 400 mm vertical stroke in &le; 32 seconds.</td>
+            <td><strong>RM-3:</strong> Provide 400 mm vertical stroke</td>
+            <td>Concept sizing and packaging review</td>
+            <td>Achieved</td>
+            <td><sl-badge variant="success">Pass</sl-badge></td>
+            <td></td>
           </tr>
           <tr>
-            <td><strong>RM-1</strong></td>
-            <td>Structural stability &amp; Self-locking</td>
-            <td>Hold vertical position under punching loads without power. Telescopic column resists lateral punch loads without binding.</td>
+            <td>Separate lifting from lateral load-bearing</td>
+            <td>Load-path design review</td>
+            <td>Achieved</td>
+            <td><sl-badge variant="success">Pass</sl-badge></td>
+            <td>Core structural principle of final concept</td>
+          </tr>
+          <tr>
+            <td>Rear linear-guide concept as final solution</td>
+            <td>Concept evaluation</td>
+            <td>Not selected</td>
+            <td><sl-badge variant="danger">Fail as final solution</sl-badge></td>
+            <td>Structurally sound but too many precision-fitted parts</td>
+          </tr>
+          <tr>
+            <td>Telescopic guided column concept</td>
+            <td>Concept evaluation</td>
+            <td>Selected</td>
+            <td><sl-badge variant="success">Pass</sl-badge></td>
+            <td>Best balance of stiffness, simplicity, and robustness</td>
+          </tr>
+          <tr>
+            <td>Commercial off-the-shelf lift columns</td>
+            <td>Concept evaluation</td>
+            <td>Not selected</td>
+            <td><sl-badge variant="danger">Fail as final solution</sl-badge></td>
+            <td>Side-load confidence insufficient</td>
+          </tr>
+          <tr>
+            <td>Screw-jack-based lifting architecture</td>
+            <td>Concept evaluation</td>
+            <td>Selected</td>
+            <td><sl-badge variant="success">Pass</sl-badge></td>
+            <td>Provides self-holding and good axial integration</td>
+          </tr>
+          <tr>
+            <td>Current full-stroke time (~32 s)</td>
+            <td>Speed estimate and observed performance</td>
+            <td>Acceptable for current implementation logic</td>
+            <td><sl-badge variant="success">Pass (functional)</sl-badge></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Ideal user preference (~10 s full stroke)</td>
+            <td>Performance target comparison</td>
+            <td>Not achieved</td>
+            <td><sl-badge variant="warning">Partial</sl-badge></td>
+            <td>Would require different mechanism or actuation strategy</td>
+          </tr>
+          <tr>
+            <td>Delrin wear and repeated-cycle behaviour</td>
+            <td>Long-term physical validation</td>
+            <td>Not yet fully tested</td>
+            <td><sl-badge variant="warning">Partial</sl-badge></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Quantitative column stiffness under punch disturbance</td>
+            <td>Physical testing</td>
+            <td>Not yet fully tested</td>
+            <td><sl-badge variant="warning">Partial</sl-badge></td>
+            <td></td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <sl-divider></sl-divider>
+    <h3>Summary of verification outcome</h3>
+    <p>
+      At present, the height-adjustment subsystem is <strong>successful in concept, load-path logic, stroke provision, and structural direction</strong>, but <strong>not yet fully closed in long-term physical validation</strong>. 
+    </p>
+    <p>The most important completed successes are:</p>
+    <ul>
+      <li>the clear separation of lifting and structural functions,</li>
+      <li>the move from exposed rail-based guidance to a more integrated telescopic column,</li>
+      <li>the achievement of the 400 mm stroke requirement,</li>
+      <li>and the preservation of a mechanically coherent load path under operational disturbance.</li>
+    </ul>
 
-    <!-- 2. TEST PROCEDURES -->
-    <div>
-      <h3>2. Test Procedures</h3>
-      
-      <h4>Test 1: Full-Stroke Actuation (RM-3)</h4>
-      <ul>
-        <li><strong>Setup:</strong> Robot fully assembled to ensure the screw jack is lifting the real-world mass.</li>
-        <li><strong>Procedure:</strong> Command the motor from the minimum limit to the maximum limit. Measure physical travel distance and duration.</li>
-        <li><strong>Success Criteria:</strong> Total measured stroke is &ge; 400 mm and total time is &le; 32 seconds.</li>
-      </ul>
-
-      <h4>Test 2: Column Deflection &amp; Self-Locking Hold</h4>
-      <ul>
-        <li><strong>Setup:</strong> Robot fully assembled and raised to maximum stroke extension. Motor power off.</li>
-        <li><strong>Procedure:</strong> Apply horizontal and vertical loads simulating user interaction to the top target pad.</li>
-        <li><strong>Success Criteria:</strong> No permanent deformation of the mast, 0 mm vertical drift over 60 seconds (jack is self-locking), and the screw jack operates smoothly without binding after load removal.</li>
-      </ul>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- 3. RESULTS -->
-    <div>
-      <h3>3. Results</h3>
-      <sl-alert variant="neutral" open style="margin-top: 16px;">
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Pending Physical Testing:</strong> Full-stroke actuation tests (RM-3), column deflection under lateral load, and self-locking position drift results will be populated following physical prototype integration.
-      </sl-alert>
-    </div>
+    <p>The most important remaining work is:</p>
+    <ul>
+      <li>repeated-cycle and wear testing of the Delrin-guided column,</li>
+      <li>quantitative measurement of lateral stiffness and backlash,</li>
+      <li>and evaluation of whether future revisions can move the full-stroke time closer to the ideal user target without weakening the structural logic of the subsystem.</li>
+    </ul>
 
     <sl-divider></sl-divider>
 
     <!-- NEXT SECTION NAVIGATION -->
     <div style="display: flex; justify-content: space-between; margin-top: 16px;">
-      <a href="electrical-control.html">
+      <a href="load-analysis.html">
         <sl-button variant="default" size="medium">
           <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-          Prev: Electrical &amp; Control
+          Prev: Load Analysis
         </sl-button>
       </a>
-      <!-- No 'Next' button as this is the final sub-page in the Height Adjustment stack -->
-      <div></div> 
+      <a href="../padding.html">
+        <sl-button variant="default" size="medium">
+          Next: Padding Subsystem
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
   </div>
 
