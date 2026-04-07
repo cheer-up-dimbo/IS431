@@ -31,13 +31,17 @@
       </p>
       <p>
         <strong style="color:#7b1fa2;">Robot Intelligence.</strong>
-        The CV pipeline exceeded its 90% accuracy target (RI-3, 96.8%) and
-        met the 150 ms end-to-end latency requirement (RI-2, ~120 ms). All
-        five AI sparring styles (RI-6) and the local LLM coaching system
-        (RI-7) were validated through live deployment at the CDE AI Fair.
-        The fair also drove key iterations: nearest-person tracking replaced
-        background clutter filtering, and the transformer-based model
-        replaced the original HSV colour tracking approach.
+        All seven Robot Intelligence requirements were verified. The
+        dual-branch (voxel + pose) Transformer exceeded its 90% accuracy
+        target (RI-3, 96.8% on an unseen person) and met the 150 ms
+        end-to-end latency requirement (RI-2, ~120 ms). CV+IMU sensor
+        fusion (RI-4), all five adaptive sparring styles (RI-6), and the
+        on-device Qwen2.5-3B LLM coach (RI-7) were validated through both
+        automated tests and the CDE AI Fair real-world deployment. The
+        fair also drove the largest design pivot of the project: the
+        unreliable HSV colour-tracking prototype was replaced from
+        scratch with the Transformer-based action recognition model that
+        now powers the deployed system.
       </p>
     </div>
 
@@ -74,16 +78,16 @@
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="3"><strong>Robot Intelligence</strong></td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Single-camera viewpoint dependency</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Model is tightly coupled to the training camera angle; different viewpoints require re-recording the dataset</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">CV model training scope is narrow (8 classes, no retraction)</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The action prediction model only labels 6 punch types, block, and idle, and its punch annotations stop at full extension. This caps what the system can recognise (no slips, no head-vs-body targets, no footwork) and forces the IMU + pad-constraint filter to absorb the model's wobble during the retraction phase rather than the CV model being correct end-to-end</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Block class underrepresentation (66.7% accuracy, n=6)</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Defensive pose classification is less reliable than offensive punches due to limited training samples</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Pose estimator not trained for boxing</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO where hands are bare, so it has no concept of gloved hands or this camera angle. The wrist keypoints become unreliable exactly when they matter most (at punch extension), and the model is forced to lean on the voxel branch instead of getting two strong signals &mdash; capping how much further the fused architecture can be pushed</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc;">LLM coaching depth (3B model, 128-token cap)</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Adequate for real-time 1 to 2 sentence tips, but post-session analysis lacks depth and specificity</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">LLM compute ceiling on the Jetson</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The Jetson has 16&nbsp;GB of memory but its GPU isn't built to run a heavy LLM in parallel with the CV pipeline. A 3B model with a 128-token output cap is the largest the current hardware can sustain without hurting the real-time loop &mdash; which limits how deep the post-session coaching analysis can go and how specific the drill suggestions can be</td>
           </tr>
         </tbody>
       </table>
@@ -121,13 +125,17 @@
             <td style="padding:10px 14px; border:1px solid #ccc;">Enables the robot to maintain or close distance, replicating a real opponent's ring movement and creating pressure-based training scenarios</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="2"><strong>Robot Intelligence</strong></td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Expand block training data and add multi-camera support</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">More varied blocking samples would improve the 66.7% block accuracy. A second camera would resolve viewpoint ambiguity between similar punches</td>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="3"><strong>Robot Intelligence</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Expand the CV model's training scope</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> so the CV model is correct end-to-end and the IMU filter no longer has to absorb the retraction wobble. Then expand the action set with <strong>slips, head/body targets, and defensive footwork</strong> &mdash; richer labels feed every other part of the system (sparring AI, analytics, LLM coach) and unlock more dynamic feedback</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Upgrade LLM to a larger quantised model</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">A 7B or 8B parameter model (still quantised to fit on-device) would generate richer post-session analysis and more specific drill suggestions</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Fine-tune a custom pose estimator on boxing footage</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Manually annotate keypoints on our own recorded footage (gloved hands, this camera viewpoint) and fine-tune YOLO Pose on it. A pose model that was actually trained for the context would let the pose stream pull its own weight instead of relying on the voxel branch to compensate, lifting the ceiling on the fused architecture</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Upgrade the LLM compute path</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Several upgrade paths preserve the &ldquo;everything local&rdquo; principle while unlocking richer post-session coaching from a larger 7B&ndash;8B model: a <strong>more powerful Jetson</strong> (Orin AGX), a <strong>dedicated discrete GPU</strong> for the LLM, or a <strong>USB AI accelerator</strong> (e.g. Hailo, Coral) to offload LLM inference</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #555;"><strong>System-Level</strong></td>
@@ -142,8 +150,14 @@
       <h3>6.4 Remaining Test Plan</h3>
       <p>
         The table below summarises the subsystem and system-level tests that
-        are defined but pending execution at the time of writing. These tests
-        will be completed once the full prototype is assembled.
+        are defined but pending execution at the time of writing. The User
+        Interface and Robot Intelligence subsystems are not in this list:
+        both have already been verified through their own dedicated test
+        infrastructure (146 unit tests, 28 integration tests, the master
+        Jupyter notebook, and the CDE AI Fair real-world deployment, all
+        documented in <a href="../pages/robot-intelligence-testing.html">5.3.4</a>).
+        The remaining tests below will be completed once the full mechanism
+        prototype is assembled.
       </p>
       <table-component subtitle="Table 19: Test Plan">
         <div id="table-subsystem-validation"></div>
@@ -173,14 +187,22 @@
         stable base (FoS exceeding 1.5), yaw rotation, and screw-jack height
         adjustment. The
         <strong style="color:#7b1fa2;">Robot Intelligence</strong> layer
-        achieves 96.8% punch classification at 30 fps with CV+IMU sensor
-        fusion and on-device LLM coaching.
+        runs entirely on a Jetson Orin NX as 10 ROS&nbsp;2 nodes: a
+        dual-branch (voxel + pose) Transformer classifies 8 punch types at
+        96.8% on an unseen person and 30&nbsp;fps, fused with IMU pad
+        impacts for confirmed punches; five adaptive sparring styles drive
+        the robot's behaviour; a local Qwen2.5-3B LLM coach delivers
+        real-time tips and post-session analysis; and a Vue&nbsp;3 + FastAPI
+        phone dashboard surfaces all of it without leaving the device.
       </p>
       <p>
         <strong>Key Technical Contributions.</strong>
-        The CV+IMU fusion pipeline for robust punch classification, the
-        Markov-chain sparring engine with weakness-biased opponent AI, and
-        the integrated on-device architecture that runs the full training
-        stack without internet connectivity.
+        The dual-branch voxel + pose Transformer architecture for early
+        punch action prediction; the CV+IMU sensor fusion pipeline that
+        turns ambiguous CV predictions into confirmed events through
+        pad-constraint filtering; the Markov-chain sparring engine with
+        weakness-biased opponent AI; and the fully on-device architecture
+        (CV inference, LLM coaching, dashboard backend) that runs the entire
+        training stack with zero internet dependency.
       </p>
     </div>

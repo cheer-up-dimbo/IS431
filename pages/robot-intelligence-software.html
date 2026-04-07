@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
   <script src="../components/scroll-to-top/scroll-to-top.js"></script>
   <script src="../components/report-nav/report-nav.js" defer></script>
+  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
   <style>
     .page-nav-row {
       display: flex;
@@ -25,6 +26,18 @@
       padding: 1px 6px;
       font-size: 0.88em;
       color: #1a7f37;
+    }
+    /* Subtle separation between H3 sub-topics under each H2 numbered section */
+    .content h3 {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #ececec;
+    }
+    .content h2 + h3,
+    .content > div > h3:first-of-type {
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
     }
   </style>
 </head>
@@ -110,11 +123,52 @@
     </table>
 
     <p>
-      The phone dashboard connects over the robot's own WiFi access point &mdash; users open it
-      on their phone while standing at the robot. This was a deliberate design choice: typing on
-      a 7-inch touchscreen with boxing gloves is impractical (confirmed during the
-      <a href="robot-intelligence-testing.html">CDE AI Fair</a>), so the phone provides a natural
-      interface for browsing stats, chatting with the AI coach, and configuring training sessions.
+      The phone dashboard exists because typing on a touchscreen with boxing gloves on is
+      impractical &mdash; a friction first confirmed during the
+      <a href="robot-intelligence-testing.html">CDE AI Fair</a> &mdash; so the phone provides
+      a natural interface for browsing stats, chatting with the AI coach, and configuring
+      training sessions.
+    </p>
+
+    <h3>Connecting from any phone, on any network</h3>
+    <p>
+      A normal localhost dashboard requires the phone and the robot to be on the same WiFi
+      &mdash; in a gym, that's almost never true. BoxBunny solves this by giving every
+      session a <strong>public URL via a localhost.run reverse tunnel</strong>, so a phone can
+      open the dashboard from <em>anywhere</em>, even on cellular data, with no router
+      configuration and no shared network.
+    </p>
+
+    <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:12px 16px; margin:14px 0; font-size:0.93rem;">
+      <div style="font-weight:600; color:#1b5e20; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #d8ead8;">How the public tunnel works</div>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #d8ead8;">
+        <span style="font-weight:600; color:#1565c0;">Tunnel &mdash;</span>
+        on startup, the dashboard server opens an outbound SSH connection to
+        <code>localhost.run</code>, which returns a unique HTTPS subdomain
+        (e.g. <code>9bc224e9279893.lhr.life</code>) that forwards to the Jetson's local port.
+      </p>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #d8ead8;">
+        <span style="font-weight:600; color:#1565c0;">Handoff &mdash;</span>
+        the URL is rendered as a <strong>QR code</strong> on the touchscreen GUI. The user
+        scans it with their phone camera &mdash; no app install, no IP, no password.
+      </p>
+      <p style="margin:0;">
+        <span style="font-weight:600; color:#1565c0;">Net effect &mdash;</span>
+        the only requirement is that the Jetson has internet. The phone can be on any
+        other network, anywhere &mdash; cellular included.
+      </p>
+    </div>
+
+    <p style="font-size:0.92rem; color:#444;">
+      If outbound internet isn't available the dashboard still serves directly over the
+      robot's local WiFi access point as a fallback &mdash; the tunnel layer is opt-in.
+    </p>
+
+    <p>
+      The diagram below ties all three communication layers together &mdash; phone &harr;
+      backend over HTTP/WebSocket, backend &harr; touchscreen GUI through <code>/tmp/</code>
+      IPC files, and GUI &harr; ROS&nbsp;2 through the QThread bridge &mdash; showing exactly
+      which messages flow where, and which database each side reads from.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.svg" subtitle="Figure: GUI &amp; Dashboard Communication Architecture"></image-component>
@@ -222,7 +276,7 @@
       The diagram below traces the full path:
     </p>
 
-    <svg viewBox="0 0 980 290" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:16px auto; display:block; font-family:system-ui,sans-serif;">
+    <svg class="zoomable" viewBox="0 0 980 290" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:16px auto; display:block; font-family:system-ui,sans-serif;">
       <defs>
         <marker id="arrChat" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
@@ -401,23 +455,39 @@
       Data is stored in SQLite across two tiers, designed for privacy and scalability:
     </p>
 
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <tbody>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:140px;">Main DB</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">Shared across all users &mdash; accounts, authentication, training presets, coaching sessions. One file: <code>boxbunny_main.db</code></td>
-        </tr>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Per-User DB</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">Isolated per user &mdash; training sessions, events, combo progress, performance tests, sparring data, weakness profiles, XP, achievements, streaks, personal records. One file per user: <code>users/{name}/boxbunny.db</code></td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;">
 
-    <p>
-      Per-user databases ensure complete data isolation (one user cannot access another's data),
-      avoid write lock contention during concurrent training, and simplify per-user data export
-      or backup.
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; border-radius:6px; padding:14px 16px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <span style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Main DB</span>
+          <code style="font-size:0.78rem;">boxbunny_main.db</code>
+        </div>
+        <div style="font-size:0.85rem; color:#555; line-height:1.55;">
+          <strong>One file, shared across all users.</strong> Holds data that has to be visible
+          to everyone on the system: accounts, authentication, training presets, and coaching
+          sessions.
+        </div>
+      </div>
+
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; border-radius:6px; padding:14px 16px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <span style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Per-User DB</span>
+          <code style="font-size:0.78rem;">users/{name}/boxbunny.db</code>
+        </div>
+        <div style="font-size:0.85rem; color:#555; line-height:1.55;">
+          <strong>One file per user, fully isolated.</strong> Holds everything personal: training
+          sessions, events, combo progress, performance tests, sparring data, weakness profiles,
+          XP, achievements, streaks, and personal records.
+        </div>
+      </div>
+
+    </div>
+
+    <p style="font-size:0.92rem; color:#444;">
+      Splitting per-user data into its own file gives <strong>complete data isolation</strong>
+      (one user cannot read another's data even at the file level), avoids
+      <strong>write-lock contention</strong> during concurrent training on multiple stations,
+      and makes per-user <strong>export, backup, or deletion</strong> a single file operation.
     </p>
 
     <h3>Real-Time Updates</h3>

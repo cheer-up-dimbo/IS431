@@ -12,8 +12,21 @@
   <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
   <script src="../components/scroll-to-top/scroll-to-top.js"></script>
   <script src="../components/report-nav/report-nav.js" defer></script>
+  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
   <style>
     .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
+    /* Subtle separation between H3 sub-topics under each H2 numbered section */
+    .content h3 {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #ececec;
+    }
+    .content h2 + h3,
+    .content > div > h3:first-of-type {
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
+    }
   </style>
 </head>
 <body>
@@ -41,7 +54,10 @@
     <sl-divider></sl-divider>
 
     <!-- 5.3.2.1 CV + IMU SENSOR FUSION -->
-    <h2>5.3.2.1 CV + IMU Sensor Fusion</h2>
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <h2 style="margin:0;">5.3.2.1 CV + IMU Sensor Fusion</h2>
+      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-4</sl-badge>
+    </div>
 
     <p>
       The <strong>punch_processor</strong> node fuses computer vision predictions with IMU pad impact data
@@ -76,12 +92,22 @@
       These fallback paths ensure graceful degradation if either sensor fails.
     </p>
 
+    <p>
+      The pipeline diagram below ties everything together &mdash; CV predictions and IMU pad
+      impacts both flow into the <code>punch_processor</code>'s ring buffer, get matched
+      within the &plusmn;500&nbsp;ms window, pass through the pad-constraint filter, and finally
+      emerge as a confirmed punch event published to the rest of the system.
+    </p>
+
     <image-component tag="image" source="../assets/robot_intelligence/ros/fusion_pipeline.svg" subtitle="Figure: CV + IMU Sensor Fusion Pipeline"></image-component>
 
     <sl-divider></sl-divider>
 
     <!-- 5.3.2.2 REAL-TIME INFERENCE PIPELINE -->
-    <h2>5.3.2.2 Real-Time Inference Pipeline</h2>
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <h2 style="margin:0;">5.3.2.2 Real-Time Inference Pipeline</h2>
+      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-5</sl-badge>
+    </div>
 
     <h3>FPS Sensitivity &mdash; Why 30fps Matters</h3>
     <p>
@@ -96,8 +122,8 @@
     <h3>The YOLO Bottleneck &mdash; TensorRT Conversion</h3>
 
     <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
-      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">YOLO bottleneck on the Jetson</div>
-      <p style="margin:0 0 6px;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">YOLO bottleneck on the Jetson</div>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#bf360c;">Problem:</span>
         the single biggest deployment challenge was YOLO Pose. In its default PyTorch
         (<code>.pt</code>) format, YOLO alone consumed most of the 33&nbsp;ms per-frame
@@ -105,11 +131,13 @@
         features the action model depends on, this meant the action model was being fed
         features at inconsistent, lower frame rates &mdash; accurate offline, broken live.
       </p>
-      <p style="margin:0 0 6px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#1b5e20;">Fix:</span>
         convert YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format,
-        FP16 precision). TensorRT optimises the computation graph for the Jetson's GPU,
-        fusing operations and eliminating overhead. This brought YOLO inference down from
+        FP16 precision &mdash; half-precision 16-bit floats, which run roughly twice as
+        fast on GPU as the default 32-bit format with negligible accuracy loss). TensorRT
+        optimises the computation graph for the Jetson's GPU, fusing operations and
+        eliminating overhead. This brought YOLO inference down from
         ~33&nbsp;ms to <strong>~16&nbsp;ms</strong>, comfortably under the frame budget.
       </p>
       <p style="margin:0;">
@@ -120,20 +148,135 @@
       </p>
     </div>
 
+    <div style="border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin:22px 0; background:#fff;">
+    <h4 style="margin-top:0;">Why does this speedup matter?</h4>
     <p>
-      Both models are optimised through TensorRT but via different routes. The action model
-      converts <code>.pth &rarr; .onnx &rarr; .trt</code> on first launch, while YOLO Pose
-      converts <code>.pt &rarr; .engine</code> directly through Ultralytics. Both run
-      automatically the first time the system boots with the <code>--optimize-gpu</code>
-      flag, and the optimised engines are cached next to the source files so subsequent
-      boots load instantly:
+      Both models run <strong>in series every frame</strong> &mdash; YOLO extracts the pose
+      features the action model immediately consumes, and together they have to fit inside
+      the <strong>33&nbsp;ms frame budget</strong> to hold 30&nbsp;fps. Because the action
+      model is small (~1.75M parameters) and was already running at ~8&nbsp;ms, the entire
+      budget effectively came down to <strong>how fast YOLO could run</strong>. That makes
+      the TensorRT speedup the deciding factor between a pipeline that holds 30&nbsp;fps and
+      one that doesn't.
     </p>
-    <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.86rem; overflow-x:auto;">action_prediction/model/
-&#9500;&#9472;&#9472; best_model.pth      <span style="color:#888;"># source weights</span>
-&#9500;&#9472;&#9472; best_model.onnx     <span style="color:#888;"># intermediate (auto-generated)</span>
-&#9500;&#9472;&#9472; best_model.trt      <span style="color:#888;"># TensorRT FP16 engine (cached)</span>
-&#9500;&#9472;&#9472; yolo26n-pose.pt     <span style="color:#888;"># source YOLO weights</span>
-&#9492;&#9472;&#9472; yolo26n-pose.engine <span style="color:#888;"># TensorRT FP16 engine (cached)</span></pre>
+
+    <svg class="zoomable" viewBox="0 0 1180 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1180px; margin:18px auto; display:block; font-family:system-ui,sans-serif;">
+      <defs>
+        <marker id="trtArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+        </marker>
+      </defs>
+
+      <text x="20" y="32" font-size="15" font-weight="700" fill="#1565c0" letter-spacing="0.5">YOLO POSE CONVERSION</text>
+      <text x="20" y="54" font-size="13" fill="#666">Ultralytics ships native TensorRT export &mdash; one-shot conversion, no intermediate file needed</text>
+
+      <!-- Box 1: .pt -->
+      <rect x="20" y="80" width="240" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+      <text x="140" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#0d47a1">yolo26n-pose.pt</text>
+      <text x="140" y="148" text-anchor="middle" font-size="13" fill="#0d47a1">Ultralytics weights</text>
+
+      <!-- Long arrow with command well above -->
+      <text x="484" y="118" text-anchor="middle" font-size="13" font-family="ui-monospace,monospace" fill="#475569">model.export(format="engine", half=True)</text>
+      <line x1="266" y1="138" x2="702" y2="138" stroke="#555" stroke-width="2.5" marker-end="url(#trtArr)"/>
+
+      <!-- Box 2: .engine -->
+      <rect x="708" y="80" width="240" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+      <text x="828" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#1b5e20">yolo26n-pose.engine</text>
+      <text x="828" y="148" text-anchor="middle" font-size="13" fill="#1b5e20">TensorRT FP16 engine</text>
+
+      <!-- Latency comparison for YOLO -->
+      <rect x="965" y="80" width="200" height="100" rx="10" fill="#fafafa" stroke="#d0d7de" stroke-width="1.5"/>
+      <text x="1065" y="103" text-anchor="middle" font-size="10" font-weight="700" fill="#94a3b8" letter-spacing="0.7">INFERENCE LATENCY</text>
+      <text x="1065" y="138" text-anchor="middle" font-size="18" font-weight="700">
+        <tspan fill="#94a3b8">~33 ms</tspan><tspan fill="#475569" dx="6" dy="0">&rarr;</tspan><tspan fill="#16a34a" dx="6">~16 ms</tspan>
+      </text>
+      <text x="1065" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#16a34a">2&times; faster</text>
+    </svg>
+
+    <p style="font-size:0.92rem; color:#444;">
+      The chart below shows how that single conversion turns a frame that <em>missed</em> the
+      33&nbsp;ms budget into one that <em>fits</em> with headroom to spare:
+    </p>
+
+    <svg class="zoomable" viewBox="0 0 1000 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+      <!-- Title -->
+      <text x="60" y="32" font-size="13" font-weight="700" fill="#0f172a">Per-frame inference budget &mdash; 33&nbsp;ms ceiling for 30&nbsp;fps</text>
+
+      <!-- Budget ceiling line -->
+      <line x1="654" y1="50" x2="654" y2="230" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4"/>
+      <rect x="610" y="48" width="88" height="20" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.2"/>
+      <text x="654" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="#b91c1c">33 ms ceiling</text>
+
+      <!-- ===== BEFORE row ===== -->
+      <text x="50" y="105" text-anchor="end" font-size="12" font-weight="700" fill="#475569">BEFORE</text>
+      <text x="50" y="120" text-anchor="end" font-size="10" fill="#94a3b8">PyTorch</text>
+
+      <!-- YOLO segment -->
+      <rect x="60" y="92" width="594" height="38" rx="4" fill="#fca5a5" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="357" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">YOLO ~33 ms</text>
+
+      <!-- Action segment -->
+      <rect x="654" y="92" width="144" height="38" rx="4" fill="#fecaca" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="726" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#7f1d1d">Action ~8 ms</text>
+
+      <text x="820" y="116" font-size="13" font-weight="700" fill="#dc2626">~41 ms &nbsp;&#x2715; misses 30&nbsp;fps</text>
+
+      <!-- ===== AFTER row ===== -->
+      <text x="50" y="180" text-anchor="end" font-size="12" font-weight="700" fill="#475569">AFTER</text>
+      <text x="50" y="195" text-anchor="end" font-size="10" fill="#94a3b8">TensorRT FP16</text>
+
+      <!-- YOLO segment -->
+      <rect x="60" y="167" width="288" height="38" rx="4" fill="#86efac" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="204" y="191" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d">YOLO ~16 ms</text>
+
+      <!-- Action segment -->
+      <rect x="348" y="167" width="144" height="38" rx="4" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="420" y="191" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">Action ~8 ms</text>
+
+      <!-- Headroom region -->
+      <rect x="492" y="167" width="162" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <text x="573" y="191" text-anchor="middle" font-size="10" font-style="italic" fill="#94a3b8">~9 ms headroom</text>
+
+      <text x="820" y="191" font-size="13" font-weight="700" fill="#16a34a">~24 ms &nbsp;&#x2713; fits 30&nbsp;fps</text>
+
+      <!-- Footnote -->
+      <text x="60" y="248" font-size="11" fill="#666">Action model is in series with YOLO &mdash; it consumes YOLO's pose output every frame, so any time YOLO spends</text>
+      <text x="60" y="263" font-size="11" fill="#666">over budget directly drags the action model below 30&nbsp;fps. The TensorRT speedup is what makes the whole pipeline real-time.</text>
+    </svg>
+    </div>
+
+    <div style="border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin:22px 0; background:#fff;">
+    <h4 style="margin-top:0;">What does TensorRT actually do?</h4>
+    <p>
+      Conversion is more than a file rename. When TensorRT compiles a model for a specific
+      Jetson, it does four things:
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Layer fusion</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">Adjacent operations (e.g. conv&nbsp;+&nbsp;bias&nbsp;+&nbsp;ReLU) are fused into a single GPU kernel, eliminating intermediate memory writes.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Kernel autotuning</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">For each fused operation, TensorRT benchmarks several CUDA implementations on the actual hardware and picks the fastest one.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">FP16 quantisation</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">Every weight is converted from 32-bit to 16-bit floating point &mdash; halving the memory bandwidth with negligible accuracy loss.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Engine serialisation</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">The optimised plan is serialised to a single binary file that loads in milliseconds &mdash; no recompilation on subsequent runs.</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.92rem; color:#444;">
+      The result is the <em>same model mathematically</em> running with roughly half the
+      memory bandwidth and a fraction of the kernel launch overhead &mdash; exactly what the
+      inference pipeline needed to sustain 30&nbsp;fps.
+    </p>
+    </div>
 
     <h3>Offline &rarr; Live Inference Gap</h3>
     <p>
@@ -143,19 +286,19 @@
 
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;">
       <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Sequential processing</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;"><strong>Issue:</strong> voxel extraction and YOLO ran one after the other, doubling per-frame time.</div>
-        <div style="font-size:0.9rem; margin-top:4px; color:#1b5e20;"><strong>Fix:</strong> parallelised into separate worker threads, running concurrently.</div>
+        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">Sequential processing</div>
+        <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> voxel extraction and YOLO ran one after the other, doubling per-frame time.</div>
+        <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> parallelised into separate worker threads, running concurrently.</div>
       </div>
       <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Buffer discontinuities</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;"><strong>Issue:</strong> dropped frames created gaps in the temporal window the model relied on.</div>
-        <div style="font-size:0.9rem; margin-top:4px; color:#1b5e20;"><strong>Fix:</strong> rolling FIFO feature buffer with strict frame ordering.</div>
+        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">Buffer discontinuities</div>
+        <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> dropped frames created gaps in the temporal window the model relied on.</div>
+        <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> rolling FIFO feature buffer with strict frame ordering.</div>
       </div>
       <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">FPS mismatch</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;"><strong>Issue:</strong> trained at a steady 30 fps but the live pipeline ran at variable rates.</div>
-        <div style="font-size:0.9rem; margin-top:4px; color:#1b5e20;"><strong>Fix:</strong> TensorRT optimisation of both models gave consistent throughput.</div>
+        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">FPS mismatch</div>
+        <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> trained at a steady 30 fps but the live pipeline ran at variable rates.</div>
+        <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> TensorRT optimisation of both models gave consistent throughput.</div>
       </div>
     </div>
 
@@ -266,7 +409,10 @@
     <sl-divider></sl-divider>
 
     <!-- 5.3.2.3 AI SPARRING ENGINE -->
-    <h2>5.3.2.3 AI Sparring Engine</h2>
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <h2 style="margin:0;">5.3.2.3 AI Sparring Engine</h2>
+      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-6</sl-badge>
+    </div>
 
     <p>
       The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
@@ -437,7 +583,10 @@
     <sl-divider></sl-divider>
 
     <!-- 5.3.2.4 LLM COACH -->
-    <h2>5.3.2.4 LLM Coach</h2>
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <h2 style="margin:0;">5.3.2.4 LLM Coach</h2>
+      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge>
+    </div>
 
     <p>
       A local AI coach runs entirely on the Jetson &mdash; no cloud, no internet &mdash; providing
@@ -597,7 +746,7 @@
       A standalone PySide6 chat GUI (<code>llm_chat_gui.py</code>) was built for iterative
       prompt tuning. It supports streaming token display, model selection, configurable
       system prompts, and sentence completion detection &mdash; used extensively to refine
-      coaching quality before deployment.
+      coaching quality before deployment. The interface is shown below.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>

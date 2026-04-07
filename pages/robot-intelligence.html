@@ -68,8 +68,22 @@
       color: #1a7f37;
       font-weight: 500;
     }
+    /* Subtle separation between H3 sub-topics under each H2 numbered section */
+    .content h3 {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #ececec;
+    }
+    .content h2 + h3,
+    .content > div > h3:first-of-type,
+    .section-nav-card h3 {
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
+    }
   </style>
   <script src="../components/report-nav/report-nav.js" defer></script>
+  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
 </head>
 <body>
   <div class="content">
@@ -85,27 +99,73 @@
     <div id="robot-intelligence">
       <h2>5.3 Robot Intelligence (Yogeeswaran)</h2>
       <p>
-        The Robot Intelligence subsystem delivers real-time boxing action recognition
-        and adaptive robot behaviour. At its core is a computer vision pipeline that
-        classifies 8 punch types using depth-based 3D voxel motion features fused with
-        2D pose estimation. Reaction time detection and human tracking build on
-        processed frames from this action prediction pipeline.
+        Robot Intelligence is the <strong>AI brain</strong> that turns BoxBunny from a static
+        striking target into an <strong>adaptive sparring partner</strong>. It sees what the
+        boxer is doing in real time, decides how the robot should respond, drives the LLM
+        coach that gives feedback, and surfaces every session as analytics on a phone
+        dashboard.
       </p>
       <p>
-        A ROS 2 workspace orchestrates these CV outputs alongside IMU sensing,
-        AI sparring logic, and local LLM coaching to fulfil three product needs:
-        Performance Analytics, Adaptive Fight Intelligence, and Realistic Training Partner.
+        At its core is a computer vision pipeline that classifies <strong>8 punch types</strong>
+        using depth-based 3D voxel motion fused with 2D pose estimation. A
+        <strong>ROS 2 workspace</strong> on an NVIDIA Jetson Orin NX orchestrates that
+        perception output alongside IMU sensing, an adaptive sparring engine, and a local
+        Qwen2.5-3B LLM coach &mdash; with everything running on-device, no cloud, no internet
+        required.
       </p>
 
       <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
         <strong>Section structure</strong>
         <ul style="margin:6px 0 0; padding-left:20px; line-height:1.6;">
-          <li><strong>This page</strong> &mdash; requirements + ROS 2 system architecture</li>
+          <li><strong>This page</strong> &mdash; subsystem boundaries, requirements, hardware, ROS 2 system architecture</li>
           <li><strong>5.3.1</strong> &mdash; Computer Vision &amp; action prediction model</li>
           <li><strong>5.3.2</strong> &mdash; Sensor fusion, sparring AI, LLM coach</li>
           <li><strong>5.3.3</strong> &mdash; Dashboard backend &amp; analytics</li>
           <li><strong>5.3.4</strong> &mdash; Testing &amp; verification of all 7 requirements</li>
         </ul>
+      </div>
+
+      <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:10px; padding:18px 22px; margin:22px 0; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+        <h3 style="margin:0 0 6px; padding:0; border:none;">Where this subsystem sits in BoxBunny</h3>
+
+        <p style="margin:0 0 12px;">
+          BoxBunny has three sibling subsystems wired through ROS&nbsp;2. Robot Intelligence
+          sits in the middle, deciding what the robot does next.
+        </p>
+
+        <div style="display:grid; grid-template-columns:1fr 28px 1fr 28px 1fr; gap:0; align-items:stretch; margin:14px 0;">
+
+          <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #1565c0; border-radius:6px; padding:14px 16px;">
+            <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">5.1 GUI</div>
+            <div style="font-size:0.92rem; font-weight:600; color:#0d47a1; margin-top:6px;">User input &amp; live feedback</div>
+            <div style="font-size:0.85rem; color:#555; margin-top:6px;">Touchscreen on the robot. User inputs in, live session state out.</div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
+
+          <div style="background:#f0f9f0; border:1px solid #c8e6c9; border-top:4px solid #2e7d32; border-radius:6px; padding:14px 16px; box-shadow:0 2px 6px rgba(46,125,50,0.12);">
+            <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">5.3 Robot Intelligence &middot; this section</div>
+            <div style="font-size:0.92rem; font-weight:600; color:#1b5e20; margin-top:6px;">The decision-making brain</div>
+            <div style="font-size:0.85rem; color:#555; margin-top:6px;">CV, sensor fusion, sparring AI, LLM coach &mdash; sensor data to commands.</div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
+
+          <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:14px 16px;">
+            <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">5.2 Robot Mechanism</div>
+            <div style="font-size:0.92rem; font-weight:600; color:#bf360c; margin-top:6px;">Physical actuation &amp; sensing</div>
+            <div style="font-size:0.85rem; color:#555; margin-top:6px;">Punch commands in, pad &amp; arm impact events out.</div>
+          </div>
+
+        </div>
+
+        <p style="font-size:0.92rem; color:#444; margin:0;">
+          Together, the three fulfil the product needs from the
+          <a href="../sections/problem-clarification.html">user research</a>:
+          <strong>Realistic Training Partner</strong> (5.3.1 + 5.3.2),
+          <strong>Adaptive Fight Intelligence</strong> (5.3.2), and
+          <strong>Performance Analytics</strong> (5.3.3).
+        </p>
       </div>
 
       <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
@@ -162,8 +222,8 @@
           </div>
           <div style="font-size:0.88rem; color:#555; margin-top:8px;">
             Phone dashboard for remote training control, performance trends, AI coach chat,
-            and <strong>population benchmarking</strong>. <strong>Two-tier SQLite</strong>
-            with per-user data isolation.
+            and <strong>population benchmarking</strong>. <strong>Public-URL tunnel</strong>
+            lets any phone connect from any network &mdash; no shared WiFi required.
           </div>
         </div>
 
@@ -180,6 +240,92 @@
           </div>
         </div>
 
+      </div>
+
+      <h3>Hardware &amp; Tech Stack</h3>
+
+      <p>
+        Everything below runs on a single <strong>NVIDIA Jetson Orin NX</strong> &mdash; one
+        board carrying perception, fusion, decision logic, the LLM coach, the dashboard
+        backend, and the touchscreen GUI all at once. No external server, no cloud, no
+        internet required.
+      </p>
+
+      <style>
+        .ts-row { display:grid; grid-template-columns:130px 1fr; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid #e5e7eb; }
+        .ts-row:last-child { border-bottom:none; padding-bottom:4px; }
+        .ts-row:first-child { padding-top:4px; }
+        .ts-label { font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#475569; text-align:right; }
+        .ts-pills { display:flex; flex-wrap:wrap; gap:6px; }
+        .ts-pill {
+          display:inline-block;
+          font-size:0.78rem;
+          font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+          padding:3px 9px;
+          border-radius:11px;
+          background:#f0f4f8;
+          border:1px solid #d0d7de;
+          color:#1f2937;
+          white-space:nowrap;
+        }
+        .ts-pill.hw { background:#e3f2fd; border-color:#bbdefb; color:#0d47a1; }
+        .ts-pill.model { background:#e8f5e9; border-color:#c8e6c9; color:#1b5e20; }
+        .ts-pill.ros { background:#f3e5f5; border-color:#e1bee7; color:#4a148c; }
+        .ts-pill.backend { background:#fff3e0; border-color:#ffe0b2; color:#bf360c; }
+        .ts-pill.frontend { background:#fce4ec; border-color:#f8bbd0; color:#880e4f; }
+        @media (max-width:700px) {
+          .ts-row { grid-template-columns:1fr; gap:6px; }
+          .ts-label { text-align:left; }
+        }
+      </style>
+
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:14px 18px; margin:12px 0;">
+        <div class="ts-row">
+          <div class="ts-label">Hardware</div>
+          <div class="ts-pills">
+            <span class="ts-pill hw">Jetson Orin NX 16GB</span>
+            <span class="ts-pill hw">Ubuntu 22.04</span>
+            <span class="ts-pill hw">CUDA 12.6</span>
+            <span class="ts-pill hw">RealSense D435i</span>
+            <span class="ts-pill hw">Teensy 4.1</span>
+            <span class="ts-pill hw">6&times; MPU6050</span>
+          </div>
+        </div>
+        <div class="ts-row">
+          <div class="ts-label">Models</div>
+          <div class="ts-pills">
+            <span class="ts-pill model">Voxel-Pose Transformer 1.75M</span>
+            <span class="ts-pill model">YOLO Pose nano</span>
+            <span class="ts-pill model">Qwen2.5-3B GGUF Q4_K_M</span>
+            <span class="ts-pill model">PyTorch &rarr; TensorRT FP16</span>
+            <span class="ts-pill model">llama-cpp-python</span>
+          </div>
+        </div>
+        <div class="ts-row">
+          <div class="ts-label">Robotics</div>
+          <div class="ts-pills">
+            <span class="ts-pill ros">ROS 2 Humble</span>
+            <span class="ts-pill ros">10 nodes</span>
+            <span class="ts-pill ros">21 messages</span>
+            <span class="ts-pill ros">6 services</span>
+          </div>
+        </div>
+        <div class="ts-row">
+          <div class="ts-label">Backend</div>
+          <div class="ts-pills">
+            <span class="ts-pill backend">FastAPI + Uvicorn</span>
+            <span class="ts-pill backend">SQLite (two-tier)</span>
+            <span class="ts-pill backend">WebSocket</span>
+            <span class="ts-pill backend">localhost.run tunnel</span>
+          </div>
+        </div>
+        <div class="ts-row">
+          <div class="ts-label">Frontends</div>
+          <div class="ts-pills">
+            <span class="ts-pill frontend">PySide6 / Qt &mdash; 10.1&Prime; touchscreen</span>
+            <span class="ts-pill frontend">Vue 3 + Tailwind &mdash; phone dashboard</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -225,7 +371,7 @@
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-5</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin Nano), no cloud</td>
+            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin NX 16&nbsp;GB), no cloud</td>
             <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
           </tr>
           <tr>
@@ -250,6 +396,14 @@
     <!-- 5.3.2 SYSTEM ARCHITECTURE -->
     <div id="system-architecture">
       <h3>System Architecture</h3>
+
+      <p style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+        This subsystem follows the same <strong>V&#8209;Model</strong> framework documented in
+        <a href="robot-mechanism.html">Section&nbsp;5.2's System Design Narrative</a>: requirements
+        RI&#8209;1 to RI&#8209;7 decompose into the subsystems in 5.3.1&ndash;5.3.3 and close back
+        into verification in <a href="robot-intelligence-testing.html">5.3.4</a>.
+      </p>
+
       <p>
         The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
         (Robot Operating System 2) &mdash; an industry-standard framework for building robotics
@@ -264,7 +418,7 @@
         behaviour:
       </p>
 
-      <svg viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+      <svg class="zoomable" viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
         <defs>
           <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
@@ -318,6 +472,13 @@
         <line x1="466" y1="180" x2="540" y2="155" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dataArr)"/>
       </svg>
 
+      <p>
+        Zooming out, the full ROS 2 node graph below shows every node, every custom topic,
+        and every service in the system &mdash; including the side branches (analytics,
+        drill manager, gesture node, robot control) that the 4-stage flow above abstracts
+        away.
+      </p>
+
       <image-component
           tag="image"
           source="../assets/robot_intelligence/ros/node_graph.svg"
@@ -326,19 +487,20 @@
 
       <h4 style="margin-top:28px;">Session State Machine</h4>
 
+      <p>
+        The session lifecycle is managed by a 5-state machine. Each state transition triggers
+        coordinated side effects across all nodes &mdash; for example, the CV frame rate scales
+        from ~6 fps (idle) to 30 fps (active), and data collection only runs during active
+        rounds. The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
+        (techniques, sparring, free, performance tests) sharing the same state machine shown
+        below.
+      </p>
+
       <image-component
           tag="image"
           source="../assets/robot_intelligence/ros/session_state_machine.svg"
           subtitle="Figure: BoxBunny Session State Machine — 5 states coordinating all node behaviour">
       </image-component>
-
-      <p style="margin-top:12px;">
-        The session lifecycle is managed by a 5-state machine. Each state transition triggers
-        coordinated side effects across all nodes — for example, the CV frame rate scales from
-        ~6 fps (idle) to 30 fps (active), and data collection only runs during active rounds.
-        The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
-        (techniques, sparring, free, performance tests) sharing this same state machine.
-      </p>
     </div>
 
     <sl-divider></sl-divider>

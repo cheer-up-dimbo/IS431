@@ -56,6 +56,18 @@
       justify-content: space-between;
       margin: 32px 0 16px;
     }
+    /* Subtle separation between H3 sub-topics under each H2 numbered section */
+    .content h3 {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #ececec;
+    }
+    .content h2 + h3,
+    .content > div > h3:first-of-type {
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
+    }
   </style>
 </head>
 <body>
@@ -71,6 +83,7 @@
     <!-- 5.3.1 INTRO -->
     <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
       <h2 style="margin:0;">5.3.1 Computer Vision & Action Prediction</h2>
+      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-3, RI-5</sl-badge>
       <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
         <sl-button variant="default" size="small">
           <sl-icon slot="prefix" name="github"></sl-icon>
@@ -134,7 +147,7 @@
         </tr>
         <tr>
           <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Edge deployment</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">All inference must run on an NVIDIA Jetson Orin Nano at 30fps with 16GB shared memory &mdash; no cloud, no external GPU.</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">All inference must run on an NVIDIA Jetson Orin NX (16&nbsp;GB) at 30fps &mdash; no cloud, no external GPU.</td>
         </tr>
       </tbody>
     </table>
@@ -144,8 +157,10 @@
     <p>
       The natural approach to recognising body movements is pose estimation &mdash; tracking
       joint positions frame by frame. The catch is that off-the-shelf pose estimators like
-      YOLO Pose are trained on datasets such as COCO where hands and wrists are almost always
-      visible as discrete features &mdash; bare skin, fingers, fine joint contours.
+      YOLO Pose are trained on datasets such as COCO (a standard public dataset of everyday
+      photos used to teach computer vision models what people, hands, and joints look like)
+      where hands and wrists are almost always visible as discrete features &mdash; bare
+      skin, fingers, fine joint contours.
       <span style="background:#fff3cd; padding:1px 4px; border-radius:3px;">Boxing breaks every
       one of those assumptions:</span> the wrists are buried inside thick padded gloves, so
       the model has nothing recognisable to lock onto at the exact body part it cares about
@@ -206,52 +221,90 @@
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Component</th>
-          <th style="padding:8px; border:1px solid #ddd;">Input</th>
-          <th style="padding:8px; border:1px solid #ddd;">Output</th>
+          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Component</th>
+          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Input &rarr; Output</th>
+          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Params</th>
           <th style="padding:8px; border:1px solid #ddd;">Role</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Voxel Branch</td>
-          <td style="padding:8px; border:1px solid #ddd;">12&sup3; 3D grid &times; 2 motion channels</td>
-          <td style="padding:8px; border:1px solid #ddd;">192-dim</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Voxel Branch (Conv3D stem)</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">12&sup3;&times;2 motion channels &rarr; 192-dim</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap;">169,200&nbsp;<span style="color:#888;">(9.7%)</span></td>
           <td style="padding:8px; border:1px solid #ddd;">Captures <em>where</em> the body moved in 3D space</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Pose Branch</td>
-          <td style="padding:8px; border:1px solid #ddd;">42 features from 7 body joints</td>
-          <td style="padding:8px; border:1px solid #ddd;">64-dim</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Pose Branch (encoder)</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">42 joint features &rarr; 64-dim</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap;">6,016&nbsp;<span style="color:#888;">(0.3%)</span></td>
           <td style="padding:8px; border:1px solid #ddd;">Captures <em>which</em> body part moved and how</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Fusion</td>
-          <td style="padding:8px; border:1px solid #ddd;">256-dim (both branches combined)</td>
-          <td style="padding:8px; border:1px solid #ddd;">192-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">Merges the two perspectives into a unified representation</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Fusion projection</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">256-dim (concatenated) &rarr; 192-dim</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap;">49,728&nbsp;<span style="color:#888;">(2.8%)</span></td>
+          <td style="padding:8px; border:1px solid #ddd;">Merges the two branches into a unified representation</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Transformer</td>
-          <td style="padding:8px; border:1px solid #ddd;">12 consecutive frames (0.4 seconds)</td>
-          <td style="padding:8px; border:1px solid #ddd;">384-dim</td>
-          <td style="padding:8px; border:1px solid #ddd;">Reasons over how the motion unfolds across time</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Transformer encoder</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">12 frames (0.4&nbsp;s) &rarr; 384-dim</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap;">1,483,776&nbsp;<span style="color:#888;">(84.9%)</span></td>
+          <td style="padding:8px; border:1px solid #ddd;">Reasons over how the motion unfolds across time (4 layers, 8 heads, d=192)</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Classifier</td>
-          <td style="padding:8px; border:1px solid #ddd;">384-dim summary</td>
-          <td style="padding:8px; border:1px solid #ddd;">8 action classes</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Classifier head</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">384-dim summary &rarr; 8 action classes</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap;">38,504&nbsp;<span style="color:#888;">(2.2%)</span></td>
           <td style="padding:8px; border:1px solid #ddd;">Final prediction: jab, cross, hooks, uppercuts, block, or idle</td>
+        </tr>
+        <tr style="background:#f8f9fa; font-weight:700;">
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Total</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">&mdash;</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap; color:#1b5e20;">1,747,224</td>
+          <td style="padding:8px; border:1px solid #ddd; font-weight:400; color:#555;">Small enough to run at ~8&nbsp;ms per frame on the Jetson</td>
         </tr>
       </tbody>
     </table>
 
+    <p style="font-size:0.92rem; color:#444;">
+      <strong>Where the parameters live:</strong> ~85% sit in the Transformer encoder (the
+      temporal reasoning core), with the rest split across the Voxel Conv3D stem, the small
+      Pose encoder, and the classifier head. The Pose branch in particular is tiny (~6K params)
+      because it only has to project 42 hand-crafted joint features into the fusion space &mdash;
+      most of the heavy lifting is done in the Transformer.
+    </p>
+
     <h3>Voxel Branch &mdash; 3D Motion Sensing</h3>
+
+    <div style="display:flex; gap:20px; align-items:flex-start; background:#f8f9fa; border-left:3px solid #1565c0; padding:14px 18px; margin:14px 0; border-radius:4px;">
+      <div style="flex:0 0 120px;">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/voxel_concept.svg" subtitle="Figure: A voxel grid with one voxel highlighted (Wikimedia Commons, public domain)" width="100%"></image-component>
+      </div>
+      <div style="flex:1; font-size:0.93rem; color:#333;">
+        <div style="font-weight:700; color:#0d47a1; margin-bottom:6px;">What is a voxel?</div>
+        <p style="margin:0 0 8px;">
+          A <strong>voxel</strong> is the 3D equivalent of a pixel. Just as a pixel is a tiny
+          square that holds a colour value at one (x,&nbsp;y) location on a flat image, a
+          voxel is a tiny <em>cube</em> that holds a value at one (x,&nbsp;y,&nbsp;z) location
+          in 3D space.
+        </p>
+        <p style="margin:0;">
+          Stack enough of them together and you get a <strong>3D grid</strong> &mdash; the same
+          way a 2D image is a grid of pixels. In this project, the depth camera turns the
+          space in front of it into a <strong>12&times;12&times;12 grid of voxels</strong>
+          (each roughly 13&nbsp;cm on a side), and each voxel records how much the user's body
+          has moved through that little region of space between frames. That's how the model
+          "sees" a punch in 3D.
+        </p>
+      </div>
+    </div>
+
     <p>
-      The depth camera sees the user in 3D. This branch divides the space around the user into
-      a 12&times;12&times;12 grid of small cubes (each roughly 13cm), creating a 3D snapshot of
-      where the body is at each moment. To detect motion, the model compares these snapshots
-      across time using two channels:
+      With that out of the way: this branch divides the space around the user into the
+      12&times;12&times;12 voxel grid described above, creating a 3D snapshot of where the
+      body is at each moment. To detect motion, the model compares these snapshots across
+      time using two channels:
     </p>
     <ul>
       <li><strong>Fast channel</strong> (2-frame difference, ~67ms) &mdash; detects the sudden onset of a punch</li>
@@ -264,15 +317,15 @@
       192-dimensional vector per frame.
     </p>
     <div style="font-size:0.92rem; color:#444; background:#fafafa; border:1px solid #eee; border-radius:6px; padding:12px 16px; margin:12px 0;">
-      <div style="font-weight:600; color:#333; margin-bottom:8px;">Design rationale</div>
+      <div style="font-weight:600; color:#333; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #e6e6e6;">Design rationale</div>
 
-      <p style="margin:0 0 8px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6;">
         <span style="font-weight:600;">Grid resolution &mdash;</span>
         shrunk from <code>24&sup3;</code> (55,296&nbsp;dims) to <code>12&sup3;</code>
         (3,456&nbsp;dims) for real-time performance on the Jetson.
       </p>
 
-      <p style="margin:0 0 8px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6;">
         <span style="font-weight:600;">Channel reduction &mdash;</span>
         earlier iterations used 10 voxel channels (directional gradients dx/dy/dz +
         velocity magnitude), but once pose was added these became redundant: pose already
@@ -303,6 +356,12 @@
       joint confidence (confidence gating) so the model automatically falls back to voxel-only
       when pose becomes unreliable. This is reinforced during training by dropping the pose
       input entirely for 15% of clips and zeroing individual joints 10% of the time.
+    </p>
+
+    <p>
+      The diagram below shows how the two branches feed the fusion projection, then how the
+      Transformer encoder reasons over a 12-frame window before the classifier head emits the
+      final 8-class prediction.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/model_architecture.svg" subtitle="Figure: FusionVoxelPoseTransformer Architecture &mdash; dual-branch fusion with transformer temporal encoding"></image-component>
@@ -517,19 +576,40 @@
     <h3>Inference Results Across Iterations</h3>
     <p>
       The videos below show the most promising inference results from key iterations, each revealing
-      specific limitations that drove the next approach:
+      specific limitations that drove the next approach. (<strong>Colab</strong> = Google
+      Colab, a cloud-hosted Jupyter notebook that provides a free GPU for ML training; the
+      RGBD model was too large to train on a laptop, so it had to live there.)
     </p>
+
+    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:12px 0; font-size:0.92rem; color:#5d4037;">
+      <strong>Important &mdash; recognition vs. prediction.</strong> The two videos below
+      are doing <em>different</em> tasks. The RGBD model on the left is offline action
+      <strong>recognition</strong>: it watches the whole clip and labels it after the fact,
+      with full bidirectional context. That's why its labels look so accurate &mdash; but it
+      can't react to a punch in progress and is far too slow for real-time use. The voxel +
+      colour tracking model on the right is true real-time action <strong>prediction</strong>,
+      classifying each frame as the motion unfolds &mdash; the same task the final deployed
+      model has to do, just at lower accuracy and with impractical coloured gloves.
+    </div>
 
     <div class="video-row two-up">
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_inference.mp4"></video>
-        <sub>RGBD Model (Iter. 3&ndash;4) &mdash; pixel-based, required Colab, too heavy for edge</sub>
+        <sub>RGBD Model (Iter. 3&ndash;4) &mdash; <strong>offline recognition</strong>, pixel-based, required Colab, too heavy for edge</sub>
       </div>
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/multimodal_inference.mp4"></video>
-        <sub>Voxel + Colour Tracking (Iter. 6) &mdash; ~68%, required coloured gloves</sub>
+        <sub>Voxel + Colour Tracking (Iter. 6) &mdash; <strong>real-time prediction</strong>, ~68%, required coloured gloves</sub>
       </div>
     </div>
+
+    <p style="font-size:0.92rem; color:#444; margin-top:14px;">
+      The video below uses <strong>GradCAM</strong> (Gradient-weighted Class Activation
+      Mapping) to visualise which image regions the RGBD model "looks at" when making a
+      prediction. The brighter red areas show where the model's attention is concentrated
+      &mdash; useful for sanity-checking that the model is learning real boxing motion
+      rather than memorising backgrounds or other spurious cues.
+    </p>
 
     <div class="video-row single" style="margin-top:12px;">
       <div class="video-box">
@@ -539,11 +619,13 @@
     </div>
 
     <p style="font-size:0.92rem; color:#444;">
-      <strong>Takeaway:</strong> deep networks <em>could</em> learn punch patterns &mdash;
-      GradCAM confirmed attention on <strong>arms and shoulders</strong>, not background
-      &mdash; but the RGBD model was <strong>too heavy for edge deployment</strong>, and
-      colour tracking required <strong>impractical gloves</strong>. Together these
-      limitations motivated the final <strong>voxel + pose fusion</strong> architecture.
+      <strong>Takeaway:</strong> deep networks <em>could</em> learn punch patterns offline
+      &mdash; GradCAM confirmed attention on <strong>arms and shoulders</strong>, not
+      background &mdash; but the RGBD model couldn't run live and was <strong>too heavy for
+      edge deployment</strong>, and the colour-tracking real-time approach required
+      <strong>impractical gloves</strong>. Together these limitations motivated the final
+      <strong>voxel + pose fusion</strong> architecture, which had to combine the deep-network
+      accuracy of the RGBD model with the real-time, glove-free operation of the voxel approach.
     </p>
 
     <h3>Final Model Inference (Deployed v11)</h3>
@@ -626,15 +708,15 @@
     </div>
 
     <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
-      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">Critical pipeline fix &mdash; silent frame drops</div>
-      <p style="margin:0 0 6px;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">Critical pipeline fix &mdash; silent frame drops</div>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#bf360c;">Problem:</span>
         early recordings silently dropped depth frames &mdash; ~15&nbsp;fps actual versus
         30&nbsp;fps expected &mdash; because the laptop couldn't write float32 depth arrays to
         the external SSD fast enough. Every temporal voxel feature was being computed against
         corrupted timing.
       </p>
-      <p style="margin:0 0 6px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#1b5e20;">Fix:</span>
         a dedicated capture thread that runs independently of disk I/O, paired with an async
         writer thread feeding off a 300-frame queue buffer. Non-blocking enqueue plus
@@ -645,6 +727,12 @@
         all earlier footage had to be re-collected and re-annotated from scratch.
       </p>
     </div>
+
+    <p>
+      The custom recording tool below wraps all of this &mdash; the dual-thread capture/writer
+      pipeline, the diagnostics, and a few common camera presets &mdash; behind a single
+      one-click interface so a recording session can start without any command-line setup.
+    </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/recording_tool.png" subtitle="Figure: Custom recording tool interface with presets"></image-component>
 
@@ -665,15 +753,15 @@
     </p>
 
     <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
-      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">Block annotation fix</div>
-      <p style="margin:0 0 6px;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">Block annotation fix</div>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#bf360c;">Problem:</span>
         block annotations originally covered only the onset (arms rising into guard). This
         caused two live failures &mdash; the rising motion looked like an uppercut, and once
         the user held the guard the model had never seen that pose, so predictions drifted to
         idle.
       </p>
-      <p style="margin:0 0 6px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#1b5e20;">Fix:</span>
         annotate the <strong>full guard sequence</strong> &mdash; rise, hold, and return
         &mdash; so the model learns every phase of a block.
@@ -687,6 +775,12 @@
         real-world reliability is significantly higher.
       </p>
     </div>
+
+    <p>
+      The screenshot below shows the annotation GUI in action: each coloured bar on the
+      timeline is one labelled punch segment, with start and end frames draggable to refine
+      the boundaries.
+    </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/annotation_freestyle.png" subtitle="Figure: Custom annotation GUI with timeline-based segment editing"></image-component>
 
@@ -752,14 +846,14 @@
     </p>
 
     <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
-      <div style="font-weight:600; color:#1b5e20; margin-bottom:6px;">Key finding &mdash; data quality over architecture</div>
-      <p style="margin:0 0 6px;">
+      <div style="font-weight:600; color:#1b5e20; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #c8e6c9;">Key finding &mdash; data quality over architecture</div>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #c8e6c9;">
         <span style="font-weight:600; color:#bf360c;">Bottleneck:</span>
         <strong>6 different architectures</strong> were tested and all plateaued at around
         <strong>92.8% validation accuracy</strong>. Hyperparameter tuning, augmentation
         strength, deeper transformers &mdash; none of it moved the needle.
       </p>
-      <p style="margin:0 0 6px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #c8e6c9;">
         <span style="font-weight:600; color:#1565c0;">Insight:</span>
         the bottleneck wasn't the model. <strong>One contributor's inconsistent technique</strong>
         was poisoning training and validation alike. Removing their clips and re-validating on
@@ -773,6 +867,12 @@
       </p>
     </div>
 
+    <p>
+      The chart below puts the <em>+4.5% data curation jump</em> next to the deltas from
+      every architecture experiment for direct comparison &mdash; the data fix is visibly
+      larger than the entire architecture-search effort combined.
+    </p>
+
     <image-component tag="image" source="../assets/robot_intelligence/cv/data_quality.svg" subtitle="Figure: Data curation had the largest impact on accuracy &mdash; larger than any architecture change"></image-component>
 
     <h3>Training</h3>
@@ -780,34 +880,41 @@
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
-          <th style="padding:8px; border:1px solid #ddd;">Value</th>
+          <th style="padding:8px; border:1px solid #ddd; width:140px;">Parameter</th>
+          <th style="padding:8px; border:1px solid #ddd; width:240px;">Value</th>
+          <th style="padding:8px; border:1px solid #ddd;">What it does</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Epochs</td>
           <td style="padding:8px; border:1px solid #ddd;">300 (early stop patience 60)</td>
+          <td style="padding:8px; border:1px solid #ddd;">How many full passes over the training data the model is allowed; training stops automatically if validation accuracy hasn't improved in 60 epochs to avoid wasted compute and overfitting.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Batch size</td>
           <td style="padding:8px; border:1px solid #ddd;">16</td>
+          <td style="padding:8px; border:1px solid #ddd;">Number of training samples processed together before updating the model weights &mdash; small enough to fit in GPU memory, large enough to give a stable gradient signal.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Optimiser</td>
           <td style="padding:8px; border:1px solid #ddd;">AdamW (LR 0.0005, weight decay 0.01)</td>
+          <td style="padding:8px; border:1px solid #ddd;">The algorithm that adjusts the model weights each step. AdamW is a strong default for Transformers; weight decay gently shrinks unused weights to prevent overfitting.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">LR schedule</td>
           <td style="padding:8px; border:1px solid #ddd;">Warmup 20 epochs &rarr; cosine decay to 1e-6</td>
+          <td style="padding:8px; border:1px solid #ddd;">How the learning rate changes over time. Starts small (warmup) so early steps don't destabilise the model, then smoothly decays so later steps make finer and finer adjustments.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Loss</td>
           <td style="padding:8px; border:1px solid #ddd;">Focal loss (&gamma;=1.5) + label smoothing (0.03)</td>
+          <td style="padding:8px; border:1px solid #ddd;">The function the model is trying to minimise. Focal loss down-weights easy examples so training focuses on hard/rare classes; label smoothing makes the model less overconfident, which improves generalisation.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Best epoch</td>
           <td style="padding:8px; border:1px solid #ddd;">73 / 133 trained</td>
+          <td style="padding:8px; border:1px solid #ddd;">The epoch at which validation accuracy peaked. The model trained for 133 epochs total but the checkpoint from epoch 73 was the one saved and deployed.</td>
         </tr>
       </tbody>
     </table>
@@ -817,6 +924,12 @@
       voxel X-axis, swapping left/right pose features, and swapping labels (jab&harr;cross, left_hook&harr;right_hook,
       left_uppercut&harr;right_uppercut), effectively doubling the dataset. Other augmentations: speed (0.8-1.2&times;),
       voxel shift/cutout/stretch, multi-window (9, 12 frames).
+    </p>
+
+    <p>
+      The end-to-end pipeline below shows how raw recordings move through annotation,
+      feature extraction (voxel + pose), training on the workstation, and finally TensorRT
+      deployment to the Jetson.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/pipeline.svg" subtitle="Figure: Training and deployment pipeline"></image-component>
@@ -966,7 +1079,12 @@
       </li>
     </ul>
 
-    <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation — bounding box + 7 upper-body keypoints reused by both human tracking and reaction time detection" width="50%"></image-component>
+    <p>
+      Both functions read directly off the bounding box and 7 upper-body keypoints shown below
+      &mdash; the same per-frame YOLO output the action model already consumes.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation — bounding box + 7 upper-body keypoints reused by both human tracking and reaction time detection" width="25%"></image-component>
 
     <sl-divider></sl-divider>
 
