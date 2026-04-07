@@ -42,10 +42,35 @@
 
     <p>
       Training data is only useful if users can see it, understand it, and act on it. This
-      section covers the software systems that turn raw session data into performance insights,
-      deliver AI-powered coaching analysis, and let users control the robot conveniently from
-      their phone &mdash; all without requiring internet access.
+      section covers the software <em>backend</em> that turns raw session data into performance
+      insights, delivers AI-powered coaching analysis, and lets users control the robot
+      conveniently from their phone &mdash; all without requiring internet access.
     </p>
+
+    <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:12px 16px; margin:14px 0; font-size:0.92rem;">
+      <strong>Where the dashboard is split between Section 5.1 and Section 5.3.3</strong>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px;">
+        <div>
+          <div style="font-weight:600; color:#0d47a1; margin-bottom:4px;">
+            <a href="gui.html#dashboard" style="color:inherit;">5.1 GUI</a> &mdash; the user-facing side
+          </div>
+          <ul style="margin:0; padding-left:18px; line-height:1.55;">
+            <li>5 phone views (Home, Performance, Training, Chat, Profile)</li>
+            <li>Gamification badges &amp; rank progression UI</li>
+            <li>Training presets UI</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-weight:600; color:#1b5e20; margin-bottom:4px;">5.3.3 (this section) &mdash; the backend</div>
+          <ul style="margin:0; padding-left:18px; line-height:1.55;">
+            <li>FastAPI server bridging phone &harr; ROS 2</li>
+            <li>Two-tier SQLite design</li>
+            <li>WebSocket protocol for live updates</li>
+            <li>IPC bridge to the touchscreen GUI</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
     <sl-divider></sl-divider>
 
@@ -178,88 +203,127 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 5.3.3.4 PHONE DASHBOARD FEATURES -->
-    <h2>5.3.3.4 Phone Dashboard</h2>
+    <!-- 5.3.3.4 PHONE DASHBOARD BACKEND -->
+    <h2>5.3.3.4 Two Backend Flows in Detail</h2>
 
     <p>
-      Built with <strong>Vue 3</strong> (Composition API, Pinia state management, Tailwind CSS)
-      and <strong>Chart.js</strong> for data visualisation, served by a FastAPI backend. The
-      dashboard provides five main views:
+      The frontend stack (Vue 3 + Pinia + Tailwind + Chart.js) and the 5 user-facing views
+      are introduced in <a href="gui/implementation.html#phone-dashboard">5.1 Implementation</a>.
+      Two of those views &mdash; <strong>AI Coach Chat</strong> and <strong>Training Remote</strong>
+      &mdash; are the most technically interesting on the backend side because they cross
+      every layer of the stack (HTTP &rarr; FastAPI &rarr; ROS 2 &rarr; touchscreen GUI). Both
+      run over the robot's own WiFi access point with no external network required.
     </p>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">View</th>
-          <th style="padding:8px; border:1px solid #ddd;">What It Shows</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Home</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">XP progress ring toward next rank, weekly goal with streak counter, quick stats with trend arrows, recent session card</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Performance</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Trend charts across selectable time periods (7/30/90 days, all time) for 5 key metrics, with personal bests</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Training Remote</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Preset grid for one-tap session start, remote GUI navigation, press-and-hold height control</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>AI Chat</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Coaching conversation with streaming responses, drill action cards, persistent history</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Profile</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">User profile with rank badge, personal settings, and account management</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Coach Station</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Group circuit training management (coach accounts only)</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Key Dashboard Views</h3>
-
+    <h3>AI Coach Chat &mdash; Phone &rarr; FastAPI &rarr; ROS &rarr; LLM</h3>
     <p>
-      The AI Coach chat and Training Remote are the two most technically interesting views.
-      Both work over the robot's WiFi access point &mdash; the user's phone does not need to
-      be on the same network as the Jetson, it connects directly to the robot's own hotspot.
+      A single chat message crosses every layer of the stack and streams back word-by-word.
+      The diagram below traces the full path:
     </p>
 
-    <div style="display:flex; justify-content:center; gap:16px; margin:16px 0;">
+    <svg viewBox="0 0 980 290" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:16px auto; display:block; font-family:system-ui,sans-serif;">
+      <defs>
+        <marker id="arrChat" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+        </marker>
+        <marker id="arrChatG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2e7d32"/>
+        </marker>
+      </defs>
+
+      <!-- Return arrow on top: from box 4 back to box 5 -->
+      <path d="M 770 50 Q 770 20 700 20 L 220 20 Q 150 20 150 50" fill="none" stroke="#2e7d32" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arrChatG)"/>
+      <text x="490" y="14" text-anchor="middle" font-size="11" font-style="italic" fill="#2e7d32">streamed response (word-by-word)</text>
+
+      <!-- Row of 5 boxes -->
+      <!-- Box 1: Phone send -->
+      <rect x="20" y="50" width="170" height="60" rx="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.8"/>
+      <text x="105" y="71" text-anchor="middle" font-size="11" font-weight="bold" fill="#0d47a1">1. PHONE</text>
+      <text x="105" y="89" text-anchor="middle" font-size="11" fill="#0d47a1">User sends</text>
+      <text x="105" y="103" text-anchor="middle" font-size="11" fill="#0d47a1">chat message</text>
+
+      <line x1="190" y1="80" x2="215" y2="80" stroke="#555" stroke-width="2" marker-end="url(#arrChat)"/>
+
+      <!-- Box 2: FastAPI -->
+      <rect x="220" y="50" width="180" height="60" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.8"/>
+      <text x="310" y="71" text-anchor="middle" font-size="11" font-weight="bold" fill="#bf360c">2. FASTAPI</text>
+      <text x="310" y="89" text-anchor="middle" font-size="11" fill="#bf360c">Assemble prompt</text>
+      <text x="310" y="103" text-anchor="middle" font-size="9" fill="#bf360c">msg + history + system</text>
+
+      <line x1="400" y1="80" x2="425" y2="80" stroke="#555" stroke-width="2" marker-end="url(#arrChat)"/>
+
+      <!-- Box 3: ROS service -->
+      <rect x="430" y="50" width="200" height="60" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.8"/>
+      <text x="530" y="71" text-anchor="middle" font-size="11" font-weight="bold" fill="#4a148c">3. ROS 2 SERVICE</text>
+      <text x="530" y="91" text-anchor="middle" font-size="10" font-family="ui-monospace,monospace" fill="#4a148c">/boxbunny/llm/generate</text>
+
+      <line x1="630" y1="80" x2="655" y2="80" stroke="#555" stroke-width="2" marker-end="url(#arrChat)"/>
+
+      <!-- Box 4: LLM GPU -->
+      <rect x="660" y="50" width="200" height="60" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.8"/>
+      <text x="760" y="71" text-anchor="middle" font-size="11" font-weight="bold" fill="#1b5e20">4. llm_node (GPU)</text>
+      <text x="760" y="89" text-anchor="middle" font-size="11" fill="#1b5e20">Qwen2.5-3B inference</text>
+      <text x="760" y="103" text-anchor="middle" font-size="10" fill="#1b5e20">~0.5&ndash;2s</text>
+
+      <!-- Drill branch below: from box 1 (phone receives) down to drill flow -->
+      <line x1="105" y1="115" x2="105" y2="160" stroke="#555" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrChat)"/>
+      <text x="115" y="138" font-size="10" font-style="italic" fill="#666">if [DRILL:&hellip;]</text>
+
+      <!-- Drill flow row -->
+      <rect x="20" y="165" width="200" height="55" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.8"/>
+      <text x="120" y="186" text-anchor="middle" font-size="11" font-weight="bold" fill="#bf360c">5. Backend parses tag</text>
+      <text x="120" y="205" text-anchor="middle" font-size="9" font-family="ui-monospace,monospace" fill="#bf360c">[DRILL:Name|combo=1-2|rounds=2]</text>
+
+      <line x1="220" y1="192" x2="245" y2="192" stroke="#555" stroke-width="2" marker-end="url(#arrChat)"/>
+
+      <rect x="250" y="165" width="180" height="55" rx="8" fill="#f5f5f5" stroke="#555" stroke-width="1.8"/>
+      <text x="340" y="186" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">6. Action card &rarr; /tmp/</text>
+      <text x="340" y="205" text-anchor="middle" font-size="10" fill="#333">JSON command file</text>
+
+      <line x1="430" y1="192" x2="455" y2="192" stroke="#555" stroke-width="2" marker-end="url(#arrChat)"/>
+
+      <rect x="460" y="165" width="180" height="55" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.8"/>
+      <text x="550" y="186" text-anchor="middle" font-size="11" font-weight="bold" fill="#1b5e20">7. Touchscreen GUI</text>
+      <text x="550" y="205" text-anchor="middle" font-size="10" fill="#1b5e20">launches drill automatically</text>
+
+      <!-- Caption -->
+      <text x="490" y="260" text-anchor="middle" font-size="11" font-style="italic" fill="#666">From a chat message to a live drill in one tap &mdash; without the phone ever talking to ROS directly.</text>
+    </svg>
+
+    <h3>Training Remote &mdash; IPC-File Bridge to the Touchscreen GUI</h3>
+    <p>
+      The phone never talks to ROS directly. Instead, the FastAPI backend writes JSON command
+      files into <code>/tmp/</code> and the touchscreen GUI polls them on a 100ms tick:
+    </p>
+    <ul style="line-height:1.7;">
+      <li><strong>Discrete commands</strong> (navigate page, start session, browse presets)
+      &mdash; backend writes one file, GUI reads it once and executes.</li>
+      <li><strong>Press-and-hold height control</strong> &mdash; the only command that needs
+      continuous input. While the user holds the up/down button, the backend re-writes
+      <code>/tmp/boxbunny_height_cmd.json</code> every ~100ms; the GUI re-reads it on the
+      same tick and drives the height motor.</li>
+      <li><strong>Stale-file deadman</strong> &mdash; if the height command file ever gets
+      older than 500ms (finger released, network blip, backend stalls), the GUI auto-stops
+      the motor. The robot can never run away because no one is checking, which is what
+      makes press-and-hold safe to expose to a remote phone.</li>
+    </ul>
+    <p style="font-size:0.92rem; color:#444;">
+      The end result: users can configure a full training session from their phone, walk
+      over to the robot with gloves already on, and start training immediately &mdash; no
+      typing on the touchscreen.
+    </p>
+
+    <div style="display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:wrap;">
       <div style="max-width:220px;">
         <image-component tag="image" source="../assets/robot_intelligence/dashboard/ai_coach.jpg" subtitle="Figure: AI Coach chat" width="100%"></image-component>
       </div>
       <div style="max-width:220px;">
         <image-component tag="image" source="../assets/robot_intelligence/dashboard/remote_control.jpg" subtitle="Figure: Training Remote" width="100%"></image-component>
       </div>
+      <div style="max-width:220px;">
+        <image-component tag="image" source="../assets/robot_intelligence/dashboard/presets.jpg" subtitle="Figure: Preset configuration" width="100%"></image-component>
+      </div>
     </div>
-
-    <p>
-      <strong>AI Coach Chat:</strong> When the user sends a message, the phone dashboard
-      makes a REST call to the FastAPI backend on the Jetson. The backend builds the full
-      prompt (user message + session history + system prompt) and calls the LLM ROS service
-      <code>/boxbunny/llm/generate</code>. The LLM node runs inference on the Jetson's GPU
-      and returns the response, which the backend streams back to the phone word-by-word via
-      the API. If the LLM outputs drill suggestion tags
-      <code>[DRILL:Name|combo=1-2|rounds=2]</code>, the backend parses them into tappable
-      action cards &mdash; tapping one writes a command to <code>/tmp/</code> that the
-      touchscreen GUI picks up and launches the drill automatically.
-    </p>
-
-    <p>
-      <strong>Training Remote:</strong> The phone sends navigation and control commands to
-      the FastAPI backend, which writes them as JSON files to <code>/tmp/</code>. The
-      touchscreen GUI polls these files every 100ms and executes the commands &mdash;
-      navigating pages, starting sessions, or adjusting robot height. This IPC-file approach
-      means the phone never communicates directly with ROS; the GUI acts as the bridge.
-      Users can browse presets, configure a full training session, and start it from their
-      phone, then walk over to the robot with gloves on, ready to train.
-    </p>
 
     <h3>Full Dashboard Walkthrough</h3>
     <p>
@@ -367,101 +431,38 @@
 
     <sl-divider></sl-divider>
 
-    <!-- 5.3.3.6 GAMIFICATION SYSTEM -->
-    <h2>5.3.3.6 Gamification</h2>
+    <!-- 5.3.3.6 GAMIFICATION BACKEND -->
+    <h2>5.3.3.6 Gamification (Backend)</h2>
 
     <p>
-      To encourage consistent training, the system tracks progress through ranks, achievements,
-      and streaks &mdash; giving users tangible goals beyond raw performance metrics.
+      The gamification layer &mdash; 6 rank tiers, 12+ achievement badges, daily streaks, and
+      personal records &mdash; is introduced in
+      <a href="gui/implementation.html#gamification-system">5.1 Implementation</a>. On the
+      backend, all of it lives in the per-user database and is computed by the
+      <code>gamification</code> router after every session through a single deterministic
+      formula:
     </p>
 
-    <h3>Rank Progression</h3>
-    <p>
-      Users earn XP after every session and progress through 6 rank tiers:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Rank</th>
-          <th style="padding:8px; border:1px solid #ddd; text-align:center;">XP Required</th>
-          <th style="padding:8px; border:1px solid #ddd;">Typical User</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Novice</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">0</td>
-          <td style="padding:8px; border:1px solid #ddd;">Just started</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Contender</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">500</td>
-          <td style="padding:8px; border:1px solid #ddd;">Training regularly</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Fighter</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">1,500</td>
-          <td style="padding:8px; border:1px solid #ddd;">Solid fundamentals</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Warrior</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4,000</td>
-          <td style="padding:8px; border:1px solid #ddd;">Consistent and skilled</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Champion</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">10,000</td>
-          <td style="padding:8px; border:1px solid #ddd;">High proficiency</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Elite</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">25,000</td>
-          <td style="padding:8px; border:1px solid #ddd;">Top dedication</td>
-        </tr>
-      </tbody>
-    </table>
+    <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.86rem; overflow-x:auto;">xp_earned = max(
+    base_xp[mode]              <span style="color:#888;"># 30&ndash;80 by training mode</span>
+    * completion_pct           <span style="color:#888;"># 0.0&ndash;1.0 of rounds finished</span>
+    * score_multiplier         <span style="color:#888;"># scales with session score</span>
+    * difficulty_multiplier    <span style="color:#888;"># 1.0&times; beginner &rarr; 2.0&times; elite</span>
+    + streak_bonus,            <span style="color:#888;"># active daily streak &rarr; bonus</span>
+    10                         <span style="color:#888;"># minimum 10 XP per session</span>
+)</pre>
 
     <p>
-      XP earned per session depends on the training mode (sparring awards the most at 80 base XP),
-      session completion, performance score, and difficulty level (1.0&times; for beginner up to
-      2.0&times; for elite). Every session awards at least 10 XP to reward participation.
-    </p>
-
-    <h3>Achievements &amp; Streaks</h3>
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Badge</th>
-          <th style="padding:8px; border:1px solid #ddd;">How to Unlock</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>First Blood</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Complete your first training session</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Century</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Throw 100 punches in a single session</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Speed Demon</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Achieve a lightning-tier reaction time</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Weekly Warrior</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Maintain a 7-day training streak</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Perfect Round</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Score 100% accuracy on a full combo drill</td>
-        </tr>
-      </tbody>
-    </table>
-    <p style="font-size:0.92rem; color:#444;">
-      12+ badges in total, each awarded once. A daily streak counter tracks consecutive training
-      days with bonus XP multipliers, and users set a configurable weekly goal (default 3 sessions).
+      The same router exposes <code>/profile</code>, <code>/achievements</code>,
+      <code>/leaderboard</code>, and <code>/benchmarks</code> endpoints; achievements are
+      checked once per session against the user's running totals (e.g. "Century" unlocks the
+      first time <code>session.total_punches &ge; 100</code>) and inserted into the
+      <code>achievements</code> table. Streaks are reset to zero by a daily check when the
+      gap between the current session and <code>streaks.last_training_date</code> exceeds one
+      calendar day, and personal records are updated only when a new value strictly beats the
+      previous one. None of this requires any client-side state &mdash; the phone and the
+      touchscreen GUI both read the same row from the per-user database, so a session started
+      on one surface immediately reflects on the other.
     </p>
 
     <sl-divider></sl-divider>

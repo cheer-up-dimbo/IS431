@@ -112,6 +112,21 @@
       never the model itself, but the inconsistent frame rate feeding it.
     </p>
 
+    <p>
+      Both models are optimised through TensorRT but via different routes. The action model
+      converts <code>.pth &rarr; .onnx &rarr; .trt</code> (FP16 precision) on first launch;
+      YOLO Pose converts <code>.pt &rarr; .engine</code> directly through Ultralytics. Both
+      conversions run automatically the first time the system boots with the
+      <code>--optimize-gpu</code> flag and the optimised engines are then cached next to the
+      source files, so subsequent boots load the engines directly with no re-conversion overhead.
+    </p>
+    <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.86rem; overflow-x:auto;">action_prediction/model/
+&#9500;&#9472;&#9472; best_model.pth      <span style="color:#888;"># source weights</span>
+&#9500;&#9472;&#9472; best_model.onnx     <span style="color:#888;"># intermediate (auto-generated)</span>
+&#9500;&#9472;&#9472; best_model.trt      <span style="color:#888;"># TensorRT FP16 engine (cached)</span>
+&#9500;&#9472;&#9472; yolo26n-pose.pt     <span style="color:#888;"># source YOLO weights</span>
+&#9492;&#9472;&#9472; yolo26n-pose.engine <span style="color:#888;"># TensorRT FP16 engine (cached)</span></pre>
+
     <h3>Offline &rarr; Live Inference Gap</h3>
     <p>
       Beyond the YOLO bottleneck, three additional issues were solved to bridge the gap between
@@ -162,7 +177,7 @@
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Model forward pass</td>
           <td style="padding:8px; border:1px solid #ddd;">~8ms</td>
-          <td style="padding:8px; border:1px solid #ddd;">730K trainable params, d=192</td>
+          <td style="padding:8px; border:1px solid #ddd;">~1.75M params, d=192</td>
         </tr>
         <tr style="font-weight:bold;">
           <td style="padding:8px; border:1px solid #ddd;">Total per frame</td>
@@ -171,6 +186,15 @@
         </tr>
       </tbody>
     </table>
+
+    <p style="font-size:0.92rem; color:#444;">
+      The 24ms-per-frame inference budget is the CV pipeline only. The full <strong>end-to-end latency
+      from camera capture to motor command is ~120ms</strong> &mdash; the remaining ~96ms covers
+      RealSense capture buffering, ROS 2 message passing through <code>punch_processor</code>,
+      the &plusmn;500ms fusion window's earliest-match logic, and the motor command queue.
+      This is verified against requirement RI&#8209;2 (&le;150ms) in
+      <a href="robot-intelligence-testing.html">5.3.4.7</a>.
+    </p>
 
     <h3>Post-Processing</h3>
     <p>
@@ -225,41 +249,16 @@
     <h2>5.3.2.3 AI Sparring Engine</h2>
 
     <p>
-      The sparring system generates intelligent, adaptive robot behaviour during training sessions.
-      Five AI opponent styles are implemented as Markov chain transition matrices, each producing
-      distinct attack patterns:
+      The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
+      their first-order Markov chain combo generation &mdash; including the transition matrix
+      worked example and the weakness-blending alpha &mdash; are introduced in
+      <a href="gui.html">Section 5.1 GUI</a> and detailed in
+      <a href="gui/implementation.html">5.1 Implementation</a>. This section covers the
+      <em>ROS-side execution</em> that turns those style definitions into live robot behaviour:
+      how the <strong>sparring_engine</strong> node paces attacks, scales difficulty, persists
+      a weakness profile across sessions, classifies the user's defensive response, and stays in
+      sync with the rest of the system through the session state machine.
     </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Style</th>
-          <th style="padding:8px; border:1px solid #ddd;">Behaviour Profile</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Boxer</td>
-          <td style="padding:8px; border:1px solid #ddd;">Technical, balanced. Mixes all punch types with clean transitions, moderate attack frequency.</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Brawler</td>
-          <td style="padding:8px; border:1px solid #ddd;">Aggressive, predictable. Heavy on hooks and crosses, short gaps between attacks.</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Counter-Puncher</td>
-          <td style="padding:8px; border:1px solid #ddd;">Reactive, patient. Low base attack frequency, spikes after user punches with quick jab/cross counters.</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Pressure</td>
-          <td style="padding:8px; border:1px solid #ddd;">Relentless, overwhelming. Very high frequency, minimal gaps, all punch types. Tests defensive endurance.</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Switch</td>
-          <td style="padding:8px; border:1px solid #ddd;">Unpredictable. Rotates between the other 4 styles every ~20 seconds. Requires continuous adaptation.</td>
-        </tr>
-      </tbody>
-    </table>
 
     <h3>Difficulty Scaling (3 levels)</h3>
 
@@ -301,11 +300,26 @@
       rate, forcing continuous improvement on weak areas.
     </p>
 
-    <p style="font-size:0.92rem; color:#444;">
-      The user-facing sparring experience (style selection, session configuration, and results display)
-      is covered in the <a href="gui.html">GUI section (5.1)</a>. This section focuses on the
-      underlying intelligence that drives the robot's behaviour.
+    <h3>Engine Safeguards</h3>
+    <p>
+      Several runtime safeguards prevent the engine from misbehaving when something else in the
+      system goes wrong:
     </p>
+    <ul style="line-height:1.7;">
+      <li><strong>Single strike at a time</strong> &mdash; a <code>robot_busy</code> flag blocks any
+      new <code>RobotCommand</code> from being published while the previous strike is still
+      executing, preventing motor command pile-ups.</li>
+      <li><strong>Session watchdog</strong> &mdash; the engine listens for the
+      <code>SessionState</code> heartbeat (2&nbsp;Hz) and deactivates itself if it stops receiving
+      one for 5 seconds, so a crashed <code>session_manager</code> never leaves a robot
+      free-swinging.</li>
+      <li><strong>Block reaction</strong> &mdash; if the user successfully blocked the previous
+      strike, the engine forces a different punch type for the next attack, preventing the AI
+      from feeding the same opening twice in a row.</li>
+      <li><strong>Idle surprise</strong> &mdash; if the user goes idle for more than 3 seconds,
+      the engine fires the next attack at 60% of the configured interval, breaking up rest
+      periods that creep in mid-round.</li>
+    </ul>
 
     <h3>Defence Detection</h3>
     <p>
