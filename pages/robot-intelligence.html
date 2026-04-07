@@ -68,8 +68,22 @@
       color: #1a7f37;
       font-weight: 500;
     }
+    /* Subtle separation between H3 sub-topics under each H2 numbered section */
+    .content h3 {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #ececec;
+    }
+    .content h2 + h3,
+    .content > div > h3:first-of-type,
+    .section-nav-card h3 {
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
+    }
   </style>
   <script src="../components/report-nav/report-nav.js" defer></script>
+  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
 </head>
 <body>
   <div class="content">
@@ -162,8 +176,8 @@
           </div>
           <div style="font-size:0.88rem; color:#555; margin-top:8px;">
             Phone dashboard for remote training control, performance trends, AI coach chat,
-            and <strong>population benchmarking</strong>. <strong>Two-tier SQLite</strong>
-            with per-user data isolation.
+            and <strong>population benchmarking</strong>. <strong>Public-URL tunnel</strong>
+            lets any phone connect from any network &mdash; no shared WiFi required.
           </div>
         </div>
 
@@ -250,6 +264,14 @@
     <!-- 5.3.2 SYSTEM ARCHITECTURE -->
     <div id="system-architecture">
       <h3>System Architecture</h3>
+
+      <p style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+        This subsystem follows the same <strong>V&#8209;Model</strong> framework documented in
+        <a href="robot-mechanism.html">Section&nbsp;5.2's System Design Narrative</a>: requirements
+        RI&#8209;1 to RI&#8209;7 decompose into the subsystems in 5.3.1&ndash;5.3.3 and close back
+        into verification in <a href="robot-intelligence-testing.html">5.3.4</a>.
+      </p>
+
       <p>
         The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
         (Robot Operating System 2) &mdash; an industry-standard framework for building robotics
@@ -264,7 +286,7 @@
         behaviour:
       </p>
 
-      <svg viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+      <svg class="zoomable" viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
         <defs>
           <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>

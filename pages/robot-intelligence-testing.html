@@ -12,11 +12,24 @@
   <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
   <script src="../components/scroll-to-top/scroll-to-top.js"></script>
   <script src="../components/report-nav/report-nav.js" defer></script>
+  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
   <style>
     .page-nav-row {
       display: flex;
       justify-content: space-between;
       margin: 32px 0 16px;
+    }
+    /* Subtle separation between H3 sub-topics under each H2 numbered section */
+    .content h3 {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #ececec;
+    }
+    .content h2 + h3,
+    .content > div > h3:first-of-type {
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
     }
   </style>
 </head>
@@ -31,7 +44,10 @@
     <br>
 
     <!-- 5.3.4 INTRO -->
-    <h2>5.3.4 Testing & Validation</h2>
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <h2 style="margin:0;">5.3.4 Testing & Validation</h2>
+      <sl-badge variant="primary" pill style="font-size:0.75rem;">Verifies RI-1 to RI-7</sl-badge>
+    </div>
 
     <p>
       The Robot Intelligence subsystem was validated through model performance and interpretability,
@@ -96,14 +112,14 @@
     </p>
 
     <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
-      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">Block class &mdash; the hardest action to classify</div>
-      <p style="margin:0 0 6px;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">Block class &mdash; the hardest action to classify</div>
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#bf360c;">Problem:</span>
         <strong>block</strong> is the weakest class at <strong>66.7%</strong>. The start of
         a block (arms rising from guard) looks nearly identical to the start of an
         <strong>uppercut</strong> (arms rising into the punch) for the first few frames.
       </p>
-      <p style="margin:0 0 6px;">
+      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#1565c0;">Insight:</span>
         the model only ever saw the <em>onset</em> of a block during training, so it had no
         way to disambiguate it from an uppercut without seeing the rest of the action.
@@ -312,7 +328,7 @@
       end-to-end system checks at the top. Each level catches a different class of bug:
     </p>
 
-    <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; margin:18px auto; display:block; font-family:system-ui,sans-serif;">
+    <svg class="zoomable" viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; margin:18px auto; display:block; font-family:system-ui,sans-serif;">
       <!-- Top: System -->
       <polygon points="320,20 440,20 460,80 300,80" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
       <text x="380" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#4a148c">SYSTEM</text>
