@@ -73,9 +73,15 @@
     <p>
       The <strong>per-class accuracy</strong> chart (right) shows the hit rate for each punch type
       individually. Most classes exceed 96%, with right hook and right uppercut achieving
-      perfect 100%. Block is the weakest at 66.7%, primarily because it had only 6 validation
-      samples &mdash; meaning just 2 misclassifications drop it significantly. Collecting more
-      block samples would likely improve this.
+      perfect 100%. <strong>Block is the weakest at 66.7%</strong>, and the cause is
+      biomechanical: the start of a block (arms rising from guard into a defensive position)
+      looks almost identical to the start of an uppercut (arms rising into the punch) for the
+      first few frames. This is exactly the failure mode the
+      <a href="robot-intelligence-cv.html">block annotation fix in 5.3.1</a> was introduced to
+      address &mdash; extending block annotations to cover the full guard sequence (rise, hold,
+      return) so the model learns the entire shape of the action rather than only its onset.
+      Live block reliability improved significantly as a result, even though the validation
+      headline number stayed in the same range.
     </p>
 
     <div class="video-row two-up">
@@ -572,9 +578,9 @@
       </thead>
       <tbody>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Block class underrepresentation</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Only 6 validation samples &rarr; 66.7% accuracy</td>
-          <td style="padding:8px; border:1px solid #ddd;">Collect more varied blocking data</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Block / uppercut onset confusion</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Block onset (arms rising from guard) is biomechanically similar to uppercut onset in the first few frames &rarr; 66.7% on the block class</td>
+          <td style="padding:8px; border:1px solid #ddd;">Block annotations extended to include the full hold + return phase to improve live reliability; future work: more varied blocking data from experienced boxers</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;"><strong>Glove occlusion</strong></td>

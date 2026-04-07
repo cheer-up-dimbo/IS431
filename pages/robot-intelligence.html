@@ -97,6 +97,17 @@
         Performance Analytics, Adaptive Fight Intelligence, and Realistic Training Partner.
       </p>
 
+      <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+        <strong>Section structure</strong>
+        <ul style="margin:6px 0 0; padding-left:20px; line-height:1.6;">
+          <li><strong>This page</strong> &mdash; requirements + ROS 2 system architecture</li>
+          <li><strong>5.3.1</strong> &mdash; Computer Vision &amp; action prediction model</li>
+          <li><strong>5.3.2</strong> &mdash; Sensor fusion, sparring AI, LLM coach</li>
+          <li><strong>5.3.3</strong> &mdash; Dashboard backend &amp; analytics</li>
+          <li><strong>5.3.4</strong> &mdash; Testing &amp; verification of all 7 requirements</li>
+        </ul>
+      </div>
+
       <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
         <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
         <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
@@ -118,11 +129,11 @@
         <tbody>
           <tr>
             <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:220px;">Action Prediction Model</td>
-            <td style="padding:8px 12px; border:1px solid #ddd;"><strong>96.8%</strong> validation accuracy on unseen person, classifying 8 punch types at 30fps on an NVIDIA Jetson. Built through 9 iterative approaches, combining 3D voxel motion with pose estimation in a dual-branch Transformer architecture.</td>
+            <td style="padding:8px 12px; border:1px solid #ddd;"><strong>96.8%</strong> validation accuracy on an unseen person, classifying 8 punch types at 30 fps on an NVIDIA Jetson. The full 9-iteration journey to this dual-branch (voxel + pose) Transformer is told in <a href="robot-intelligence-cv.html">5.3.1</a>.</td>
           </tr>
           <tr>
             <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">ROS 2 System</td>
-            <td style="padding:8px 12px; border:1px solid #ddd;">12 nodes orchestrating CV inference, IMU sensor fusion, 5 adaptive AI sparring styles with weakness tracking, and a local LLM coach (Qwen2.5-3B) providing real-time technique feedback.</td>
+            <td style="padding:8px 12px; border:1px solid #ddd;">10 ROS 2 nodes orchestrating CV inference, IMU sensor fusion, 5 adaptive AI sparring styles with weakness tracking, and a local LLM coach (Qwen2.5-3B) providing real-time technique feedback.</td>
           </tr>
           <tr>
             <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Dashboard &amp; Analytics</td>
@@ -212,7 +223,7 @@
         the standard for robotics projects requiring sensor integration and motor control.
       </p>
       <p>
-        The system consists of 12 nodes communicating via 21 custom message types and 6 services.
+        The system consists of 10 ROS 2 nodes communicating via 21 custom message types and 6 services.
         The primary data flow follows four stages:
       </p>
       <ul style="margin:8px 0 16px; line-height:1.7;">
@@ -225,7 +236,7 @@
       <image-component
           tag="image"
           source="../assets/robot_intelligence/ros/node_graph.svg"
-          subtitle="Figure: BoxBunny ROS 2 System Node Graph — 12 nodes, 40+ topics, 6 services">
+          subtitle="Figure: BoxBunny ROS 2 System Node Graph — 10 nodes, 40+ topics, 6 services">
       </image-component>
 
       <h4 style="margin-top:28px;">Session State Machine</h4>

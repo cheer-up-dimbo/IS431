@@ -143,13 +143,18 @@
 
     <p>
       The natural approach to recognising body movements is pose estimation &mdash; tracking
-      joint positions frame by frame. However, in this boxing context, pose estimation fails
-      at the worst possible moment: when the boxer extends a punch toward the camera, the
-      gloves completely occlude the wrist keypoints, and the arm foreshortens into a single
-      mass of pixels. The images below show this in action &mdash; the skeleton frequently
-      breaks or jumps during punch extension, with keypoints snapping to incorrect positions.
-      This is why early iterations using pose estimation alone peaked at ~67% accuracy &mdash;
-      the feature extraction was most unreliable exactly when the discriminative motion was happening.
+      joint positions frame by frame. The catch is that off-the-shelf pose estimators like
+      YOLO Pose are trained on datasets such as COCO where hands and wrists are almost always
+      visible as discrete features &mdash; bare skin, fingers, fine joint contours. Boxing
+      breaks every one of those assumptions: the wrists are buried inside thick padded gloves,
+      so the model has nothing recognisable to lock onto at the exact body part it cares about
+      most. In this boxing context, pose estimation therefore fails at the worst possible
+      moment: when the boxer extends a punch toward the camera, the gloves completely occlude
+      the wrist keypoints and the arm foreshortens into a single mass of pixels. The images
+      below show this in action &mdash; the skeleton frequently breaks or jumps during punch
+      extension, with keypoints snapping to incorrect positions. This is why early iterations
+      using pose estimation alone peaked at ~67% accuracy &mdash; the feature extraction was
+      most unreliable exactly when the discriminative motion was happening.
     </p>
 
     <div class="video-row two-up">
@@ -869,6 +874,44 @@
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/ablation.svg" subtitle="Figure: Ablation study — both branches contribute unique information"></image-component>
+
+    <sl-divider></sl-divider>
+
+    <!-- 5.3.1.5 SECONDARY CV FUNCTIONS -->
+    <h2>5.3.1.5 Secondary CV Functions</h2>
+
+    <p>
+      The same per-frame YOLO pose output and depth-based bounding box that feed the action
+      model are reused by two lighter-weight functions, so neither runs an independent perception
+      stack:
+    </p>
+
+    <ul style="line-height:1.7;">
+      <li>
+        <strong>Human Tracking</strong> &mdash; the user's bounding box centre, width, depth,
+        and lateral/depth displacement are published every frame as a <code>UserTracking</code>
+        message. Downstream nodes use this to keep the robot facing the user (yaw motor),
+        auto-adjust the height column to the user's shoulder line during the countdown, and
+        classify slips and dodges in the defence detection pipeline.
+      </li>
+      <li>
+        <strong>Reaction Time Detection</strong> &mdash; instead of relying on velocity
+        thresholds (which proved unreliable for users with different stances during the
+        <a href="robot-intelligence-testing.html">CDE Fair</a>), reaction time is measured by
+        depth-based proximity: when a stimulus is fired, the system watches the user's hand
+        depth and timestamps the moment it crosses a calibrated threshold toward the robot.
+        Combined with the <code>session_manager</code>'s precise stimulus timestamp, this gives
+        millisecond-accurate reaction times reported by the Reaction Test mode.
+      </li>
+    </ul>
+
+    <p style="font-size:0.92rem; color:#444;">
+      Both functions piggy-back on the action prediction frame rate (30 fps active, 6 fps idle)
+      and add negligible compute overhead because the underlying YOLO + depth extraction is
+      already running for the action model.
+    </p>
+
+    <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation — bounding box + 7 upper-body keypoints reused by both human tracking and reaction time detection" width="50%"></image-component>
 
     <sl-divider></sl-divider>
 
