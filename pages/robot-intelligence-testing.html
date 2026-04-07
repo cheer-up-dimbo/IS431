@@ -133,11 +133,11 @@
       </p>
     </div>
 
-    <div class="video-row two-up">
-      <div class="video-box">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:center; margin:16px 0;">
+      <div style="display:flex; align-items:center; justify-content:center;">
         <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/confusion_matrix.png" subtitle="Figure: Confusion Matrix — 7/222 misclassifications" width="100%"></image-component>
       </div>
-      <div class="video-box">
+      <div style="display:flex; align-items:center; justify-content:center;">
         <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/per_class_accuracy.png" subtitle="Figure: Per-Class Accuracy — most classes above 96%" width="100%"></image-component>
       </div>
     </div>
@@ -220,6 +220,44 @@
       glove tracking system was implemented, requiring users to wear red and green gloves. The prototype ran 9 ROS 2 packages with 3 drill modes.
     </p>
 
+    <image-component tag="image" source="../assets/robot_intelligence/cde_fair/user_testing.jpg" subtitle="Figure: A public visitor trying BoxBunny at the CDE AI Fair &mdash; one of the dozens of in-the-wild user sessions during the showcase" width="35%"></image-component>
+
+    <h3>Procedure</h3>
+    <p>
+      An <em>informal field deployment</em> with public visitors, not a controlled study.
+      The setup is summarised in the five blocks below:
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">Setting</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#333; line-height:1.5;">BoxBunny showcase booth at the <strong>"Robotics Meets AI Showcase"</strong>, January 2025. Running live for the <strong>full duration of the fair</strong>.</div>
+      </div>
+
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">Participants</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#333; line-height:1.5;"><strong>Dozens of public visitors</strong> &mdash; varying <strong>ages, heights, and skill levels</strong>. A much wider range of body types and movement styles than any lab test could cover.</div>
+      </div>
+
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">Task flow</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#333; line-height:1.5;"><strong>30-second briefing</strong> &rarr; put on red/green tracking gloves &rarr; try the <strong>three drills</strong> (reaction, shadow sparring, defence) at their own pace.</div>
+      </div>
+
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.74rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.6px;">Data collection</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#333; line-height:1.5;"><strong>Live observation</strong> by the team &mdash; CV stream stability, user posture, failure modes the moment they appeared. Captured as <strong>field notes</strong> + <strong>cross-referenced against software logs</strong> at end of day.</div>
+      </div>
+
+      <div style="background:#f0f9f0; border:1px solid #c8e6c9; border-top:3px solid #16a34a; padding:12px 14px; border-radius:4px; grid-column:1 / -1;">
+        <div style="font-size:0.74rem; font-weight:700; color:#16a34a; text-transform:uppercase; letter-spacing:0.6px;">Outcome</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#333; line-height:1.5;"><strong>6 distinct, reproducible failure modes</strong> that each drove a concrete architectural change in the final system &mdash; documented in the <strong>Findings</strong> section below.</div>
+      </div>
+
+    </div>
+
+    <h3>Findings</h3>
     <p>
       Despite being a simpler prototype, the live deployment exposed real-world challenges
       that directly shaped the final system. Each issue below caused a visible failure in
