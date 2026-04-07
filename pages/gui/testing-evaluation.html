@@ -19,6 +19,15 @@
       align-items: center;
       margin-top: 32px;
     }
+    .validation-loop {
+      margin: 22px 0 18px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+      overflow-x: auto;
+    }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>
 </head>
@@ -40,6 +49,44 @@
       <strong>V-Model alignment:</strong> This page corresponds to the right side of the V,
       where GUI requirements are verified against measurable outcomes.
     </p>
+    <p>
+      The test results are also product feedback. They show whether the GUI felt usable as a
+      training tool, not just whether the implementation was technically correct.
+    </p>
+
+    <div class="validation-loop">
+      <svg viewBox="0 0 980 180" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:780px; height:auto; display:block;" aria-label="GUI validation loop">
+        <rect x="0" y="0" width="980" height="180" rx="12" fill="#f8fafc"/>
+        <text x="490" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Validation Loop</text>
+        <text x="490" y="43" text-anchor="middle" font-size="11" fill="#64748b">Testing closed the loop between requirements, user feedback, and the final training experience.</text>
+
+        <defs>
+          <marker id="gui-validation-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+          </marker>
+        </defs>
+
+        <rect x="40" y="72" width="170" height="68" rx="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.4"/>
+        <text x="125" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">GUI requirements</text>
+        <text x="125" y="118" text-anchor="middle" font-size="10.5" fill="#1e40af">defined in Section 5.1</text>
+
+        <rect x="260" y="72" width="170" height="68" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+        <text x="345" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">Functional tests</text>
+        <text x="345" y="118" text-anchor="middle" font-size="10.5" fill="#9a3412">pass/fail behavior checks</text>
+
+        <rect x="480" y="72" width="170" height="68" rx="16" fill="#dcfce7" stroke="#86efac" stroke-width="1.4"/>
+        <text x="565" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">User testing</text>
+        <text x="565" y="118" text-anchor="middle" font-size="10.5" fill="#166534">showcase observations</text>
+
+        <rect x="700" y="72" width="240" height="68" rx="16" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.4"/>
+        <text x="820" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">Design revision</text>
+        <text x="820" y="118" text-anchor="middle" font-size="10.5" fill="#6b21a8">larger display, clearer hierarchy, verified flow</text>
+
+        <line x1="212" y1="106" x2="252" y2="106" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-validation-arrow)"/>
+        <line x1="432" y1="106" x2="472" y2="106" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-validation-arrow)"/>
+        <line x1="652" y1="106" x2="692" y2="106" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-validation-arrow)"/>
+      </svg>
+    </div>
 
     <!-- FUNCTIONAL TESTING -->
     <div>
@@ -49,6 +96,11 @@
         "Robotics Meets AI Showcase" event in late January 2026. The features tested were
         the combo curriculum system, the reaction time test, and the navigation stack. Test
         scenarios verified correct behaviour under normal use conditions.
+      </p>
+      <p>
+        The focus was on whether the product supported training flow cleanly. Each test asked
+        a practical question: can the boxer start quickly, stay in the session, and get back
+        to progress review without friction?
       </p>
 
       <table-component id="gui-functional-testing" subtitle="Table: Functional Test Results"></table-component>
@@ -97,6 +149,11 @@
         7-inch touchscreen mounted directly on the robot, and a larger external monitor
         connected to the same Jetson Orin NX showing the same GUI output.
       </p>
+      <p>
+        This setup was useful because it exposed the product under real user conditions. The
+        event showed how the GUI performed when people approached it as a training tool rather
+        than as a demo screen.
+      </p>
       <div style="margin-top:16px;">
         <image-component
           tag="gui-technique-tiers"
@@ -114,6 +171,11 @@
         comfortably while also focusing on technique. Users who switched to the larger monitor
         did not report the same issues.
       </p>
+      <p>
+        This confirmed that the product needed stronger readability and a clearer information
+        hierarchy during active training. The issue was not only display size, but how well the
+        GUI supported attention split between movement and screen reading.
+      </p>
       <h4>Display Upgrade Decision</h4>
       <p>
         These observations validated a hardware revision. The 7-inch display was replaced with
@@ -122,6 +184,10 @@
         training. Because the GUI used proportional layout sizing rather than fixed pixel
         coordinates, the existing interface scaled to the new resolution without requiring a
         redesign cycle.
+      </p>
+      <p>
+        The decision followed the user evidence rather than the hardware preference. It was a
+        product change driven by how boxers actually used the interface in training.
       </p>
     </div>
 
