@@ -368,18 +368,6 @@ new gridjs.Grid({
       "Encoder validation, repeated strike cycles, induced collision tests to detect torque/encoder spikes."
     ],
     [
-      gridjs.html("Camera + CV<br>(Reaction Time + Tracking)"),
-      "Validate reliable detection of movement, user tracking, and pose stability.",
-      "Pose accuracy, reaction threshold calibration, depth consistency, tracking under different angles.",
-      "YOLO pose-estimation tests, slow-motion reference comparison, multi-angle tracking tests, threshold tuning."
-    ],
-    [
-      "Counter-Punching Model",
-      "Classify punches accurately and trigger appropriate counter responses.",
-      "Punch-type recognition, inference timing, robustness to noise.",
-      "Train/test model on annotated sequences, confusion-matrix evaluation, real-time inference testing with users."
-    ],
-    [
       gridjs.html("Rotation Motor<br>(Torso Tracking)"),
       "Ensure torso rotates accurately to face user.",
       "Rotation angle accuracy, response speed, stability under load.",

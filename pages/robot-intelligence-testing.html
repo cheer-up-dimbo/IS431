@@ -531,25 +531,28 @@
     <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">ros2 launch boxbunny_core boxbunny_dev.launch.py</pre>
 
     <p>
-      The two screenshots below show the simulator interface: on the left, the manual
-      injection panel for clicking individual pad impacts at any force level; on the right,
-      the preset configuration panel for replaying canned punch sequences against the
-      pipeline.
+      The two screenshots below show two different things. <strong>On the left</strong> is
+      the Teensy simulator window itself &mdash; click any pad or arm at any force level
+      and the system reacts as if a real IMU registered the strike. <strong>On the right</strong>
+      is the touchscreen GUI's preset overlay, which a user opens by hitting the
+      <strong>head pad</strong> and navigates with <strong>left/right pad</strong> hits to
+      browse and start a saved training preset hands-free. The video below the screenshots
+      shows the head-pad open, left/right scroll, and centre-pad confirm flow in action.
     </p>
 
     <div style="display:grid; grid-template-columns:2fr 3fr; gap:16px; margin:16px 0; align-items:center;">
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Figure: Teensy Simulator — manual impact injection" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator.png" subtitle="Figure: Teensy simulator &mdash; inject pad &amp; arm strikes at any force level" width="100%"></image-component>
       </div>
       <div>
-        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Figure: Preset configuration" width="100%"></image-component>
+        <image-component tag="image" source="../assets/robot_intelligence/ros/teensy_simulator_preset.png" subtitle="Figure: Preset overlay on the touchscreen GUI &mdash; opened by head pad, navigated with left/right pads" width="100%"></image-component>
       </div>
     </div>
 
     <div class="video-row single" style="margin-top:12px;">
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/ros/teensy_simulator.mkv" type="video/x-matroska" style="max-width:700px;"></video>
-        <sub>Teensy Simulator in action — injecting pad impacts and observing system response</sub>
+        <sub>Demo &mdash; head pad opens the preset overlay, left/right pads scroll between presets, centre pad confirms and starts the session</sub>
       </div>
     </div>
 
@@ -744,7 +747,11 @@
     <!-- 5.3.4.8 LIMITATIONS -->
     <h2>5.3.4.8 Limitations</h2>
 
-    <p>All requirements were met, but several limitations remain:</p>
+    <p>All requirements were met, but several limitations remain that scope out the natural
+    next direction for the system. The rows highlighted below are the <strong>principal
+    limitations</strong> &mdash; the ones that most shape what the system can and cannot do
+    today, and the ones carried forward into the overall project discussion in
+    <a href="../sections/future-work.html">Section 6.2</a>.</p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
@@ -755,43 +762,45 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Block / uppercut onset confusion</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Block onset (arms rising from guard) is biomechanically similar to uppercut onset in the first few frames &rarr; 66.7% on the block class</td>
-          <td style="padding:8px; border:1px solid #ddd;">Block annotations extended to include the full hold + return phase to improve live reliability; future work: more varied blocking data from experienced boxers</td>
+        <tr style="background:#fffbe6;">
+          <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Annotation excludes retraction</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">Punch annotations end at full extension, so the model wobbles during the retraction phase &mdash; the IMU + pad-constraint filter in <a href="robot-intelligence-integration.html">5.3.2.1</a> currently absorbs these misclassifications</td>
+          <td style="padding:8px; border:1px solid #ddd;">Add an explicit <strong>retraction class</strong> so predictions stay correct end-to-end and the IMU filter becomes redundant rather than load-bearing</td>
+        </tr>
+        <tr style="background:#fffbe6;">
+          <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>CV model has a limited action vocabulary</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">The action prediction model only classifies 8 actions (jab, cross, left/right hook, left/right uppercut, block, idle) &mdash; no slips, no head-vs-torso target distinction, no defensive footwork. Downstream coaching insight is bounded by what these 8 labels can express</td>
+          <td style="padding:8px; border:1px solid #ddd;">Expand the CV model's class set with <strong>slips, head/body target variants, and defensive movements</strong> &mdash; richer labels feed every other part of the system (sparring AI, analytics, LLM coach) and unlock more dynamic feedback</td>
+        </tr>
+        <tr style="background:#fffbe6;">
+          <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Pose estimator not trained for boxing</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">YOLO Pose is pretrained on COCO, where hands and wrists are bare and clearly visible. It has no concept of what a gloved hand looks like and no training on this camera angle &mdash; so wrist keypoints are unreliable exactly when they matter most. The voxel branch currently compensates for this</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Fine-tune a custom pose estimator</strong> on our own recorded boxing footage with manually annotated keypoints &mdash; gloved hands, this camera viewpoint, our pose set. A pose model that was actually trained for the context would lift the load off the voxel branch and improve accuracy further</td>
+        </tr>
+        <tr style="background:#fffbe6;">
+          <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>LLM compute ceiling</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">The Jetson has 16&nbsp;GB but its GPU isn't built to run a heavy LLM in parallel with the CV pipeline, IMU fusion, sparring engine, and the rest of the system. A 3B model with a 128-token cap is the sweet spot the current hardware can sustain &mdash; anything larger and inference latency starts hurting the real-time loop</td>
+          <td style="padding:8px; border:1px solid #ddd;">Several upgrade paths open up here: a <strong>more powerful Jetson</strong> (Orin AGX) with stronger GPU; a <strong>dedicated discrete GPU</strong> for the LLM separate from the CV GPU; or a <strong>USB AI accelerator</strong> (e.g. Hailo, Coral) to offload LLM inference. Cloud LLMs would unlock the largest models but break the &ldquo;everything local&rdquo; principle the system was designed around, so on-device upgrades are preferred</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Glove occlusion</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Wrist keypoints lost at punch extension</td>
-          <td style="padding:8px; border:1px solid #ddd;">Pose dropout augmentation + 12-frame temporal context; fundamental single-camera constraint</td>
+          <td style="padding:8px; border:1px solid #ddd;">Narrow camera field of view</td>
+          <td style="padding:8px; border:1px solid #ddd;">When the user steps in or extends a punch, the hand and the lower body leave the frame entirely &mdash; useful information about footwork and full punch travel is lost. Multi-camera was deliberately ruled out as inconvenient and the current single-camera mount has already proved the concept works</td>
+          <td style="padding:8px; border:1px solid #ddd;">Move to a wider field-of-view camera (or a slightly different mount that captures the full body) to recover footwork data and the parts of punches that currently leave the frame &mdash; without giving up the simplicity of a single camera</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Camera viewpoint</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Model coupled to training camera angle</td>
-          <td style="padding:8px; border:1px solid #ddd;">Re-recording required for different viewpoints; fixed mount on robot</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Single camera</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">No multi-view triangulation; some punches identical from one angle</td>
-          <td style="padding:8px; border:1px solid #ddd;">IMU fusion compensates; multi-camera setup as future work</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Jetson thermal</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Sustained 30fps CV + LLM may cause throttling</td>
-          <td style="padding:8px; border:1px solid #ddd;">Adaptive frame rate (~6fps idle) and 20s LLM timeout manage budget</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>LLM quality</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">3B model + 128-token cap limits coaching depth</td>
-          <td style="padding:8px; border:1px solid #ddd;">Adequate for real-time tips; post-session analysis can be generic</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>D435i IMU kernel</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Built-in IMU requires unavailable Tegra kernel module</td>
-          <td style="padding:8px; border:1px solid #ddd;">Manual <code>--camera-pitch</code> workaround</td>
+          <td style="padding:8px; border:1px solid #ddd;">Manual camera tilt calibration</td>
+          <td style="padding:8px; border:1px solid #ddd;">The D435i's built-in IMU requires the <code>hid_sensor_hub</code> kernel module which isn't in the Tegra kernel, so the camera's tilt has to be set manually at launch via <code>--camera-pitch</code></td>
+          <td style="padding:8px; border:1px solid #ddd;">Mount a small external IMU on the camera bracket (e.g. an MPU6050 wired through the existing Teensy) to read the tilt automatically and feed it into the CV node</td>
         </tr>
       </tbody>
     </table>
+
+    <p style="font-size:0.88rem; color:#666; font-style:italic; margin-top:-4px;">
+      Highlighted rows are the principal limitations carried into the project-wide
+      discussion in <a href="../sections/future-work.html">Section 6.2</a>. The two unhighlighted
+      rows below are smaller, more contained engineering opportunities that don't materially
+      gate the system's current capability.
+    </p>
 
     <sl-divider></sl-divider>
 

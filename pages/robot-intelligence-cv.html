@@ -147,7 +147,7 @@
         </tr>
         <tr>
           <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Edge deployment</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">All inference must run on an NVIDIA Jetson Orin Nano at 30fps with 16GB shared memory &mdash; no cloud, no external GPU.</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">All inference must run on an NVIDIA Jetson Orin NX (16&nbsp;GB) at 30fps &mdash; no cloud, no external GPU.</td>
         </tr>
       </tbody>
     </table>
@@ -157,8 +157,10 @@
     <p>
       The natural approach to recognising body movements is pose estimation &mdash; tracking
       joint positions frame by frame. The catch is that off-the-shelf pose estimators like
-      YOLO Pose are trained on datasets such as COCO where hands and wrists are almost always
-      visible as discrete features &mdash; bare skin, fingers, fine joint contours.
+      YOLO Pose are trained on datasets such as COCO (a standard public dataset of everyday
+      photos used to teach computer vision models what people, hands, and joints look like)
+      where hands and wrists are almost always visible as discrete features &mdash; bare
+      skin, fingers, fine joint contours.
       <span style="background:#fff3cd; padding:1px 4px; border-radius:3px;">Boxing breaks every
       one of those assumptions:</span> the wrists are buried inside thick padded gloves, so
       the model has nothing recognisable to lock onto at the exact body part it cares about
@@ -878,34 +880,41 @@
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
         <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
-          <th style="padding:8px; border:1px solid #ddd;">Value</th>
+          <th style="padding:8px; border:1px solid #ddd; width:140px;">Parameter</th>
+          <th style="padding:8px; border:1px solid #ddd; width:240px;">Value</th>
+          <th style="padding:8px; border:1px solid #ddd;">What it does</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Epochs</td>
           <td style="padding:8px; border:1px solid #ddd;">300 (early stop patience 60)</td>
+          <td style="padding:8px; border:1px solid #ddd;">How many full passes over the training data the model is allowed; training stops automatically if validation accuracy hasn't improved in 60 epochs to avoid wasted compute and overfitting.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Batch size</td>
           <td style="padding:8px; border:1px solid #ddd;">16</td>
+          <td style="padding:8px; border:1px solid #ddd;">Number of training samples processed together before updating the model weights &mdash; small enough to fit in GPU memory, large enough to give a stable gradient signal.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Optimiser</td>
           <td style="padding:8px; border:1px solid #ddd;">AdamW (LR 0.0005, weight decay 0.01)</td>
+          <td style="padding:8px; border:1px solid #ddd;">The algorithm that adjusts the model weights each step. AdamW is a strong default for Transformers; weight decay gently shrinks unused weights to prevent overfitting.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">LR schedule</td>
           <td style="padding:8px; border:1px solid #ddd;">Warmup 20 epochs &rarr; cosine decay to 1e-6</td>
+          <td style="padding:8px; border:1px solid #ddd;">How the learning rate changes over time. Starts small (warmup) so early steps don't destabilise the model, then smoothly decays so later steps make finer and finer adjustments.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Loss</td>
           <td style="padding:8px; border:1px solid #ddd;">Focal loss (&gamma;=1.5) + label smoothing (0.03)</td>
+          <td style="padding:8px; border:1px solid #ddd;">The function the model is trying to minimise. Focal loss down-weights easy examples so training focuses on hard/rare classes; label smoothing makes the model less overconfident, which improves generalisation.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">Best epoch</td>
           <td style="padding:8px; border:1px solid #ddd;">73 / 133 trained</td>
+          <td style="padding:8px; border:1px solid #ddd;">The epoch at which validation accuracy peaked. The model trained for 133 epochs total but the checkpoint from epoch 73 was the one saved and deployed.</td>
         </tr>
       </tbody>
     </table>

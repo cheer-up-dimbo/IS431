@@ -134,8 +134,10 @@
       <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
         <span style="font-weight:600; color:#1b5e20;">Fix:</span>
         convert YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format,
-        FP16 precision). TensorRT optimises the computation graph for the Jetson's GPU,
-        fusing operations and eliminating overhead. This brought YOLO inference down from
+        FP16 precision &mdash; half-precision 16-bit floats, which run roughly twice as
+        fast on GPU as the default 32-bit format with negligible accuracy loss). TensorRT
+        optimises the computation graph for the Jetson's GPU, fusing operations and
+        eliminating overhead. This brought YOLO inference down from
         ~33&nbsp;ms to <strong>~16&nbsp;ms</strong>, comfortably under the frame budget.
       </p>
       <p style="margin:0;">
