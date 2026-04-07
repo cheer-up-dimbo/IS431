@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Testing &amp; Evaluation â GUI</title>
+  <title>IS-431: Testing &amp; Evaluation - GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -36,13 +36,17 @@
     <p>
       This section presents the functional testing conducted during development iterations and user testing observations from the public showcase event.
     </p>
+    <p>
+      <strong>V-Model alignment:</strong> This page corresponds to the right side of the V,
+      where GUI requirements are verified against measurable outcomes.
+    </p>
 
     <!-- FUNCTIONAL TESTING -->
     <div>
       <h3>Functional Testing</h3>
       <p>
         Functional testing was conducted on the features available at the time of the
-        "Robotics Meets AI Showcase" event in late January 2025. The features tested were
+        "Robotics Meets AI Showcase" event in late January 2026. The features tested were
         the combo curriculum system, the reaction time test, and the navigation stack. Test
         scenarios verified correct behaviour under normal use conditions.
       </p>
@@ -88,10 +92,10 @@
       <h4>Setup</h4>
       <p>
         Members of the public physically interacted with BoxBunny at the "Robotics Meets AI
-        Showcase" event in late January 2025, specifically within the Robotics and AI in Work
+        Showcase" event in late January 2026, specifically within the Robotics and AI in Work
         and Play segment. Two displays were available during the demonstration: the original
         7-inch touchscreen mounted directly on the robot, and a larger external monitor
-        connected to the same Jetson Nano showing the same GUI output.
+        connected to the same Jetson Orin NX showing the same GUI output.
       </p>
       <div style="margin-top:16px;">
         <image-component
@@ -143,37 +147,37 @@
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-1</td>
-            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and IMU pad operable</td>
+            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and physical button operable: large touch targets, minimal text input, IMU-based button navigation</td>
             <td style="padding:8px; border:1px solid #ddd;">All interactive elements &ge;60px; full navigation via 4 pads</td>
             <td style="padding:8px; border:1px solid #ddd;">Functional test; showcase observation; IMU nav confirmed in live session</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-2</td>
-            <td style="padding:8px; border:1px solid #ddd;">Multi-user data isolation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Multi-user accounts with complete data isolation between users</td>
             <td style="padding:8px; border:1px solid #ddd;">Zero cross-contamination across accounts</td>
             <td style="padding:8px; border:1px solid #ddd;">5 test accounts; pytest isolation tests; no cross-user data observed</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-3</td>
-            <td style="padding:8px; border:1px solid #ddd;">50-combo curriculum with mastery-based progression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Structured training progression through a 50-combo curriculum with mastery-based advancement</td>
             <td style="padding:8px; border:1px solid #ddd;">Unlock after 5 sessions with average score &ge;3.0/5.0</td>
             <td style="padding:8px; border:1px solid #ddd;">Curriculum algorithm pytest; multiple complete training cycles observed</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-4</td>
-            <td style="padding:8px; border:1px solid #ddd;">Real-time session data display</td>
+            <td style="padding:8px; border:1px solid #ddd;">Real-time session data display (combo prompts, round timers, performance metrics)</td>
             <td style="padding:8px; border:1px solid #ddd;">Combo prompt, timer, and punch counter update within one display frame</td>
-            <td style="padding:8px; border:1px solid #ddd;">ROS 2 QThread bridge; functional observation during live sessions</td>
+            <td style="padding:8px; border:1px solid #ddd;">Functional observation during live sessions; interface event-update checks</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-5</td>
-            <td style="padding:8px; border:1px solid #ddd;">Hardware-independent development</td>
-            <td style="padding:8px; border:1px solid #ddd;">Full GUI runs on Windows laptop with no ROS or hardware</td>
-            <td style="padding:8px; border:1px solid #ddd;">Entire development cycle conducted on laptop; mock interface pytest confirmed</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hardware-independent development via an abstracted integration layer with mock interfaces</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full GUI runs on Windows laptop with no connected robot hardware</td>
+            <td style="padding:8px; border:1px solid #ddd;">Entire development cycle conducted on laptop; mock-interface tests confirmed expected behavior</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
         </tbody>

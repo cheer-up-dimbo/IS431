@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Implementation â GUI</title>
+  <title>IS-431: Implementation - GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -78,10 +78,14 @@
 
     <h2>Implementation</h2>
     <p>
-      The GUI was built over six iterations across 15 weeks (December 2024 to April 2025).
+      The GUI was built over six iterations across 15 weeks (December 2025 to April 2026).
       Each iteration had a defined objective, produced working software, and closed with a
       review before the next iteration began. This section documents the development timeline,
       the system architecture, and the key engineering decisions that shaped the final system.
+    </p>
+    <p>
+      <strong>V-Model alignment:</strong> This page corresponds to the base of the V,
+      where decomposed GUI concepts are integrated into a single, testable subsystem build.
     </p>
 
     <!-- ITERATIONS -->
@@ -169,7 +173,7 @@
         calling hardware interfaces directly, all hardware communication is routed through
         this layer. During development on a Windows laptop with no hardware connected, the
         layer switches automatically to mock interfaces that simulate hardware responses.
-        When deployed on the Jetson Nano, the mock interfaces are replaced by real
+        When deployed on the Jetson Orin NX, the mock interfaces are replaced by real
         implementations without any changes to the layers above.
       </p>
 
@@ -180,19 +184,16 @@
     <div>
       <h3>ROS 2 Integration</h3>
       <p>
-        The GUI communicates with the broader BoxBunny system through a GuiBridge class
-        that spawns a background QThread running a ROS 2 node. ROS topic callbacks on the
-        worker thread emit Qt Signals, which are automatically marshalled to the GUI's main
-        thread for safe widget updates. This architecture allows real-time punch
-        confirmations, drill progress updates, session state changes, and coaching tips to
-        flow into the interface without blocking the UI event loop.
+        The GUI communicates with the broader BoxBunny system through a GuiBridge interface
+        that receives session events and sends user commands. This keeps interface behavior
+        responsive while preserving a clean boundary between user interaction flow and backend
+        processing. From the user's perspective, this enables live updates for punch
+        confirmations, drill progress, session state, and coaching prompts.
       </p>
       <p>
-        When ROS 2 is unavailable (for example, during UI development on a laptop without
-        the full robotics stack), the bridge degrades gracefully: all signals are suppressed,
-        service calls return failure immediately, and the GUI runs in standalone mode using
-        mock interfaces. This preserved the ability to develop and test the entire GUI
-        independently of hardware throughout the project.
+        During laptop-only development, the same interface runs in mock mode so the GUI can be
+        validated without connected hardware. Internal node architecture, transport details,
+        and backend implementation are documented in Section 5.4.
       </p>
     </div>
 
@@ -244,14 +245,14 @@
         The sequence on a typical session is as follows. The user configures the session and
         taps Start. The GUI sends a request to the backend with the training mode, difficulty,
         and username, and receives a session ID in return. Throughout the session, state changes
-        arrive from the backend — countdown, active round, rest period, next round — and the
+        arrive from the backend: countdown, active round, rest period, and next round. The
         GUI uses these to drive the on-screen timer, round counter, and screen transitions.
         When the final round ends or the user exits early, the GUI sends an end request with
         the session ID. The backend returns a summary containing punch counts, accuracy scores,
         and performance metrics, which the results page then displays.
       </p>
       <p>
-        This separation means Section 5.3 (Robot Intelligence) handles all scoring and data
+        This separation means Section 5.3 (Robot Intelligence) handles scoring and data
         collection logic, while Section 5.1 (GUI) handles all presentation and user flow
         logic. The GUI does not need to know how punch scoring is calculated, and the backend
         does not need to know how results are displayed.
@@ -273,7 +274,8 @@
         combo mastery. Users can also start training sessions remotely, adjust robot height,
         manage presets, and chat with the AI coach. Remote commands are written as JSON to a
         shared file that the GUI polls every 100 ms, providing near-instant responsiveness
-        without requiring a direct socket connection between the dashboard and the GUI process. The backend implementation of the dashboard server, API endpoints, and WebSocket communication is documented in Section 5.3 (Robot Intelligence).
+        without requiring direct control coupling between the dashboard and touchscreen flow.
+        Backend server architecture and API-level details are documented in Section 5.3.
       </p>
     </div>
 
@@ -576,8 +578,8 @@
         When the local LLM is unavailable due to memory constraints, the GUI falls back to
         a pool of 54 categorised hardcoded tips rather than showing an error. A relevant
         templated response is a better experience than no response at all (Norman, 2013).
-        The LLM model, prompt engineering, and inference pipeline are documented in
-        Section 5.3 (Robot Intelligence).
+        Model architecture and inference pipeline details are documented in Section 5.3
+        (Robot Intelligence).
       </p>
 
       <!-- SOUND SYSTEM -->

@@ -20,6 +20,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
 class ExplodeViewer extends HTMLElement {
   constructor() {
@@ -262,90 +263,61 @@ class ExplodeViewer extends HTMLElement {
     controls.enablePan = true;
     this._controls = controls;
 
-    // ─── Load Model ───
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/libs/draco/');
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
-    gltfLoader.load(
-      src,
-      (gltf) => {
-        const model = gltf.scene;
-
-        // Centre and scale
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 0.5 / maxDim;
-        model.scale.setScalar(scale);
-        model.position.sub(center.clone().multiplyScalar(scale));
-        scene.add(model);
-
-        // ─── Collect Explodable Parts (axis-aligned) ───
-        const axis = new THREE.Vector3(...explodeAxis).normalize();
-        this._parts = [];
-
-        // First pass: compute each mesh's signed distance along the axis
-        const meshData = [];
-        model.traverse((child) => {
-          if (child.isMesh) {
-            const worldPos = new THREE.Vector3();
-            child.getWorldPosition(worldPos);
-            // Signed projection onto axis (distance from model centre)
-            const signedDist = worldPos.dot(axis);
-            meshData.push({ mesh: child, signedDist });
-          }
-        });
-
-        // Find the median distance to use as the explode centre
-        if (meshData.length > 0) {
-          const dists = meshData.map(d => d.signedDist).sort((a, b) => a - b);
-          const medianDist = dists[Math.floor(dists.length / 2)];
-
-          meshData.forEach(({ mesh, signedDist }) => {
-            // Direction along axis: positive if above median, negative if below
-            const offset = signedDist - medianDist;
-            // Direction is just the axis, sign determined by offset
-            const direction = axis.clone().multiplyScalar(offset >= 0 ? 1 : -1);
-            // Magnitude proportional to distance from median
-            const magnitude = Math.abs(offset) > 0.0001 ? Math.abs(offset) : 0.01;
-
-            this._parts.push({
-              mesh,
-              originalPosition: mesh.position.clone(),
-              explodeDirection: direction,
-              explodeMagnitude: magnitude,
-              name: mesh.name || mesh.parent?.name || 'unnamed'
-            });
+    // ─── Load Model (.glb/.gltf or .stl) ───
+    const srcPath = src.split('?')[0].split('#')[0].toLowerCase();
+    if (srcPath.endsWith('.stl')) {
+      const stlLoader = new STLLoader();
+      stlLoader.load(
+        src,
+        (geometry) => {
+          geometry.computeVertexNormals();
+          const material = new THREE.MeshStandardMaterial({
+            color: 0xbfc7d5,
+            metalness: 0.05,
+            roughness: 0.75,
+            side: THREE.DoubleSide
           });
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.name = 'STL Mesh';
+          const model = new THREE.Group();
+          model.add(mesh);
+          this._onModelLoaded(model, explodeAxis, scene, camera, controls, loaderEl, partCountEl);
+        },
+        (progress) => {
+          if (progress.total > 0) {
+            const pct = Math.round((progress.loaded / progress.total) * 100);
+            loaderEl.querySelector('.loading-text').textContent = `Loading… ${pct}%`;
+          }
+        },
+        (error) => {
+          console.error('[ExplodeViewer] Load error:', error);
+          loaderEl.querySelector('.loading-text').textContent = 'Failed to load model.';
+          loaderEl.querySelector('.spinner').style.display = 'none';
         }
-
-        partCountEl.textContent =
-          `${this._parts.length} component${this._parts.length !== 1 ? 's' : ''} detected in scene graph`;
-
-        // Fit camera
-        const fov = camera.fov * (Math.PI / 180);
-        const cameraZ = (0.5 / Math.tan(fov / 2)) * 1.5;
-        camera.position.set(cameraZ * 0.7, cameraZ * 0.4, cameraZ);
-        controls.target.set(0, 0, 0);
-        controls.update();
-
-        loaderEl.classList.add('hidden');
-        console.log('[ExplodeViewer] Loaded:', this._parts.length, 'parts');
-      },
-      (progress) => {
-        if (progress.total > 0) {
-          const pct = Math.round((progress.loaded / progress.total) * 100);
-          loaderEl.querySelector('.loading-text').textContent = `Loading… ${pct}%`;
+      );
+    } else {
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/libs/draco/');
+      const gltfLoader = new GLTFLoader();
+      gltfLoader.setDRACOLoader(dracoLoader);
+      gltfLoader.load(
+        src,
+        (gltf) => {
+          this._onModelLoaded(gltf.scene, explodeAxis, scene, camera, controls, loaderEl, partCountEl);
+        },
+        (progress) => {
+          if (progress.total > 0) {
+            const pct = Math.round((progress.loaded / progress.total) * 100);
+            loaderEl.querySelector('.loading-text').textContent = `Loading… ${pct}%`;
+          }
+        },
+        (error) => {
+          console.error('[ExplodeViewer] Load error:', error);
+          loaderEl.querySelector('.loading-text').textContent = 'Failed to load model.';
+          loaderEl.querySelector('.spinner').style.display = 'none';
         }
-      },
-      (error) => {
-        console.error('[ExplodeViewer] Load error:', error);
-        loaderEl.querySelector('.loading-text').textContent = 'Failed to load model.';
-        loaderEl.querySelector('.spinner').style.display = 'none';
-      }
-    );
+      );
+    }
 
     // ─── Slider ───
     slider.addEventListener('input', () => {
@@ -383,6 +355,70 @@ class ExplodeViewer extends HTMLElement {
       renderer.setSize(w, height);
     });
     this._resizeObserver.observe(this);
+  }
+
+  _onModelLoaded(model, explodeAxis, scene, camera, controls, loaderEl, partCountEl) {
+    // Centre and scale
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 0.5 / maxDim;
+    model.scale.setScalar(scale);
+    model.position.sub(center.clone().multiplyScalar(scale));
+    scene.add(model);
+
+    // ─── Collect Explodable Parts (axis-aligned) ───
+    const axis = new THREE.Vector3(...explodeAxis).normalize();
+    this._parts = [];
+
+    // First pass: compute each mesh's signed distance along the axis
+    const meshData = [];
+    model.traverse((child) => {
+      if (child.isMesh) {
+        const worldPos = new THREE.Vector3();
+        child.getWorldPosition(worldPos);
+        // Signed projection onto axis (distance from model centre)
+        const signedDist = worldPos.dot(axis);
+        meshData.push({ mesh: child, signedDist });
+      }
+    });
+
+    // Find the median distance to use as the explode centre
+    if (meshData.length > 0) {
+      const dists = meshData.map(d => d.signedDist).sort((a, b) => a - b);
+      const medianDist = dists[Math.floor(dists.length / 2)];
+
+      meshData.forEach(({ mesh, signedDist }) => {
+        // Direction along axis: positive if above median, negative if below
+        const offset = signedDist - medianDist;
+        // Direction is just the axis, sign determined by offset
+        const direction = axis.clone().multiplyScalar(offset >= 0 ? 1 : -1);
+        // Magnitude proportional to distance from median
+        const magnitude = Math.abs(offset) > 0.0001 ? Math.abs(offset) : 0.01;
+
+        this._parts.push({
+          mesh,
+          originalPosition: mesh.position.clone(),
+          explodeDirection: direction,
+          explodeMagnitude: magnitude,
+          name: mesh.name || mesh.parent?.name || 'unnamed'
+        });
+      });
+    }
+
+    partCountEl.textContent =
+      `${this._parts.length} component${this._parts.length !== 1 ? 's' : ''} detected in scene graph`;
+
+    // Fit camera
+    const fov = camera.fov * (Math.PI / 180);
+    const cameraZ = (0.5 / Math.tan(fov / 2)) * 1.5;
+    camera.position.set(cameraZ * 0.7, cameraZ * 0.4, cameraZ);
+    controls.target.set(0, 0, 0);
+    controls.update();
+
+    loaderEl.classList.add('hidden');
+    console.log('[ExplodeViewer] Loaded:', this._parts.length, 'parts');
   }
 
   disconnectedCallback() {

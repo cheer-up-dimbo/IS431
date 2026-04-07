@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Design &amp; Ideation â GUI</title>
+  <title>IS-431: Design &amp; Ideation - GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -37,19 +37,24 @@
       consequences for feasibility, usability, and maintainability. The options considered for
       each decision are documented below.
     </p>
+    <p>
+      <strong>V-Model alignment:</strong> This page corresponds to the left side of the V,
+      where product needs from <a href="../appendix-product-mapping.html">Appendix 5</a>
+      are decomposed into concrete GUI design decisions.
+    </p>
 
     <!-- FRAMEWORK SELECTION -->
     <div>
       <h3>Framework Selection</h3>
       <p>
         The project had a four-month development window from December 2025 to April 2026.
-        The chosen framework needed to run on the Jetson Nano without additional configuration,
+        The chosen framework needed to run on the Jetson Orin NX without additional configuration,
         support touchscreen interaction natively, and be learnable quickly enough to leave
         adequate time for feature development. Four options were evaluated.
       </p>
       <table-component id="gui-framework-comparison" subtitle="Table: Framework Selection Evaluation"></table-component>
       <p>
-        PySide6 was selected. It runs natively on the Jetson Nano, has mature touchscreen
+        PySide6 was selected. It runs natively on the Jetson Orin NX, has mature touchscreen
         layout support, and builds on existing Python knowledge. The extensive Qt documentation
         reduced the risk of hitting unresolvable blockers within the compressed timeline.
       </p>
@@ -191,7 +196,7 @@
       <h4>Original Display</h4>
       <p>
         The original display was a 7-inch resistive touchscreen at 1024x600 resolution,
-        selected for its low cost and direct DSI compatibility with the Jetson Nano. All
+        selected for its low cost and direct DSI compatibility with the Jetson Orin NX. All
         six development iterations were built and tested against this display. The layout,
         font sizing, and touch target geometry were designed for a 7-inch form factor.
       </p>
@@ -209,7 +214,7 @@
       <p>
         Based on these observations, the display was upgraded to a 10.1-inch IPS capacitive
         touchscreen at 1280x800 resolution (DSI interface, Raspberry Pi compatible, also
-        confirmed working on the Jetson Nano). The timeline did not allow for a full redesign
+        confirmed working on the Jetson Orin NX). The timeline did not allow for a full redesign
         cycle, so this is framed as a hardware revision informed by user observation rather
         than an iterative software redesign. The existing layout scaled to the larger display
         without breaking, as the GUI used proportional sizing rather than fixed pixel
