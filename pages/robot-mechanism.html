@@ -18,6 +18,80 @@
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <script src="../components/report-nav/report-nav.js" defer></script>
+  <style>
+    /* V-Model diagram lightbox */
+    .vmodel-wrapper {
+      position: relative;
+      cursor: zoom-in;
+    }
+    .vmodel-expand-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-family: Inter, system-ui, sans-serif;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      transition: background 0.15s;
+      z-index: 2;
+      backdrop-filter: blur(4px);
+    }
+    .vmodel-expand-btn:hover { background: rgba(255,255,255,0.98); color: #1e40af; border-color: #93c5fd; }
+    .vmodel-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(15,23,42,0.82);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .vmodel-modal.open { display: flex; }
+    .vmodel-modal-inner {
+      position: relative;
+      width: 100%;
+      max-width: 1400px;
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 14px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+    .vmodel-modal-inner svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 14px;
+    }
+    .vmodel-close-btn {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-size: 18px;
+      line-height: 34px;
+      text-align: center;
+      cursor: pointer;
+      color: #475569;
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .vmodel-close-btn:hover { background: #fee2e2; color: #dc2626; }
+  </style>
 </head>
 <body>
   <div class="content">
@@ -117,68 +191,88 @@
       </p>
 
       <!-- BoxBunny V-Model SVG Diagram -->
-      <div style="margin: 24px 0; text-align: center; overflow-x: auto;">
-        <svg viewBox="0 0 1200 510" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1200px; border-radius:12px; border:1px solid #e5e7eb; background:#fafafa;" overflow="visible">
+      <div class="vmodel-wrapper" style="margin: 28px 0; text-align: center; overflow-x: auto;" onclick="openVmodelModal()">
+        <button class="vmodel-expand-btn" onclick="event.stopPropagation(); openVmodelModal()" title="View fullscreen">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1h4a.5.5 0 0 1 0 1H2.707l3.647 3.646a.5.5 0 1 1-.708.708L2 2.707V5.5a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 1.5 1zm13 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V2.707l-3.646 3.647a.5.5 0 0 1-.708-.708L13.293 2H10.5a.5.5 0 0 1 0-1h4zm-13 13h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v2.793l3.646-3.647a.5.5 0 0 1 .708.708L2.707 14H5.5zm9.354-3.854a.5.5 0 0 1 .708 0l3.646 3.647V11.5a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1 0-1h2.793l-3.647-3.646a.5.5 0 0 1 0-.708z"/></svg>
+          Expand diagram
+        </button>
+        <svg id="vmodelSVG" viewBox="0 0 1260 530" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1260px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; box-shadow:0 2px 12px rgba(0,0,0,0.06);" font-family="Inter, system-ui, sans-serif">
+
+          <rect width="1260" height="530" rx="12" fill="#f8fafc"/>
+
           <!-- Title -->
-          <text x="600" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#0f172a" font-family="sans-serif">BoxBunny — Systems Engineering V-Model</text>
+          <text x="630" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a" letter-spacing="0.5">BoxBunny — Systems Engineering V-Model</text>
 
-          <!-- V-arm: Design (blue) -->
-          <polyline points="220,80 330,210 445,335 600,435" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- V-arm: Verification (green) -->
-          <polyline points="980,80 870,210 755,335 600,435" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Section headers -->
+          <text x="310" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#2563eb" letter-spacing="1.5">DESIGN DECOMPOSITION</text>
+          <text x="950" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a" letter-spacing="1.5">VERIFICATION &amp; VALIDATION</text>
 
-          <!-- Dashed horizontal connectors -->
-          <line x1="220" y1="80" x2="980" y2="80" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
-          <line x1="330" y1="210" x2="870" y2="210" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
-          <line x1="445" y1="335" x2="755" y2="335" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
+          <!-- Dashed horizontal connectors (drawn before nodes so pills cover ends) -->
+          <line x1="100" y1="110" x2="1160" y2="110" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+          <line x1="200" y1="230" x2="1060" y2="230" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+          <line x1="310" y1="350" x2="950" y2="350" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
 
-          <!-- Design nodes -->
-          <circle cx="220" cy="80" r="18" fill="#2563eb" stroke="white" stroke-width="2.5"/>
-          <circle cx="330" cy="210" r="18" fill="#2563eb" stroke="white" stroke-width="2.5"/>
-          <circle cx="445" cy="335" r="18" fill="#2563eb" stroke="white" stroke-width="2.5"/>
-          <!-- Build node -->
-          <circle cx="600" cy="435" r="22" fill="#d97706" stroke="white" stroke-width="2.5"/>
-          <!-- Verification nodes -->
-          <circle cx="755" cy="335" r="18" fill="#16a34a" stroke="white" stroke-width="2.5"/>
-          <circle cx="870" cy="210" r="18" fill="#16a34a" stroke="white" stroke-width="2.5"/>
-          <circle cx="980" cy="80" r="18" fill="#16a34a" stroke="white" stroke-width="2.5"/>
+          <!-- V-arms -->
+          <polyline points="246,110 356,230 470,350 630,430" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <polyline points="1014,110 904,230 790,350 630,430" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
 
-          <!-- Design labels (right-aligned) -->
-          <text x="202" y="67" text-anchor="end" font-size="12" font-weight="600" fill="#1e40af" font-family="sans-serif">Problem Definition</text>
-          <text x="202" y="82" text-anchor="end" font-size="10" fill="#64748b" font-family="sans-serif">System requirements RM-1 to RM-7</text>
+          <!-- NODE 01 — blue pill, cx=246 cy=110 -->
+          <rect x="151" y="72" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="246" y="96"  text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">01</text>
+          <text x="246" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Problem Definition</text>
+          <text x="246" y="125" text-anchor="middle" font-size="9"  fill="#3b82f6">System req. RM-1 to RM-7</text>
 
-          <text x="312" y="197" text-anchor="end" font-size="12" font-weight="600" fill="#1e40af" font-family="sans-serif">System-Level Design</text>
-          <text x="312" y="212" text-anchor="end" font-size="10" fill="#64748b" font-family="sans-serif">Mech. stack, power and data architecture</text>
+          <!-- NODE 02 — blue pill, cx=356 cy=230 -->
+          <rect x="261" y="192" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="356" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">02</text>
+          <text x="356" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">System-Level Design</text>
+          <text x="356" y="245" text-anchor="middle" font-size="9"  fill="#3b82f6">Mech. stack, power &amp; data arch.</text>
 
-          <text x="427" y="322" text-anchor="end" font-size="12" font-weight="600" fill="#1e40af" font-family="sans-serif">Subsystem Design</text>
-          <text x="427" y="337" text-anchor="end" font-size="10" fill="#64748b" font-family="sans-serif">Base, Rotation, Height, Padding, Arm</text>
+          <!-- NODE 03 — blue pill, cx=470 cy=350 -->
+          <rect x="375" y="312" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="470" y="333" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">03</text>
+          <text x="470" y="348" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Subsystem Design</text>
+          <text x="470" y="361" text-anchor="middle" font-size="9"  fill="#3b82f6">Base · Rotation · Height</text>
+          <text x="470" y="373" text-anchor="middle" font-size="9"  fill="#3b82f6">Padding · Arm</text>
 
-          <!-- Build label -->
-          <text x="600" y="474" text-anchor="middle" font-size="12" font-weight="600" fill="#92400e" font-family="sans-serif">Fabrication &amp; Assembly</text>
-          <text x="600" y="489" text-anchor="middle" font-size="10" fill="#78350f" font-family="sans-serif">Steel welding, 3D-printing, integration</text>
+          <!-- BUILD node — amber ellipse, cx=630 cy=430 -->
+          <ellipse cx="630" cy="430" rx="110" ry="42" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+          <text x="630" y="420" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">Fabrication &amp; Assembly</text>
+          <text x="630" y="434" text-anchor="middle" font-size="9"  fill="#b45309">Steel welding · 3D-printing</text>
+          <text x="630" y="447" text-anchor="middle" font-size="9"  fill="#b45309">Electronics integration</text>
 
-          <!-- Verification labels (left-aligned) -->
-          <text x="773" y="322" text-anchor="start" font-size="12" font-weight="600" fill="#166534" font-family="sans-serif">Subsystem Validation</text>
-          <text x="773" y="337" text-anchor="start" font-size="10" fill="#64748b" font-family="sans-serif">Analysis, physical tests, benchmarks</text>
+          <!-- NODE 04 — green pill, cx=790 cy=350 -->
+          <rect x="695" y="312" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="790" y="333" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">04</text>
+          <text x="790" y="348" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Subsystem Validation</text>
+          <text x="790" y="361" text-anchor="middle" font-size="9"  fill="#16a34a">Analysis · Physical tests</text>
+          <text x="790" y="373" text-anchor="middle" font-size="9"  fill="#16a34a">Benchmarks</text>
 
-          <text x="888" y="197" text-anchor="start" font-size="12" font-weight="600" fill="#166534" font-family="sans-serif">System Integration Testing</text>
-          <text x="888" y="212" text-anchor="start" font-size="10" fill="#64748b" font-family="sans-serif">RM-1 to RM-7 verification matrix</text>
+          <!-- NODE 05 — green pill, cx=904 cy=230 -->
+          <rect x="809" y="192" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="904" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">05</text>
+          <text x="904" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Integration Test</text>
+          <text x="904" y="245" text-anchor="middle" font-size="9"  fill="#16a34a">RM-1 to RM-7 verify matrix</text>
 
-          <text x="998" y="67" text-anchor="start" font-size="12" font-weight="600" fill="#166534" font-family="sans-serif">System Acceptance</text>
-          <text x="998" y="82" text-anchor="start" font-size="10" fill="#64748b" font-family="sans-serif">Full boxing drill demonstration</text>
+          <!-- NODE 06 — green pill, cx=1014 cy=110 -->
+          <rect x="919" y="72" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="1014" y="96"  text-anchor="middle" font-size="10" font-weight="700" fill="#166534">06</text>
+          <text x="1014" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Acceptance</text>
+          <text x="1014" y="125" text-anchor="middle" font-size="9"  fill="#16a34a">Full boxing drill demonstration</text>
 
           <!-- Legend -->
-          <rect x="20" y="476" width="12" height="12" fill="#2563eb" rx="2"/>
-          <text x="36" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Design decomposition</text>
-          <rect x="190" y="476" width="12" height="12" fill="#16a34a" rx="2"/>
-          <text x="206" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Verification &amp; validation</text>
-          <rect x="370" y="476" width="12" height="12" fill="#d97706" rx="2"/>
-          <text x="386" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Fabrication</text>
-          <line x1="465" y1="482" x2="492" y2="482" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <text x="498" y="487" font-size="10" fill="#64748b" font-family="sans-serif">Verification correspondence</text>
+          <line x1="30" y1="498" x2="1230" y2="498" stroke="#e2e8f0" stroke-width="1"/>
+          <rect x="38" y="506" width="12" height="12" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="56" y="516" font-size="10" fill="#64748b">Design decomposition</text>
+          <rect x="220" y="506" width="12" height="12" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="238" y="516" font-size="10" fill="#64748b">Verification &amp; validation</text>
+          <ellipse cx="418" cy="512" rx="8" ry="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+          <text x="432" y="516" font-size="10" fill="#64748b">Fabrication &amp; integration</text>
+          <line x1="590" y1="512" x2="617" y2="512" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="625" y="516" font-size="10" fill="#64748b">Req.-to-verification correspondence</text>
         </svg>
-        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
-          Figure: BoxBunny Systems Engineering V-Model showing design decomposition (left, blue), fabrication at the base (orange), and verification closure (right, green). Dashed lines indicate requirement-to-verification correspondence at each level.
+        <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
+          Figure: BoxBunny Systems Engineering V-Model — design decomposition (left, blue), fabrication and integration (centre, amber), and verification closure (right, green). Dashed lines indicate requirement-to-verification correspondence at each level.
         </sub>
       </div>
 
@@ -278,7 +372,7 @@
 
       <h4>Data Architecture</h4>
       <p>
-        The system implements a two-tier hierarchical control architecture. The upper tier resides on an NVIDIA Jetson Orin NX compute module running ROS 2 Humble, which hosts the graphical control interface, executes the combat finite-state-machine, sequences strike libraries, and processes impact detection events. The lower tier resides on a Teensy 4.0 microcontroller executing a deterministic unified control loop that manages CAN command transmission to the arm actuators, PWM output to the height driver, I2C polling of all inertial sensors, and publication of a consolidated feedback payload to the Jetson via a micro-ROS USB bridge. A hardware-level current watchdog running independently of the GUI provides a last-resort safety layer by immediately disabling all arm actuators if phase current on any axis exceeds its rated threshold. The base rotation axis is governed by a dedicated PID controller executing on a secondary WiFi-enabled microcontroller, receiving angle references from the Jetson over a UDP link. The height axis operates under open-loop timed commands, with passive position retention provided by the self-locking geometry of the screw-jack mechanism. Impact events are classified on the Jetson by computing the acceleration vector magnitude from inertial sensor readings and publishing detected strikes as timestamped ROS 2 messages. Control loop rates, ROS 2 topic definitions, bus utilisation strategies, and watchdog parameters are detailed in the individual subsystem pages.
+        The system implements a two-tier hierarchical control architecture. The upper tier resides on an NVIDIA Jetson Orin NX compute module running ROS 2 Humble, which hosts the graphical control interface, executes the combat finite-state-machine, sequences strike libraries, and processes impact detection events. The lower tier resides on a Teensy 4.0 microcontroller executing a deterministic unified control loop that manages CAN command transmission to the arm actuators, PWM output to the height driver, I2C polling of all inertial sensors, and publication of a consolidated feedback payload to the Jetson via a micro-ROS USB bridge. A hardware-level current watchdog running independently of the GUI provides a last-resort safety layer by immediately disabling all arm actuators if phase current on any axis exceeds its rated threshold. The base rotation axis is governed by a dedicated controller executing on a secondary WiFi-enabled microcontroller, receiving angle references from the Jetson over a UDP link. The height axis operates under open-loop timed commands, with passive position retention provided by the self-locking geometry of the screw-jack mechanism. Impact events are classified on the Jetson by computing the acceleration vector magnitude from inertial sensor readings and publishing detected strikes as timestamped ROS 2 messages. Control loop rates, ROS 2 topic definitions, bus utilisation strategies, and watchdog parameters are detailed in the individual subsystem pages.
       </p>
 
       <image-component
@@ -499,5 +593,38 @@
   </script>
   <script type="module" src="../components/table-component/table-component.js"></script>
   <script src="../components/table-component/tables.js"></script>
+
+  <!-- V-Model Fullscreen Modal -->
+  <div id="vmodelModal" class="vmodel-modal" onclick="closeVmodelModal(event)">
+    <div class="vmodel-modal-inner" id="vmodelModalInner">
+      <div class="vmodel-close-btn" onclick="closeVmodelModal()" title="Close">&#x2715;</div>
+    </div>
+  </div>
+  <script>
+    var _vmodelSVGCache = null;
+    function openVmodelModal() {
+      var modal = document.getElementById('vmodelModal');
+      var inner = document.getElementById('vmodelModalInner');
+      if (!_vmodelSVGCache) {
+        var origSVG = document.getElementById('vmodelSVG');
+        _vmodelSVGCache = origSVG.cloneNode(true);
+        _vmodelSVGCache.style.borderRadius = '14px';
+      }
+      // Remove any previous SVG clone, keep close button
+      var existing = inner.querySelector('svg');
+      if (existing) existing.remove();
+      inner.appendChild(_vmodelSVGCache.cloneNode(true));
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeVmodelModal(e) {
+      if (e && e.target !== document.getElementById('vmodelModal') && !e.target.classList.contains('vmodel-close-btn')) return;
+      document.getElementById('vmodelModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeVmodelModal({target: document.getElementById('vmodelModal')});
+    });
+  </script>
 </body>
 </html>
