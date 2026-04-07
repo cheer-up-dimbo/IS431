@@ -94,31 +94,39 @@
     </p>
 
     <h3>The YOLO Bottleneck &mdash; TensorRT Conversion</h3>
-    <p>
-      The single biggest deployment challenge was the YOLO Pose model. Running in its default
-      PyTorch format (<code>.pt</code>) on the Jetson, YOLO alone consumed most of the 33ms
-      per-frame budget, dragging the entire pipeline below 30fps. Because YOLO provides the
-      pose features that the action model depends on, this bottleneck meant the action model
-      was receiving features at inconsistent, lower frame rates &mdash; making it inaccurate
-      despite performing well on pre-recorded 30fps data.
-    </p>
-    <p>
-      Converting YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format with FP16 precision)
-      resolved this completely. TensorRT optimises the model's computation graph for the Jetson's
-      GPU architecture, fusing operations and eliminating overhead. This brought YOLO inference
-      down to ~16ms, well within the 33ms frame budget, allowing the full pipeline to sustain
-      a consistent 30fps. The action model immediately became accurate and reliable in live
-      deployment once this conversion was done &mdash; confirming that the accuracy issue was
-      never the model itself, but the inconsistent frame rate feeding it.
-    </p>
+
+    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">YOLO bottleneck on the Jetson</div>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#bf360c;">Problem:</span>
+        the single biggest deployment challenge was YOLO Pose. In its default PyTorch
+        (<code>.pt</code>) format, YOLO alone consumed most of the 33&nbsp;ms per-frame
+        budget, dragging the whole pipeline below 30&nbsp;fps. Since YOLO provides the pose
+        features the action model depends on, this meant the action model was being fed
+        features at inconsistent, lower frame rates &mdash; accurate offline, broken live.
+      </p>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#1b5e20;">Fix:</span>
+        convert YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format,
+        FP16 precision). TensorRT optimises the computation graph for the Jetson's GPU,
+        fusing operations and eliminating overhead. This brought YOLO inference down from
+        ~33&nbsp;ms to <strong>~16&nbsp;ms</strong>, comfortably under the frame budget.
+      </p>
+      <p style="margin:0;">
+        <span style="font-weight:600; color:#555;">Result:</span>
+        the action model became accurate and reliable in live deployment immediately
+        &mdash; confirming the accuracy issue was never the model, only the frame rate
+        feeding it.
+      </p>
+    </div>
 
     <p>
       Both models are optimised through TensorRT but via different routes. The action model
-      converts <code>.pth &rarr; .onnx &rarr; .trt</code> (FP16 precision) on first launch;
-      YOLO Pose converts <code>.pt &rarr; .engine</code> directly through Ultralytics. Both
-      conversions run automatically the first time the system boots with the
-      <code>--optimize-gpu</code> flag and the optimised engines are then cached next to the
-      source files, so subsequent boots load the engines directly with no re-conversion overhead.
+      converts <code>.pth &rarr; .onnx &rarr; .trt</code> on first launch, while YOLO Pose
+      converts <code>.pt &rarr; .engine</code> directly through Ultralytics. Both run
+      automatically the first time the system boots with the <code>--optimize-gpu</code>
+      flag, and the optimised engines are cached next to the source files so subsequent
+      boots load instantly:
     </p>
     <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.86rem; overflow-x:auto;">action_prediction/model/
 &#9500;&#9472;&#9472; best_model.pth      <span style="color:#888;"># source weights</span>
@@ -129,24 +137,27 @@
 
     <h3>Offline &rarr; Live Inference Gap</h3>
     <p>
-      Beyond the YOLO bottleneck, three additional issues were solved to bridge the gap between
-      offline accuracy and live performance:
+      Beyond the YOLO bottleneck, three more issues had to be solved before the offline
+      accuracy translated into live performance:
     </p>
-    <ol>
-      <li>
-        <strong>Sequential processing</strong> &mdash; voxel extraction and YOLO ran one after the other,
-        doubling per-frame time. Fix: parallelised into separate worker threads so they run concurrently.
-      </li>
-      <li>
-        <strong>Frame buffer discontinuities</strong> &mdash; dropped frames created gaps in the temporal
-        window. Fix: proper rolling feature buffer with FIFO queue and strict frame ordering.
-      </li>
-      <li>
-        <strong>Effective FPS mismatch</strong> &mdash; trained at consistent 30fps but live pipeline ran at
-        variable rates. Fix: TensorRT optimisation of both YOLO and the action model guaranteed consistent
-        throughput.
-      </li>
-    </ol>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;">
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Sequential processing</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;"><strong>Issue:</strong> voxel extraction and YOLO ran one after the other, doubling per-frame time.</div>
+        <div style="font-size:0.9rem; margin-top:4px; color:#1b5e20;"><strong>Fix:</strong> parallelised into separate worker threads, running concurrently.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Buffer discontinuities</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;"><strong>Issue:</strong> dropped frames created gaps in the temporal window the model relied on.</div>
+        <div style="font-size:0.9rem; margin-top:4px; color:#1b5e20;"><strong>Fix:</strong> rolling FIFO feature buffer with strict frame ordering.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">FPS mismatch</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;"><strong>Issue:</strong> trained at a steady 30 fps but the live pipeline ran at variable rates.</div>
+        <div style="font-size:0.9rem; margin-top:4px; color:#1b5e20;"><strong>Fix:</strong> TensorRT optimisation of both models gave consistent throughput.</div>
+      </div>
+    </div>
 
     <h3>Latency Breakdown</h3>
 
@@ -198,11 +209,20 @@
 
     <h3>Post-Processing</h3>
     <p>
-      Raw outputs pass through three stages: <strong>EMA smoothing</strong> (&alpha;=0.35) to reduce
-      frame-to-frame jitter, a <strong>hysteresis gate</strong> (12% confidence margin) to prevent class
-      oscillation, and a <strong>state machine</strong> requiring minimum 2 frames to enter an action,
-      minimum 3 frames hold, sustain confidence &ge;0.78, with block requiring 4 consecutive frames.
+      Raw model outputs are noisy frame to frame &mdash; the same punch can flicker between
+      classes for a few frames at a time. Three stages clean this up before the result is
+      published as a confirmed prediction:
     </p>
+    <dl style="margin:12px 0; line-height:1.55;">
+      <dt style="font-weight:600; color:#1565c0;">EMA smoothing &mdash; <span style="font-weight:400; color:#555;">&alpha; = 0.35</span></dt>
+      <dd style="margin:2px 0 10px 18px;">An exponential moving average over per-class confidences damps out frame-to-frame jitter so a single noisy frame can't flip the prediction.</dd>
+
+      <dt style="font-weight:600; color:#1565c0;">Hysteresis gate &mdash; <span style="font-weight:400; color:#555;">12% confidence margin</span></dt>
+      <dd style="margin:2px 0 10px 18px;">The new top class must beat the current top class by 12% confidence before the prediction is allowed to switch &mdash; this prevents two close classes from oscillating.</dd>
+
+      <dt style="font-weight:600; color:#1565c0;">State machine &mdash; <span style="font-weight:400; color:#555;">2 frames to enter, 3 to hold, &ge;0.78 sustain (block: 4)</span></dt>
+      <dd style="margin:2px 0 0 18px;">A class must hold for at least 2 frames at &ge;0.78 confidence before it is committed, and 3 more frames to stay committed. Block requires 4 consecutive frames because of its biomechanical similarity to uppercut onset.</dd>
+    </dl>
 
     <h3>Adaptive Frame Rate</h3>
     <p>
@@ -302,24 +322,28 @@
 
     <h3>Engine Safeguards</h3>
     <p>
-      Several runtime safeguards prevent the engine from misbehaving when something else in the
-      system goes wrong:
+      Four runtime safeguards keep the engine safe and adaptive when something elsewhere in
+      the system goes wrong:
     </p>
-    <ul style="line-height:1.7;">
-      <li><strong>Single strike at a time</strong> &mdash; a <code>robot_busy</code> flag blocks any
-      new <code>RobotCommand</code> from being published while the previous strike is still
-      executing, preventing motor command pile-ups.</li>
-      <li><strong>Session watchdog</strong> &mdash; the engine listens for the
-      <code>SessionState</code> heartbeat (2&nbsp;Hz) and deactivates itself if it stops receiving
-      one for 5 seconds, so a crashed <code>session_manager</code> never leaves a robot
-      free-swinging.</li>
-      <li><strong>Block reaction</strong> &mdash; if the user successfully blocked the previous
-      strike, the engine forces a different punch type for the next attack, preventing the AI
-      from feeding the same opening twice in a row.</li>
-      <li><strong>Idle surprise</strong> &mdash; if the user goes idle for more than 3 seconds,
-      the engine fires the next attack at 60% of the configured interval, breaking up rest
-      periods that creep in mid-round.</li>
-    </ul>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+      <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px;">
+        <div style="font-weight:600; color:#5d4037;">Single strike at a time</div>
+        <div style="font-size:0.92rem; margin-top:4px; color:#555;">A <code>robot_busy</code> flag blocks any new <code>RobotCommand</code> while the previous strike is still executing &mdash; no motor command pile-ups.</div>
+      </div>
+      <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 14px;">
+        <div style="font-weight:600; color:#0d47a1;">Session watchdog</div>
+        <div style="font-size:0.92rem; margin-top:4px; color:#555;">Listens for the <code>SessionState</code> heartbeat (2&nbsp;Hz) and deactivates itself if none arrives for 5 seconds &mdash; a crashed <code>session_manager</code> never leaves the robot free-swinging.</div>
+      </div>
+      <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px;">
+        <div style="font-weight:600; color:#1b5e20;">Block reaction</div>
+        <div style="font-size:0.92rem; margin-top:4px; color:#555;">If the user successfully blocked the last strike, the engine forces a different punch type for the next attack &mdash; the AI never feeds the same opening twice in a row.</div>
+      </div>
+      <div style="background:#f3e5f5; border-left:3px solid #6a1b9a; padding:10px 14px;">
+        <div style="font-weight:600; color:#4a148c;">Idle surprise</div>
+        <div style="font-size:0.92rem; margin-top:4px; color:#555;">If the user goes idle for more than 3 seconds, the engine fires the next attack at 60% of the normal interval &mdash; breaking up rest periods that creep into a round.</div>
+      </div>
+    </div>
 
     <h3>Defence Detection</h3>
     <p>
@@ -423,11 +447,29 @@
 
     <h3>Why Local LLM?</h3>
     <p>
-      Cloud-based AI coaching would add network latency and require stable internet &mdash; neither
-      is guaranteed in a gym environment. Running the LLM on-device ensures instant responses,
-      zero dependency on external services, and complete privacy of training data. The challenge
-      was fitting a capable language model alongside the CV pipeline within the Jetson's 16GB
-      shared memory.
+      Cloud-based AI coaching would add network latency and require stable internet, neither
+      of which is guaranteed in a gym environment. Running the LLM on-device addresses three
+      problems at once:
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0;">
+      <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 12px;">
+        <div style="font-size:0.78rem; font-weight:600; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Latency</div>
+        <div style="font-size:0.92rem; margin-top:4px;">Tips return in ~0.5&ndash;2&nbsp;s with no network round-trip.</div>
+      </div>
+      <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 12px;">
+        <div style="font-size:0.78rem; font-weight:600; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Reliability</div>
+        <div style="font-size:0.92rem; margin-top:4px;">Coaching keeps working when the gym WiFi doesn't.</div>
+      </div>
+      <div style="background:#fff3e0; border-left:3px solid #e65100; padding:10px 12px;">
+        <div style="font-size:0.78rem; font-weight:600; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Privacy</div>
+        <div style="font-size:0.92rem; margin-top:4px;">Training data never leaves the robot.</div>
+      </div>
+    </div>
+
+    <p>
+      The challenge then became fitting a capable language model alongside the CV pipeline
+      within the Jetson's 16&nbsp;GB shared memory.
     </p>
 
     <h3>Model Selection &amp; Deployment</h3>
@@ -610,14 +652,28 @@
 
     <h3>Reliability &amp; Fallback</h3>
     <p>
-      Several mechanisms ensure the coach never fails silently:
+      Four layers of defence ensure the coach never fails silently &mdash; the user always
+      sees something useful, even if the LLM hangs, the model is missing, or GPU memory runs out.
     </p>
-    <ul>
-      <li><strong>Response quality</strong> &mdash; 128-token limit prevents cut-offs, explicit "keep tips SHORT" instruction, markdown stripping removes formatting artifacts</li>
-      <li><strong>Timeout protection</strong> &mdash; 20-second hard timeout on a background thread prevents the coach from blocking the system</li>
-      <li><strong>Fallback tips</strong> &mdash; 65 pre-written tips across 4 categories (technique, encouragement, correction, suggestion) are served when the LLM is unavailable, the model file is missing, or GPU memory runs out</li>
-      <li><strong>Auto-recovery</strong> &mdash; the system tracks consecutive failures and attempts a model reload after 3 failures in a row</li>
-    </ul>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Response quality</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">128-token cap prevents mid-sentence cut-offs, an explicit "keep tips SHORT" instruction is in the system prompt, and markdown is stripped from outputs to remove formatting artefacts.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Timeout protection</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">A 20-second hard timeout runs on a background thread &mdash; if inference hangs, the coach fails over to a fallback tip instead of blocking the rest of the system.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Fallback tips</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">65 pre-written tips across 4 categories (technique, encouragement, correction, suggestion) are served when the LLM is unavailable, the model file is missing, or GPU memory runs out.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Auto-recovery</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">The system tracks consecutive failures and attempts a model reload after 3 failures in a row &mdash; transient GPU contention recovers itself without intervention.</div>
+      </div>
+    </div>
 
     <sl-divider></sl-divider>
 

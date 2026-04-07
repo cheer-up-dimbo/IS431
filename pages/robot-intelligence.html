@@ -125,26 +125,62 @@
       </div>
 
       <h3>Key Achievements</h3>
-      <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-        <tbody>
-          <tr>
-            <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:220px;">Action Prediction Model</td>
-            <td style="padding:8px 12px; border:1px solid #ddd;"><strong>96.8%</strong> validation accuracy on an unseen person, classifying 8 punch types at 30 fps on an NVIDIA Jetson. The full 9-iteration journey to this dual-branch (voxel + pose) Transformer is told in <a href="robot-intelligence-cv.html">5.3.1</a>.</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">ROS 2 System</td>
-            <td style="padding:8px 12px; border:1px solid #ddd;">10 ROS 2 nodes orchestrating CV inference, IMU sensor fusion, 5 adaptive AI sparring styles with weakness tracking, and a local LLM coach (Qwen2.5-3B) providing real-time technique feedback.</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Dashboard &amp; Analytics</td>
-            <td style="padding:8px 12px; border:1px solid #ddd;">Phone dashboard (Vue 3 + FastAPI) for remote training control, performance trend analysis, AI coach chat, and population benchmarking. Two-tier SQLite database with per-user data isolation.</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Testing &amp; Validation</td>
-            <td style="padding:8px 12px; border:1px solid #ddd;">146 unit tests, 28 integration tests, CDE AI Fair real-world deployment with public users, and comprehensive model interpretability analysis. All 7 requirements verified.</td>
-          </tr>
-        </tbody>
-      </table>
+
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:14px 0;">
+
+        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #2e7d32; border-radius:6px; padding:16px 18px;">
+          <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">Action Prediction Model</div>
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+            <span style="font-size:2.1rem; font-weight:700; color:#1b5e20; line-height:1;">96.8%</span>
+            <span style="font-size:0.85rem; color:#555;">validation accuracy on an unseen person</span>
+          </div>
+          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+            Classifies <strong>8 punch types</strong> at <strong>30&nbsp;fps</strong> on an
+            NVIDIA Jetson. Built over <strong>9 iterations</strong> as a dual-branch
+            (voxel + pose) Transformer &mdash; full story in
+            <a href="robot-intelligence-cv.html">5.3.1</a>.
+          </div>
+        </div>
+
+        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #1565c0; border-radius:6px; padding:16px 18px;">
+          <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">ROS 2 System</div>
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+            <span style="font-size:2.1rem; font-weight:700; color:#0d47a1; line-height:1;">10</span>
+            <span style="font-size:0.85rem; color:#555;">ROS 2 nodes &middot; 21 messages &middot; 6 services</span>
+          </div>
+          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+            Orchestrates CV inference, IMU sensor fusion, <strong>5 adaptive AI sparring
+            styles</strong> with weakness tracking, and a local <strong>Qwen2.5-3B LLM
+            coach</strong> running entirely on-device.
+          </div>
+        </div>
+
+        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:16px 18px;">
+          <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">Dashboard &amp; Analytics</div>
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+            <span style="font-size:1.4rem; font-weight:700; color:#bf360c; line-height:1;">Vue&nbsp;3 + FastAPI</span>
+          </div>
+          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+            Phone dashboard for remote training control, performance trends, AI coach chat,
+            and <strong>population benchmarking</strong>. <strong>Two-tier SQLite</strong>
+            with per-user data isolation.
+          </div>
+        </div>
+
+        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #6a1b9a; border-radius:6px; padding:16px 18px;">
+          <div style="font-size:0.74rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.6px;">Testing &amp; Validation</div>
+          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+            <span style="font-size:2.1rem; font-weight:700; color:#4a148c; line-height:1;">146</span>
+            <span style="font-size:0.85rem; color:#555;">unit + 28 integration tests</span>
+          </div>
+          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+            <strong>CDE AI Fair</strong> real-world deployment with public users, full model
+            interpretability analysis, and <strong>all 7 requirements verified</strong>
+            in <a href="robot-intelligence-testing.html">5.3.4</a>.
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -223,15 +259,64 @@
         the standard for robotics projects requiring sensor integration and motor control.
       </p>
       <p>
-        The system consists of 10 ROS 2 nodes communicating via 21 custom message types and 6 services.
-        The primary data flow follows four stages:
+        The system consists of 10 ROS 2 nodes communicating via 21 custom message types and
+        6 services. Every confirmed punch flows through four stages from camera to robot
+        behaviour:
       </p>
-      <ul style="margin:8px 0 16px; line-height:1.7;">
-        <li><strong>Capture</strong> &mdash; Intel RealSense D435i streams depth + RGB frames</li>
-        <li><strong>Perception</strong> &mdash; <span class="node-tag">cv_node</span> runs YOLO pose estimation and 3D voxel extraction in parallel, feeding a transformer-based action classifier</li>
-        <li><strong>Fusion</strong> &mdash; <span class="node-tag">punch_processor</span> matches CV detections with IMU pad impacts using temporal and pad-constraint filtering</li>
-        <li><strong>Downstream</strong> &mdash; Confirmed punches propagate to <span class="node-tag">session_manager</span>, <span class="node-tag">drill_manager</span>, <span class="node-tag">sparring_engine</span>, <span class="node-tag">analytics_node</span>, and <span class="node-tag">llm_node</span></li>
-      </ul>
+
+      <svg viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+        <defs>
+          <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+          </marker>
+        </defs>
+
+        <!-- Stage 1: Capture -->
+        <rect x="20" y="50" width="200" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.8"/>
+        <text x="120" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#0d47a1" letter-spacing="0.6">CAPTURE</text>
+        <text x="120" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#0d47a1">RealSense D435i</text>
+        <text x="120" y="100" text-anchor="middle" font-size="10" fill="#0d47a1">RGB + depth</text>
+        <text x="120" y="116" text-anchor="middle" font-size="10" fill="#0d47a1">848&times;480 @ 30 fps</text>
+        <text x="120" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#1565c0">camera_node</text>
+
+        <line x1="225" y1="100" x2="248" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+
+        <!-- Stage 2: Perception -->
+        <rect x="252" y="50" width="220" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.8"/>
+        <text x="362" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1b5e20" letter-spacing="0.6">PERCEPTION</text>
+        <text x="362" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">YOLO pose</text>
+        <text x="362" y="91" text-anchor="middle" font-size="10" fill="#1b5e20">+ 3D voxel motion</text>
+        <text x="362" y="111" text-anchor="middle" font-size="10" fill="#1b5e20">&rarr; 8-class action</text>
+        <text x="362" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#2e7d32">cv_node</text>
+
+        <line x1="477" y1="100" x2="500" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+
+        <!-- Stage 3: Fusion -->
+        <rect x="504" y="50" width="220" height="100" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.8"/>
+        <text x="614" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#bf360c" letter-spacing="0.6">FUSION</text>
+        <text x="614" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#bf360c">CV &harr; IMU match</text>
+        <text x="614" y="91" text-anchor="middle" font-size="10" fill="#bf360c">&plusmn;500 ms window</text>
+        <text x="614" y="111" text-anchor="middle" font-size="10" fill="#bf360c">+ pad constraints</text>
+        <text x="614" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#e65100">punch_processor</text>
+
+        <line x1="729" y1="100" x2="752" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+
+        <!-- Stage 4: Downstream -->
+        <rect x="756" y="50" width="210" height="100" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.8"/>
+        <text x="861" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#4a148c" letter-spacing="0.6">DOWNSTREAM</text>
+        <text x="861" y="71" text-anchor="middle" font-size="10" fill="#4a148c">Session &middot; Drills</text>
+        <text x="861" y="86" text-anchor="middle" font-size="10" fill="#4a148c">Sparring AI</text>
+        <text x="861" y="101" text-anchor="middle" font-size="10" fill="#4a148c">Analytics &middot; LLM</text>
+        <text x="861" y="116" text-anchor="middle" font-size="10" fill="#4a148c">Robot motors</text>
+        <text x="861" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#6a1b9a">5 nodes</text>
+
+        <!-- IMU side input -->
+        <rect x="356" y="180" width="220" height="40" rx="8" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="466" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#555">Teensy + 6&times; MPU6050 IMUs</text>
+        <text x="466" y="210" text-anchor="middle" font-size="9" font-style="italic" fill="#777">imu_node &mdash; pad &amp; arm impacts</text>
+
+        <line x1="466" y1="180" x2="540" y2="155" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dataArr)"/>
+      </svg>
 
       <image-component
           tag="image"

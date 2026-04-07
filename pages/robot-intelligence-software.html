@@ -52,7 +52,7 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px;">
         <div>
           <div style="font-weight:600; color:#0d47a1; margin-bottom:4px;">
-            <a href="gui.html#dashboard" style="color:inherit;">5.1 GUI</a> &mdash; the user-facing side
+            <a href="gui.html" style="color:inherit;">5.1 GUI</a> &mdash; the user-facing side
           </div>
           <ul style="margin:0; padding-left:18px; line-height:1.55;">
             <li>5 phone views (Home, Performance, Training, Chat, Profile)</li>
@@ -167,6 +167,7 @@
       </tbody>
     </table>
 
+
     <sl-divider></sl-divider>
 
     <!-- 5.3.3.3 AI COACH ANALYSIS -->
@@ -208,7 +209,7 @@
 
     <p>
       The frontend stack (Vue 3 + Pinia + Tailwind + Chart.js) and the 5 user-facing views
-      are introduced in <a href="gui/implementation.html#phone-dashboard">5.1 Implementation</a>.
+      are introduced in <a href="gui/implementation.html">5.1 Implementation</a>.
       Two of those views &mdash; <strong>AI Coach Chat</strong> and <strong>Training Remote</strong>
       &mdash; are the most technically interesting on the backend side because they cross
       every layer of the stack (HTTP &rarr; FastAPI &rarr; ROS 2 &rarr; touchscreen GUI). Both
@@ -437,7 +438,7 @@
     <p>
       The gamification layer &mdash; 6 rank tiers, 12+ achievement badges, daily streaks, and
       personal records &mdash; is introduced in
-      <a href="gui/implementation.html#gamification-system">5.1 Implementation</a>. On the
+      <a href="gui/implementation.html">5.1 Implementation</a>. On the
       backend, all of it lives in the per-user database and is computed by the
       <code>gamification</code> router after every session through a single deterministic
       formula:
@@ -453,17 +454,56 @@
 )</pre>
 
     <p>
-      The same router exposes <code>/profile</code>, <code>/achievements</code>,
-      <code>/leaderboard</code>, and <code>/benchmarks</code> endpoints; achievements are
-      checked once per session against the user's running totals (e.g. "Century" unlocks the
-      first time <code>session.total_punches &ge; 100</code>) and inserted into the
-      <code>achievements</code> table. Streaks are reset to zero by a daily check when the
-      gap between the current session and <code>streaks.last_training_date</code> exceeds one
-      calendar day, and personal records are updated only when a new value strictly beats the
-      previous one. None of this requires any client-side state &mdash; the phone and the
-      touchscreen GUI both read the same row from the per-user database, so a session started
-      on one surface immediately reflects on the other.
+      The same router also exposes the read-side endpoints used by both the phone and the
+      touchscreen GUI:
     </p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 16px;">
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/profile</span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/achievements</span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/leaderboard</span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/benchmarks</span>
+    </div>
+
+    <p>
+      Each gamification dimension has its own update rule, all running on the per-user
+      database with no client-side state:
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Achievements</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">Checked once per session against the user's running totals &mdash; e.g. <strong>Century</strong> unlocks the first time <code>session.total_punches &ge; 100</code> &mdash; and inserted into the <code>achievements</code> table.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Streaks</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">A daily check resets the streak to zero when the gap between the current session and <code>streaks.last_training_date</code> exceeds one calendar day.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Personal records</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">Updated only when a new value <em>strictly</em> beats the previous one &mdash; ties don't count, so the &ldquo;all-time best&rdquo; figures are always genuinely new wins.</div>
+      </div>
+      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Two surfaces, one source of truth</div>
+        <div style="font-size:0.9rem; margin-top:6px; color:#555;">The phone and the touchscreen GUI read the same row from the per-user database, so a session started on one surface immediately reflects on the other &mdash; no sync logic required.</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.92rem; color:#444;">
+      The screenshots below show what users see on the phone: the home view surfaces XP
+      progress, current rank, and the daily streak counter, while the analytics view shows
+      the trend charts, personal records, and peer percentile rankings powered by the same
+      gamification router.
+    </p>
+
+    <div style="display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:wrap;">
+      <div style="max-width:220px;">
+        <image-component tag="image" source="../assets/robot_intelligence/dashboard/welcome.jpg" subtitle="Figure: Home view &mdash; XP, rank, daily streak" width="100%"></image-component>
+      </div>
+      <div style="max-width:220px;">
+        <image-component tag="image" source="../assets/robot_intelligence/dashboard/analytics.jpg" subtitle="Figure: Analytics &mdash; trends, records, percentiles" width="100%"></image-component>
+      </div>
+    </div>
 
     <sl-divider></sl-divider>
 

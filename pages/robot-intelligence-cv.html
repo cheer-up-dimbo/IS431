@@ -145,16 +145,18 @@
       The natural approach to recognising body movements is pose estimation &mdash; tracking
       joint positions frame by frame. The catch is that off-the-shelf pose estimators like
       YOLO Pose are trained on datasets such as COCO where hands and wrists are almost always
-      visible as discrete features &mdash; bare skin, fingers, fine joint contours. Boxing
-      breaks every one of those assumptions: the wrists are buried inside thick padded gloves,
-      so the model has nothing recognisable to lock onto at the exact body part it cares about
-      most. In this boxing context, pose estimation therefore fails at the worst possible
-      moment: when the boxer extends a punch toward the camera, the gloves completely occlude
-      the wrist keypoints and the arm foreshortens into a single mass of pixels. The images
-      below show this in action &mdash; the skeleton frequently breaks or jumps during punch
-      extension, with keypoints snapping to incorrect positions. This is why early iterations
-      using pose estimation alone peaked at ~67% accuracy &mdash; the feature extraction was
-      most unreliable exactly when the discriminative motion was happening.
+      visible as discrete features &mdash; bare skin, fingers, fine joint contours.
+      <span style="background:#fff3cd; padding:1px 4px; border-radius:3px;">Boxing breaks every
+      one of those assumptions:</span> the wrists are buried inside thick padded gloves, so
+      the model has nothing recognisable to lock onto at the exact body part it cares about
+      most.
+    </p>
+
+    <p>
+      The result is exactly the wrong failure mode for action recognition: the skeleton breaks
+      or jumps during punch extension &mdash; the moment when the discriminative motion is
+      actually happening. Pose estimation alone peaked at <strong>~67% accuracy</strong> in
+      early iterations for this reason.
     </p>
 
     <div class="video-row two-up">
@@ -165,31 +167,29 @@
         <image-component tag="image" source="../assets/robot_intelligence/cv/pose_fail_2.png" subtitle="Figure: Pose skeleton breaks during punch extension" width="100%"></image-component>
       </div>
     </div>
+
     <p>
-      These failures happen constantly during live inference &mdash; the pose skeleton is
-      unreliable for a significant portion of every punch. This is exactly why the model
-      uses <strong>confidence gating</strong>: YOLO reports a confidence score for each
-      detected joint, and when that confidence drops (as it does during the failures shown
-      above), the model automatically reduces the influence of the pose signal and relies
-      more heavily on the voxel branch instead. Without this mechanism, the broken skeleton
-      data would actively mislead the model.
+      The fix has two parts. <strong>Confidence gating</strong> handles the failures: YOLO
+      reports a confidence for each detected joint, and the model automatically scales down
+      the pose signal whenever those drop &mdash; falling back on the voxel branch instead.
+      Without this, the broken skeleton would actively mislead the network.
     </p>
+
     <p>
-      Paradoxically, despite these failures, pose estimation turned out to be the missing
-      piece that unlocked the final model. While it fails during extension, the joint
-      positions captured during the <em>preparation phase</em> (the first 100&ndash;200ms
-      before the arm extends) reliably reveal which hand is moving &mdash; information that
-      depth-based voxels alone cannot provide. So the model gets the critical left/right
-      information early from pose, then smoothly transitions to voxel-only reasoning as
-      the punch extends and pose becomes unreliable. This is the core insight behind the
-      dual-branch fusion architecture.
+      The second part is the insight that turned pose from a liability into the missing piece
+      of the final model: <strong>pose only fails during extension, not during preparation</strong>.
+      In the first 100&ndash;200&nbsp;ms before the arm extends, the joints are still visible
+      and they reliably reveal which hand is moving &mdash; information depth-based voxels
+      alone cannot provide. The model gets the critical left/right call early from pose, then
+      smoothly transitions to voxel-only reasoning as the punch extends. This is the core
+      idea behind the dual-branch fusion architecture.
     </p>
 
     <p>
       The model classifies 8 actions: <strong>jab</strong>, <strong>cross</strong>,
       <strong>left hook</strong>, <strong>right hook</strong>, <strong>left uppercut</strong>,
-      <strong>right uppercut</strong>, <strong>block</strong>, and <strong>idle</strong>.
-      Idle acts as the neutral baseline, preventing false positives when the user is not punching.
+      <strong>right uppercut</strong>, <strong>block</strong>, and <strong>idle</strong>
+      (the neutral baseline that prevents false positives when the user is not punching).
     </p>
 
     <sl-divider></sl-divider>
@@ -263,16 +263,31 @@
       A 3D convolutional neural network (Conv3D) compresses this spatial information into a compact
       192-dimensional vector per frame.
     </p>
-    <p style="font-size:0.92rem; color:#444;">
-      <strong>Design rationale:</strong> The grid was optimised from an initial 24&sup3; (55,296 dimensions)
-      down to 12&sup3; (3,456 dimensions) for real-time performance. Earlier iterations also used 10 channels
-      (including directional gradients dx/dy/dz and velocity magnitude), but once pose was added these
-      became redundant &mdash; pose provides explicit directional information, reducing the voxel to just
-      2 delta channels with no accuracy loss. The grid is person-centred (anchored to the user's median
-      position with exponential smoothing) and depth-weighted so closer voxels (the punching hand) have
-      a stronger signal. A background model (90th percentile of the first 30 frames) removes static
-      depth, isolating only the user's body motion.
-    </p>
+    <div style="font-size:0.92rem; color:#444; background:#fafafa; border:1px solid #eee; border-radius:6px; padding:12px 16px; margin:12px 0;">
+      <div style="font-weight:600; color:#333; margin-bottom:8px;">Design rationale</div>
+
+      <p style="margin:0 0 8px;">
+        <span style="font-weight:600;">Grid resolution &mdash;</span>
+        shrunk from <code>24&sup3;</code> (55,296&nbsp;dims) to <code>12&sup3;</code>
+        (3,456&nbsp;dims) for real-time performance on the Jetson.
+      </p>
+
+      <p style="margin:0 0 8px;">
+        <span style="font-weight:600;">Channel reduction &mdash;</span>
+        earlier iterations used 10 voxel channels (directional gradients dx/dy/dz +
+        velocity magnitude), but once pose was added these became redundant: pose already
+        provides explicit directional information, so the voxel was cut to just 2 delta
+        channels with no accuracy loss.
+      </p>
+
+      <p style="margin:0;">
+        <span style="font-weight:600;">Spatial conditioning &mdash;</span>
+        the grid is person-centred (anchored to the user's median position with exponential
+        smoothing), depth-weighted so closer voxels carry a stronger signal, and background
+        depth is removed using a 90th-percentile model from the first 30 frames so only the
+        user's body motion remains.
+      </p>
+    </div>
 
     <h3>Pose Branch &mdash; Body Joint Tracking</h3>
     <p>
@@ -524,11 +539,11 @@
     </div>
 
     <p style="font-size:0.92rem; color:#444;">
-      The RGBD model showed that deep networks could learn punch patterns but was too large for
-      real-time edge deployment. The GradCAM visualisation confirmed the model was attending to
-      relevant body regions (arms, shoulders) rather than background features. The multimodal
-      voxel + colour tracking approach improved accuracy but required impractical coloured gloves.
-      These limitations collectively motivated the final voxel + pose fusion architecture.
+      <strong>Takeaway:</strong> deep networks <em>could</em> learn punch patterns &mdash;
+      GradCAM confirmed attention on <strong>arms and shoulders</strong>, not background
+      &mdash; but the RGBD model was <strong>too heavy for edge deployment</strong>, and
+      colour tracking required <strong>impractical gloves</strong>. Together these
+      limitations motivated the final <strong>voxel + pose fusion</strong> architecture.
     </p>
 
     <h3>Final Model Inference (Deployed v11)</h3>
@@ -545,14 +560,13 @@
     </div>
 
     <p style="font-size:0.92rem; color:#444; margin-top:8px;">
-      Both participants were unseen during training. Person 1, newer to boxing, has less consistent
-      form &mdash; some punches blend together, making even human observers uncertain of the type.
-      The model reflects this ambiguity with lower confidence. Person 2, a trained boxer with cleaner
-      technique, demonstrates the model predicting punch type reliably before the punch lands.
-      In both cases, the model struggles during punch retraction (not included in training annotations).
-      This limitation is addressed by the CV + IMU sensor fusion system covered in
-      <a href="robot-intelligence-integration.html">Section 5.3.2</a>, where pad-constraint
-      filtering effectively compensates for retraction misclassifications.
+      Both participants were <strong>unseen during training</strong>. Person&nbsp;1's
+      <strong>looser form lowers confidence</strong> on ambiguous punches, while
+      Person&nbsp;2's <strong>cleaner technique</strong> lets the model commit to the
+      prediction <em>before</em> the punch lands. Both clips also show the model wobbling
+      during punch <strong>retraction</strong> (not in the training annotations) &mdash; a
+      limitation that <a href="robot-intelligence-integration.html">5.3.2's CV&nbsp;+&nbsp;IMU
+      fusion</a> cleans up via <strong>pad-constraint filtering</strong>.
     </p>
 
     <sl-divider></sl-divider>
@@ -611,12 +625,26 @@
       </div>
     </div>
 
-    <p>
-      <strong>Critical pipeline fix:</strong> Early recordings silently dropped depth frames (~15fps actual vs 30fps expected)
-      because the laptop could not write float32 depth arrays to an external SSD fast enough. The fix: a dedicated capture
-      thread running independently of disk I/O, an async writer thread with a 300-frame queue buffer, non-blocking enqueue,
-      and frame-drop diagnostics. All early data had to be re-collected and re-annotated from scratch.
-    </p>
+    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">Critical pipeline fix &mdash; silent frame drops</div>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#bf360c;">Problem:</span>
+        early recordings silently dropped depth frames &mdash; ~15&nbsp;fps actual versus
+        30&nbsp;fps expected &mdash; because the laptop couldn't write float32 depth arrays to
+        the external SSD fast enough. Every temporal voxel feature was being computed against
+        corrupted timing.
+      </p>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#1b5e20;">Fix:</span>
+        a dedicated capture thread that runs independently of disk I/O, paired with an async
+        writer thread feeding off a 300-frame queue buffer. Non-blocking enqueue plus
+        frame-drop diagnostics caught any future regressions.
+      </p>
+      <p style="margin:0;">
+        <span style="font-weight:600; color:#555;">Cost:</span>
+        all earlier footage had to be re-collected and re-annotated from scratch.
+      </p>
+    </div>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/recording_tool.png" subtitle="Figure: Custom recording tool interface with presets"></image-component>
 
@@ -636,16 +664,29 @@
       could keep up with the iteration pace of the rest of the project.
     </p>
 
-    <p>
-      <strong>Block annotation fix:</strong> Originally, block annotations covered <strong>only the onset</strong>
-      (arms rising into guard). This caused two live failures: the rising motion looked like an <strong>uppercut</strong>,
-      and once the user held the guard the model had never seen that pose &mdash; so predictions
-      <strong>drifted to idle</strong>. The fix was to annotate the <strong>full guard sequence (rise, hold, return)</strong>
-      so the model learns every phase of a block. Validation accuracy stayed effectively the same
-      (v10: 97.3%, v11: 96.8%), but live block detection improved dramatically &mdash; the gain came entirely
-      from the annotation change, not the model. Block remains the lowest class at <strong>66.7%</strong> validation
-      accuracy as the smallest class, but its <strong>real-world reliability</strong> improved significantly.
-    </p>
+    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">Block annotation fix</div>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#bf360c;">Problem:</span>
+        block annotations originally covered only the onset (arms rising into guard). This
+        caused two live failures &mdash; the rising motion looked like an uppercut, and once
+        the user held the guard the model had never seen that pose, so predictions drifted to
+        idle.
+      </p>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#1b5e20;">Fix:</span>
+        annotate the <strong>full guard sequence</strong> &mdash; rise, hold, and return
+        &mdash; so the model learns every phase of a block.
+      </p>
+      <p style="margin:0;">
+        <span style="font-weight:600; color:#555;">Result:</span>
+        validation accuracy stayed effectively the same (v10: 97.3%, v11: 96.8%), but
+        <strong>live block detection improved dramatically</strong>. The gain came entirely
+        from the annotation change, not the model. Block remains the lowest class at
+        <strong>66.7%</strong> validation accuracy because it is the smallest class, but its
+        real-world reliability is significantly higher.
+      </p>
+    </div>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/annotation_freestyle.png" subtitle="Figure: Custom annotation GUI with timeline-based segment editing"></image-component>
 
@@ -694,20 +735,43 @@
     </p>
 
     <p>
-      <strong>Small dataset, big constraint:</strong> Although more people contributed footage, only <strong>three of us had enough boxing experience</strong>
-      to produce consistent technique &mdash; so the usable dataset came down to three subjects. With so few,
-      each person's individual quirks became an outsized signal, the leave-one-person-out split left just a
-      <strong>single unseen subject</strong> for validation, and rare classes like block ended up with only a handful of segments.
-      That the model still reaches <strong>97.3% validation accuracy</strong> under these conditions shows the approach is working &mdash;
-      and points to clear headroom: a <strong>larger, more diverse dataset</strong> from <strong>experienced boxers</strong> with cleaner technique
-      would unlock better generalisation, more reliable rare-class detection, and room for deeper architectures the current data cannot support.
+      <strong>Small dataset, big constraint.</strong> Although more people contributed footage,
+      only three of us had enough boxing experience to produce consistent technique &mdash;
+      so the usable dataset came down to three subjects. With so few, each person's individual
+      quirks became an outsized signal, the leave-one-person-out split left just a single
+      unseen subject for validation, and rare classes like block ended up with only a handful
+      of segments.
     </p>
 
     <p>
-      <strong>Data quality over architecture:</strong> Removing one person's inconsistent data improved accuracy from
-      92.8% to 97.3% (+4.5%) &mdash; larger than any architecture change across 6 models tested. This was the single
-      biggest accuracy gain in the project.
+      That the model still reaches <strong>97.3% validation accuracy</strong> under these
+      conditions is what makes the approach interesting &mdash; it also points to clear
+      headroom. A larger, more diverse dataset from experienced boxers with cleaner technique
+      would unlock better generalisation, more reliable rare-class detection, and room for
+      deeper architectures the current data cannot support.
     </p>
+
+    <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
+      <div style="font-weight:600; color:#1b5e20; margin-bottom:6px;">Key finding &mdash; data quality over architecture</div>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#bf360c;">Bottleneck:</span>
+        <strong>6 different architectures</strong> were tested and all plateaued at around
+        <strong>92.8% validation accuracy</strong>. Hyperparameter tuning, augmentation
+        strength, deeper transformers &mdash; none of it moved the needle.
+      </p>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#1565c0;">Insight:</span>
+        the bottleneck wasn't the model. <strong>One contributor's inconsistent technique</strong>
+        was poisoning training and validation alike. Removing their clips and re-validating on
+        a different unseen person was the only thing that hadn't been tried.
+      </p>
+      <p style="margin:0;">
+        <span style="font-weight:600; color:#1b5e20;">Result:</span>
+        accuracy jumped from 92.8% to <strong>97.3% (+4.5%)</strong> &mdash; larger than any
+        architecture change across all 6 models, and the <strong>single biggest accuracy
+        gain in the entire project</strong>.
+      </p>
+    </div>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/data_quality.svg" subtitle="Figure: Data curation had the largest impact on accuracy &mdash; larger than any architecture change"></image-component>
 
@@ -881,35 +945,26 @@
     <h2>5.3.1.5 Secondary CV Functions</h2>
 
     <p>
-      The same per-frame YOLO pose output and depth-based bounding box that feed the action
-      model are reused by two lighter-weight functions, so neither runs an independent perception
-      stack:
+      The same YOLO pose output and depth bounding box that feed the action model are reused
+      by two lighter-weight functions &mdash; neither runs an independent perception stack,
+      so they add negligible compute on top of what the action model already costs.
     </p>
 
     <ul style="line-height:1.7;">
       <li>
-        <strong>Human Tracking</strong> &mdash; the user's bounding box centre, width, depth,
-        and lateral/depth displacement are published every frame as a <code>UserTracking</code>
-        message. Downstream nodes use this to keep the robot facing the user (yaw motor),
-        auto-adjust the height column to the user's shoulder line during the countdown, and
-        classify slips and dodges in the defence detection pipeline.
+        <strong>Human Tracking</strong> &mdash; bounding box centre, width, depth, and
+        lateral/depth displacement are published each frame as a <code>UserTracking</code>
+        message. Downstream nodes use this to face the robot at the user (yaw motor),
+        auto-adjust height during the countdown, and classify slips and dodges.
       </li>
       <li>
-        <strong>Reaction Time Detection</strong> &mdash; instead of relying on velocity
-        thresholds (which proved unreliable for users with different stances during the
-        <a href="robot-intelligence-testing.html">CDE Fair</a>), reaction time is measured by
-        depth-based proximity: when a stimulus is fired, the system watches the user's hand
-        depth and timestamps the moment it crosses a calibrated threshold toward the robot.
-        Combined with the <code>session_manager</code>'s precise stimulus timestamp, this gives
-        millisecond-accurate reaction times reported by the Reaction Test mode.
+        <strong>Reaction Time Detection</strong> &mdash; depth-based proximity replaces the
+        velocity thresholds that proved unreliable at the
+        <a href="robot-intelligence-testing.html">CDE Fair</a>. When a stimulus fires, the
+        system timestamps the moment the user's hand depth crosses a calibrated threshold
+        toward the robot, giving millisecond-accurate reaction times.
       </li>
     </ul>
-
-    <p style="font-size:0.92rem; color:#444;">
-      Both functions piggy-back on the action prediction frame rate (30 fps active, 6 fps idle)
-      and add negligible compute overhead because the underlying YOLO + depth extraction is
-      already running for the action model.
-    </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation — bounding box + 7 upper-body keypoints reused by both human tracking and reaction time detection" width="50%"></image-component>
 

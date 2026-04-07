@@ -52,37 +52,70 @@
 
     <h3>Overall Performance</h3>
 
-    <p>
-      The deployed model (v11) achieves <strong>96.8% validation accuracy</strong> on an unseen person
-      and <strong>94.2% macro F1-score</strong> (the average F1 across classes, treating each class
-      equally regardless of size &mdash; a fairer measure than accuracy when classes are imbalanced),
-      with only 7 out of 222 samples misclassified. Model v10
-      reached 97.3% but had poorer live block detection, so v11 was selected for deployment.
+    <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-left:4px solid #2e7d32; border-radius:6px; padding:14px 18px; margin:14px 0;">
+      <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px;">Final Model (v11) &mdash; Headline Results</div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+        <div>
+          <div style="font-size:1.9rem; font-weight:700; color:#1b5e20; line-height:1;">96.8%</div>
+          <div style="font-size:0.85rem; color:#555; margin-top:4px;">validation accuracy<br>on an <strong>unseen person</strong></div>
+        </div>
+        <div>
+          <div style="font-size:1.9rem; font-weight:700; color:#1b5e20; line-height:1;">94.2%</div>
+          <div style="font-size:0.85rem; color:#555; margin-top:4px;">macro F1-score<br>(class-balanced)</div>
+        </div>
+        <div>
+          <div style="font-size:1.9rem; font-weight:700; color:#1b5e20; line-height:1;">7 / 222</div>
+          <div style="font-size:0.85rem; color:#555; margin-top:4px;">samples misclassified<br>on the validation set</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.92rem; color:#555;">
+      Macro F1 averages F1 across all classes equally regardless of class size, which is a
+      fairer measure than raw accuracy when classes are imbalanced. Model <strong>v10</strong>
+      reached 97.3% on the same split but had poorer live block detection, so <strong>v11</strong>
+      was selected for deployment after the
+      <a href="robot-intelligence-cv.html">block annotation fix</a>.
     </p>
 
     <h3>Classification Results</h3>
 
     <p>
-      The <strong>confusion matrix</strong> (left) shows exactly where the model gets confused.
-      Each cell represents how often a true punch type (row) was predicted as another type (column).
-      The strong diagonal means the model is correct most of the time. The few off-diagonal
-      cells reveal that errors occur between biomechanically similar punches &mdash; for example,
-      left hook confused with left uppercut (both involve the left arm swinging), and block
-      confused with idle (both involve minimal movement).
+      The <strong>confusion matrix</strong> (left) shows where the model gets confused: each
+      cell counts how often a true class (row) was predicted as another (column). The strong
+      diagonal means the model is right most of the time, and the few off-diagonal cells
+      cluster between <strong>biomechanically similar punches</strong> &mdash; left hook
+      confused with left uppercut (both swing the left arm), and block confused with idle
+      (both involve minimal movement).
     </p>
     <p>
-      The <strong>per-class accuracy</strong> chart (right) shows the hit rate for each punch type
-      individually. Most classes exceed 96%, with right hook and right uppercut achieving
-      perfect 100%. <strong>Block is the weakest at 66.7%</strong>, and the cause is
-      biomechanical: the start of a block (arms rising from guard into a defensive position)
-      looks almost identical to the start of an uppercut (arms rising into the punch) for the
-      first few frames. This is exactly the failure mode the
-      <a href="robot-intelligence-cv.html">block annotation fix in 5.3.1</a> was introduced to
-      address &mdash; extending block annotations to cover the full guard sequence (rise, hold,
-      return) so the model learns the entire shape of the action rather than only its onset.
-      Live block reliability improved significantly as a result, even though the validation
-      headline number stayed in the same range.
+      The <strong>per-class accuracy</strong> chart (right) shows the hit rate per punch type.
+      Most classes exceed <strong>96%</strong>, with right hook and right uppercut at a
+      perfect <strong>100%</strong>. The notable exception is the block class, which is
+      addressed in the callout below.
     </p>
+
+    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
+      <div style="font-weight:600; color:#5d4037; margin-bottom:6px;">Block class &mdash; the hardest action to classify</div>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#bf360c;">Problem:</span>
+        <strong>block</strong> is the weakest class at <strong>66.7%</strong>. The start of
+        a block (arms rising from guard) looks nearly identical to the start of an
+        <strong>uppercut</strong> (arms rising into the punch) for the first few frames.
+      </p>
+      <p style="margin:0 0 6px;">
+        <span style="font-weight:600; color:#1565c0;">Insight:</span>
+        the model only ever saw the <em>onset</em> of a block during training, so it had no
+        way to disambiguate it from an uppercut without seeing the rest of the action.
+      </p>
+      <p style="margin:0;">
+        <span style="font-weight:600; color:#1b5e20;">Fix &amp; live impact:</span>
+        the <a href="robot-intelligence-cv.html">block annotation fix in 5.3.1</a> extended
+        annotations to cover the full guard sequence (rise, hold, return). The validation
+        headline number stayed in the same range, but <strong>live block reliability improved
+        significantly</strong> &mdash; the gain came entirely from the annotation, not the model.
+      </p>
+    </div>
 
     <div class="video-row two-up">
       <div class="video-box">
@@ -110,15 +143,17 @@
     <h3>What the Model Learned (t-SNE Visualisation)</h3>
 
     <p>
-      To understand what the model has learned internally, its high-dimensional representations
-      (384 dimensions) are compressed to 2D using a technique called t-SNE (t-distributed Stochastic
-      Neighbour Embedding &mdash; a dimensionality-reduction method that preserves local similarity,
-      so points close together in the original space stay close in 2D). Each dot represents
-      one punch sample, coloured by its true class. If the model has learned meaningful features,
-      samples of the same punch type should cluster together and different types should be
-      separated. The plot below confirms this &mdash; tight, well-separated clusters for each
-      action class. Notably, the clusters that show partial overlap (left hook / left uppercut)
-      match exactly the classes that confuse the model in the confusion matrix above.
+      The model's internal 384-dimensional representations are compressed to 2D using
+      <strong>t-SNE</strong> (a dimensionality-reduction method that preserves local
+      similarity). Each dot is a punch sample coloured by its true class &mdash; if the
+      model has learned meaningful features, <strong>same-class dots should cluster
+      together and different classes should separate</strong>.
+    </p>
+    <p>
+      The plot below confirms exactly that: <strong>tight, well-separated clusters</strong>
+      for each action class. The only clusters that partially overlap are
+      <strong>left&nbsp;hook&nbsp;/&nbsp;left&nbsp;uppercut</strong> &mdash; the same pair
+      that confuses the model in the confusion matrix above. The two visualisations agree.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/tsne_embeddings.png" subtitle="Figure: t-SNE Embeddings — each dot is a punch sample, same-colour clusters confirm discriminative learning" width="70%"></image-component>
@@ -126,14 +161,30 @@
     <h3>Which Frames Matter Most</h3>
 
     <p>
-      Gradient saliency (a technique that measures how much the model's output changes with respect
-      to each input, indicating which parts the model relied on most) reveals how much each frame in
-      the 12-frame window contributes to the model's prediction. The chart below shows a clear pattern: <strong>later frames are
-      significantly more important than early ones</strong>. The most recent frame (index 11)
-      has the highest importance, with frames 6&ndash;9 also scoring high. This makes intuitive
-      sense &mdash; the most recent motion contains the strongest signal about what punch is
-      being thrown. The first few frames (indices 1&ndash;4) contribute less, as they mostly
-      capture the preparation phase before the discriminative motion begins.
+      <strong>Gradient saliency</strong> measures how much the model's output changes with
+      respect to each input, revealing which frames in the 12-frame window the model relied
+      on most. The chart below shows a clear pattern: <strong>later frames are significantly
+      more important than early ones</strong>. The most recent frame (index&nbsp;11) scores
+      highest, with frames&nbsp;6&ndash;9 close behind, while the first few frames
+      (indices&nbsp;1&ndash;4) contribute the least.
+    </p>
+
+    <div style="background:#f8f9fa; border-left:3px solid #1565c0; padding:10px 14px; margin:14px 0; font-size:0.93rem;">
+      <strong style="color:#0d47a1;">Important &mdash; this is not the same as "predicting after the punch ends".</strong>
+      The 12-frame window is a <strong>rolling causal window</strong> that always covers the
+      <em>most recent ~400&nbsp;ms</em> of motion. As a punch unfolds, that window slides
+      forward with it, so &ldquo;the latest frame in the window&rdquo; is always
+      <strong>the present moment</strong> &mdash; not the end of the punch. A new prediction
+      is emitted every frame while the punch is still in progress.
+    </div>
+
+    <p>
+      What this chart actually says is that the model makes its decisions based on the
+      <strong>most recent ~200&nbsp;ms</strong> of motion rather than the deeper history.
+      That is exactly what action <em>prediction</em> needs: the model commits to a punch
+      type as soon as the discriminative motion appears in the recent past, not after the
+      punch retracts. The very early frames in the window mostly capture the preparation
+      phase before the discriminative motion has begun, so they reasonably contribute less.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/temporal_importance.png" subtitle="Figure: Temporal Importance — later frames contribute most to the model's prediction"></image-component>
@@ -154,58 +205,88 @@
     </p>
 
     <p>
-      Despite being an earlier, simplified version, the live deployment revealed critical real-world
-      challenges that directly shaped the design of the final system:
+      Despite being a simpler prototype, the live deployment exposed real-world challenges
+      that directly shaped the final system. Each issue below caused a visible failure in
+      front of public users at the fair &mdash; and each one drove a concrete change to the
+      final architecture.
     </p>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Issue</th>
-          <th style="padding:8px; border:1px solid #ddd;">Problem</th>
-          <th style="padding:8px; border:1px solid #ddd;">Fix in Final System</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Background clutter</td>
-          <td style="padding:8px; border:1px solid #ddd;">People walking behind the user caused false punch detections</td>
-          <td style="padding:8px; border:1px solid #ddd;">Nearest-person tracking prioritises closest and largest person</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Colour tracking failure</td>
-          <td style="padding:8px; border:1px solid #ddd;">HSV glove tracking susceptible to similarly-coloured objects</td>
-          <td style="padding:8px; border:1px solid #ddd;">Replaced with Transformer-based action recognition model</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Variable punching stances</td>
-          <td style="padding:8px; border:1px solid #ddd;">Fixed velocity thresholds unreliable across users</td>
-          <td style="padding:8px; border:1px solid #ddd;">Switched to depth-based proximity detection</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">LLM cold start</td>
-          <td style="padding:8px; border:1px solid #ddd;">Several seconds delay on first coaching prompt</td>
-          <td style="padding:8px; border:1px solid #ddd;">Lazy model loading at GUI startup</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Touchscreen input friction</td>
-          <td style="padding:8px; border:1px solid #ddd;">Typing on 7&Prime; touchscreen awkward with gloves</td>
-          <td style="padding:8px; border:1px solid #ddd;">Phone dashboard enables mobile interaction</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Camera resource contention</td>
-          <td style="padding:8px; border:1px solid #ddd;">Multiple CV consumers each opening camera caused contention</td>
-          <td style="padding:8px; border:1px solid #ddd;">Single camera node publishes to shared topics</td>
-        </tr>
-      </tbody>
-    </table>
-    <p style="text-align:center; font-style:italic; font-size:0.9rem; color:#666; margin-top:8px;">
-      Table: CDE Fair &mdash; real-world issues and fixes that shaped the final system
-    </p>
+    <style>
+      .ba-table {
+        width:100%;
+        border-collapse:separate;
+        border-spacing:0;
+        margin:18px 0;
+        font-size:0.92rem;
+        border-radius:10px;
+        overflow:hidden;
+        box-shadow:0 1px 4px rgba(0,0,0,0.06);
+      }
+      .ba-table th { padding:14px 20px; text-align:left; font-size:0.78rem; font-weight:700; letter-spacing:0.9px; text-transform:uppercase; color:#fff; }
+      .ba-table th.ba-head-prob { background:#c62828; width:50%; }
+      .ba-table th.ba-head-fix  { background:#2e7d32; width:50%; }
+      .ba-table td { padding:20px 22px; vertical-align:top; border-bottom:6px solid #f0f2f5; }
+      .ba-table tr:last-child td { border-bottom:none; }
+      .ba-table .ba-prob { background:#fff; }
+      .ba-table .ba-fix  { background:#f6fbf6; border-left:1px solid #e6e6e6; }
+      .ba-table tbody tr:nth-child(even) .ba-prob { background:#f9fafb; }
+      .ba-table tbody tr:nth-child(even) .ba-fix  { background:#eef7ee; }
+      .ba-table .ba-num { display:none; }
+      .ba-table .ba-head { margin-bottom:6px; }
+      .ba-table .ba-prob .ba-issue { color:#c62828; }
+      .ba-table .ba-fix  .ba-issue { color:#2e7d32; }
+      .ba-table .ba-issue {
+        font-weight:700;
+        font-size:1rem;
+        letter-spacing:-0.1px;
+      }
+      .ba-table .ba-detail {
+        display:block;
+        font-size:0.88rem;
+        color:#555;
+        line-height:1.55;
+      }
+    </style>
+
+      <table class="ba-table">
+        <thead>
+          <tr>
+            <th class="ba-head-prob">&#x2715;&nbsp;&nbsp;What failed at the fair</th>
+            <th class="ba-head-fix">&#x2713;&nbsp;&nbsp;What we built instead</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ba-prob"><div class="ba-head"><span class="ba-num">1</span><span class="ba-issue">Background clutter</span></div><span class="ba-detail">People walking behind the user triggered false punch detections.</span></td>
+            <td class="ba-fix"><div class="ba-head"><span class="ba-num">1</span><span class="ba-issue">Nearest-person tracking</span></div><span class="ba-detail">The closest and largest person in frame is now prioritised.</span></td>
+          </tr>
+          <tr>
+            <td class="ba-prob"><div class="ba-head"><span class="ba-num">2</span><span class="ba-issue">Colour tracking failure</span></div><span class="ba-detail">HSV glove tracking confused red/green gloves with similarly coloured background objects.</span></td>
+            <td class="ba-fix"><div class="ba-head"><span class="ba-num">2</span><span class="ba-issue">Transformer action model</span></div><span class="ba-detail">Colour tracking replaced entirely with the deep model in <a href="robot-intelligence-cv.html">5.3.1</a>.</span></td>
+          </tr>
+          <tr>
+            <td class="ba-prob"><div class="ba-head"><span class="ba-num">3</span><span class="ba-issue">Variable punching stances</span></div><span class="ba-detail">Fixed velocity thresholds for reaction time were unreliable across users with different stances.</span></td>
+            <td class="ba-fix"><div class="ba-head"><span class="ba-num">3</span><span class="ba-issue">Depth-based proximity</span></div><span class="ba-detail">Reaction time now measured by hand depth crossing a calibrated threshold &mdash; stance-independent.</span></td>
+          </tr>
+          <tr>
+            <td class="ba-prob"><div class="ba-head"><span class="ba-num">4</span><span class="ba-issue">LLM cold start</span></div><span class="ba-detail">First coaching prompt of every session paused several seconds while the model loaded.</span></td>
+            <td class="ba-fix"><div class="ba-head"><span class="ba-num">4</span><span class="ba-issue">Lazy load at GUI startup</span></div><span class="ba-detail">The model is preloaded at GUI startup so the first prompt is already warm.</span></td>
+          </tr>
+          <tr>
+            <td class="ba-prob"><div class="ba-head"><span class="ba-num">5</span><span class="ba-issue">Touchscreen input friction</span></div><span class="ba-detail">Typing on the 7&Prime; touchscreen with boxing gloves was practically impossible.</span></td>
+            <td class="ba-fix"><div class="ba-head"><span class="ba-num">5</span><span class="ba-issue">Phone dashboard</span></div><span class="ba-detail">The phone dashboard (<a href="robot-intelligence-software.html">5.3.3</a>) provides a natural mobile interface for chat and configuration.</span></td>
+          </tr>
+          <tr>
+            <td class="ba-prob"><div class="ba-head"><span class="ba-num">6</span><span class="ba-issue">Camera resource contention</span></div><span class="ba-detail">Multiple CV consumers each opening their own camera handle caused USB contention and dropped frames.</span></td>
+            <td class="ba-fix"><div class="ba-head"><span class="ba-num">6</span><span class="ba-issue">Single camera owner</span></div><span class="ba-detail">A single <code>cv_node</code> owns the camera and publishes to shared ROS topics.</span></td>
+          </tr>
+        </tbody>
+      </table>
 
     <p>
-      These lessons directly shaped the final system. Most notably, colour tracking limitations
-      motivated the Transformer-based action recognition model.
+      Most notably, the colour-tracking failure was the moment that committed the project
+      to building the Transformer-based action recognition model from scratch &mdash; the
+      single biggest design decision in 5.3 traces directly back to a few hours at this fair.
     </p>
 
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; align-items:end;">
@@ -226,40 +307,59 @@
     <h2>5.3.4.3 Testing Infrastructure</h2>
 
     <p>
-      Testing followed a bottom-up strategy, starting from individual components and building
-      up to full system validation:
+      Testing followed the classic bottom-up pyramid &mdash; many small, fast unit tests at
+      the base, fewer cross-module integration tests in the middle, and a small number of
+      end-to-end system checks at the top. Each level catches a different class of bug:
     </p>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Level</th>
-          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Count</th>
-          <th style="padding:8px; border:1px solid #ddd;">What It Validates</th>
-          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Tool</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Unit Tests</strong></td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">146</td>
-          <td style="padding:8px; border:1px solid #ddd;">Individual components: sensor fusion logic, gamification rules, database operations</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">pytest (Python's standard test framework)</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Integration Tests</strong></td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">28</td>
-          <td style="padding:8px; border:1px solid #ddd;">Cross-module communication: config loading, ROS message fields, fusion end-to-end</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Custom script</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>System-Level</strong></td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">12 sections</td>
-          <td style="padding:8px; border:1px solid #ddd;">Full operational workflow: hardware checks, live CV, LLM, GUI, dashboard</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">Jupyter notebook</td>
-        </tr>
-      </tbody>
-    </table>
+    <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; margin:18px auto; display:block; font-family:system-ui,sans-serif;">
+      <!-- Top: System -->
+      <polygon points="320,20 440,20 460,80 300,80" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+      <text x="380" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#4a148c">SYSTEM</text>
+      <text x="380" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#4a148c">12 sections</text>
+      <text x="380" y="76" text-anchor="middle" font-size="9" fill="#4a148c">Jupyter notebook</text>
+
+      <!-- Mid: Integration -->
+      <polygon points="300,82 460,82 490,162 270,162" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+      <text x="380" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#bf360c">INTEGRATION</text>
+      <text x="380" y="130" text-anchor="middle" font-size="18" font-weight="700" fill="#bf360c">28 tests</text>
+      <text x="380" y="148" text-anchor="middle" font-size="9" fill="#bf360c">Custom script</text>
+
+      <!-- Base: Unit -->
+      <polygon points="270,164 490,164 540,300 220,300" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+      <text x="380" y="200" text-anchor="middle" font-size="12" font-weight="700" fill="#1b5e20">UNIT</text>
+      <text x="380" y="232" text-anchor="middle" font-size="26" font-weight="700" fill="#1b5e20">146 tests</text>
+      <text x="380" y="252" text-anchor="middle" font-size="11" fill="#1b5e20">pytest</text>
+      <text x="380" y="272" text-anchor="middle" font-size="9" fill="#1b5e20">12 shared fixtures &middot; 3 test files</text>
+
+      <!-- Right-side annotations -->
+      <text x="555" y="48" font-size="11" font-weight="600" fill="#4a148c">Full operational workflow</text>
+      <text x="555" y="62" font-size="10" fill="#666">hardware check &middot; live CV &middot; LLM &middot;</text>
+      <text x="555" y="74" font-size="10" fill="#666">GUI &middot; dashboard end-to-end</text>
+
+      <text x="555" y="115" font-size="11" font-weight="600" fill="#bf360c">Cross-module communication</text>
+      <text x="555" y="129" font-size="10" fill="#666">config loading &middot; ROS message fields</text>
+      <text x="555" y="141" font-size="10" fill="#666">fusion end-to-end &middot; motor protocol</text>
+
+      <text x="555" y="220" font-size="11" font-weight="600" fill="#1b5e20">Individual components</text>
+      <text x="555" y="234" font-size="10" fill="#666">sensor fusion logic &middot; pad constraints</text>
+      <text x="555" y="246" font-size="10" fill="#666">defence classification &middot; database</text>
+      <text x="555" y="258" font-size="10" fill="#666">user mgmt &middot; presets &middot; XP &middot; streaks</text>
+
+      <!-- Left side label -->
+      <text x="200" y="48" font-size="10" font-style="italic" fill="#888" text-anchor="end">few, slow,</text>
+      <text x="200" y="60" font-size="10" font-style="italic" fill="#888" text-anchor="end">end-to-end</text>
+
+      <text x="200" y="232" font-size="10" font-style="italic" fill="#888" text-anchor="end">many, fast,</text>
+      <text x="200" y="244" font-size="10" font-style="italic" fill="#888" text-anchor="end">deterministic</text>
+
+      <line x1="205" y1="80" x2="205" y2="240" stroke="#bbb" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <polygon points="200,75 210,75 205,68" fill="#bbb"/>
+      <polygon points="200,245 210,245 205,252" fill="#bbb"/>
+    </svg>
+    <p style="text-align:center; font-style:italic; font-size:0.9rem; color:#666; margin-top:-4px;">
+      Figure: Testing pyramid &mdash; 146 unit tests at the base, 28 integration tests in the middle, 12 end-to-end system sections at the top
+    </p>
 
     <sl-divider></sl-divider>
 
@@ -494,6 +594,16 @@
 
     <!-- 5.3.4.7 VERIFICATION SUMMARY -->
     <h2>5.3.4.7 Verification Summary</h2>
+
+    <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-left:4px solid #2e7d32; border-radius:6px; padding:14px 18px; margin:14px 0;">
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div style="font-size:2.2rem; font-weight:700; color:#1b5e20; line-height:1;">7&nbsp;/&nbsp;7</div>
+        <div>
+          <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">Robot Intelligence requirements</div>
+          <div style="font-size:0.95rem; color:#1b5e20; margin-top:2px;">All requirements verified through dedicated tests, benchmarks, and live deployment.</div>
+        </div>
+      </div>
+    </div>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
