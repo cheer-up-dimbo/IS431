@@ -307,6 +307,77 @@
 
     <sl-divider></sl-divider>
 
+    <!-- INTEGRATION WITH ROBOT INTELLIGENCE -->
+    <div>
+      <h3>Integration with Robot Intelligence</h3>
+      <p>
+        The GUI is the user-facing layer of a larger system. The robot intelligence subsystem
+        (Section 5.3) handles all sensing, scoring, and AI inference. The GUI presents
+        the outputs of that processing to the user and sends user intent back into the system.
+        Neither side depends on the internal details of the other.
+      </p>
+      <p>
+        From the user's perspective, this integration is what makes the interface feel live.
+        When a punch lands on a pad, the combo display advances automatically. When a round
+        ends, the rest screen appears without any user action. When the AI coach generates a tip,
+        it slides in at the top of the screen. All of this happens because the GUI listens for
+        events from the backend and reacts to them in real time.
+      </p>
+      <p>
+        The flow works in two directions:
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Direction</th>
+            <th style="padding:8px; border:1px solid #ddd;">Trigger</th>
+            <th style="padding:8px; border:1px solid #ddd;">What the user sees in the GUI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">5.3 &rarr; GUI</td>
+            <td style="padding:8px; border:1px solid #ddd;">Confirmed punch detected (CV + IMU fusion)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combo step advances, punch counter increments, sparring HUD updates</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">5.3 &rarr; GUI</td>
+            <td style="padding:8px; border:1px solid #ddd;">Session state changes (countdown / active / rest / complete)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Timer starts, rest screen appears, round counter updates, results page loads</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">5.3 &rarr; GUI</td>
+            <td style="padding:8px; border:1px solid #ddd;">AI coaching tip delivered</td>
+            <td style="padding:8px; border:1px solid #ddd;">Tip bar slides down from the top of the training screen</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">5.3 &rarr; GUI</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU pad tapped outside a session</td>
+            <td style="padding:8px; border:1px solid #ddd;">Page navigates without touching the screen</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">GUI &rarr; 5.3</td>
+            <td style="padding:8px; border:1px solid #ddd;">User taps Start</td>
+            <td style="padding:8px; border:1px solid #ddd;">Backend begins data collection; session ID returned to GUI</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">GUI &rarr; 5.3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Session ends (timer or user action)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Backend finalises scoring and returns summary; results page populates</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; white-space:nowrap;">GUI &rarr; 5.3</td>
+            <td style="padding:8px; border:1px solid #ddd;">User requests AI feedback on results page</td>
+            <td style="padding:8px; border:1px solid #ddd;">LLM generates personalised response; chat interface displays it</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI and Robot Intelligence data flow</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- NAV CARDS -->
     <div>
       <h3>Detailed Documentation</h3>
@@ -329,6 +400,15 @@
       </div>
     </div>
 
+    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+      <a href="gui/design-ideation.html">
+        <sl-button variant="default" size="medium">
+          Next: Design and Ideation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
+    </div>
+
     <sl-divider></sl-divider>
 
     <!-- CROSS-REFERENCES -->
@@ -346,24 +426,13 @@
           communicates with during sparring and training sessions.
         </li>
         <li>
-          <strong><a href="robot-intelligence.html">5.4 Robot Intelligence</a></strong>
+          <strong><a href="robot-intelligence.html">5.3 Robot Intelligence</a></strong>
           covers the computer vision subsystem whose punch detection output feeds into the
           GUI's Reaction Test and Sparring mode via a file-based handshake interface.
         </li>
       </ul>
     </div>
 
-    <sl-divider></sl-divider>
-
-    <!-- NEXT SECTION NAVIGATION -->
-    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-      <a href="robot-mechanism.html">
-        <sl-button variant="default" size="medium">
-          Next: 5.2 Upper Mechanism
-          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
-        </sl-button>
-      </a>
-    </div>
 
   </div>
 

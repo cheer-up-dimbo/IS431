@@ -197,6 +197,68 @@
     </div>
 
     <sl-divider></sl-divider>
+
+    <!-- IMU NAVIGATION -->
+    <div>
+      <h3>IMU Navigation</h3>
+      <p>
+        A key usability constraint identified during needs finding is that boxers cannot
+        reliably operate a touchscreen while wearing gloves. Research on touch input shows that
+        even moderate hand coverage significantly reduces accuracy on targets below 48px
+        (Parhi, Karlson and Myers, 2006). The GUI addresses casual gloved interaction by using
+        60px minimum touch targets throughout, but the more complete solution for in-session
+        use is hands-free navigation via the robot's IMU pads.
+      </p>
+      <p>
+        The four pads double as navigation controls outside of training sessions. Left pad
+        moves to the previous item, right pad moves to the next, centre pad confirms a
+        selection, and head pad navigates back. This mapping follows the directional
+        convention familiar from physical four-button controllers, which reduces the need
+        for users to learn new interaction patterns (Norman, 2013).
+      </p>
+      <p>
+        One edge case is the home screen, which has no parent to return to. On the home
+        screen, the head pad opens a quick-access preset overlay instead of attempting a
+        back navigation with nowhere to go.
+      </p>
+      <p>
+        During active training, all pad navigation is disabled. Without this, punch impacts
+        on the pads would trigger accidental page changes mid-session. The disable state
+        activates during the countdown and active phases of every session and restores
+        automatically during rest and after session completion.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- SESSION ORCHESTRATION -->
+    <div>
+      <h3>Session Orchestration</h3>
+      <p>
+        The GUI is the session lifecycle controller for every training mode: technique drills,
+        sparring, free training, and performance tests. Every session begins with an explicit
+        start request from the GUI and ends with an explicit end request that retrieves the
+        session summary.
+      </p>
+      <p>
+        The sequence on a typical session is as follows. The user configures the session and
+        taps Start. The GUI sends a request to the backend with the training mode, difficulty,
+        and username, and receives a session ID in return. Throughout the session, state changes
+        arrive from the backend — countdown, active round, rest period, next round — and the
+        GUI uses these to drive the on-screen timer, round counter, and screen transitions.
+        When the final round ends or the user exits early, the GUI sends an end request with
+        the session ID. The backend returns a summary containing punch counts, accuracy scores,
+        and performance metrics, which the results page then displays.
+      </p>
+      <p>
+        This separation means Section 5.3 (Robot Intelligence) handles all scoring and data
+        collection logic, while Section 5.1 (GUI) handles all presentation and user flow
+        logic. The GUI does not need to know how punch scoring is calculated, and the backend
+        does not need to know how results are displayed.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
     <div>
       <h3>Phone Dashboard</h3>
       <p>
@@ -211,7 +273,7 @@
         combo mastery. Users can also start training sessions remotely, adjust robot height,
         manage presets, and chat with the AI coach. Remote commands are written as JSON to a
         shared file that the GUI polls every 100 ms, providing near-instant responsiveness
-        without requiring a direct socket connection between the dashboard and the GUI process. The backend implementation of the dashboard server, API endpoints, and WebSocket communication is documented in Section 5.4 (Robot Intelligence).
+        without requiring a direct socket connection between the dashboard and the GUI process. The backend implementation of the dashboard server, API endpoints, and WebSocket communication is documented in Section 5.3 (Robot Intelligence).
       </p>
     </div>
 
@@ -496,12 +558,43 @@
       <!-- AI COACHING -->
       <h4>AI Coaching Integration</h4>
       <p>
-        The combo training flow includes a post-session chat page where users can ask for
-        feedback on their performance. The chat is powered by a local LLM (Qwen 2.5 3B GGUF
-        via llama-cpp-python). On hardware where the model cannot be loaded (insufficient memory
-        or missing model file), the system falls back to hardcoded template responses. This
-        fallback was implemented as a design decision rather than an error state, since the
-        Jetson Nano's 4 GB of RAM makes model availability uncertain. The LLM pipeline, model selection, and prompt engineering details are documented in Section 5.4 (Robot Intelligence).
+        Immediate, specific feedback is a consistent predictor of skill acquisition in motor
+        learning (Schmidt and Lee, 2011). The GUI surfaces AI coaching feedback at two points
+        in the session flow to support this.
+      </p>
+      <p>
+        During training, coaching tips appear in a bar that slides down from the top of the
+        active session screen. The bar is color-coded by tip type: technique corrections,
+        encouragement, drill suggestions, and general boxing guidance are visually
+        distinguished. The bar auto-dismisses after ten seconds to avoid obscuring the
+        combo display during active punching.
+      </p>
+      <p>
+        After a session, the results page includes a chat interface where users can ask
+        the AI coach for specific feedback. The coach has access to the session summary,
+        including which combos were missed, accuracy by punch type, and session duration.
+        When the local LLM is unavailable due to memory constraints, the GUI falls back to
+        a pool of 54 categorised hardcoded tips rather than showing an error. A relevant
+        templated response is a better experience than no response at all (Norman, 2013).
+        The LLM model, prompt engineering, and inference pipeline are documented in
+        Section 5.3 (Robot Intelligence).
+      </p>
+
+      <!-- SOUND SYSTEM -->
+      <h4>Sound System</h4>
+      <p>
+        Audio feedback reinforces task events without requiring the user's visual attention,
+        which is useful during active training when the user is focused on the pads rather
+        than the screen (Gaver, 1989). The GUI uses 18 WAV sound effects, all preloaded at
+        startup for zero-latency playback.
+      </p>
+      <p>
+        A priority tier system prevents lower-priority sounds from masking higher-priority
+        ones. Round start and end bells carry the highest priority among session sounds.
+        Countdown ticks sit below bells, hit confirmation sounds sit below ticks, and
+        UI navigation clicks sit at the lowest priority. A navigation click cannot interrupt
+        a bell, but a bell will always cut through regardless of what else is playing.
+        Volume and per-sound toggles are available from the Settings page.
       </p>
 
 
@@ -563,6 +656,17 @@ class CustomPage(ButtonNavigationMixin, QWidget):
         The complete feature set delivered across all six iterations is summarised below.
       </p>
       <table-component id="gui-feature-set" subtitle="Table: Complete Feature Set"></table-component>
+    </div>
+
+    <!-- REFERENCES -->
+    <div>
+      <h3>References</h3>
+      <ul style="list-style:none; padding-left:0; font-size:0.92rem; line-height:1.7;">
+        <li>Gaver, W.W. (1989). The SonicFinder: An interface that uses auditory icons. <em>Human-Computer Interaction</em>, 4(1), 67-94.</li>
+        <li>Norman, D.A. (2013). <em>The Design of Everyday Things: Revised and Expanded Edition</em>. Basic Books.</li>
+        <li>Parhi, P., Karlson, A.K. and Myers, B.A. (2006). Target size study for one-handed thumb use on small touchscreen devices. In <em>Proceedings of the 8th Conference on Human-Computer Interaction with Mobile Devices and Services (MobileHCI 2006)</em>, pp. 203-210.</li>
+        <li>Schmidt, R.A. and Lee, T.D. (2011). <em>Motor Control and Learning: A Behavioral Emphasis</em> (5th ed.). Human Kinetics.</li>
+      </ul>
     </div>
 
     <!-- BOTTOM NAVIGATION -->

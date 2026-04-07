@@ -59,6 +59,29 @@
 
     <sl-divider></sl-divider>
 
+    <!-- AUTOMATED TEST SUITE -->
+    <div>
+      <h3>Automated Test Suite</h3>
+      <p>
+        The project runs 146 pytest tests across all subsystems. The GUI-relevant tests cover
+        the following areas:
+      </p>
+      <ul style="line-height:1.8; font-size:0.92rem;">
+        <li><strong>Navigation stack:</strong> arbitrary-depth push and pop sequences verify correct reverse-order page return</li>
+        <li><strong>Multi-user data isolation:</strong> five parallel test accounts confirm zero cross-contamination across user data</li>
+        <li><strong>Combo curriculum mastery algorithm:</strong> score accumulation, unlock threshold, and tier advancement logic</li>
+        <li><strong>Gamification:</strong> XP calculation and rank thresholds across all six rank tiers</li>
+        <li><strong>Pattern lock authentication:</strong> SHA-256 hash encode and verify round-trip</li>
+        <li><strong>GuiBridge offline degradation:</strong> all service calls return failure cleanly when the ROS stack is unavailable, confirming the mock interface functions correctly</li>
+      </ul>
+      <p>
+        Tests are executed from the project's master Jupyter notebook and run independently
+        of hardware. All GUI tests pass without a connected Jetson or ROS environment.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- USER TESTING -->
     <div>
       <h3>User Testing: Robotics Meets AI Showcase</h3>
@@ -100,6 +123,66 @@
 
     <sl-divider></sl-divider>
 
+    <!-- PERFORMANCE CRITERIA ASSESSMENT -->
+    <div>
+      <h3>Performance Criteria Assessment</h3>
+      <p>
+        The table below maps each GUI requirement to its target, verification method,
+        and outcome.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Verification</th>
+            <th style="padding:8px; border:1px solid #ddd;">Met?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and IMU pad operable</td>
+            <td style="padding:8px; border:1px solid #ddd;">All interactive elements &ge;60px; full navigation via 4 pads</td>
+            <td style="padding:8px; border:1px solid #ddd;">Functional test; showcase observation; IMU nav confirmed in live session</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Multi-user data isolation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Zero cross-contamination across accounts</td>
+            <td style="padding:8px; border:1px solid #ddd;">5 test accounts; pytest isolation tests; no cross-user data observed</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">50-combo curriculum with mastery-based progression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Unlock after 5 sessions with average score &ge;3.0/5.0</td>
+            <td style="padding:8px; border:1px solid #ddd;">Curriculum algorithm pytest; multiple complete training cycles observed</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Real-time session data display</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combo prompt, timer, and punch counter update within one display frame</td>
+            <td style="padding:8px; border:1px solid #ddd;">ROS 2 QThread bridge; functional observation during live sessions</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hardware-independent development</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full GUI runs on Windows laptop with no ROS or hardware</td>
+            <td style="padding:8px; border:1px solid #ddd;">Entire development cycle conducted on laptop; mock interface pytest confirmed</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI Performance Criteria Assessment</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- DELIVERABLES STATUS -->
     <div>
       <h3>Requirements Verification</h3>
@@ -118,7 +201,12 @@
           Back: Implementation
         </sl-button>
       </a>
-      <div></div>
+      <a href="../robot-mechanism.html">
+        <sl-button variant="default" size="medium">
+          Next: 5.2 Robot Mechanism
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
 
   </div>
