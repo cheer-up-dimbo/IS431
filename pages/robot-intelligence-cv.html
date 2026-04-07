@@ -356,6 +356,12 @@
       input entirely for 15% of clips and zeroing individual joints 10% of the time.
     </p>
 
+    <p>
+      The diagram below shows how the two branches feed the fusion projection, then how the
+      Transformer encoder reasons over a 12-frame window before the classifier head emits the
+      final 8-class prediction.
+    </p>
+
     <image-component tag="image" source="../assets/robot_intelligence/cv/model_architecture.svg" subtitle="Figure: FusionVoxelPoseTransformer Architecture &mdash; dual-branch fusion with transformer temporal encoding"></image-component>
 
     <sl-divider></sl-divider>
@@ -568,19 +574,40 @@
     <h3>Inference Results Across Iterations</h3>
     <p>
       The videos below show the most promising inference results from key iterations, each revealing
-      specific limitations that drove the next approach:
+      specific limitations that drove the next approach. (<strong>Colab</strong> = Google
+      Colab, a cloud-hosted Jupyter notebook that provides a free GPU for ML training; the
+      RGBD model was too large to train on a laptop, so it had to live there.)
     </p>
+
+    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:12px 0; font-size:0.92rem; color:#5d4037;">
+      <strong>Important &mdash; recognition vs. prediction.</strong> The two videos below
+      are doing <em>different</em> tasks. The RGBD model on the left is offline action
+      <strong>recognition</strong>: it watches the whole clip and labels it after the fact,
+      with full bidirectional context. That's why its labels look so accurate &mdash; but it
+      can't react to a punch in progress and is far too slow for real-time use. The voxel +
+      colour tracking model on the right is true real-time action <strong>prediction</strong>,
+      classifying each frame as the motion unfolds &mdash; the same task the final deployed
+      model has to do, just at lower accuracy and with impractical coloured gloves.
+    </div>
 
     <div class="video-row two-up">
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_inference.mp4"></video>
-        <sub>RGBD Model (Iter. 3&ndash;4) &mdash; pixel-based, required Colab, too heavy for edge</sub>
+        <sub>RGBD Model (Iter. 3&ndash;4) &mdash; <strong>offline recognition</strong>, pixel-based, required Colab, too heavy for edge</sub>
       </div>
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/multimodal_inference.mp4"></video>
-        <sub>Voxel + Colour Tracking (Iter. 6) &mdash; ~68%, required coloured gloves</sub>
+        <sub>Voxel + Colour Tracking (Iter. 6) &mdash; <strong>real-time prediction</strong>, ~68%, required coloured gloves</sub>
       </div>
     </div>
+
+    <p style="font-size:0.92rem; color:#444; margin-top:14px;">
+      The video below uses <strong>GradCAM</strong> (Gradient-weighted Class Activation
+      Mapping) to visualise which image regions the RGBD model "looks at" when making a
+      prediction. The brighter red areas show where the model's attention is concentrated
+      &mdash; useful for sanity-checking that the model is learning real boxing motion
+      rather than memorising backgrounds or other spurious cues.
+    </p>
 
     <div class="video-row single" style="margin-top:12px;">
       <div class="video-box">
@@ -590,11 +617,13 @@
     </div>
 
     <p style="font-size:0.92rem; color:#444;">
-      <strong>Takeaway:</strong> deep networks <em>could</em> learn punch patterns &mdash;
-      GradCAM confirmed attention on <strong>arms and shoulders</strong>, not background
-      &mdash; but the RGBD model was <strong>too heavy for edge deployment</strong>, and
-      colour tracking required <strong>impractical gloves</strong>. Together these
-      limitations motivated the final <strong>voxel + pose fusion</strong> architecture.
+      <strong>Takeaway:</strong> deep networks <em>could</em> learn punch patterns offline
+      &mdash; GradCAM confirmed attention on <strong>arms and shoulders</strong>, not
+      background &mdash; but the RGBD model couldn't run live and was <strong>too heavy for
+      edge deployment</strong>, and the colour-tracking real-time approach required
+      <strong>impractical gloves</strong>. Together these limitations motivated the final
+      <strong>voxel + pose fusion</strong> architecture, which had to combine the deep-network
+      accuracy of the RGBD model with the real-time, glove-free operation of the voxel approach.
     </p>
 
     <h3>Final Model Inference (Deployed v11)</h3>
@@ -697,6 +726,12 @@
       </p>
     </div>
 
+    <p>
+      The custom recording tool below wraps all of this &mdash; the dual-thread capture/writer
+      pipeline, the diagnostics, and a few common camera presets &mdash; behind a single
+      one-click interface so a recording session can start without any command-line setup.
+    </p>
+
     <image-component tag="image" source="../assets/robot_intelligence/cv/recording_tool.png" subtitle="Figure: Custom recording tool interface with presets"></image-component>
 
     <h3>Annotation</h3>
@@ -738,6 +773,12 @@
         real-world reliability is significantly higher.
       </p>
     </div>
+
+    <p>
+      The screenshot below shows the annotation GUI in action: each coloured bar on the
+      timeline is one labelled punch segment, with start and end frames draggable to refine
+      the boundaries.
+    </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/annotation_freestyle.png" subtitle="Figure: Custom annotation GUI with timeline-based segment editing"></image-component>
 
@@ -824,6 +865,12 @@
       </p>
     </div>
 
+    <p>
+      The chart below puts the <em>+4.5% data curation jump</em> next to the deltas from
+      every architecture experiment for direct comparison &mdash; the data fix is visibly
+      larger than the entire architecture-search effort combined.
+    </p>
+
     <image-component tag="image" source="../assets/robot_intelligence/cv/data_quality.svg" subtitle="Figure: Data curation had the largest impact on accuracy &mdash; larger than any architecture change"></image-component>
 
     <h3>Training</h3>
@@ -868,6 +915,12 @@
       voxel X-axis, swapping left/right pose features, and swapping labels (jab&harr;cross, left_hook&harr;right_hook,
       left_uppercut&harr;right_uppercut), effectively doubling the dataset. Other augmentations: speed (0.8-1.2&times;),
       voxel shift/cutout/stretch, multi-window (9, 12 frames).
+    </p>
+
+    <p>
+      The end-to-end pipeline below shows how raw recordings move through annotation,
+      feature extraction (voxel + pose), training on the workstation, and finally TensorRT
+      deployment to the Jetson.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/pipeline.svg" subtitle="Figure: Training and deployment pipeline"></image-component>
@@ -1016,6 +1069,11 @@
         toward the robot, giving millisecond-accurate reaction times.
       </li>
     </ul>
+
+    <p>
+      Both functions read directly off the bounding box and 7 upper-body keypoints shown below
+      &mdash; the same per-frame YOLO output the action model already consumes.
+    </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation — bounding box + 7 upper-body keypoints reused by both human tracking and reaction time detection" width="25%"></image-component>
 

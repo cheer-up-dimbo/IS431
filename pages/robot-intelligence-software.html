@@ -123,10 +123,11 @@
     </table>
 
     <p>
-      The phone dashboard exists because typing on a 7&Prime; touchscreen with boxing gloves
-      is impractical (confirmed during the <a href="robot-intelligence-testing.html">CDE AI Fair</a>),
-      so the phone provides a natural interface for browsing stats, chatting with the AI coach,
-      and configuring training sessions.
+      The phone dashboard exists because typing on a touchscreen with boxing gloves on is
+      impractical &mdash; a friction first confirmed during the
+      <a href="robot-intelligence-testing.html">CDE AI Fair</a> &mdash; so the phone provides
+      a natural interface for browsing stats, chatting with the AI coach, and configuring
+      training sessions.
     </p>
 
     <h3>Connecting from any phone, on any network</h3>
@@ -141,30 +142,33 @@
     <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:12px 16px; margin:14px 0; font-size:0.93rem;">
       <div style="font-weight:600; color:#1b5e20; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #d8ead8;">How the public tunnel works</div>
       <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #d8ead8;">
-        <span style="font-weight:600; color:#1565c0;">Step 1 &mdash;</span>
-        when the dashboard server starts, it opens an outbound SSH connection to
-        <code>localhost.run</code>. The remote service replies with a unique HTTPS subdomain
+        <span style="font-weight:600; color:#1565c0;">Tunnel &mdash;</span>
+        on startup, the dashboard server opens an outbound SSH connection to
+        <code>localhost.run</code>, which returns a unique HTTPS subdomain
         (e.g. <code>9bc224e9279893.lhr.life</code>) that forwards to the Jetson's local port.
       </p>
       <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #d8ead8;">
-        <span style="font-weight:600; color:#1565c0;">Step 2 &mdash;</span>
-        the URL is rendered as a <strong>QR code</strong> in the Jupyter notebook and on the
-        touchscreen GUI. The user scans it with their phone camera and the dashboard opens
-        instantly &mdash; no app install, no IP address, no WiFi password.
+        <span style="font-weight:600; color:#1565c0;">Handoff &mdash;</span>
+        the URL is rendered as a <strong>QR code</strong> on the touchscreen GUI. The user
+        scans it with their phone camera &mdash; no app install, no IP, no password.
       </p>
       <p style="margin:0;">
-        <span style="font-weight:600; color:#1565c0;">Why it matters &mdash;</span>
-        the only requirement is that the Jetson itself has any internet connection (gym WiFi,
-        a phone hotspot, anything). The user's phone can be on a completely different
-        network. This is what turns the dashboard from a local convenience into a
-        feature you can actually demo to anyone, anywhere.
+        <span style="font-weight:600; color:#1565c0;">Net effect &mdash;</span>
+        the only requirement is that the Jetson has internet. The phone can be on any
+        other network, anywhere &mdash; cellular included.
       </p>
     </div>
 
     <p style="font-size:0.92rem; color:#444;">
-      For deployments where outbound internet isn't available, the dashboard also still serves
-      directly over the robot's local WiFi access point as a fallback &mdash; the tunnel
-      layer is opt-in.
+      If outbound internet isn't available the dashboard still serves directly over the
+      robot's local WiFi access point as a fallback &mdash; the tunnel layer is opt-in.
+    </p>
+
+    <p>
+      The diagram below ties all three communication layers together &mdash; phone &harr;
+      backend over HTTP/WebSocket, backend &harr; touchscreen GUI through <code>/tmp/</code>
+      IPC files, and GUI &harr; ROS&nbsp;2 through the QThread bridge &mdash; showing exactly
+      which messages flow where, and which database each side reads from.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/ros/gui_dashboard_comm.svg" subtitle="Figure: GUI &amp; Dashboard Communication Architecture"></image-component>

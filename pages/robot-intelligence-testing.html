@@ -305,6 +305,13 @@
       single biggest design decision in 5.3 traces directly back to a few hours at this fair.
     </p>
 
+    <p>
+      For reference, the three diagrams below show the CDE Fair prototype's internals: the
+      simpler ROS 2 node graph (9 packages versus the final system's 10), the HSV
+      glove-tracking CV pipeline that the Transformer model later replaced, and the state
+      flow of the reaction drill that was used live with public visitors.
+    </p>
+
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; align-items:end;">
       <div>
         <image-component tag="image" source="../assets/robot_intelligence/cde_fair/ros_node_graph.png" subtitle="Figure: CDE Fair — ROS 2 Architecture" width="100%"></image-component>
@@ -484,6 +491,13 @@
     </p>
 
     <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">ros2 launch boxbunny_core boxbunny_dev.launch.py</pre>
+
+    <p>
+      The two screenshots below show the simulator interface: on the left, the manual
+      injection panel for clicking individual pad impacts at any force level; on the right,
+      the preset configuration panel for replaying canned punch sequences against the
+      pipeline.
+    </p>
 
     <div style="display:grid; grid-template-columns:2fr 3fr; gap:16px; margin:16px 0; align-items:center;">
       <div>

@@ -489,6 +489,21 @@
       for (const src of scripts) {
         await loadScript(src);
       }
+
+      // 3. Re-trigger hash scroll AFTER dynamic sections are injected.
+      // The sections are loaded async, so the browser's initial scroll-to-hash
+      // (e.g. #future-work, #discussion) happens before the target element exists
+      // and silently fails. This re-runs it now that the anchor is in the DOM.
+      if (window.location.hash) {
+        const id = decodeURIComponent(window.location.hash.substring(1));
+        // Wait one frame so the browser has finished layout after the script injections
+        requestAnimationFrame(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'auto', block: 'start' });
+          }
+        });
+      }
     }
 
     document.addEventListener('DOMContentLoaded', init);

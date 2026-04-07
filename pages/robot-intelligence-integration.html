@@ -92,6 +92,13 @@
       These fallback paths ensure graceful degradation if either sensor fails.
     </p>
 
+    <p>
+      The pipeline diagram below ties everything together &mdash; CV predictions and IMU pad
+      impacts both flow into the <code>punch_processor</code>'s ring buffer, get matched
+      within the &plusmn;500&nbsp;ms window, pass through the pad-constraint filter, and finally
+      emerge as a confirmed punch event published to the rest of the system.
+    </p>
+
     <image-component tag="image" source="../assets/robot_intelligence/ros/fusion_pipeline.svg" subtitle="Figure: CV + IMU Sensor Fusion Pipeline"></image-component>
 
     <sl-divider></sl-divider>
@@ -737,7 +744,7 @@
       A standalone PySide6 chat GUI (<code>llm_chat_gui.py</code>) was built for iterative
       prompt tuning. It supports streaming token display, model selection, configurable
       system prompts, and sentence completion detection &mdash; used extensively to refine
-      coaching quality before deployment.
+      coaching quality before deployment. The interface is shown below.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>
