@@ -557,8 +557,54 @@
 
     <h3>Recording Infrastructure</h3>
     <p>
-      A custom recording tool captures at 30fps (960&times;540 RGB + 848&times;480 depth) from a D435i mounted at ~1.5m height, 1-2m from the user.
+      A custom recording tool captures from an <strong>Intel RealSense D435i</strong> mounted at ~1.5m height,
+      1&ndash;2m from the user. Footage is recorded at <strong>60fps</strong> (960&times;540 RGB + 848&times;480 depth)
+      and then <strong>downsampled to 30fps</strong> for training. Capturing at 60fps keeps each frame sharp by
+      reducing motion blur during fast punches, while sampling down to 30fps gives the model enough temporal
+      information to learn the motion without doubling the data and compute cost &mdash; the best of both.
     </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+      <tbody>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:200px;">Depth technology</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">Active stereo IR with built-in projector (works in low light, struggles in direct sunlight)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Depth resolution / FPS</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">Up to 1280&times;720 @ 90fps (project records 848&times;480 @ 60fps, downsampled to 30fps for training)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">RGB resolution / FPS</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">Up to 1920&times;1080 @ 30fps (project records 960&times;540 @ 60fps to match depth alignment, downsampled to 30fps)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Depth range / accuracy</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">~0.3&ndash;3m usable; ~&plusmn;2% error at 2m &mdash; comfortably within the 1&ndash;2m boxing distance</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Field of view (depth)</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">87&deg; &times; 58&deg; &mdash; wide enough to capture the full upper body at 1m</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Built-in IMU</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">6-axis (BMI055) &mdash; not used in this project (Tegra kernel module unavailable on Jetson, see <a href="robot-intelligence-testing.html">limitations</a>); pad IMUs handle motion sensing instead</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Interface</td>
+          <td style="padding:8px 12px; border:1px solid #ddd;">USB 3.0, single cable to Jetson</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="video-row two-up">
+      <div class="video-box" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/realsense_d435i.webp" subtitle="Figure: Intel RealSense D435i depth camera" width="80%"></image-component>
+      </div>
+      <div class="video-box">
+        <image-component tag="image" source="../assets/robot_intelligence/cv/camera_stand.jpg" subtitle="Figure: Adjustable camera stand used to mount the D435i during recording" width="100%"></image-component>
+      </div>
+    </div>
 
     <p>
       <strong>Critical pipeline fix:</strong> Early recordings silently dropped depth frames (~15fps actual vs 30fps expected)
@@ -571,18 +617,29 @@
 
     <h3>Annotation</h3>
     <p>
-      A custom timeline-based annotation tool (<code>annotate_punches_gui.py</code>) with drag-to-resize segments and
-      auto-save every 30 seconds. Punch segments span from the first preparatory cue (shoulder drop, hip rotation)
-      to full extension &mdash; retraction is excluded because it looks similar across punch types.
+      A custom <strong>timeline-based annotation tool</strong> (<code>annotate_punches_gui.py</code>) with drag-to-resize segments and
+      <strong>auto-save every 30 seconds</strong>. Punch segments span from the <strong>first preparatory cue</strong> (shoulder drop, hip rotation)
+      to <strong>full extension</strong> &mdash; <strong>retraction is excluded</strong> because it looks similar across punch types.
     </p>
 
     <p>
-      <strong>Block annotation fix:</strong> Initially, block annotations covered only the onset (arms rising). This made
-      block onset indistinguishable from uppercut onset, hurting live inference. Extending annotations to cover the full
-      guard sequence (rise, hold, return) dramatically improved live block detection &mdash; v10 had 97.3% validation accuracy
-      but poor live blocks; v11 had 96.8% validation but substantially better live performance due to this fix alone.
-      Block accuracy remains the lowest at 66.7% in validation due to having only 6 samples (the smallest class),
-      but its real-world usability improved significantly with the annotation change.
+      Almost all of the dataset was annotated <strong>manually by me</strong>, and across the project I easily annotated
+      <strong>thousands of segments</strong>. Every time something was wrong &mdash; a new camera angle, a different recording
+      setup, a labelling-scheme change &mdash; days of footage had to be re-recorded and re-annotated from scratch.
+      Building this GUI was essential to making that loop survivable: keyboard-driven labelling, drag-to-resize,
+      segment shortcuts, and auto-save turned what would have been a hopelessly slow process into something that
+      could keep up with the iteration pace of the rest of the project.
+    </p>
+
+    <p>
+      <strong>Block annotation fix:</strong> Originally, block annotations covered <strong>only the onset</strong>
+      (arms rising into guard). This caused two live failures: the rising motion looked like an <strong>uppercut</strong>,
+      and once the user held the guard the model had never seen that pose &mdash; so predictions
+      <strong>drifted to idle</strong>. The fix was to annotate the <strong>full guard sequence (rise, hold, return)</strong>
+      so the model learns every phase of a block. Validation accuracy stayed effectively the same
+      (v10: 97.3%, v11: 96.8%), but live block detection improved dramatically &mdash; the gain came entirely
+      from the annotation change, not the model. Block remains the lowest class at <strong>66.7%</strong> validation
+      accuracy as the smallest class, but its <strong>real-world reliability</strong> improved significantly.
     </p>
 
     <image-component tag="image" source="../assets/robot_intelligence/cv/annotation_freestyle.png" subtitle="Figure: Custom annotation GUI with timeline-based segment editing"></image-component>
@@ -590,8 +647,8 @@
     <h3>Dataset</h3>
     <p>
       The dataset uses a <strong>leave-one-person-out</strong> validation strategy &mdash; the model is
-      trained on data from two people and validated on a completely unseen third person. This directly
-      tests whether the model generalises to new users (the real deployment requirement) rather than
+      trained on data from <strong>two people</strong> and validated on a <strong>completely unseen third person</strong>. This directly
+      tests whether the model <strong>generalises to new users</strong> (the real deployment requirement) rather than
       memorising individual movement patterns.
     </p>
 
@@ -627,8 +684,18 @@
     </table>
 
     <p>
-      8 action classes across all splits. Class imbalance (block is smallest) mitigated with
-      class-balanced sampling per epoch and focal loss (&gamma;=1.5).
+      <strong>8 action classes</strong> across all splits. <strong>Class imbalance</strong> (block is smallest) mitigated with
+      <strong>class-balanced sampling</strong> (each epoch sees roughly equal numbers of every class) and <strong>focal loss</strong> (&gamma;=1.5 &mdash; a loss function that down-weights easy examples so the model focuses on rare/hard ones).
+    </p>
+
+    <p>
+      <strong>Small dataset, big constraint:</strong> Although more people contributed footage, only <strong>three of us had enough boxing experience</strong>
+      to produce consistent technique &mdash; so the usable dataset came down to three subjects. With so few,
+      each person's individual quirks became an outsized signal, the leave-one-person-out split left just a
+      <strong>single unseen subject</strong> for validation, and rare classes like block ended up with only a handful of segments.
+      That the model still reaches <strong>97.3% validation accuracy</strong> under these conditions shows the approach is working &mdash;
+      and points to clear headroom: a <strong>larger, more diverse dataset</strong> from <strong>experienced boxers</strong> with cleaner technique
+      would unlock better generalisation, more reliable rare-class detection, and room for deeper architectures the current data cannot support.
     </p>
 
     <p>

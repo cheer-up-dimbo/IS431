@@ -54,7 +54,9 @@
 
     <p>
       The deployed model (v11) achieves <strong>96.8% validation accuracy</strong> on an unseen person
-      and <strong>94.2% macro F1-score</strong>, with only 7 out of 222 samples misclassified. Model v10
+      and <strong>94.2% macro F1-score</strong> (the average F1 across classes, treating each class
+      equally regardless of size &mdash; a fairer measure than accuracy when classes are imbalanced),
+      with only 7 out of 222 samples misclassified. Model v10
       reached 97.3% but had poorer live block detection, so v11 was selected for deployment.
     </p>
 
@@ -103,7 +105,9 @@
 
     <p>
       To understand what the model has learned internally, its high-dimensional representations
-      (384 dimensions) are compressed to 2D using a technique called t-SNE. Each dot represents
+      (384 dimensions) are compressed to 2D using a technique called t-SNE (t-distributed Stochastic
+      Neighbour Embedding &mdash; a dimensionality-reduction method that preserves local similarity,
+      so points close together in the original space stay close in 2D). Each dot represents
       one punch sample, coloured by its true class. If the model has learned meaningful features,
       samples of the same punch type should cluster together and different types should be
       separated. The plot below confirms this &mdash; tight, well-separated clusters for each
@@ -116,8 +120,9 @@
     <h3>Which Frames Matter Most</h3>
 
     <p>
-      Gradient saliency reveals how much each frame in the 12-frame window contributes to the
-      model's prediction. The chart below shows a clear pattern: <strong>later frames are
+      Gradient saliency (a technique that measures how much the model's output changes with respect
+      to each input, indicating which parts the model relied on most) reveals how much each frame in
+      the 12-frame window contributes to the model's prediction. The chart below shows a clear pattern: <strong>later frames are
       significantly more important than early ones</strong>. The most recent frame (index 11)
       has the highest importance, with frames 6&ndash;9 also scoring high. This makes intuitive
       sense &mdash; the most recent motion contains the strongest signal about what punch is
@@ -138,8 +143,8 @@
       BoxBunny was deployed at the "Robotics Meets AI Showcase" in late January 2025 for public
       interaction. From a Robot Intelligence perspective, the key context is that the
       Transformer-based action prediction model was not yet ready &mdash; instead, a simpler
-      HSV colour-based glove tracking system was implemented, requiring users to wear red and
-      green gloves. The prototype ran 9 ROS 2 packages with 3 drill modes.
+      HSV (Hue-Saturation-Value, a colour space that separates colour from brightness) colour-based
+      glove tracking system was implemented, requiring users to wear red and green gloves. The prototype ran 9 ROS 2 packages with 3 drill modes.
     </p>
 
     <p>
@@ -233,7 +238,7 @@
           <td style="padding:8px; border:1px solid #ddd;"><strong>Unit Tests</strong></td>
           <td style="padding:8px; border:1px solid #ddd; text-align:center;">146</td>
           <td style="padding:8px; border:1px solid #ddd;">Individual components: sensor fusion logic, gamification rules, database operations</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">pytest</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">pytest (Python's standard test framework)</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;"><strong>Integration Tests</strong></td>
