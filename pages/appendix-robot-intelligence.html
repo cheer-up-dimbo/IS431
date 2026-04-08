@@ -134,7 +134,7 @@
           <td style="padding:8px; border:1px solid #ddd; text-align:center;">6</td>
           <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Colour Tracking</strong></td>
           <td style="padding:8px; border:1px solid #ddd;">1,749 dims/frame: 12&sup3; voxel delta + optical flow + glove colour tracking (18 dims). VoxelFlowModel (~1.2M): Conv3D + MLP branches, concatenation fusion.</td>
-          <td style="padding:8px; border:1px solid #ddd;">~68%. <span style="color:#c62828;">Required coloured gloves. HSV unreliable.</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
+          <td style="padding:8px; border:1px solid #ddd;">~96%. <span style="color:#c62828;">Required coloured gloves. HSV unreliable in variable lighting.</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd; text-align:center;">7</td>
@@ -152,7 +152,7 @@
           <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>8</strong></td>
           <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Pose Fusion</strong></td>
           <td style="padding:8px; border:1px solid #ddd;">3,480 dims/frame: 12&sup3; &times; 2ch voxel (3,456) + 24-dim YOLO pose. Gradients removed (5&times; reduction). Confidence gating, pose dropout (30% clip + 20% joint).</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">97.3% &mdash; Breakthrough.</strong> L/R confusion eliminated. Full circle &mdash; pose returned.</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">97.3% &mdash; Breakthrough.</strong> L/R confusion eliminated. Crucially, this also unlocked <strong>glove-agnostic deployment</strong> &mdash; YOLO Pose locates wrists visually, so the model now works with any boxing gloves (or even bare hands), without the iter 6 constraint of needing red/green colour markers. Full circle &mdash; pose returned.</td>
         </tr>
         <tr style="background:#e8f5e9;">
           <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>9</strong></td>

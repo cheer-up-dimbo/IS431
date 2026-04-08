@@ -31,6 +31,23 @@
       padding-top: 0;
       border-top: none;
     }
+    /* Strong visual break between MAIN sections */
+    .content sl-divider {
+      --width: 3px;
+      --color: #2e7d32;
+      margin: 56px 0 36px !important;
+      border-radius: 2px;
+    }
+    /* Bigger, bolder H2 main-section headings */
+    .content > h2,
+    .content > div > h2 {
+      font-size: 1.7rem !important;
+      color: #1b5e20 !important;
+      letter-spacing: -0.3px;
+    }
+    .content > div:has(> h2) {
+      padding-top: 4px;
+    }
   </style>
 </head>
 <body>

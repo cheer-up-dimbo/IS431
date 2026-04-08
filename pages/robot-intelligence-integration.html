@@ -15,6 +15,7 @@
   <script src="../components/svg-zoom/svg-zoom.js" defer></script>
   <style>
     .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
+
     /* Subtle separation between H3 sub-topics under each H2 numbered section */
     .content h3 {
       margin-top: 36px;
@@ -26,6 +27,25 @@
       margin-top: 16px;
       padding-top: 0;
       border-top: none;
+    }
+
+    /* Strong visual break between MAIN sections (5.3.2.1, 5.3.2.2, ...) */
+    .content sl-divider {
+      --width: 3px;
+      --color: #2e7d32;
+      margin: 56px 0 36px !important;
+      border-radius: 2px;
+    }
+    /* Bigger, bolder H2 main-section headings */
+    .content > h2,
+    .content > div > h2 {
+      font-size: 1.7rem !important;
+      color: #1b5e20 !important;
+      letter-spacing: -0.3px;
+    }
+    /* Tag the H2 wrapper divs (the ones containing an H2 + badge) with extra top padding */
+    .content > div:has(> h2) {
+      padding-top: 4px;
     }
   </style>
 </head>
@@ -60,37 +80,52 @@
     </div>
 
     <p>
-      The <strong>punch_processor</strong> node fuses computer vision predictions with IMU pad impact data
-      to produce confirmed punch events.
+      The CV model on its own says <em>"the user just threw a left hook"</em>. The IMU pad on its
+      own says <em>"something hit me hard"</em>. Neither is enough &mdash; CV can hallucinate
+      punches into thin air, and the IMU can't tell a hook from a cross. The
+      <strong>punch_processor</strong> node fuses the two into <em>confirmed</em> punch events
+      using three layers of logic: temporal matching, biomechanical filtering, and graceful
+      fallback when one sensor fails.
     </p>
 
-    <h3>Fusion Algorithm</h3>
+    <h3>1. Temporal matching &mdash; lining up CV and IMU in time</h3>
     <p>
-      When an IMU pad impact exceeds 5.0 m/s&sup2; (after gravity calibration), the node queries the CV
-      prediction ring buffer within a &pm;500ms window. Frame-count voting selects the dominant prediction
-      type, and the result is emitted as a confirmed punch with both CV confidence and IMU force data.
+      When an IMU pad impact exceeds 5.0&nbsp;m/s&sup2; (after gravity calibration), the node
+      queries the CV prediction ring buffer within a <strong>&plusmn;500&nbsp;ms</strong>
+      window centred on the impact timestamp. Frame-count voting selects the dominant
+      prediction type within that window, and the result is emitted as a confirmed punch
+      carrying both the CV confidence and the IMU force.
     </p>
 
-    <h3>Pad-Constraint Filtering</h3>
-    <p>Each pad accepts only biomechanically valid punch types:</p>
+    <h3>2. Pad-constraint filtering &mdash; rejecting biomechanically impossible matches</h3>
+    <p>
+      Even with a clean temporal match, some CV predictions are physically impossible &mdash;
+      a left hook cannot land on the right pad. Each pad therefore only accepts the punch
+      types that could biomechanically reach it:
+    </p>
     <ul>
-      <li><strong>Centre pad</strong> — jab and cross only</li>
-      <li><strong>Left pad</strong> — left hook and left uppercut only</li>
-      <li><strong>Right pad</strong> — right hook and right uppercut only</li>
-      <li><strong>Head pad</strong> — any punch type</li>
+      <li><strong>Centre pad</strong> &mdash; jab and cross only</li>
+      <li><strong>Left pad</strong> &mdash; left hook and left uppercut only</li>
+      <li><strong>Right pad</strong> &mdash; right hook and right uppercut only</li>
+      <li><strong>Head pad</strong> &mdash; any punch type</li>
     </ul>
     <p>
-      If the primary CV prediction violates the constraint, secondary predictions are checked with a minimum
-      confidence threshold of 0.25.
+      If the primary CV prediction violates this constraint, secondary predictions are checked
+      against the same rules with a minimum confidence threshold of 0.25 &mdash; this is what
+      catches the model's retraction-phase wobble that
+      <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a> refers to.
     </p>
 
-    <h3>Fallbacks</h3>
+    <h3>3. Fallbacks &mdash; graceful degradation when one sensor fails</h3>
     <p>
-      <strong>CV-only mode:</strong> &ge;3 consecutive frames at &ge;0.6 confidence, emitted with a 0.3
-      penalty.<br>
-      <strong>IMU-only mode:</strong> default 0.3 confidence, punch type inferred from pad location.<br>
-      These fallback paths ensure graceful degradation if either sensor fails.
+      Both layers above assume CV and IMU are both producing usable data. When one of them
+      fails &mdash; the camera obscured, a pad disconnected &mdash; the node still emits a
+      best-effort punch event so downstream nodes never starve:
     </p>
+    <ul>
+      <li><strong>CV-only mode:</strong> &ge;3 consecutive frames at &ge;0.6 confidence, emitted with a 0.3 penalty</li>
+      <li><strong>IMU-only mode:</strong> default 0.3 confidence, punch type inferred from pad location</li>
+    </ul>
 
     <p>
       The pipeline diagram below ties everything together &mdash; CV predictions and IMU pad
@@ -109,7 +144,15 @@
       <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-5</sl-badge>
     </div>
 
-    <h3>FPS Sensitivity &mdash; Why 30fps Matters</h3>
+    <p>
+      Getting the action model from <em>"works on a recorded clip"</em> to <em>"works live
+      on the robot"</em> required four things in sequence: a frame rate the model could
+      trust, enough per-frame compute to actually hit it, output that didn't flicker between
+      classes, and a resource budget that left room for the LLM coach to run on the same GPU.
+      Each subsection below tackles one of those four problems, in order.
+    </p>
+
+    <h3>1. Frame rate &mdash; why 30fps matters</h3>
     <p>
       The action prediction model was trained on features extracted at a consistent 30fps. Its voxel
       temporal deltas use 2-frame (67ms) and 8-frame (267ms) lookbacks &mdash; if the actual frame rate
@@ -119,7 +162,12 @@
       predictions significantly.
     </p>
 
-    <h3>The YOLO Bottleneck &mdash; TensorRT Conversion</h3>
+    <h3>2. Per-frame compute &mdash; the YOLO bottleneck</h3>
+    <p>
+      Knowing 30fps was non-negotiable, the next question was whether the pipeline could
+      actually hit it on the Jetson. The answer at first was no &mdash; and the bottleneck
+      was a single component:
+    </p>
 
     <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
       <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">YOLO bottleneck on the Jetson</div>
@@ -278,10 +326,10 @@
     </p>
     </div>
 
-    <h3>Offline &rarr; Live Inference Gap</h3>
-    <p>
-      Beyond the YOLO bottleneck, three more issues had to be solved before the offline
-      accuracy translated into live performance:
+    <h4 style="margin-top:24px;">Three more compute-side issues</h4>
+    <p style="font-size:0.94rem; color:#444;">
+      The TensorRT speedup got the per-frame budget under control, but three secondary
+      issues stood between offline accuracy and live performance:
     </p>
 
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;">
@@ -302,7 +350,11 @@
       </div>
     </div>
 
-    <h3>Latency Breakdown</h3>
+    <h4 style="margin-top:24px;">Final per-frame budget</h4>
+    <p style="font-size:0.94rem; color:#444;">
+      With the TensorRT speedup and the three compute fixes in place, here is what a single
+      frame actually costs end-to-end:
+    </p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
@@ -350,11 +402,13 @@
       <a href="robot-intelligence-testing.html">5.3.4.7</a>.
     </p>
 
-    <h3>Post-Processing</h3>
+    <h3>3. Output stability &mdash; cleaning up noisy predictions</h3>
     <p>
-      Raw model outputs are noisy frame to frame &mdash; the same punch can flicker between
-      classes for a few frames at a time. Three stages clean this up before the result is
-      published as a confirmed prediction:
+      A stable 30fps gets the model the inputs it expects, but the <em>outputs</em> still
+      need work. Even on perfectly clean frames, the model's per-frame top class can
+      flicker between two similar punches for a few frames at a time. Publishing every
+      raw prediction would generate spurious events, so three filtering stages stand
+      between the model and the rest of the system:
     </p>
     <dl style="margin:12px 0; line-height:1.55;">
       <dt style="font-weight:600; color:#1565c0;">EMA smoothing &mdash; <span style="font-weight:400; color:#555;">&alpha; = 0.35</span></dt>
@@ -367,13 +421,25 @@
       <dd style="margin:2px 0 0 18px;">A class must hold for at least 2 frames at &ge;0.78 confidence before it is committed, and 3 more frames to stay committed. Block requires 4 consecutive frames because of its biomechanical similarity to uppercut onset.</dd>
     </dl>
 
-    <h3>Adaptive Frame Rate</h3>
+    <h3>4. Resource sharing &mdash; coexisting with the LLM</h3>
     <p>
-      The <strong>cv_node</strong> runs at 30fps during active sessions but drops to ~6fps when idle,
-      freeing GPU headroom for LLM inference during rest periods.
+      Frame rate, compute, and output stability all assume the CV pipeline owns the GPU.
+      In practice it shares the Jetson with the LLM coach, the touchscreen GUI, and the
+      ROS messaging layer. Two mechanisms keep them out of each other's way:
     </p>
 
-    <h3>GPU Memory</h3>
+    <p>
+      <strong>Adaptive frame rate.</strong> The <code>cv_node</code> runs at the full
+      30&nbsp;fps only during <em>active</em> training sessions. Outside of active rounds
+      &mdash; idle, countdown, rest periods &mdash; it drops to ~6&nbsp;fps, freeing the
+      GPU for LLM inference exactly when the user is reading a coaching tip rather than
+      throwing punches.
+    </p>
+
+    <p>
+      <strong>Static memory budget.</strong> Every model that runs on the Jetson has a
+      known memory footprint. The combined budget below has been measured under live load:
+    </p>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
@@ -406,6 +472,15 @@
       </tbody>
     </table>
 
+    <p style="font-size:0.92rem; color:#444;">
+      The combined footprint sits comfortably below the Jetson's 16&nbsp;GB ceiling, leaving
+      headroom for upgrades like a larger LLM (see
+      <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>). With frame rate,
+      compute, output stability, and resource sharing all handled, the action model now
+      runs reliably in real time &mdash; the foundation that the rest of this section builds
+      on top of.
+    </p>
+
     <sl-divider></sl-divider>
 
     <!-- 5.3.2.3 AI SPARRING ENGINE -->
@@ -418,15 +493,17 @@
       The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
       their first-order Markov chain combo generation &mdash; including the transition matrix
       worked example and the weakness-blending alpha &mdash; are introduced in
-      <a href="gui.html">Section 5.1 GUI</a> and detailed in
-      <a href="gui/implementation.html">5.1 Implementation</a>. This section covers the
-      <em>ROS-side execution</em> that turns those style definitions into live robot behaviour:
-      how the <strong>sparring_engine</strong> node paces attacks, scales difficulty, persists
-      a weakness profile across sessions, classifies the user's defensive response, and stays in
-      sync with the rest of the system through the session state machine.
+      <a href="gui.html">Section 5.1 GUI</a>. This section covers the
+      <em>ROS-side execution</em> that turns those style definitions into live robot behaviour.
+      The <strong>sparring_engine</strong> node has to do five things in a loop, every round,
+      for every opponent style: <strong>pace attacks</strong> at the right intensity,
+      <strong>adapt</strong> to the user's weak areas, <strong>stay safe</strong> when something
+      else in the system goes wrong, <strong>read the user's response</strong> to each strike,
+      and provide a simpler <strong>reactive mode</strong> for unstructured practice. Each
+      subsection below covers one of those five jobs.
     </p>
 
-    <h3>Difficulty Scaling (3 levels)</h3>
+    <h3>1. Pacing attacks &mdash; difficulty scaling</h3>
 
     <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
       <thead>
@@ -459,17 +536,21 @@
       </tbody>
     </table>
 
-    <h3>Weakness Tracking</h3>
+    <h3>2. Adapting to the user &mdash; weakness tracking</h3>
     <p>
-      The <strong>sparring_weakness_profile</strong> table persistently tracks per-punch-type defence success
-      rates across sessions. The AI biases attacks toward punch types where the user has the lowest defence
-      rate, forcing continuous improvement on weak areas.
+      Difficulty levels alone make sparring harder; they don't make it <em>smarter</em>.
+      The <strong>sparring_weakness_profile</strong> table persistently tracks the user's
+      per-punch-type defence success rate across sessions, and the engine biases attacks
+      toward whichever punches the user has been worst at defending against. Over time the
+      robot stops feeding the user openings they already handle well and concentrates on
+      the gaps &mdash; forcing continuous improvement instead of comfortable repetition.
     </p>
 
-    <h3>Engine Safeguards</h3>
+    <h3>3. Staying safe &mdash; engine safeguards</h3>
     <p>
-      Four runtime safeguards keep the engine safe and adaptive when something elsewhere in
-      the system goes wrong:
+      A relentless attack engine that doesn't know when to stop is dangerous &mdash; both
+      to the user and to the motors. Four runtime safeguards keep the engine safe and
+      well-behaved when something elsewhere in the system goes wrong:
     </p>
 
     <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
@@ -491,11 +572,13 @@
       </div>
     </div>
 
-    <h3>Defence Detection</h3>
+    <h3>4. Reading the user's response &mdash; defence detection</h3>
     <p>
-      When the robot attacks during sparring, the system must determine how the user responded.
-      Each robot punch opens a 500ms detection window, during which the <strong>punch_processor</strong>
-      classifies the user's response using a priority-based system:
+      The weakness profile from #2 only works if the engine actually knows whether the user
+      <em>defended</em> a strike or got hit by it. Every time the robot throws a punch, a
+      500&nbsp;ms detection window opens and the <strong>punch_processor</strong> classifies
+      the user's response using a priority-based system &mdash; physical contact wins over
+      visual cues, but visual cues catch the cases where the user dodged cleanly:
     </p>
 
     <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
@@ -541,11 +624,14 @@
       in future sessions.
     </p>
 
-    <h3>Free Training Mode</h3>
+    <h3>5. Reactive mode &mdash; free training</h3>
     <p>
-      An unstructured practice mode where the robot reacts to the user's punches rather
-      than following a scripted sequence. When the user hits a pad, the robot responds with
-      a contextually appropriate counter-punch:
+      Sparring mode is structured: the robot drives, the user defends. <strong>Free training</strong>
+      flips the loop &mdash; the user drives, the robot reacts. Whenever the user hits a pad,
+      the robot fires back a contextually appropriate counter-punch instead of following
+      a scripted sequence. This is the simplest engine in the section because there's no
+      Markov chain, no weakness profile, and no difficulty scaling &mdash; just a pad-to-counter
+      mapping:
     </p>
 
     <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
@@ -589,12 +675,14 @@
     </div>
 
     <p>
-      A local AI coach runs entirely on the Jetson &mdash; no cloud, no internet &mdash; providing
-      personalised boxing guidance in three modes: real-time tips during training, post-session
-      analysis, and interactive chat via the phone dashboard.
+      A local AI coach runs entirely on the Jetson &mdash; no cloud, no internet. Building one
+      that's actually useful inside a real-time boxing system means answering four questions
+      in order: <strong>why local at all</strong>, <strong>which model fits</strong>,
+      <strong>how to make it sound like a coach</strong>, and <strong>what happens when it
+      fails</strong>. The four subsections below tackle each in turn.
     </p>
 
-    <h3>Why Local LLM?</h3>
+    <h3>1. Why local? &mdash; the constraint that shapes everything else</h3>
     <p>
       Cloud-based AI coaching would add network latency and require stable internet, neither
       of which is guaranteed in a gym environment. Running the LLM on-device addresses three
@@ -617,11 +705,11 @@
     </div>
 
     <p>
-      The challenge then became fitting a capable language model alongside the CV pipeline
-      within the Jetson's 16&nbsp;GB shared memory.
+      Committing to local raises the obvious follow-up: which model is small enough to fit
+      alongside the CV pipeline on the Jetson but capable enough to actually coach?
     </p>
 
-    <h3>Model Selection &amp; Deployment</h3>
+    <h3>2. Which model fits? &mdash; selection &amp; deployment</h3>
 
     <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
       <tbody>
@@ -652,7 +740,12 @@
       </tbody>
     </table>
 
-    <h3>Three Coaching Modes</h3>
+    <h4 style="margin-top:24px;">When does the coach actually speak?</h4>
+    <p style="font-size:0.94rem; color:#444;">
+      Picking Qwen2.5-3B answers the &ldquo;what runs&rdquo; question, but a model loaded in
+      memory is just an idle model. The engine wakes the LLM in three different situations,
+      each with its own context payload and output style:
+    </p>
 
     <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
       <thead>
@@ -689,20 +782,29 @@
       interface and demonstrate the flexibility of the system prompt approach.
     </p>
 
-    <h3>System Prompt Design</h3>
+    <h3>3. Sounding like a coach &mdash; prompt, parameters, and knowledge base</h3>
     <p>
-      A 24-line embedded system prompt instructs the model to act as "BoxBunny AI Coach" with
-      knowledge of all 6 punch types and their codes, 5 boxing styles (European, Russian,
-      American, Cuban, hybrid), and AIBA methodology (AIBA, 2015). The prompt enforces plain text output
-      (no markdown formatting) and adjusts advice depth to the user's skill level
-      (beginner/intermediate/advanced). Different system prompt keys are used for each of
-      the three coaching modes.
+      A general-purpose 3B model doesn't know boxing out of the box and doesn't sound like
+      a coach unless you tell it to. Three pieces of configuration shape its voice and its
+      domain expertise: a system prompt that defines its persona, a tuned parameter set
+      that balances quality against the real-time loop, and a curated knowledge base that
+      grounds its advice in real boxing technique.
     </p>
 
-    <h3>Inference Parameters &amp; Tuning</h3>
+    <h4 style="margin-top:18px;">System prompt</h4>
     <p>
-      The following parameters were tuned during development to balance response quality,
-      speed, and coherence:
+      A 24-line embedded system prompt instructs the model to act as &ldquo;BoxBunny AI Coach&rdquo;
+      with knowledge of all 6 punch types and their codes, 5 boxing styles (European, Russian,
+      American, Cuban, hybrid), and AIBA methodology (AIBA, 2015). The prompt enforces plain
+      text output (no markdown formatting) and adjusts advice depth to the user's skill
+      level (beginner / intermediate / advanced). Different system prompt keys are used for
+      each of the three coaching modes above.
+    </p>
+
+    <h4 style="margin-top:18px;">Inference parameters</h4>
+    <p>
+      Each parameter below was tuned during development to balance response quality, speed,
+      and the real-time constraint that the LLM cannot block the rest of the system:
     </p>
 
     <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
@@ -751,10 +853,12 @@
 
     <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>
 
-    <h3>Boxing Knowledge Base</h3>
+    <h4 style="margin-top:18px;">Boxing knowledge base</h4>
     <p>
-      To ground the LLM's responses in real boxing expertise, 17 documents are injected into its
-      context during coaching analysis:
+      The system prompt and parameters tell the model <em>how</em> to talk; the knowledge
+      base tells it <em>what</em> to talk about. 17 documents are injected into the context
+      during coaching analysis so the LLM's advice is grounded in real boxing expertise
+      rather than general-purpose hallucination:
     </p>
 
     <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
@@ -799,10 +903,12 @@
       </tbody>
     </table>
 
-    <h3>Reliability &amp; Fallback</h3>
+    <h3>4. What if it fails? &mdash; reliability and fallback</h3>
     <p>
-      Four layers of defence ensure the coach never fails silently &mdash; the user always
-      sees something useful, even if the LLM hangs, the model is missing, or GPU memory runs out.
+      Everything above describes the coach when it works. The harder problem is what happens
+      when it <em>doesn't</em> &mdash; the LLM hangs under GPU contention, the model file is
+      missing, generation runs out of memory mid-response. Four layers of defence ensure the
+      user always sees something useful instead of an error or a dead UI:
     </p>
 
     <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
@@ -823,6 +929,13 @@
         <div style="font-size:0.9rem; margin-top:6px; color:#555;">The system tracks consecutive failures and attempts a model reload after 3 failures in a row &mdash; transient GPU contention recovers itself without intervention.</div>
       </div>
     </div>
+
+    <p style="font-size:0.92rem; color:#444;">
+      Together the four steps above &mdash; constraint, model selection, voice, and fallback
+      &mdash; turn a generic 3B LLM into a domain-specific coach that streams useful tips to
+      the user during real training sessions, on a single Jetson, with no internet, and
+      degrades gracefully when anything goes wrong.
+    </p>
 
     <sl-divider></sl-divider>
 

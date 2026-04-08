@@ -68,6 +68,23 @@
       padding-top: 0;
       border-top: none;
     }
+    /* Strong visual break between MAIN sections */
+    .content sl-divider {
+      --width: 3px;
+      --color: #2e7d32;
+      margin: 56px 0 36px !important;
+      border-radius: 2px;
+    }
+    /* Bigger, bolder H2 main-section headings */
+    .content > h2,
+    .content > div > h2 {
+      font-size: 1.7rem !important;
+      color: #1b5e20 !important;
+      letter-spacing: -0.3px;
+    }
+    .content > div:has(> h2) {
+      padding-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -401,8 +418,8 @@
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">3</td>
           <td style="padding:8px; border:1px solid #ddd;">Raw RGBD + 3D CNNs (Swin3D, 88M params)</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">&mdash;</td>
-          <td style="padding:8px; border:1px solid #ddd;">Model too large for edge hardware.</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">87.2%</td>
+          <td style="padding:8px; border:1px solid #ddd;">Strong recognition accuracy, but model was far too large for edge hardware and required Colab to train.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">4</td>
@@ -419,8 +436,8 @@
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">6</td>
           <td style="padding:8px; border:1px solid #ddd;">Voxel + Colour Tracking</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">~68%</td>
-          <td style="padding:8px; border:1px solid #ddd;">Required coloured gloves (red/green). HSV tracking unreliable in variable lighting.</td>
+          <td style="padding:8px; border:1px solid #ddd; text-align:center;">~96%</td>
+          <td style="padding:8px; border:1px solid #ddd;">Worked well in offline tests, but required users to wear red/green gloves. HSV tracking proved unreliable in variable lighting and impractical to deploy.</td>
         </tr>
         <tr>
           <td style="padding:8px; border:1px solid #ddd;">7</td>
@@ -432,7 +449,7 @@
           <td style="padding:8px; border:1px solid #ddd;"><strong>8</strong></td>
           <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Pose Fusion</strong></td>
           <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>97.3%</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Breakthrough.</strong> Pose eliminated left/right confusion completely. Full circle — pose returned.</td>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Breakthrough.</strong> Pose eliminated left/right confusion completely &mdash; and unlike iter 6, the model now works with <strong>any boxing gloves</strong> (or even bare hands), since YOLO Pose locates the wrist joint visually rather than tracking a specific colour. Full circle &mdash; pose returned.</td>
         </tr>
         <tr style="background:#e8f5e9;">
           <td style="padding:8px; border:1px solid #ddd;"><strong>9</strong></td>
@@ -492,7 +509,7 @@
           </div>
           <div style="text-align:center; color:#999; padding:2px 0;">&darr;</div>
           <div style="padding:8px 12px; background:#f5f5f5; border-radius:6px; border-left:3px solid #2e7d32; margin-bottom:6px;">
-            <strong>6. Voxel + Colour</strong> (~68%)<br>
+            <strong>6. Voxel + Colour</strong> (~96%)<br>
             <span style="color:#c62828;">&cross; Impractical coloured gloves</span><br>
             <span style="color:#e65100;">&#9733; Insight: voxels need hand info</span>
           </div>
@@ -516,7 +533,8 @@
       <!-- MERGED RESULT -->
       <div style="padding:12px 16px; background:#e8f5e9; border:2px solid #2e7d32; border-radius:8px; text-align:center;">
         <strong style="font-size:1rem;">8. Voxel + Pose Fusion &mdash; 97.3%</strong><br>
-        <span>Pose solves left/right confusion. Voxels capture 3D motion. Full circle.</span>
+        <span>Pose solves left/right confusion. Voxels capture 3D motion. Full circle.</span><br>
+        <span style="font-size:0.86rem; color:#1b5e20; font-style:italic;">Works with any boxing gloves &mdash; no coloured gloves required, since YOLO finds the wrist visually.</span>
       </div>
       <div style="text-align:center; color:#999; padding:4px 0;">&darr;</div>
       <div style="padding:12px 16px; background:#e8f5e9; border:2px solid #1b5e20; border-radius:8px; text-align:center;">
@@ -575,31 +593,34 @@
 
     <h3>Inference Results Across Iterations</h3>
     <p>
-      The videos below show the most promising inference results from key iterations, each revealing
-      specific limitations that drove the next approach. (<strong>Colab</strong> = Google
-      Colab, a cloud-hosted Jupyter notebook that provides a free GPU for ML training; the
-      RGBD model was too large to train on a laptop, so it had to live there.)
+      The videos below show the most promising inference results from key iterations, each
+      revealing specific limitations that drove the next approach. The earliest of them &mdash;
+      the RGBD model from iterations 3&ndash;4 &mdash; was so large it had to be trained on
+      <strong>Google Colab</strong> rather than a local laptop, since the laptop GPU couldn't
+      fit it. (<em>Colab is a cloud-hosted Jupyter notebook that provides a free GPU for ML
+      training</em>.)
     </p>
 
     <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:12px 0; font-size:0.92rem; color:#5d4037;">
       <strong>Important &mdash; recognition vs. prediction.</strong> The two videos below
       are doing <em>different</em> tasks. The RGBD model on the left is offline action
       <strong>recognition</strong>: it watches the whole clip and labels it after the fact,
-      with full bidirectional context. That's why its labels look so accurate &mdash; but it
-      can't react to a punch in progress and is far too slow for real-time use. The voxel +
-      colour tracking model on the right is true real-time action <strong>prediction</strong>,
-      classifying each frame as the motion unfolds &mdash; the same task the final deployed
-      model has to do, just at lower accuracy and with impractical coloured gloves.
+      with full bidirectional context. That's why its labels look so accurate (87.2% test
+      accuracy) &mdash; but it can't react to a punch in progress and is far too slow for
+      real-time use. The voxel + colour tracking model on the right is true real-time
+      action <strong>prediction</strong>, classifying each frame as the motion unfolds
+      &mdash; the same task the final deployed model has to do, with the practical drawback
+      of needing coloured gloves.
     </div>
 
     <div class="video-row two-up">
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_inference.mp4"></video>
-        <sub>RGBD Model (Iter. 3&ndash;4) &mdash; <strong>offline recognition</strong>, pixel-based, required Colab, too heavy for edge</sub>
+        <sub>RGBD Model (Iter. 3) &mdash; <strong>offline recognition</strong>, 87.2% test accuracy, pixel-based, required Colab, too heavy for edge</sub>
       </div>
       <div class="video-box">
         <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/multimodal_inference.mp4"></video>
-        <sub>Voxel + Colour Tracking (Iter. 6) &mdash; <strong>real-time prediction</strong>, ~68%, required coloured gloves</sub>
+        <sub>Voxel + Colour Tracking (Iter. 6) &mdash; <strong>real-time prediction</strong>, ~96%, but required coloured gloves</sub>
       </div>
     </div>
 
