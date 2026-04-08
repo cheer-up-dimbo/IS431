@@ -4,16 +4,17 @@
     if (!ctx) return;
 
     const labels = [
+      "Limited Coaching Attention",
       "Lack of Training Partners",
       "Slow Progress",
-      "Injury-Prone",
-      "Limited Coaching Attention",
       "Time Commitment",
+      "Injury-Prone",
       "Unmotivated",
       "Tracking Progress"
     ];
 
-    const values = [12, 11, 8, 8, 7, 5, 2];
+    const values = [40, 38, 36, 22, 18, 14, 14];
+    const totalRespondents = 50;
 
     new Chart(ctx, {
       type: "pie",
@@ -26,10 +27,9 @@
           tooltip: {
             callbacks: {
               label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
                 const value = context.raw;
-                const percent = ((value / total) * 100).toFixed(1);
-                return `${context.label}: ${percent}% (${value})`;
+                const percent = ((value / totalRespondents) * 100).toFixed(1);
+                return `${context.label}: ${percent}% (${value} of ${totalRespondents} boxers)`;
               }
             }
           }

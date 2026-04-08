@@ -1,0 +1,361 @@
+SOURCE: Optimizing CPR performance the role of body.pdf
+TOTAL PAGES: 7
+
+RELEVANT PAGES: [2, 4, 5, 6, 7]
+============================================================
+
+--- PAGE 1 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 BMC Emergency Medicine
+https://doi.org/10.1186/s12873-025-01348-z
+RESEARCH Open Access
+Optimizing CPR performance: the role of body
+composition and ergonomic positioning
+Tayfun Aygun1 , Olcay Karaoglu2 , Hakan Senturk3 , Arif Keskin1 , Nurullah Yucel4 and Gulam Hekimoglu5*
+Abstract
+Background Quality cardiopulmonary resuscitation (CPR) is associated with improved survival rates in prehospital
+arrest cases. Although CPR guidelines emphasize compression depth, rate, and recoil, individual anatomical and
+biomechanical factors influencing CPR performance remain underexplored. This study aims to determine the optimal
+CPR position by focusing on individual positional conditions and anthropometric data to improve CPR effectiveness
+and guide team member selection in emergency scenarios.
+Methods A cross-sectional study involving 123 paramedic associate degree students was conducted.
+Anthropometric measurements including upper extremity length, biceps circumference, and femur length were
+obtained. CPR performance was assessed using a feedback-capable mannequin, with data collected on compression
+depth, frequency, rhythm quality, and compression/decompression ratios. Positional parameters such as knee and
+hip angles, distance between knees, and distance from the mannequin were recorded and analyzed in relation to CPR
+outcomes.
+Results Male participants demonstrated significantly higher CPR quality scores than females (65.09 ± 28.26 vs.
+48.85 ± 27.11, p = 0.004). Positive correlations were found between BMI (r = 0.239, p = 0.008), upper extremity length
+(r = 0.364, p < 0.001), biceps circumference (r = 0.350, p < 0.001), and CPR quality metrics. A moderate inter-knee
+position (shoulder-width distance) provided superior compression depth and rhythm stability compared to narrow or
+wide positions (p < 0.001).
+Conclusion Anthropometric and positional factors significantly influence CPR performance. Emergency team
+members with appropriate physical profiles (e.g., greater muscle mass, limb length, BMI) and adopting occupational
+ergonomic factors (e.g., moderate knee range, limited joint flexion) may improve CPR quality in the prehospital
+setting.
+Keywords Biomechanics, Cardiopulmonary resuscitation, Ergonomics, Heart massage
+*Correspondence:
+Gulam Hekimoglu
+gulam.hekimoglu@sbu.edu.tr
+1Department of Anatomy, Faculty of Medicine, Giresun University,
+Giresun, Turkey
+2Emergency and First Aid Program, Gumushane University, Gumushane,
+Turkey
+3Emergency and First Aid Program, Giresun University, Giresun, Turkey
+4Department of Anatomy, Hamidiye International Faculty of Medicine,
+University of Health Sciences, Istanbul, Turkey
+5Department of Histology and Embryology, International Faculty of
+Medicine, University of Health Sciences, Istanbul, Turkey
+© The Author(s) 2025. Open Access This article is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
+International License, which permits any non-commercial use, sharing, distribution and reproduction in any medium or format, as long as you
+give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if you modified the
+licensed material. You do not have permission under this licence to share adapted material derived from this article or parts of it. The images or
+other third party material in this article are included in the article’s Creative Commons licence, unless indicated otherwise in a credit line to the
+material. If material is not included in the article’s Creative Commons licence and your intended use is not permitted by statutory regulation or
+exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit h t t p : / / c e r a t i
+v e c o m m o n .s o r g / l i c e n s e s / y b - n c - n d / 4 . 0. /
+
+--- PAGE 2 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 Page 2 of 7
+Introduction
+obtained from the Ethics Committee of the Health Sci-
+Cardiopulmonary resuscitation (CPR) is an essential ences Department of Karadeniz Technical University
+emergency procedure to sustain blood circulation and (No: 2024/90, Date: 03.06.2024). Informed consent forms
+preserve brain function in people who suffer from car- were obtained from all participants after providing the
+diac arrest. Until spontaneous cardiac function can be necessary information.
+restored or more advanced medical care becomes avail-
+able, this life-saving method uses rescue breathing and Participants
+chest compressions to assist oxygenation and circulation The study included 123 undergraduate paramedic stu-
+[1]. In order to improve the likelihood of survival and dents (88 females, 35 males) from Giresun University
+lower the danger of irreversible neurological injury, the Şebinkarahisar Health Services Vocational School. The
+fundamental goal of CPR is to maintain a partial flow of participants were comprised of 2nd year students who
+oxygenated blood to the brain and essential organs [2]. were more experienced and had frequent resuscitation
+CPR is still one of the most popular and successful first- practice, and 1st year students who were relatively inex-
+aid treatments for out-of-hospital cardiac arrest, even perienced and had less practice. Inclusion criteria were
+with major improvements in emergency medicine and active enrollment in a paramedic program, completion
+technology. According to studies, performing prompt, of basic CPR training, age 18–25 years, and absence of
+effective CPR can increase a person’s chances of survival musculoskeletal disorders affecting performance. Exclu-
+by two or even three times [3]. Furthermore, continuous sion criteria included previous CPR instructor certifica-
+worldwide training programs emphasize the critical role tion, recent upper extremity injury, and inability to kneel
+that cardiopulmonary resuscitation plays in the chain of for extended periods. Data on age, gender, weight, height,
+survival and seek to raise public awareness and prepared- and class level were collected from all participants. BMI
+ness for performing it [4]. was calculated (kg/m²). The CPR environment consisted
+The paramedic profession requires a high level of tech- of a CPR mannequin placed on the floor and a monitor-
+nical competence, the ability to make rapid decisions, ing system.
+and the capacity to act swiftly and accurately. Paramed-
+ics perform emergency life support procedures, such as CPR performance evaluation
+CPR, in pre-hospital cardiac arrests [5]. High-quality Equipment: CPR procedures were performed using a
+chest compressions are associated with higher survival Laerdal Resusci Anne® QCPR manikin equipped with
+rates in patients experiencing cardiac arrest [6]. The qual- Bluetooth connectivity and real-time feedback capabil-
+ity of CPR can be assessed through parameters such as ity. The manikin was placed on the floor to simulate real-
+the number of compressions per minute, compression istic prehospital conditions. This enabled us to collect
+and decompression ratios, and compression depth [7]. quantitative data such as total CPR quality, compression
+Studies examine the quality of CPR from various per- depth, average compressions per minute, rhythm of CPR
+spectives; such as performing CPR while seated or stand- speed, and compression and decompression percentages
+ing [8], based on the height of the platform [9], according (Table 1; Fig. 1).
+to the position of the dominant hand [10, 11], using tech-
+nological devices that provide feedback [12] and con- Biomechanical data
+ducting effective CPR for 2 min with 1-minute rotations Upper extremity length (from the glenoid prominence to
+[13]. These studies, from a biomechanical perspective, the wrist joint), maximum biceps circumference (at the
+address the scene and the application to guide practitio- thickest point of the brachial region), and femur length
+ners toward an ergonomic CPR technique that causes less (from the greater trochanter to the lateral epicondyle)
+fatigue over longer periods. This study aims to identify were measured using a standard tape measure. During
+the most optimal CPR position based on angular assess- the CPR procedure, photographs and video recordings
+ments and anthropometric data, focusing on individual were taken from the front and side views at the same
+positioning. This will help in selecting the most suitable level as the manikin using a tripod. Camera positions
+person from the team for CPR and guide in delivering were standardized across all participants. The position of
+effective compressions for longer durations in the most the provider during CPR (hip and knee joint angles) was
+appropriate position. determined from these recordings. The distance from the
+knees to the model was recorded. The distance between
+Materials and methods
+the knees was assessed using images taken from behind
+The study was conducted retrospectively in accordance the participant (Fig. 2).
+with the World Medical Association Declaration of Hel-
+sinki Ethical Principles for Medical Research Involv-
+ing Human Participants. Approval for the study was
+
+--- PAGE 3 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 Page 3 of 7
+Table 1 CPR performance evaluation criteria and descriptions
+compression depth (r = -0.186, p = 0.039), between knee
+CPR quality measurements: The Laerdal QCPR system provided
+joint angle and total CPR quality (r = -0.200, p = 0.027),
+validated, objective measurements [14, 15]
+and between hip and knee joint angles (r = -0.328,
+Total CPR Quality Score The cumulative score is calculated
+p < 0.001).
+(0-100%) using Laerdal’s algorithm, which
+measures closeness to guideline The maximum circumference of the biceps region
+recommendations showed a positive correlation with compression qual-
+Average Compression Depth Percentage of compressions reaching ity (r = 0.454, p < 0.001), total CPR quality (r = 0.350,
+Quality (0-100%) a depth of 50–60 mm p < 0.001), and compression ratio (r = 0.456, p < 0.001),
+Compressions Per Minute Actual number of compressions
+while showing a negative correlation with decompression
+Rhythm Quality (0-100%) Consistency with compression
+ratio (r = -0.214, p = 0.017).
+intervals
+Upper extremity length was positively correlated with
+Compression Rate (0-100%) Percentage of chest compression
+total CPR quality (r = 0.364, p < 0.001), average compres-
+phase per cycle
+sion depth quality (r = 0.617, p < 0.001), and compression
+Decompression Rate (0-100%) Percentage of chest recoil phase per
+cycle ratio (r = 0.618, p < 0.001) (Table 3).
+Performance Protocol Each participant performed continu- When the positional conditions affecting the CPR qual-
+ous chest compressions for 2 min ity were examined, no statistically significant results were
+without ventilation, following estab- found regarding the proximity to the model. However,
+lished protocols for QCPR assessment.
+when the distance between the knees was evaluated in
+CPR, cardiopulmonary resuscitation
+three groups (narrow, mean, and wide), the statistically
+significant relationships with CPR outcomes are pre-
+Statistical analysis sented in Table 4.
+Based on previous CPR quality studies with effect sizes
+Discussion
+of 0.5, α = 0.05, and power = 0.80, the minimum required
+sample size was calculated as 64 participants. Our sam- This study focused on anatomical, ergonomic, and bio-
+ple of 123 provides adequate power (> 90%) for detect- mechanical reasons for CPR quality and showed that
+ing meaningful correlations. The research data were both anthropometric characteristics and positioning
+evaluated using SPSS 27.0 (Inc., Chicago, IL). Descriptive strategies significantly affect CPR quality. Our findings
+statistics were presented as mean ± SD, frequency distri- suggest that providers with longer upper limbs, greater
+bution, and percentage. The conformity of the variables muscle mass, and moderate BMI demonstrate better CPR
+to normal distribution was examined. For variables found quality. Certain positioning strategies, including mod-
+to be normally distributed, Student’s t-test was used erate knee-to-knee distance and reduced joint flexion
+between two independent groups, and ANOVA was used angles, increase compression effectiveness regardless of
+in more than two independent groups. Pearson’s correla- individual characteristics. All these data were compared
+tion was used in determining the relationship between with outcomes that assessed CPR quality from different
+different areas. Statistical significance level was accepted perspectives and their relationships were examined.
+as p < 0.05. Both the American Heart Association (AHA) and the
+European Resuscitation Guidelines (ERC) emphasize the
+Results
+importance of high-quality CPR during resuscitation.
+Participant characteristics High-quality CPR is known to increase survival rates
+Table 2 presents demographic characteristics and CPR after cardiac arrest [16, 17]. According to current AHA
+performance metrics by gender. Male participants were guidelines for CPR administration, a person must com-
+significantly taller (178.86 ± 6.42 vs. 163.51 ± 5.18 cm, press the chest at least 2 inches (approximately 5 cm)
+p < 0.001), heavier (74.72 ± 14.21 vs. 60.09 ± 9.95 kg, (1/3 of the anterior-posterior thoracic cross-section of
+p < 0.001), and had longer upper extremities (59.67 ± 3.34 the body) at a rate of at least 100 chest compressions
+vs. 53.35 ± 3.06 cm, p < 0.001) compared to females. per minute (100–120/min) to be considered effective in
+No significant differences were observed in age or BMI creating blood flow in the patient [18]. Anderson et al.
+between genders. defines perfect CPR as a two-minute CPR session with a
+depth of 50–60 millimeters, a rate of 100–120 per min-
+Correlation of CPR performance with anthropometric data ute, and complete chest retraction, with 90% or more
+It was observed that BMI had a positive correlation with compression [19]. In our study and the model we worked
+total CPR quality (r = 0.239, p = 0.008) and compression on, data were obtained by calibrating these standards.
+quality (r = 0.271, p = 0.002). Regarding the relationship Another issue affecting the quality of CPR is the posi-
+between positional variables and CPR outcomes, a nega- tion of the practitioner and which hand is placed at the
+tive correlation was observed between hip joint angle and bottom for compression according to that position.
+
+--- PAGE 4 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 Page 4 of 7
+Fig. 1 CPR outputs of the Laerdal Resusci Anne® QCPR brand resuscitation dummy. All data other than ventilation was monitored instantly on the screen.
+Ventilation was not applied during the application
+According to the results, practices where the right hand for longer periods of time. This result may be effective in
+is placed at the bottom in the left placement and prac- decision-making for team or provider selection in pro-
+tices where the left hand is placed at the bottom in the longed CPR scenarios.
+right placement significantly affect the CPR compression Although the kinematics of CPR varies significantly
+pressure and depth [20]. with the changing position of the provider, it has been
+The strong correlation between upper limb length and shown that these differences do not affect the compres-
+multiple CPR measurements demonstrates the mechani- sion force, depth, and frequency applied by experienced
+cal advantage provided by longer lever arms. Providers providers. Therefore, whether the patient is on the floor
+with longer arms can reach target compression depths or beds of different heights [21], it has been reported that
+(50–60 mm) with less effort and maintain CPR quality this does not affect the quality of CPR [22]. However,
+
+--- PAGE 5 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 Page 5 of 7
+Fig. 2 Anatomical data obtained from the lateral view illustration of the CPR provider is shown. a1: hip joint angle, a2: knee joint angle, sum of h1 and
+h2: upper extremity length, h3: femur length, c1 and c2: local maximum circumference measurements, m1: distance to the model
+Table 2 Demographic characteristics and comparison of by Hyun et al., a 20.3 cm distance between the knees gave
+variables between sexes more positive CPR quality results than a 50 cm distance
+Female Male P- [25].
+(n = 88) (n = 35) value Our finding that smaller hip and knee angles improve
+Demographics CPR performance aligns with biomechanical prin-
+Class 1 61 25 0.818 ciples of force transmission. Hip angles < 70° and knee
+Class 2 27 10
+angles < 90° appear to optimize the kinetic chain from
+Age 20.61 ± 3.12 20.57 ± 0.91 0.938
+torso to hands, allowing more efficient transfer of body
+Weight 60.09 ± 9.95 74.72 ± 14.21 < 0.001
+weight into compression force. This finding is supported
+Height 163.51 ± 5.18 178.86 ± 6.42 < 0.001
+by recent research on rescuer positioning that empha-
+BMI 22.46 ± 3.45 23.40 ± 4.68 0.223
+sizes the importance of ergonomic considerations in
+Upper extremity length 53.35 ± 3.06 59.67 ± 3.34 < 0.001
+CPR delivery. According to Dainty, in continuous CPR
+CPR performance metrics
+applications (CCR CPR, continuous cardiac massage),
+CPR total quality 48.85 ± 27.11 65.09 ± 28.26 0.004
+significant decreases in CPR force occur from the begin-
+Average compression 42.50 ± 7.18 55.54 ± 9.64 < 0.001
+depth quality ning [26]. Based on the results, we can recommend that
+Compressions per 124.25 ± 11.99 128.69 ± 11.40 0.063* practitioners should perform arm strength exercises to
+minute improve CPR quality. This is in line with the data pre-
+Rhythm quality 32.76 ± 26.97 31.14 ± 33.54 0.780 sented by López-González et al. [27]. In addition, the
+Compression ratio 21.07 ± 23.73 65.29 ± 29.91 < 0.001 positive correlation of BMI with CPR quality is another
+Decompression ratio 85.49 ± 19.15 59.26 ± 27.02 < 0.001 parameter mentioned by Russo et al. [28].
+BMI, body mass index; CPR, cardiopulmonary resuscitation
+* indicates statistically significant Conclusion
+Muscle volume, limb length and BMI play an impor-
+another study reported that the position in which the tant role in the selection of the CPR practitioner within
+biomechanical stress of the back muscles and lumbar the paramedic team. In addition, when the practitio-
+region is minimized is in CPR performed on 60 cm high ners apply heart massage in the kneeling position on the
+Table [23]. Nicolau et al., who evaluated the relationship floor, they position their knees at a moderate level, that
+between the model-provider limb angle and the qual- is, at shoulder width, and do not allow high extension in
+ity of CPR applied in different positions during applica- the hip and knee joint angles, which has shown positive
+tion, reported once again that the 90-degree angulation results in terms of CPR quality and compression depth.
+is the most efficient position [24]. In a study conducted
+
+--- PAGE 6 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 Page 6 of 7
+Table 3 Correlation of CPR quality parameters with anthropometric data
+Anthropometric Total CPR quality Compression depth Compression per Rhythm quality Compression Decom-
+variable quality minute ratio pres-sion
+ratio
+Height 0.256** 0.593*** 0.191* -0.012 0.641*** -0.449***
+(p = 0.004) (p < 0.001) (p = 0.034) (p = 0.897) (p < 0.001) (p < 0.001)
+Weight 0.341*** 0.545*** -0.022 0.122 0.562*** -0.410***
+(p < 0.001) (p < 0.001) (p = 0.806) (p = 0.179) (p < 0.001) (p < 0.001)
+BMI (kg/m²) 0.239** 0.271** -0.132 0.130 0.267** -0.202*
+(p = 0.008) (p = 0.002) (p = 0.146) (p = 0.153) (p = 0.003) (p = 0.025)
+Upper extremity Length 0.364*** 0.617*** 0.017 0.101 0.618** -0.340**
+(cm) (p < 0.001) (p < 0.001) (p = 0.850) (p = 0.265) (p < 0.001) (p < 0.001)
+Biceps Circumference 0.350*** 0.454*** -0.050 0.080 0.4567*** -0.214*
+(cm) (p < 0.001) (p < 0.001) (p = 0.580) (p = 0.381) (p < 0.001) (p = 0.017)
+BMI, body mass index; CPR, cardiopulmonary resuscitation
+* p < 0.05, ** p < 0.01, *** p < 0.001
+Table 4 Effect of the distance between the two knees positioned during CPR application on CPR outputs
+Narrow Mean Wide P-value Post-hoc significance
+(n = 81) (n = 26) (n = 16)
+CPR total quality 50.91 ± 28.88 63.58 ± 26.70* 50.00 ± 25.59 < 0.001 moderate > narrow, wide
+Average compression depth quality 43.88 ± 8.90 53.92 ± 8.83* 45.50 ± 10.40 < 0.001 moderate > narrow, wide
+Compressions per minute 123.7 ± 12.06 125.88 ± 10.09 134.0 ± 11.08* 0.006 wide > moderate, narrow
+Rhythm quality 33.70 ± 26.77 40.15 ± 33.98* 12.44 ± 22.15 0.007 moderate > wide
+Compression ratio 26.96 ± 29.35 53.77 ± 30.17* 34.81 ± 38.79 < 0.001 moderate > narrow,
+wide
+Decompression ratio 81.52 ± 22.99 65.31 ± 28.93* 81.00 ± 19.08 0.011 narrow, wide > moderate
+CPR, cardiopulmonary resuscitation
+* indicates statistically significant
+Acknowledgements Competing interests
+We thank all participants and Giresun University, Sebinkarahisar Health The authors declare no competing interests.
+Services Vocational School Directorate for providing the necessary
+permissions for this study. Received: 4 July 2025 / Accepted: 1 September 2025
+Author contributions
+TA: Conceptualization, Methodology, Visualization, Formal Analysis, Writing –
+Original Draft; OK: Data curation, Resources; HS: Visualization, Resources, Data
+curation, Investigation; AK: Formal Analysis, Supervision; NY: Methodology,
+References
+Visualization, Formal Analysis; GH: Supervision, Writing- Reviewing and Editing.
+1. Merchant RM, Topjian AA, Panchal AR, Cheng A, Aziz K, Berg KM, et al. Adult
+basic and advanced life support, pediatric basic and advanced life support,
+Funding
+neonatal life support, resuscitation education science, and systems of care
+No funding was used for the study.
+writing groups. Part 1: executive summary: 2020 American Heart Association
+guidelines for cardiopulmonary resuscitation and emergency cardiovascular
+Data availability
+care. Circulation. 2020;142:S337–57.
+All data are available upon request from the first author, Dr. Tayfun Aygun, by
+2. Meaney PA, Bobrow BJ, Mancini ME, Christenson J, De Caen AR, Bhanji F, et
+contacting fzttayfunaygun@gmail.com.
+al. Cardiopulmonary resuscitation quality: improving cardiac resuscitation
+outcomes both inside and outside the hospital: a consensus statement from
+Declarations the American Heart Association. Circulation. 2013;128:417–35.
+3. Perkins GD, Handley AJ, Koster RW, Castrén M, Smyth MA, Olasveengen T, et
+Ethical approval al. European Resuscitation Council Guidelines for Resuscitation 2015: Section
+The study was conducted retrospectively in accordance with the World 2. Adult basic life support and automated external defibrillation. Resuscita-
+Medical Association Declaration of Helsinki Ethical Principles for Medical tion. 2015;95:81–99.
+Research Involving Human Participants. Approval for the study was obtained 4. Hazinski MF, Nolan JP, Aickin R, Bhanji F, Billi JE, Callaway CW, et al. Part 1:
+from the Ethics Committee of the Health Sciences Department of Karadeniz executive summary: 2015 international consensus on cardiopulmonary
+Technical University (No: 2024/90, Date: 03.06.2024). resuscitation and emergency cardiovascular care science with treatment
+recommendations. Circulation. 2015;132:S2–39.
+Consent to participate 5. Perkins GD, Lall R, Quinn T, Deakin CD, Cooke MW, Horton J, et al. Mechanical
+Informed consent forms were obtained from all participants after providing versus manual chest compression for out-of-hospital cardiac arrest (PARA-
+the necessary information. MEDIC): a pragmatic, cluster randomised controlled trial. Lancet (London
+England). 2015;385:947–55.
+Consent for publication 6. Rea TD, Fahrenbruch C, Culley L, Donohoe RT, Hambly C, Innes J, et al. CPR
+Not applicable. with chest compression alone or with rescue breathing. N Engl J Med.
+2010;363:423–33.
+
+--- PAGE 7 ---
+Aygun et al. BMC Emergency Medicine (2025) 25:187 Page 7 of 7
+7. Zhang N, Wang J, Li Y, Liu J, Zhu H. How does rescuer’s position setting emergency cardiovascular care science with treatment recommendations:
+impact quality of chest compression: A randomized crossover simulation summary from the basic life support; advanced life support; pediatric life
+study on unexperienced clinicians. Emerg Med Int. 2024;2024:9950885. support; neonatal life support; education. Circulation. 2022;146:e483–557.
+8. Mullin S, Lydon S, O’Connor P. The effect of operator position on the quality 19. Anderson R, Sebaldt A, Lin Y, Cheng A. Optimal training frequency for acquisi-
+of chest compressions delivered in a simulated ambulance. Prehosp Disaster tion and retention of high-quality CPR skills: A randomized trial. Resuscitation.
+Med. 2020;35:55–60. 2019;135:153–61.
+9. Ho CS, Hsu YJ, Li F, Tang CC, Yang CP, Huang CC, et al. Effect of ambulance 20. Tsou JY, Kao CL, Hong MY, Chang CJ, Su FC, Chi CH. How does the side of
+stretcher bed height adjustment on CPR quality and rescuer fatigue in a approach impact the force delivered during external chest compression? Am
+laboratory environment. Int J Med Sci. 2021;18:2783–8. J Emerg Med. 2021;48:67–72.
+10. Zhou XL, Li L, Jiang C, Xu B, Wang HL, Xiong D, et al. Up-down hand position 21. Elvira JC, Lucía A, De Las Heras JF, Pérez M, Alvarez AJ, Carvajal A, et al. Active
+switch May delay the fatigue of non-dominant hand position rescuers and compression-decompression cardiopulmonary resuscitation in standing
+improve chest compression quality during cardiopulmonary resuscitation: a position over the patient (ACD-S), kneeling beside the patient (ACD-B), and
+randomized crossover manikin study. PLoS ONE. 2015;10:e0133483. standard CPR: comparison of physiological and efficacy parameters. Resusci-
+11. Jiang C, Jiang S, Zhao Y, Xu B, long Zhou X. Dominant hand position improves tation. 1998;37:153–60.
+the quality of external chest compression: a manikin study based on 2010 22. Chi CH, Tsou JY, Su FC. Effects of rescuer position on the kinematics of car-
+CPR guidelines. J Emerg Med. 2015;48:436–44. diopulmonary resuscitation (CPR) and the force of delivered compressions.
+12. Plata C, Stolz M, Warnecke T, Steinhauser S, Hinkelbein J, Wetsch WA, et al. Resuscitation. 2008;76:69–75.
+Using a smartphone application (PocketCPR) to determine CPR quality in a 23. Tsou JY, Chi CH, Hsu RMF, Wu HF, Su FC. Mechanical loading of the low back
+bystander CPR scenario - A manikin trial. Resuscitation. 2019;137:87–93. during cardiopulmonary resuscitation. Resuscitation. 2009;80:1181–6.
+13. Kim DH, Seo YW, Jang TC. CPR quality with rotation of every 1 versus 2 min- 24. Nicolau A, Bispo I, Lazarovici M, Ericsson C, Sa-Couto P, Jorge I, et al. Influ-
+utes as characteristics of rescuers: A randomized crossover simulation study. ence of rescuer position and arm angle on chest compression quality: an
+Med (Baltim). 2023;102:e33066. international multicentric randomized crossover simulation trial. Resusc Plus.
+14. Tanaka S, Tsukigase K, Hara T, Sagisaka R, Myklebust H, Birkenes TS, et al. Effect 2024;20:100815.
+of real-time visual feedback device quality cardiopulmonary resuscitation 25. Hyun SH, Han JH, Ryew CC. Effect of knee positions on cardiac compression
+(QCPR) classroom with a metronome sound on layperson CPR training in variables in cardiopulmonary resuscitation of rescuer; manikin study. J Exerc
+japan: a cluster randomized control trial. BMJ Open. 2019;9:e026140. Rehabil. 2018;14:530–5.
+15. Cortegiani A, Russotto V, Montalto F, Iozzo P, Meschis R, Pugliesi M, et al. Use 26. Dainty RS, Gregory DE. Investigation of low back and shoulder demand dur-
+of a real-time training software (Laerdal QCPR®) compared to instructor- ing cardiopulmonary resuscitation. Appl Ergon [Internet]. 2017;58:535–42.
+based feedback for high-quality chest compressions acquisition in secondary 27. López-González A, Sánchez-López M, Garcia-Hermoso A, López-Tendero J,
+school students: a randomized trial. PLoS ONE. 2017;12:e0169591. Rabanales-Sotos J. Martínez-Vizcaíno V. Muscular fitness as a mediator of
+16. Bhanji F, Donoghue AJ, Wolff MS, Flores GE, Halamek LP, Berman JM, et al. Part quality cardiopulmonary resuscitation. Am J Emerg Med. 2016;34:1845–9.
+14: Education: 2015 American Heart Association guidelines update for car- 28. Russo SG, Neumann P, Reinhardt S, Timmermann A, Niklas A, Quintel M, et al.
+diopulmonary resuscitation and emergency cardiovascular care. Circulation. Impact of physical fitness and biometric data on the quality of external chest
+2015;132:S561–73. compression: a randomised, crossover trial. BMC Emerg Med. 2011;11:20.
+17. Truszewski Z, Szarpak L, Kurowski A, Evrin T, Zasko P, Bogdanski L, et al. Ran-
+domized trial of the chest compressions effectiveness comparing 3 feedback
+CPR devices and standard basic life support by nurses. Am J Emerg Med.
+Publisher’s note
+2016;34:381–5.
+18. Wyckoff MH, Greif R, Morley PT, Ng KC, Olasveengen TM, Singletary EM, et Springer Nature remains neutral with regard to jurisdictional claims in
+al. 2022 International consensus on cardiopulmonary resuscitation and published maps and institutional affiliations.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Design &amp; Ideation â GUI</title>
+  <title>IS-431: Design &amp; Ideation - GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -37,21 +37,72 @@
       consequences for feasibility, usability, and maintainability. The options considered for
       each decision are documented below.
     </p>
+    <p>
+      The starting point was not the software stack. It was the training product brief: boxers
+      needed a way to start sessions quickly, follow drills without confusion, and review
+      progress without leaving the training flow. The ideas below were selected against that
+      use case first, then against implementation constraints.
+    </p>
+    <p>
+      <strong>V-Model alignment:</strong> This page corresponds to the left side of the V,
+      where product needs from <a href="../appendix-product-mapping.html">Appendix 6</a>
+      are decomposed into concrete GUI design decisions.
+    </p>
+
+    <div style="margin:22px 0 18px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+      <svg viewBox="0 0 980 160" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:780px; height:auto; display:block;" aria-label="GUI product needs translation flow">
+        <rect x="0" y="0" width="980" height="160" rx="12" fill="#f8fafc"/>
+        <text x="490" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Need-to-Design Translation</text>
+        <text x="490" y="43" text-anchor="middle" font-size="11" fill="#64748b">Product needs are translated into interface choices before implementation begins.</text>
+
+        <defs>
+          <marker id="gui-design-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+          </marker>
+        </defs>
+
+        <rect x="34" y="68" width="220" height="66" rx="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.4"/>
+        <text x="144" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">Appendix 6 need</text>
+        <text x="144" y="114" text-anchor="middle" font-size="10.5" fill="#1e40af">Training, usability, progression, feedback</text>
+
+        <rect x="280" y="68" width="220" height="66" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+        <text x="390" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">GUI concept</text>
+        <text x="390" y="114" text-anchor="middle" font-size="10.5" fill="#9a3412">Flow, touch targets, state visibility</text>
+
+        <rect x="526" y="68" width="220" height="66" rx="16" fill="#dcfce7" stroke="#86efac" stroke-width="1.4"/>
+        <text x="636" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">Design choice</text>
+        <text x="636" y="114" text-anchor="middle" font-size="10.5" fill="#166534">PySide6, stack navigation, curriculum pages</text>
+
+        <rect x="772" y="68" width="174" height="66" rx="16" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.4"/>
+        <text x="859" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">Training effect</text>
+        <text x="859" y="114" text-anchor="middle" font-size="10.5" fill="#6b21a8">Fast, readable, coach-like flow</text>
+
+        <line x1="254" y1="101" x2="276" y2="101" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-design-arrow)"/>
+        <line x1="500" y1="101" x2="522" y2="101" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-design-arrow)"/>
+        <line x1="746" y1="101" x2="768" y2="101" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-design-arrow)"/>
+      </svg>
+    </div>
 
     <!-- FRAMEWORK SELECTION -->
     <div>
       <h3>Framework Selection</h3>
       <p>
         The project had a four-month development window from December 2025 to April 2026.
-        The chosen framework needed to run on the Jetson Nano without additional configuration,
+        The chosen framework needed to run on the Jetson Orin NX without additional configuration,
         support touchscreen interaction natively, and be learnable quickly enough to leave
         adequate time for feature development. Four options were evaluated.
       </p>
+      <p>
+        The decision was also driven by training UX. The framework had to support large touch
+        targets, fast page switching, and layouts that stay readable during movement and short
+        glances between punches.
+      </p>
       <table-component id="gui-framework-comparison" subtitle="Table: Framework Selection Evaluation"></table-component>
       <p>
-        PySide6 was selected. It runs natively on the Jetson Nano, has mature touchscreen
+        PySide6 was selected. It runs natively on the Jetson Orin NX, has mature touchscreen
         layout support, and builds on existing Python knowledge. The extensive Qt documentation
-        reduced the risk of hitting unresolvable blockers within the compressed timeline.
+        reduced the risk of hitting unresolvable blockers within the compressed timeline, while
+        still leaving enough headroom for a training-focused interface.
       </p>
     </div>
 
@@ -65,6 +116,10 @@
         Three navigation paradigms were evaluated against the core requirement that any feature
         must be reachable within a small number of interactions from the main menu, and that the
         interface must remain usable via both touchscreen and physical button input.
+      </p>
+      <p>
+        In training terms, this was about preserving rhythm. A boxer should be able to move from
+        login to drill selection to session start without breaking focus or hunting through menus.
       </p>
       <table-component id="gui-nav-concepts" subtitle="Table: Navigation Architecture Evaluation"></table-component>
       <div style="display:flex; justify-content:center; margin:24px 0;">
@@ -152,6 +207,11 @@
         simple as creating or deleting a folder, which also eliminated the need for a
         centralised account management database.
       </p>
+      <p>
+        From the product side, this supports a personal training history. A boxer expects their
+        progress, scores, and test results to stay attached to their own profile, not blend into
+        someone else’s session record.
+      </p>
     </div>
 
     <!-- COMBO CURRICULUM LEARNING APPROACH -->
@@ -162,6 +222,11 @@
         the 50-combo library. Three approaches were evaluated against the requirements
         that progression should feel structured, mastery should be measurable, and the
         system should mirror how boxing coaches actually structure pad work.
+      </p>
+      <p>
+        This is where the product story matters most. The curriculum is not just a list of
+        combinations. It is the training path the boxer sees over repeated sessions, so the
+        structure had to feel like coaching progression rather than arbitrary unlocks.
       </p>
 
       <table-component id="gui-curriculum-concepts" subtitle="Table: Combo Curriculum Learning Approach Evaluation"></table-component>
@@ -179,6 +244,10 @@
         principles including pose estimation, hardcoded random sequences, and wearable
         sensors. Three software-side generation strategies were evaluated.
       </p>
+      <p>
+        The product question was simple: would a boxer feel challenged by the session, or would
+        it feel scripted? That user experience target drove the choice of generation strategy.
+      </p>
 
       <table-component id="gui-sparring-concepts" subtitle="Table: Sparring Sequence Generation Evaluation"></table-component>
     </div>
@@ -191,9 +260,13 @@
       <h4>Original Display</h4>
       <p>
         The original display was a 7-inch resistive touchscreen at 1024x600 resolution,
-        selected for its low cost and direct DSI compatibility with the Jetson Nano. All
+        selected for its low cost and direct DSI compatibility with the Jetson Orin NX. All
         six development iterations were built and tested against this display. The layout,
         font sizing, and touch target geometry were designed for a 7-inch form factor.
+      </p>
+      <p>
+        This decision had a direct training effect. The display needed to stay readable while
+        users were moving, sweating, and glancing at the screen between drills.
       </p>
       <h4>User Observations at the Showcase</h4>
       <p>
@@ -209,7 +282,7 @@
       <p>
         Based on these observations, the display was upgraded to a 10.1-inch IPS capacitive
         touchscreen at 1280x800 resolution (DSI interface, Raspberry Pi compatible, also
-        confirmed working on the Jetson Nano). The timeline did not allow for a full redesign
+        confirmed working on the Jetson Orin NX). The timeline did not allow for a full redesign
         cycle, so this is framed as a hardware revision informed by user observation rather
         than an iterative software redesign. The existing layout scaled to the larger display
         without breaking, as the GUI used proportional sizing rather than fixed pixel
@@ -224,6 +297,11 @@
         the robot from their phone without walking to the touchscreen between rounds.
         Three approaches were evaluated.
       </p>
+      <p>
+        The dashboard existed to extend the training product beyond the robot itself. A boxer
+        should be able to check progress, adjust sessions, and review results from the side of
+        the gym as easily as from the touchscreen.
+      </p>
       <table-component id="gui-dashboard-concepts" subtitle="Table: Phone Dashboard Companion Evaluation"></table-component>
     </div>
 
@@ -231,8 +309,13 @@
     <div>
       <h3>Authentication Method</h3>
       <p>
-        The touchscreen authentication method needed to be usable while wearing boxing
-        gloves, which rules out fine-motor input methods. The pattern lock interface is documented in <a href="../appendix-gui.html">Appendix 3</a>.
+        The touchscreen authentication method was designed for quick bare-hand use, with a
+        pattern lock that avoids fine-motor input and keeps login fast at the start of
+        training. The pattern lock interface is documented in <a href="../appendix-gui.html">Appendix 3</a>.
+      </p>
+      <p>
+        This was not just a security choice. It was a product usability choice, because login
+        had to fit the same physical constraints as the rest of the training flow.
       </p>
       <table-component id="gui-auth-concepts" subtitle="Table: Authentication Method Evaluation"></table-component>
 
@@ -259,12 +342,62 @@
         defined in a single <code>theme.py</code> file, and no inline hex codes appear
         elsewhere in the codebase.
       </p>
+      <div style="margin:18px 0 20px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+        <svg viewBox="0 0 960 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:760px; height:auto; display:block;" aria-label="GUI design system style board">
+          <rect x="0" y="0" width="960" height="300" rx="12" fill="#f8fafc"/>
+          <text x="480" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Design System Snapshot</text>
+          <text x="480" y="42" text-anchor="middle" font-size="11" fill="#64748b">A high-level view of palette, typography, spacing, and punch-type accents.</text>
+
+          <defs>
+            <marker id="design-system-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <g>
+            <rect x="56" y="66" width="112" height="32" rx="14" fill="#0b0f14" stroke="#0f172a" stroke-width="1.2"/>
+            <line x1="182" y1="82" x2="266" y2="82" stroke="#64748b" stroke-width="2.2" marker-end="url(#design-system-arrow)"/>
+            <text x="280" y="86" font-size="12" fill="#334155">Background color so the interface stays calm and low glare.</text>
+          </g>
+
+          <g>
+            <rect x="56" y="112" width="112" height="32" rx="14" fill="#1f2937" stroke="#334155" stroke-width="1.2"/>
+            <line x1="182" y1="128" x2="266" y2="128" stroke="#64748b" stroke-width="2.2" marker-end="url(#design-system-arrow)"/>
+            <text x="280" y="132" font-size="12" fill="#334155">Foreground and action contrast so buttons stay readable.</text>
+          </g>
+
+          <g>
+            <rect x="56" y="158" width="112" height="32" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <line x1="182" y1="174" x2="266" y2="174" stroke="#64748b" stroke-width="2.2" marker-end="url(#design-system-arrow)"/>
+            <text x="280" y="178" font-size="12" fill="#334155">Typography scale so headings and body text feel balanced.</text>
+          </g>
+
+          <g>
+            <rect x="56" y="204" width="112" height="32" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <line x1="182" y1="220" x2="266" y2="220" stroke="#64748b" stroke-width="2.2" marker-end="url(#design-system-arrow)"/>
+            <circle cx="86" cy="220" r="8" fill="#3b82f6"/>
+            <circle cx="108" cy="220" r="8" fill="#fb7185"/>
+            <circle cx="130" cy="220" r="8" fill="#22c55e"/>
+            <circle cx="152" cy="220" r="8" fill="#f59e0b"/>
+            <text x="280" y="224" font-size="12" fill="#334155">Punch colours so training states stay consistent across pages.</text>
+          </g>
+
+          <g>
+            <rect x="56" y="250" width="112" height="20" rx="10" fill="#111827"/>
+            <line x1="182" y1="260" x2="266" y2="260" stroke="#64748b" stroke-width="2.2" marker-end="url(#design-system-arrow)"/>
+            <rect x="68" y="254" width="88" height="12" rx="6" fill="#e2e8f0"/>
+            <rect x="68" y="254" width="28" height="12" rx="6" fill="#111827"/>
+            <text x="280" y="264" font-size="12" fill="#334155">Touch target scale so controls stay easy to hit.</text>
+          </g>
+        </svg>
+      </div>
       <p>
         The key design decisions include a dark theme with a deep navy-black background
         (#0B0F14) chosen to reduce glare under bright gym lighting, a warm orange (#FF6B35)
         primary accent for call-to-action buttons and active states, and the Inter font
         family loaded as a custom variable-weight font. All interactive elements maintain a
-        minimum 60px touch target for gloved-hand operation. Each of the six punch types is
+        minimum 60px touch target so they remain easy to hit with bare hands during normal use,
+        while the padded targets feed the training interactions during drills. Each of the six punch types is
         assigned a distinct color (blue for jab, coral for cross, green for lead hook, amber
         for rear hook, purple for lead uppercut, yellow for rear uppercut) used consistently
         across combo displays, charts, and analytics. The UI is designed at 1024x600 pixels
@@ -272,7 +405,6 @@
         hold regardless of the actual screen resolution.
       </p>
     </div>
-    <sl-divider></sl-divider>
 
     <!-- REFERENCES -->
     <div>
@@ -284,7 +416,12 @@
 
     <!-- BOTTOM NAVIGATION -->
     <div class="page-nav-row">
-      <div></div>
+      <a href="../gui.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Back: 5.1 User Interface (GUI)
+        </sl-button>
+      </a>
       <a href="implementation.html">
         <sl-button variant="default" size="medium">
           Next: Implementation

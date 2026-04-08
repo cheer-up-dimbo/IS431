@@ -13,6 +13,79 @@
   <script src="../components/scroll-to-top/scroll-to-top.js"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
   <style>
+    /* GUI V-Model diagram lightbox */
+    .gui-vmodel-wrapper {
+      position: relative;
+      cursor: zoom-in;
+    }
+    .gui-vmodel-expand-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-family: Inter, system-ui, sans-serif;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      transition: background 0.15s;
+      z-index: 2;
+      backdrop-filter: blur(4px);
+    }
+    .gui-vmodel-expand-btn:hover { background: rgba(255,255,255,0.98); color: #1e40af; border-color: #93c5fd; }
+    .gui-vmodel-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(15,23,42,0.82);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .gui-vmodel-modal.open { display: flex; }
+    .gui-vmodel-modal-inner {
+      position: relative;
+      width: 100%;
+      max-width: 1400px;
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 14px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+    .gui-vmodel-modal-inner svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 14px;
+    }
+    .gui-vmodel-close-btn {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-size: 18px;
+      line-height: 34px;
+      text-align: center;
+      cursor: pointer;
+      color: #475569;
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .gui-vmodel-close-btn:hover { background: #fee2e2; color: #dc2626; }
+
     .section-nav-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -44,6 +117,21 @@
       font-size: 0.88rem;
       color: #666;
     }
+    .gui-story-loop {
+      margin: 24px 0 8px;
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+      overflow-x: auto;
+    }
+    .gui-story-loop svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      min-width: 760px;
+    }
     sl-tab-group { margin: 20px 0; }
     sl-tab-panel p { margin: 8px 0; font-size: 0.95rem; line-height: 1.6; }
   </style>
@@ -63,15 +151,54 @@
     <div id="user-interface">
       <h2>5.1 User Interface (GUI)</h2>
       <p>
-        The GUI is the primary control surface of BoxBunny. It handles user authentication,
-        training mode selection, session execution, performance analytics, and all communication
-        between the user and the robot's hardware subsystems. Users interact with the interface
-        via the onboard touchscreen, and the system also supports physical button navigation
-        through the punching contact points and IMU sensors, allowing hands-free control during
-        active training. Every design decision was filtered through a single principle: the
-        interface must never become the obstacle. If a user pauses mid-session to figure out
-        how to navigate, the design has failed.
+        The GUI is the primary training interface of BoxBunny. It turns user intent into
+        session choices, workout control, progress tracking, and feedback that boxers can act
+        on during training. Users interact with the interface via the onboard touchscreen,
+        and the system also supports physical button navigation through the punching contact
+        points and IMU sensors, allowing hands-free control during active training. Every
+        design decision was filtered through a single principle: the interface must never
+        become the obstacle. If a user pauses mid-session to figure out how to navigate, the
+        training flow breaks.
       </p>
+      <p>
+        The GUI therefore sits at the product level as well as the technical level. The pages
+        below show how boxer needs, training goals, and practical gym constraints shaped the
+        interface, then how those choices were built, integrated, and tested.
+      </p>
+
+      <div class="gui-story-loop">
+        <svg viewBox="0 0 1080 190" xmlns="http://www.w3.org/2000/svg" aria-label="GUI product story flow">
+          <rect x="0" y="0" width="1080" height="190" rx="12" fill="#f8fafc"/>
+          <text x="540" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Product Story Flow</text>
+          <text x="540" y="46" text-anchor="middle" font-size="11" fill="#64748b">The GUI is shaped by training needs first, then translated into interface behavior.</text>
+
+          <defs>
+            <marker id="gui-story-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <rect x="38" y="72" width="220" height="76" rx="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.4"/>
+          <text x="148" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">Boxer needs</text>
+          <text x="148" y="120" text-anchor="middle" font-size="10.5" fill="#1e40af">Start quickly, stay oriented, review progress</text>
+
+          <rect x="288" y="72" width="220" height="76" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+          <text x="398" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">GUI requirements</text>
+          <text x="398" y="120" text-anchor="middle" font-size="10.5" fill="#9a3412">Touch, buttons, isolation, live metrics</text>
+
+          <rect x="542" y="72" width="220" height="76" rx="16" fill="#dcfce7" stroke="#86efac" stroke-width="1.4"/>
+          <text x="652" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">Training session</text>
+          <text x="652" y="120" text-anchor="middle" font-size="10.5" fill="#166534">Drill setup, active round, rest, review</text>
+
+          <rect x="796" y="72" width="246" height="76" rx="16" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.4"/>
+          <text x="919" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">Product feedback</text>
+          <text x="919" y="120" text-anchor="middle" font-size="10.5" fill="#6b21a8">Scores, coaching, history, next-session decisions</text>
+
+          <line x1="258" y1="110" x2="284" y2="110" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-story-arrow)"/>
+          <line x1="512" y1="110" x2="538" y2="110" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-story-arrow)"/>
+          <line x1="766" y1="110" x2="792" y2="110" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-story-arrow)"/>
+        </svg>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -97,32 +224,193 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Touchscreen and physical button operable: large touch targets, minimal text input, IMU-based button navigation</td>
-            <td style="padding:8px; border:1px solid #ddd;">User journey (4.2), Function Spec display latency</td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (Section 4.2), Function Spec display latency, Appendix 6 mapping</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Multi-user accounts with complete data isolation between users</td>
-            <td style="padding:8px; border:1px solid #ddd;">Product need: Performance Analytics</td>
+            <td style="padding:8px; border:1px solid #ddd;">Product need: Performance Analytics (Appendix 6)</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Structured training progression through a 50-combo curriculum with mastery-based advancement</td>
-            <td style="padding:8px; border:1px solid #ddd;">Product need: Skill Progression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Product need: Skill Progression (Appendix 6)</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Real-time session data display (combo prompts, round timers, performance metrics)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Function Spec: on-screen dashboard, brightness requirements</td>
+            <td style="padding:8px; border:1px solid #ddd;">Function Spec: on-screen dashboard, brightness requirements, Appendix 6 mapping</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Hardware-independent development via an abstracted integration layer with mock interfaces</td>
-            <td style="padding:8px; border:1px solid #ddd;">Parallel development constraint</td>
+            <td style="padding:8px; border:1px solid #ddd;">Parallel development constraint, Appendix 6 mapping</td>
           </tr>
         </tbody>
       </table>
 
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI Requirements and Sources</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- SYSTEM DESIGN NARRATIVE (V-MODEL APPLICATION) -->
+    <div>
+      <h3>System Design Narrative</h3>
+      <p>
+        Following the Systems Engineering V-Model in Section 3.2, GUI-1 to
+        GUI-5 were fixed before detailed screen design (INCOSE, 2023). These
+        requirements trace back to product needs mapped in
+        <a href="appendix-product-mapping.html">Appendix 6</a>. The diagram
+        below applies the same V-Model structure used in Robot Mechanism, but
+        for GUI engineering decisions.
+      </p>
+      <p>
+        In product terms, the GUI had to feel like training support rather than
+        a control panel. Boxers needed quick drill access, clear round state,
+        simple navigation under fatigue, and a path from session start to
+        progress review without unnecessary friction.
+      </p>
+
+      <!-- GUI V-Model SVG Diagram -->
+      <div class="gui-vmodel-wrapper" style="margin: 28px 0; text-align: center; overflow-x: auto;" onclick="openGuiVmodelModal()">
+        <button class="gui-vmodel-expand-btn" onclick="event.stopPropagation(); openGuiVmodelModal()" title="View fullscreen">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1h4a.5.5 0 0 1 0 1H2.707l3.647 3.646a.5.5 0 1 1-.708.708L2 2.707V5.5a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 1.5 1zm13 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V2.707l-3.646 3.647a.5.5 0 0 1-.708-.708L13.293 2H10.5a.5.5 0 0 1 0-1h4zm-13 13h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v2.793l3.646-3.647a.5.5 0 0 1 .708.708L2.707 14H5.5zm9.354-3.854a.5.5 0 0 1 .708 0l3.646 3.647V11.5a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1 0-1h2.793l-3.647-3.646a.5.5 0 0 1 0-.708z"/></svg>
+          Expand diagram
+        </button>
+
+        <svg id="guiVmodelSVG" viewBox="0 0 1260 530" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1260px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; box-shadow:0 2px 12px rgba(0,0,0,0.06);" font-family="Inter, system-ui, sans-serif">
+          <rect width="1260" height="530" rx="12" fill="#f8fafc"/>
+
+          <text x="630" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a" letter-spacing="0.5">BoxBunny GUI - Systems Engineering V-Model</text>
+          <text x="310" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#2563eb" letter-spacing="1.5">DESIGN DECOMPOSITION</text>
+          <text x="950" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a" letter-spacing="1.5">VERIFICATION AND VALIDATION</text>
+
+          <line x1="100" y1="110" x2="1160" y2="110" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+          <line x1="200" y1="230" x2="1060" y2="230" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+          <line x1="310" y1="350" x2="950" y2="350" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+
+          <polyline points="246,110 356,230 470,350 630,430" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <polyline points="1014,110 904,230 790,350 630,430" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+          <rect x="151" y="72" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="246" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">01</text>
+          <text x="246" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">GUI Problem Framing</text>
+          <text x="246" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">GUI-1 to GUI-5 fixed</text>
+
+          <rect x="261" y="192" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="356" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">02</text>
+          <text x="356" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Flow Architecture</text>
+          <text x="356" y="245" text-anchor="middle" font-size="9" fill="#3b82f6">Navigation and page contracts</text>
+
+          <rect x="375" y="312" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="470" y="333" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">03</text>
+          <text x="470" y="348" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Feature Decomposition</text>
+          <text x="470" y="361" text-anchor="middle" font-size="9" fill="#3b82f6">Training, Performance, Sparring</text>
+          <text x="470" y="373" text-anchor="middle" font-size="9" fill="#3b82f6">Others, Coach Station</text>
+
+          <ellipse cx="630" cy="430" rx="110" ry="42" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+          <text x="630" y="420" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">GUI Integration Build</text>
+          <text x="630" y="434" text-anchor="middle" font-size="9" fill="#b45309">Unified session workflow</text>
+          <text x="630" y="447" text-anchor="middle" font-size="9" fill="#b45309">Stable event contracts</text>
+
+          <rect x="695" y="312" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="790" y="333" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">04</text>
+          <text x="790" y="348" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Module Verification</text>
+          <text x="790" y="361" text-anchor="middle" font-size="9" fill="#16a34a">Flow and state transition tests</text>
+          <text x="790" y="373" text-anchor="middle" font-size="9" fill="#16a34a">Account isolation checks</text>
+
+          <rect x="809" y="192" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="904" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">05</text>
+          <text x="904" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Interaction Test</text>
+          <text x="904" y="245" text-anchor="middle" font-size="9" fill="#16a34a">GUI event-response consistency</text>
+
+          <rect x="919" y="72" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="1014" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">06</text>
+          <text x="1014" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">User Acceptance</text>
+          <text x="1014" y="125" text-anchor="middle" font-size="9" fill="#16a34a">Gloved-use and session trials</text>
+
+          <line x1="30" y1="498" x2="1230" y2="498" stroke="#e2e8f0" stroke-width="1"/>
+          <rect x="38" y="506" width="12" height="12" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="56" y="516" font-size="10" fill="#64748b">Design decomposition</text>
+          <rect x="220" y="506" width="12" height="12" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="238" y="516" font-size="10" fill="#64748b">Verification and validation</text>
+          <ellipse cx="426" cy="512" rx="8" ry="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+          <text x="440" y="516" font-size="10" fill="#64748b">Integration build stage</text>
+          <line x1="590" y1="512" x2="617" y2="512" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="625" y="516" font-size="10" fill="#64748b">Requirement to verification correspondence</text>
+        </svg>
+
+        <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
+          Figure: GUI Systems Engineering V-Model showing requirement decomposition (left), integration build (centre), and verification closure (right) for GUI-1 to GUI-5.
+        </sub>
+      </div>
+
+      <h4>Left Side of the V: Design Decomposition</h4>
+      <p>
+        Decomposition was performed by interaction outcome, not by isolated
+        page. GUI-1 drove gloved-operable controls and hands-free navigation.
+        GUI-2 and GUI-3 drove account-scoped progression data. GUI-4 drove
+        live round-state presentation. GUI-5 drove stable integration contracts
+        so interface behavior could be validated while connected subsystems were
+        still maturing.
+      </p>
+
+      <h4>Base of the V: Integration Build</h4>
+      <p>
+        At integration stage, the modules were assembled into one operator
+        workflow: login, mode selection, session execution, and review.
+        Navigation, timer behavior, and results patterns were standardized
+        across modes so interaction remained predictable under training pace.
+      </p>
+
+      <h4>Right Side of the V: Verification Closure</h4>
+      <p>
+        Verification was planned from the same requirements used during
+        decomposition. Functional checks covered account isolation, progression
+        unlock rules, session-state transitions, and navigation stack
+        correctness. User trials validated gloved operability and transition
+        speed during active training. Together, these checks close the
+        requirement-to-verification loop for GUI-1 to GUI-5 (INCOSE, 2023).
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">V-Model Stage</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">GUI Focus</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Applied to BoxBunny GUI</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Verification Evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Concept and Requirements</td>
+            <td style="padding:8px; border:1px solid #ddd;">Define user-operable interface behaviour</td>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-1 to GUI-5 derived from user journey and function specifications</td>
+            <td style="padding:8px; border:1px solid #ddd;">Requirement table and traceability mapping</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">High-Level Design</td>
+            <td style="padding:8px; border:1px solid #ddd;">Partition features into coherent modules</td>
+            <td style="padding:8px; border:1px solid #ddd;">Training, Performance, Sparring, Others, and Coach Station flows with shared navigation patterns</td>
+            <td style="padding:8px; border:1px solid #ddd;">Screen-flow checks and navigation path tests</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Detailed Design and Build</td>
+            <td style="padding:8px; border:1px solid #ddd;">Assemble interface logic with stable subsystem contracts</td>
+            <td style="padding:8px; border:1px solid #ddd;">Session setup, round HUD, results pages, and account-scoped history</td>
+            <td style="padding:8px; border:1px solid #ddd;">Mode-by-mode functional testing</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Verification and Validation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Confirm performance against GUI requirements</td>
+            <td style="padding:8px; border:1px solid #ddd;">Multi-user isolation checks, progression rule checks, and active-session usability checks</td>
+            <td style="padding:8px; border:1px solid #ddd;">Validation summary and testing records</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI application of the V-Model from decomposition to verification</p>
     </div>
 
     <sl-divider></sl-divider>
@@ -258,12 +546,14 @@
         touchscreen at 1024x600, later upgraded to a 10.1-inch capacitive display at 1280x800
         following user testing observations. The application uses a five-layer architecture
         separating presentation, application logic, business logic, integration, and data
-        concerns. The integration layer connects the GUI to ROS 2 nodes via a QThread-based
-        bridge, enabling real-time data flow for punch detection, drill progress, and coaching
-        tips. A phone-accessible companion dashboard (Vue 3 web app) shares the same user
-        database and serves over the robot's WiFi access point, allowing users to view
-        analytics, start training remotely, and chat with the AI coach from their phone.
-        The system was built over seven iterations from December 2024 to April 2025.
+        concerns. The integration layer exchanges standard session events and control commands
+        with the robot intelligence subsystem, enabling real-time updates for drill progress,
+        timer state, and coaching prompts from the user's perspective. A phone-accessible
+        companion dashboard (Vue 3 web app) shares the same user database and serves over the
+        robot's WiFi access point, allowing users to view analytics, start training remotely,
+        and chat with the AI coach from their phone. Backend implementation details are
+        documented in Section 5.3. The system was built over six iterations from December 2025
+        to April 2026.
       </p>
     </div>
 
@@ -307,6 +597,67 @@
 
     <sl-divider></sl-divider>
 
+    <!-- INTEGRATION WITH ROBOT INTELLIGENCE -->
+    <div>
+      <h3>Integration with Robot Intelligence</h3>
+      <p>
+        The GUI is the user-facing layer of a larger system. The robot intelligence subsystem
+        (Section 5.3) handles sensing, scoring, and AI inference. The GUI presents
+        the outputs of that processing to the user and sends user intent back into the system.
+        Neither side depends on the internal details of the other.
+      </p>
+      <p>
+        From the user's perspective, this integration is what makes the interface feel live.
+        When a punch lands on a pad, the combo display advances automatically. When a round
+        ends, the rest screen appears without any user action. When the AI coach generates a tip,
+        it slides in at the top of the screen. All of this happens because the GUI listens for
+        events from the backend and reacts to them in real time.
+      </p>
+      <p>
+        The flow works in two directions:
+      </p>
+
+      <div style="width:100%; overflow-x:auto; margin:18px 0 8px 0;">
+        <svg viewBox="0 0 980 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; display:block; margin:0 auto; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc; box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+          <rect x="0" y="0" width="980" height="320" rx="12" fill="#f8fafc"/>
+
+          <text x="490" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">GUI and Robot Intelligence Relationship</text>
+
+          <rect x="60" y="78" width="280" height="150" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="200" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">5.1 User Interface</text>
+          <text x="200" y="138" text-anchor="middle" font-size="11" fill="#1e40af">User taps Start</text>
+          <text x="200" y="158" text-anchor="middle" font-size="11" fill="#1e40af">User hits pads during a session</text>
+          <text x="200" y="178" text-anchor="middle" font-size="11" fill="#1e40af">User opens results or coach feedback</text>
+          <text x="200" y="200" text-anchor="middle" font-size="11" fill="#1e40af">GUI updates the screen in response</text>
+
+          <rect x="640" y="78" width="280" height="150" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+          <text x="780" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d">5.3 Robot Intelligence</text>
+          <text x="780" y="138" text-anchor="middle" font-size="11" fill="#166534">Detects punches and session state</text>
+          <text x="780" y="158" text-anchor="middle" font-size="11" fill="#166534">Returns round updates and results</text>
+          <text x="780" y="178" text-anchor="middle" font-size="11" fill="#166534">Delivers coaching tips and feedback</text>
+          <text x="780" y="200" text-anchor="middle" font-size="11" fill="#166534">Keeps the training flow synchronized</text>
+
+          <defs>
+            <marker id="gui-int-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+            </marker>
+          </defs>
+
+          <path d="M 340 132 C 430 132, 520 132, 640 132" fill="none" stroke="#475569" stroke-width="2.4" marker-end="url(#gui-int-arrow)"/>
+          <path d="M 640 182 C 520 182, 430 182, 340 182" fill="none" stroke="#475569" stroke-width="2.4" marker-end="url(#gui-int-arrow)"/>
+
+          <rect x="382" y="96" width="216" height="34" rx="17" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.2"/>
+          <text x="490" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">User intent flows to the backend</text>
+
+          <rect x="382" y="160" width="216" height="34" rx="17" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.2"/>
+          <text x="490" y="182" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Responses flow back to the GUI</text>
+        </svg>
+      </div>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Figure: Bidirectional relationship between the GUI and Robot Intelligence</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- NAV CARDS -->
     <div>
       <h3>Detailed Documentation</h3>
@@ -319,7 +670,7 @@
         <a href="gui/implementation.html" class="section-nav-card">
           <sl-icon name="code-square" style="font-size: 2rem;"></sl-icon>
           <h3>Implementation</h3>
-          <p>Seven iterations, layered architecture, ROS 2 integration, phone dashboard, key engineering decisions</p>
+          <p>Six iterations, layered architecture, ROS 2 integration, phone dashboard, key engineering decisions</p>
         </a>
         <a href="gui/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
@@ -327,6 +678,15 @@
           <p>Functional testing, user testing, requirements verification</p>
         </a>
       </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+      <a href="gui/design-ideation.html">
+        <sl-button variant="default" size="medium">
+          Next: Design and Ideation
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
 
     <sl-divider></sl-divider>
@@ -346,29 +706,51 @@
           communicates with during sparring and training sessions.
         </li>
         <li>
-          <strong><a href="robot-intelligence.html">5.4 Robot Intelligence</a></strong>
+          <strong><a href="robot-intelligence.html">5.3 Robot Intelligence</a></strong>
           covers the computer vision subsystem whose punch detection output feeds into the
           GUI's Reaction Test and Sparring mode via a file-based handshake interface.
         </li>
       </ul>
     </div>
 
-    <sl-divider></sl-divider>
 
-    <!-- NEXT SECTION NAVIGATION -->
-    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-      <a href="robot-mechanism.html">
-        <sl-button variant="default" size="medium">
-          Next: 5.2 Upper Mechanism
-          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
-        </sl-button>
-      </a>
+  </div>
+
+  <!-- GUI V-Model Fullscreen Modal -->
+  <div id="guiVmodelModal" class="gui-vmodel-modal" onclick="closeGuiVmodelModal(event)">
+    <div class="gui-vmodel-modal-inner" id="guiVmodelModalInner">
+      <div class="gui-vmodel-close-btn" onclick="closeGuiVmodelModal()" title="Close">&#x2715;</div>
     </div>
-
   </div>
 
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
     <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
   </sl-button>
+
+  <script>
+    var _guiVmodelSVGCache = null;
+    function openGuiVmodelModal() {
+      var modal = document.getElementById('guiVmodelModal');
+      var inner = document.getElementById('guiVmodelModalInner');
+      if (!_guiVmodelSVGCache) {
+        var origSVG = document.getElementById('guiVmodelSVG');
+        _guiVmodelSVGCache = origSVG.cloneNode(true);
+        _guiVmodelSVGCache.style.borderRadius = '14px';
+      }
+      var existing = inner.querySelector('svg');
+      if (existing) existing.remove();
+      inner.appendChild(_guiVmodelSVGCache.cloneNode(true));
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeGuiVmodelModal(e) {
+      if (e && e.target !== document.getElementById('guiVmodelModal') && !e.target.classList.contains('gui-vmodel-close-btn')) return;
+      document.getElementById('guiVmodelModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeGuiVmodelModal({target: document.getElementById('guiVmodelModal')});
+    });
+  </script>
 </body>
 </html>

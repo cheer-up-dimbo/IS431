@@ -139,6 +139,11 @@ body.has-report-nav .content {
   margin-right: auto;
 }
 
+body.has-report-nav .report-container {
+  margin-left: 280px;
+  margin-right: auto;
+}
+
 /* Toggle button (for mobile / collapse) */
 .report-nav__toggle {
   position: fixed;
@@ -177,6 +182,10 @@ body.nav-collapsed .content {
     box-shadow: 4px 0 20px rgba(0,0,0,0.15);
   }
   body.has-report-nav .content {
+    margin-left: auto;
+  }
+
+  body.has-report-nav .report-container {
     margin-left: auto;
   }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Implementation â GUI</title>
+  <title>IS-431: Implementation - GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -63,6 +63,15 @@
       font-size: 0.92rem;
       line-height: 1.6;
     }
+    .iteration-timeline {
+      margin: 22px 0 18px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+      overflow-x: auto;
+    }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>
 </head>
@@ -78,16 +87,77 @@
 
     <h2>Implementation</h2>
     <p>
-      The GUI was built over six iterations across 15 weeks (December 2024 to April 2025).
+      The GUI was built over six iterations across 15 weeks (December 2025 to April 2026).
       Each iteration had a defined objective, produced working software, and closed with a
       review before the next iteration began. This section documents the development timeline,
       the system architecture, and the key engineering decisions that shaped the final system.
     </p>
+    <p>
+      <strong>V-Model alignment:</strong> This page corresponds to the base of the V,
+      where decomposed GUI concepts are integrated into a single, testable subsystem build.
+    </p>
+    <p>
+      The implementation story is still a product story. Each release turned the GUI from a
+      set of selected concepts into something a boxer could actually use in training, with the
+      architecture serving the user flow rather than the other way around.
+    </p>
+
+    <div class="iteration-timeline">
+      <svg viewBox="0 0 1080 170" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:860px; height:auto; display:block;" aria-label="GUI iteration timeline">
+        <rect x="0" y="0" width="1080" height="170" rx="12" fill="#f8fafc"/>
+        <text x="540" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Six-Iteration Build Timeline</text>
+        <text x="540" y="43" text-anchor="middle" font-size="11" fill="#64748b">Each iteration adds one layer of training flow, integration, or polish.</text>
+
+        <line x1="90" y1="92" x2="990" y2="92" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+
+        <g>
+          <circle cx="120" cy="92" r="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+          <text x="120" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">1</text>
+          <text x="120" y="126" text-anchor="middle" font-size="11" fill="#334155">Foundation</text>
+          <text x="120" y="141" text-anchor="middle" font-size="10" fill="#64748b">login, layout, shell</text>
+        </g>
+        <g>
+          <circle cx="290" cy="92" r="18" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+          <text x="290" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">2</text>
+          <text x="290" y="126" text-anchor="middle" font-size="11" fill="#334155">Session flow</text>
+          <text x="290" y="141" text-anchor="middle" font-size="10" fill="#64748b">navigation, rounds, start/end</text>
+        </g>
+        <g>
+          <circle cx="460" cy="92" r="18" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+          <text x="460" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">3</text>
+          <text x="460" y="126" text-anchor="middle" font-size="11" fill="#334155">Training logic</text>
+          <text x="460" y="141" text-anchor="middle" font-size="10" fill="#64748b">curriculum, scoring, history</text>
+        </g>
+        <g>
+          <circle cx="630" cy="92" r="18" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
+          <text x="630" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#7e22ce">4</text>
+          <text x="630" y="126" text-anchor="middle" font-size="11" fill="#334155">Integration</text>
+          <text x="630" y="141" text-anchor="middle" font-size="10" fill="#64748b">bridge, mock mode, ROS flow</text>
+        </g>
+        <g>
+          <circle cx="800" cy="92" r="18" fill="#cffafe" stroke="#06b6d4" stroke-width="2"/>
+          <text x="800" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#0e7490">5</text>
+          <text x="800" y="126" text-anchor="middle" font-size="11" fill="#334155">Dashboard</text>
+          <text x="800" y="141" text-anchor="middle" font-size="10" fill="#64748b">phone companion and sync</text>
+        </g>
+        <g>
+          <circle cx="970" cy="92" r="18" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+          <text x="970" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#b91c1c">6</text>
+          <text x="970" y="126" text-anchor="middle" font-size="11" fill="#334155">Polish</text>
+          <text x="970" y="141" text-anchor="middle" font-size="10" fill="#64748b">stability, tuning, validation</text>
+        </g>
+      </svg>
+    </div>
 
     <!-- ITERATIONS -->
     <div>
       <h3>Development Iterations</h3>
       <table-component id="gui-iterations" subtitle="Table: GUI Development Iterations"></table-component>
+      <p>
+        The iteration plan followed the product development sequence from Chapter 3: select the
+        concept, build the minimum viable version, check it against user needs, then refine the
+        training flow before moving to the next layer.
+      </p>
 
       <!--
       <p>
@@ -140,6 +210,11 @@
         responsibility, so changes in one layer do not cascade into unrelated parts of the
         codebase.
       </p>
+      <p>
+        From the user's perspective, that architecture exists to keep the training experience
+        smooth. A user should see a stable drill flow and fast feedback, even when the underlying
+        data, integration, or session logic changes.
+      </p>
 
       <div class="arch-diagram">
         <div class="arch-layer arch-l1">
@@ -169,8 +244,13 @@
         calling hardware interfaces directly, all hardware communication is routed through
         this layer. During development on a Windows laptop with no hardware connected, the
         layer switches automatically to mock interfaces that simulate hardware responses.
-        When deployed on the Jetson Nano, the mock interfaces are replaced by real
+        When deployed on the Jetson Orin NX, the mock interfaces are replaced by real
         implementations without any changes to the layers above.
+      </p>
+      <p>
+        That separation mattered because the product had to keep moving while the rest of the
+        robot was still being developed. The GUI could be tested with realistic training flows
+        before the physical system was fully available.
       </p>
 
       <table-component id="gui-integration-specs" subtitle="Table: Integration Layer Specifications"></table-component>
@@ -180,19 +260,176 @@
     <div>
       <h3>ROS 2 Integration</h3>
       <p>
-        The GUI communicates with the broader BoxBunny system through a GuiBridge class
-        that spawns a background QThread running a ROS 2 node. ROS topic callbacks on the
-        worker thread emit Qt Signals, which are automatically marshalled to the GUI's main
-        thread for safe widget updates. This architecture allows real-time punch
-        confirmations, drill progress updates, session state changes, and coaching tips to
-        flow into the interface without blocking the UI event loop.
+        The GUI communicates with the broader BoxBunny system through a GuiBridge interface
+        that receives session events and sends user commands. This keeps interface behavior
+        responsive while preserving a clean boundary between user interaction flow and backend
+        processing. From the user's perspective, this enables live updates for punch
+        confirmations, drill progress, session state, and coaching prompts.
       </p>
       <p>
-        When ROS 2 is unavailable (for example, during UI development on a laptop without
-        the full robotics stack), the bridge degrades gracefully: all signals are suppressed,
-        service calls return failure immediately, and the GUI runs in standalone mode using
-        mock interfaces. This preserved the ability to develop and test the entire GUI
-        independently of hardware throughout the project.
+        In product terms, the bridge is what makes the GUI feel alive during training. The user
+        sees the session react immediately, rather than feeling like they are waiting on a
+        separate machine in the background.
+      </p>
+      <p>
+        During laptop-only development, the same interface runs in mock mode so the GUI can be
+        validated without connected hardware. Internal node architecture, transport details,
+        and backend implementation are documented in Section 5.3.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- IMU NAVIGATION -->
+    <div>
+      <h3>IMU Navigation</h3>
+      <p>
+        A key usability constraint identified during needs finding is that boxers cannot
+        reliably operate a touchscreen while actively training. Research on touch input shows
+        that even moderate hand coverage significantly reduces accuracy on targets below 48px
+        (Parhi, Karlson and Myers, 2006). The GUI is therefore designed for normal touchscreen
+        use with bare hands, while the IMU pads provide the training-time control path.
+      </p>
+      <p>
+        This feature exists because the training product has to work under movement and fast
+        session changes. The navigation model was chosen to keep the boxer focused on the drill
+        instead of on the screen.
+      </p>
+      <div style="margin:18px 0 14px; padding:18px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow:hidden;">
+        <svg id="imuNavSVG" viewBox="0 0 1120 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:100%; height:auto; display:block;" aria-label="Interactive IMU navigation visual">
+          <rect x="0" y="0" width="1120" height="340" rx="12" fill="#f8fafc"/>
+          <text x="560" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Interactive IMU Navigation Cue</text>
+          <text x="560" y="46" text-anchor="middle" font-size="11" fill="#64748b">Click a pad to preview the direction label and the active state.</text>
+
+          <defs>
+            <marker id="imu-nav-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <rect x="316" y="50" width="488" height="28" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+          <text id="imuNavStatus" x="560" y="64" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="#0f172a">Press a pad to preview the navigation response</text>
+
+          <circle cx="560" cy="206" r="64" fill="#0f172a" stroke="#1e293b" stroke-width="2.5"/>
+          <text x="560" y="200" text-anchor="middle" dominant-baseline="middle" font-size="14" font-weight="700" fill="#ffffff">GUI</text>
+          <text x="560" y="220" text-anchor="middle" dominant-baseline="middle" font-size="10.5" fill="#cbd5e1">training-time control path</text>
+
+          <g id="imuPadUp" class="imu-pad" onclick="setImuState('up')" style="cursor:pointer;">
+            <rect x="520" y="94" width="80" height="34" rx="17" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.4"/>
+            <text x="560" y="111" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#1d4ed8">Up / Head</text>
+          </g>
+
+          <g id="imuPadRight" class="imu-pad" onclick="setImuState('right')" style="cursor:pointer;">
+            <rect x="690" y="190" width="92" height="34" rx="17" fill="#dcfce7" stroke="#86efac" stroke-width="1.4"/>
+            <text x="736" y="207" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#15803d">Right</text>
+          </g>
+
+          <g id="imuPadLeft" class="imu-pad" onclick="setImuState('left')" style="cursor:pointer;">
+            <rect x="338" y="190" width="92" height="34" rx="17" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+            <text x="384" y="207" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#c2410c">Left</text>
+          </g>
+
+          <g id="imuPadConfirm" class="imu-pad" onclick="setImuState('confirm')" style="cursor:pointer;">
+            <rect x="520" y="284" width="80" height="34" rx="17" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.4"/>
+            <text x="560" y="301" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#7e22ce">Confirm</text>
+          </g>
+
+          <line x1="560" y1="128" x2="560" y2="146" stroke="#64748b" stroke-width="2" marker-end="url(#imu-nav-arrow)"/>
+          <line x1="682" y1="207" x2="648" y2="207" stroke="#64748b" stroke-width="2" marker-end="url(#imu-nav-arrow)"/>
+          <line x1="438" y1="207" x2="472" y2="207" stroke="#64748b" stroke-width="2" marker-end="url(#imu-nav-arrow)"/>
+          <line x1="560" y1="282" x2="560" y2="268" stroke="#64748b" stroke-width="2" marker-end="url(#imu-nav-arrow)"/>
+
+        </svg>
+      </div>
+      <p>
+        The four pads double as navigation controls outside of training sessions. Left pad
+        moves to the previous item, right pad moves to the next, centre pad confirms a
+        selection, and head pad navigates back. This mapping follows the directional
+        convention familiar from physical four-button controllers, which reduces the need
+        for users to learn new interaction patterns (Norman, 2013).
+      </p>
+      <p>
+        One edge case is the home screen, which has no parent to return to. On the home
+        screen, the head pad opens a quick-access preset overlay instead of attempting a
+        back navigation with nowhere to go.
+      </p>
+      <p>
+        During active training, all pad navigation is disabled. Without this, punch impacts
+        on the pads would trigger accidental page changes mid-session. The disable state
+        activates during the countdown and active phases of every session and restores
+        automatically during rest and after session completion.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- SESSION ORCHESTRATION -->
+    <div>
+      <h3>Session Orchestration</h3>
+      <p>
+        The GUI is the session lifecycle controller for every training mode: technique drills,
+        sparring, free training, and performance tests. Every session begins with an explicit
+        start request from the GUI and ends with an explicit end request that retrieves the
+        session summary.
+      </p>
+      <p>
+        From the product point of view, this is the core training loop. The user configures a
+        drill, starts it, receives live state feedback, and ends with a summary that supports
+        the next training decision.
+      </p>
+      <div style="margin:18px 0 14px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+        <svg viewBox="0 0 1040 210" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:820px; height:auto; display:block;" aria-label="Session orchestration flow">
+          <rect x="0" y="0" width="1040" height="210" rx="12" fill="#f8fafc"/>
+          <text x="520" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Typical Session Flow</text>
+          <text x="520" y="43" text-anchor="middle" font-size="11" fill="#64748b">A training session moves from setup to live control to results review.</text>
+
+          <defs>
+            <marker id="session-flow-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <rect x="26" y="78" width="152" height="70" rx="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.4"/>
+          <text x="102" y="106" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">Configure</text>
+          <text x="102" y="125" text-anchor="middle" font-size="10.5" fill="#1e40af">mode, level, duration</text>
+
+          <rect x="220" y="78" width="152" height="70" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+          <text x="296" y="106" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">Start</text>
+          <text x="296" y="125" text-anchor="middle" font-size="10.5" fill="#9a3412">session ID issued</text>
+
+          <rect x="414" y="78" width="152" height="70" rx="16" fill="#dcfce7" stroke="#86efac" stroke-width="1.4"/>
+          <text x="490" y="106" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">Run</text>
+          <text x="490" y="125" text-anchor="middle" font-size="10.5" fill="#166534">countdown, active, rest</text>
+
+          <rect x="608" y="78" width="152" height="70" rx="16" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.4"/>
+          <text x="684" y="106" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">Finish</text>
+          <text x="684" y="125" text-anchor="middle" font-size="10.5" fill="#6b21a8">summary returned</text>
+
+          <rect x="802" y="78" width="212" height="70" rx="16" fill="#fee2e2" stroke="#fca5a5" stroke-width="1.4"/>
+          <text x="908" y="106" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">Review</text>
+          <text x="908" y="125" text-anchor="middle" font-size="10.5" fill="#991b1b">results, next-session choice</text>
+
+          <line x1="178" y1="113" x2="212" y2="113" stroke="#64748b" stroke-width="2.2" marker-end="url(#session-flow-arrow)"/>
+          <line x1="372" y1="113" x2="406" y2="113" stroke="#64748b" stroke-width="2.2" marker-end="url(#session-flow-arrow)"/>
+          <line x1="566" y1="113" x2="600" y2="113" stroke="#64748b" stroke-width="2.2" marker-end="url(#session-flow-arrow)"/>
+          <line x1="760" y1="113" x2="794" y2="113" stroke="#64748b" stroke-width="2.2" marker-end="url(#session-flow-arrow)"/>
+        </svg>
+      </div>
+      <p>
+        The sequence on a typical session is as follows. The user configures the session and
+        taps Start. The GUI sends a request to the backend with the training mode, difficulty,
+        and username, and receives a session ID in return. Throughout the session, state changes
+        arrive from the backend: countdown, active round, rest period, and next round. The
+        GUI uses these to drive the on-screen timer, round counter, and screen transitions.
+        When the final round ends or the user exits early, the GUI sends an end request with
+        the session ID. The backend returns a summary containing punch counts, accuracy scores,
+        and performance metrics, which the results page then displays.
+      </p>
+      <p>
+        This separation means Section 5.3 (Robot Intelligence) handles scoring and data
+        collection logic, while Section 5.1 (GUI) handles all presentation and user flow
+        logic. The GUI does not need to know how punch scoring is calculated, and the backend
+        does not need to know how results are displayed.
       </p>
     </div>
 
@@ -200,18 +437,10 @@
     <div>
       <h3>Phone Dashboard</h3>
       <p>
-        A companion web dashboard was implemented to give users access to their training
-        data from their phone. The dashboard is a Vue 3 single-page application served by a
-        lightweight backend running on the same Jetson. Users connect to the robot's WiFi
-        access point and open the dashboard in their phone browser.
-      </p>
-      <p>
-        The dashboard reads from the same SQLite databases as the touchscreen GUI, providing
-        a synchronized view of session history, performance trends, achievement progress, and
-        combo mastery. Users can also start training sessions remotely, adjust robot height,
-        manage presets, and chat with the AI coach. Remote commands are written as JSON to a
-        shared file that the GUI polls every 100 ms, providing near-instant responsiveness
-        without requiring a direct socket connection between the dashboard and the GUI process. The backend implementation of the dashboard server, API endpoints, and WebSocket communication is documented in Section 5.4 (Robot Intelligence).
+        A companion phone dashboard gives users a quick way to check progress and make light
+        training adjustments without walking back to the robot. It is most useful between
+        rounds or after a session, when the boxer wants a fast summary rather than a full
+        touchscreen interaction. More detailed integration notes are in Section 5.3.
       </p>
     </div>
 
@@ -219,18 +448,9 @@
     <div>
       <h3>Gamification System</h3>
       <p>
-        A gamification layer was added to sustain user motivation across sessions. Experience
-        points (XP) are awarded per training session based on the training mode, session
-        completion percentage, performance score, and current training streak. Users progress
-        through six ranks: Novice, Contender, Fighter, Warrior, Champion, and Elite, each
-        requiring increasing XP thresholds.
-      </p>
-      <p>
-        Twelve achievement badges track specific milestones such as first completed session
-        (First Blood), 100 total punches (Century), fastest reaction time (Speed Demon), and
-        highest defense rate (Iron Chin). A daily training streak counter encourages
-        consistency, with bonus XP multipliers applied during active streaks. Personal records
-        for power, stamina, and reaction metrics are tracked and surfaced on the dashboard. The session history interface consolidating all training types is shown in <a href="../appendix-gui.html">Appendix 3</a>.
+        The rank and badge system gives users visible progress after a session, which helps
+        keep training feeling rewarding instead of repetitive. The detailed scoring and data
+        model are covered in Section 5.3.
       </p>
 
       <div style="margin-top:16px;">
@@ -496,12 +716,27 @@
       <!-- AI COACHING -->
       <h4>AI Coaching Integration</h4>
       <p>
-        The combo training flow includes a post-session chat page where users can ask for
-        feedback on their performance. The chat is powered by a local LLM (Qwen 2.5 3B GGUF
-        via llama-cpp-python). On hardware where the model cannot be loaded (insufficient memory
-        or missing model file), the system falls back to hardcoded template responses. This
-        fallback was implemented as a design decision rather than an error state, since the
-        Jetson Nano's 4 GB of RAM makes model availability uncertain. The LLM pipeline, model selection, and prompt engineering details are documented in Section 5.4 (Robot Intelligence).
+        Users benefit from feedback that appears when it is most useful: quick prompts during
+        training and a more reflective chat view after a session. That keeps the coaching feel
+        light and readable while still giving the boxer a clear next step. More detail on the
+        AI coaching pipeline is in Section 5.3.
+      </p>
+
+      <!-- SOUND SYSTEM -->
+      <h4>Sound System</h4>
+      <p>
+        Audio feedback reinforces task events without requiring the user's visual attention,
+        which is useful during active training when the user is focused on the pads rather
+        than the screen (Gaver, 1989). The GUI uses 18 WAV sound effects, all preloaded at
+        startup for zero-latency playback.
+      </p>
+      <p>
+        A priority tier system prevents lower-priority sounds from masking higher-priority
+        ones. Round start and end bells carry the highest priority among session sounds.
+        Countdown ticks sit below bells, hit confirmation sounds sit below ticks, and
+        UI navigation clicks sit at the lowest priority. A navigation click cannot interrupt
+        a bell, but a bell will always cut through regardless of what else is playing.
+        Volume and per-sound toggles are available from the Settings page.
       </p>
 
 
@@ -565,6 +800,17 @@ class CustomPage(ButtonNavigationMixin, QWidget):
       <table-component id="gui-feature-set" subtitle="Table: Complete Feature Set"></table-component>
     </div>
 
+    <!-- REFERENCES -->
+    <div>
+      <h3>References</h3>
+      <ul style="list-style:none; padding-left:0; font-size:0.92rem; line-height:1.7;">
+        <li>Gaver, W.W. (1989). The SonicFinder: An interface that uses auditory icons. <em>Human-Computer Interaction</em>, 4(1), 67-94.</li>
+        <li>Norman, D.A. (2013). <em>The Design of Everyday Things: Revised and Expanded Edition</em>. Basic Books.</li>
+        <li>Parhi, P., Karlson, A.K. and Myers, B.A. (2006). Target size study for one-handed thumb use on small touchscreen devices. In <em>Proceedings of the 8th Conference on Human-Computer Interaction with Mobile Devices and Services (MobileHCI 2006)</em>, pp. 203-210.</li>
+        <li>Schmidt, R.A. and Lee, T.D. (2011). <em>Motor Control and Learning: A Behavioral Emphasis</em> (5th ed.). Human Kinetics.</li>
+      </ul>
+    </div>
+
     <!-- BOTTOM NAVIGATION -->
     <div class="page-nav-row">
       <a href="design-ideation.html">
@@ -596,6 +842,53 @@ class CustomPage(ButtonNavigationMixin, QWidget):
         return origRender.call(this, el);
       };
     })();
+
+    function setImuState(direction) {
+      var labels = {
+        up: 'Pressed: Up / Head pad - navigate back',
+        right: 'Pressed: Right pad - move to the next item',
+        left: 'Pressed: Left pad - move to the previous item',
+        confirm: 'Pressed: Confirm pad - select the current item'
+      };
+      var activeFills = {
+        up: '#93c5fd',
+        right: '#86efac',
+        left: '#fdba74',
+        confirm: '#d8b4fe'
+      };
+      var pads = {
+        up: document.querySelector('#imuPadUp rect'),
+        right: document.querySelector('#imuPadRight rect'),
+        left: document.querySelector('#imuPadLeft rect'),
+        confirm: document.querySelector('#imuPadConfirm rect')
+      };
+      var texts = {
+        up: document.querySelector('#imuPadUp text'),
+        right: document.querySelector('#imuPadRight text'),
+        left: document.querySelector('#imuPadLeft text'),
+        confirm: document.querySelector('#imuPadConfirm text')
+      };
+      var dimFill = '#e2e8f0';
+      var dimStroke = '#cbd5e1';
+
+      Object.keys(pads).forEach(function(key) {
+        if (!pads[key] || !texts[key]) return;
+        if (key === direction) {
+          pads[key].setAttribute('fill', activeFills[key]);
+          pads[key].setAttribute('stroke', '#475569');
+          texts[key].setAttribute('fill', '#0f172a');
+        } else {
+          pads[key].setAttribute('fill', dimFill);
+          pads[key].setAttribute('stroke', dimStroke);
+          texts[key].setAttribute('fill', '#64748b');
+        }
+      });
+
+      var status = document.getElementById('imuNavStatus');
+      if (status) status.textContent = labels[direction] || 'Press a pad to preview the navigation response';
+    }
+
+    setImuState('up');
   </script>
   <script type="module" src="../../components/table-component/table-component.js"></script>
   <script src="../../components/table-component/gui-iterations.js"></script>

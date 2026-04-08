@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-190 -136 524 600">
+<filter id="f"><feColorMatrix type="saturate" values="0"/></filter>
+<marker id="m"><use href="#c" filter="url(#f)"/></marker>
+<g transform="scale(71,82)">
+<path marker-mid="url(#m)" fill="none" d="M-3,2.5zl1-1.5l1-1.5l1-1.5-2,5l1-1.5l2-3l1,3.5-1,.5l1-1.5-2,2l1-1.5l1-1.5z"/>
+<g id="c" stroke="#000" stroke-width=".02">
+<path fill="#f99" d="M.5,1l1,.5l1-.5-1-.5z"/>
+<path fill="#e66" d="M.5,1v1l1,.5v-1z"/>
+<path fill="#c66" d="M2.5,1v1l-1,.5v-1z"/>
+</g>
+</g>
+</svg>

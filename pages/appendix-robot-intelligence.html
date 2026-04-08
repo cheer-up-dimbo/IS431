@@ -1,278 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Appendix 6 - Robot Intelligence</title>
-  <link rel="icon" href="../favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
-  <link rel="stylesheet" href="../index.css">
-  <script type="module" src="../components/image/image-component.js"></script>
-  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
-  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
-  <script src="../components/report-nav/report-nav.js" defer></script>
-  <style>
-    .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
-    .test-table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 0.92rem; }
-    .test-table th { padding: 8px 12px; border: 1px solid #ddd; background: #f0f0f0; text-align: left; font-weight: 600; }
-    .test-table td { padding: 8px 12px; border: 1px solid #ddd; vertical-align: top; }
-    .test-table td:nth-child(2) { text-align: center; width: 60px; }
-    .test-file-header { background: #e8edf2; font-weight: 600; }
-    .test-file-header td { border-bottom: 2px solid #aab; font-size: 0.95rem; padding: 10px 12px; }
-    .fixture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; margin: 12px 0; }
-    .fixture-item { display: flex; gap: 8px; align-items: baseline; font-size: 0.92rem; padding: 6px 10px; background: #f8f9fa; border-radius: 4px; }
-    .fixture-item code { font-size: 0.85rem; white-space: nowrap; }
-    .video-grid-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
-    .video-grid-4col .video-cell video { width: 100%; height: auto; border-radius: 6px; }
-    .video-grid-4col .video-cell sub { display: block; margin-top: 4px; text-align: center; font-size: 0.82rem; color: #555; }
-    @media (max-width: 800px) { .video-grid-4col { grid-template-columns: repeat(2, 1fr); } }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>IS-431: Appendix 7 - Robot Intelligence</title>
+ <link rel="icon" href="../favicon.ico" type="image/x-icon">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+ <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+ <link rel="stylesheet" href="../index.css">
+ <script type="module" src="../components/image/image-component.js"></script>
+ <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+ <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+ <script src="../components/report-nav/report-nav.js" defer></script>
+ <style>
+    /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
+    code {
+      background: #f0f4f8;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.88em;
+      color: #1a7f37;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+ .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
+ .test-table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 0.92rem; }
+ .test-table th { padding: 8px 12px; border: 1px solid #ddd; background: #f0f0f0; text-align: left; font-weight: 600; }
+ .test-table td { padding: 8px 12px; border: 1px solid #ddd; vertical-align: top; }
+ .test-table td:nth-child(2) { text-align: center; width: 60px; }
+ .test-file-header { background: #e8edf2; font-weight: 600; }
+ .test-file-header td { border-bottom: 2px solid #aab; font-size: 0.95rem; padding: 10px 12px; }
+ .fixture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; margin: 12px 0; }
+ .fixture-item { display: flex; gap: 8px; align-items: baseline; font-size: 0.92rem; padding: 6px 10px; background: #f8f9fa; border-radius: 4px; }
+ .fixture-item code { font-size: 0.85rem; white-space: nowrap; }
+ .video-grid-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+ .video-grid-4col .video-cell video { width: 100%; height: auto; border-radius: 6px; }
+ .video-grid-4col .video-cell sub { display: block; margin-top: 4px; text-align: center; font-size: 0.82rem; color: #555; }
+ @media (max-width: 800px) { .video-grid-4col { grid-template-columns: repeat(2, 1fr); } }
+ </style>
 </head>
 <body>
-  <div class="content">
-    <a href="robot-intelligence.html" class="back-btn">
-      <sl-button variant="default" size="medium">
-        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-        Back to Robot Intelligence
-      </sl-button>
-    </a>
-    <br>
+ <div class="content">
+ <a href="robot-intelligence.html" class="back-btn">
+ <sl-button variant="default" size="medium">
+ <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+ Back to Robot Intelligence
+ </sl-button>
+ </a>
+ <br>
 
-    <h2>Appendix 6: Robot Intelligence</h2>
+ <h2>Appendix 7: Robot Intelligence</h2>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- A. DETAILED FEATURE EXPLORATION -->
-    <h3>A. Detailed Feature Exploration — 9 Iterations</h3>
+ <!-- A. DETAILED FEATURE EXPLORATION -->
+ <h3>A. Detailed Feature Exploration, 9 Iterations</h3>
 
-    <p>
-      Section 5.3.1.2 summarises the development journey in a table. This appendix provides
-      the full technical detail for each iteration — architectures tested, feature dimensions,
-      and the precise failure modes that motivated each transition.
-    </p>
+ <p>
+ Section 5.3.1.2 summarises the development journey in a table. This appendix provides
+ the full technical detail for each iteration, architectures tested, feature dimensions,
+ and the precise failure modes that motivated each transition.
+ </p>
 
-    <h4>Feature Visualisation Comparison</h4>
-    <p>Each video below shows the same boxing footage processed through the corresponding feature extraction method, illustrating the evolution from raw pixels to the final voxel+pose representation.</p>
+ <h4>Feature Visualisation Comparison</h4>
+ <p>Each video below shows the same boxing footage processed through the corresponding feature extraction method, illustrating the evolution from raw pixels to the final voxel+pose representation.</p>
 
-    <div class="video-grid-4col">
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/1_rgbd_baseline.mp4"></video>
-        <sub>1. RGBD Baseline</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/2_2d_skeleton.mp4"></video>
-        <sub>2. 2D Skeleton</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/3_3d_skeleton_rgbd.mp4"></video>
-        <sub>3. 3D Skeleton + RGBD</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/4_voxel_delta.mp4"></video>
-        <sub>4. Voxel Delta</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/5_rgbd_bbox_crop.mp4"></video>
-        <sub>5. RGBD Bbox Crop</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/6_segmentation_depth.mp4"></video>
-        <sub>6. Segmentation + Depth</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/7_zmask_grid_com.mp4"></video>
-        <sub>7. Z-Mask Grid</sub>
-      </div>
-      <div class="video-cell">
-        <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/8_glove_color_tracking.mp4"></video>
-        <sub>8. Colour Tracking</sub>
-      </div>
-    </div>
+ <div class="video-grid-4col">
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/1_rgbd_baseline.mp4"></video>
+ <sub>1. RGBD Baseline</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/2_2d_skeleton.mp4"></video>
+ <sub>2. 2D Skeleton</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/3_3d_skeleton_rgbd.mp4"></video>
+ <sub>3. 3D Skeleton + RGBD</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/4_voxel_delta.mp4"></video>
+ <sub>4. Voxel Delta</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/5_rgbd_bbox_crop.mp4"></video>
+ <sub>5. RGBD Bbox Crop</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/6_segmentation_depth.mp4"></video>
+ <sub>6. Segmentation + Depth</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/7_zmask_grid_com.mp4"></video>
+ <sub>7. Z-Mask Grid</sub>
+ </div>
+ <div class="video-cell">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/8_glove_color_tracking.mp4"></video>
+ <sub>8. Colour Tracking</sub>
+ </div>
+ </div>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.88rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd; text-align:center; width:30px;">#</th>
-          <th style="padding:8px; border:1px solid #ddd; width:180px;">Approach</th>
-          <th style="padding:8px; border:1px solid #ddd;">Features &amp; Architecture</th>
-          <th style="padding:8px; border:1px solid #ddd; width:160px;">Outcome</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">1</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>2D Pose + LSTM/GCN</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">17 COCO keypoints via YOLO-Pose, 12-channel skeleton features. Models: LSTM, AAGCN (~2.5M params), ST-GCN, ST-GCN++</td>
-          <td style="padding:8px; border:1px solid #ddd;">Pipeline validated. <span style="color:#c62828;">Training data angles did not match robot camera.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>3D Pose</strong> (depth lifting)</td>
-          <td style="padding:8px; border:1px solid #ddd;">2D keypoints lifted to 3D via depth maps with skeleton constraints. Models: AAGCN, MotionBERT, PoseC3D</td>
-          <td style="padding:8px; border:1px solid #ddd;">~67%. <span style="color:#c62828;">Glove occlusion blocks wrists at punch extension.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Raw RGBD + 3D CNNs</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">4-channel input (RGB + depth), 112&times;112 crops. Models: Swin3D-B (~88M), MViT V2, R3D-18 (~33M)</td>
-          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">33&ndash;88M params, too large for edge. Batch size 2 on Colab.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>RGBD + Segmentation + Causal Transformer</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">YOLO segmentation + frozen EfficientNet-B2 (512-dim). CausalActionTransformer: 6 layers, 8 heads, ~3M trainable / ~35M total. Progressive prediction loss at all timesteps.</td>
-          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">Still pixel-based, still required Colab.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Z-Mask</strong> (depth grid)</td>
-          <td style="padding:8px; border:1px solid #ddd;">1,156 dims/frame: 12&times;12 depth grid, RGB grid, centre of mass, velocity derivatives. BoxingCAT: 1D conv + 4 causal transformer layers + future prediction head.</td>
-          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">2D grid lost 3D spatial info. Hooks vs uppercuts indistinguishable.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">6</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Colour Tracking</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">1,749 dims/frame: 12&sup3; voxel delta + optical flow + glove colour tracking (18 dims). VoxelFlowModel (~1.2M): Conv3D + MLP branches, concatenation fusion.</td>
-          <td style="padding:8px; border:1px solid #ddd;">~68%. <span style="color:#c62828;">Required coloured gloves. HSV unreliable.</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">7</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel-Only Transformer</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">55,296 dims/frame: 24&sup3; grid &times; 4 channels (delta + directional gradients). CausalVoxelTransformerModel (~2M): Conv3D stem, 4-layer causal transformer.</td>
-          <td style="padding:8px; border:1px solid #ddd;">80.6%. <span style="color:#c62828;">19/56 jabs &rarr; cross (34% L/R error).</span> <span style="color:#e65100;">Insight: need pose for L/R.</span></td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">7b</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel Optimisation</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Grid 24&sup3; &rarr; 12&sup3; (55,296 &rarr; 17,280 dims). Multi-scale deltas (67ms + 267ms). Channel_p90 normalisation.</td>
-          <td style="padding:8px; border:1px solid #ddd;"><span style="color:#2e7d32;">Real-time capable. Established 12&sup3; grid for all subsequent iterations.</span></td>
-        </tr>
-        <tr style="background:#e8f5e9;">
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>8</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Pose Fusion</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">3,480 dims/frame: 12&sup3; &times; 2ch voxel (3,456) + 24-dim YOLO pose. Gradients removed (5&times; reduction). Confidence gating, pose dropout (30% clip + 20% joint).</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">97.3% &mdash; Breakthrough.</strong> L/R confusion eliminated. Full circle &mdash; pose returned.</td>
-        </tr>
-        <tr style="background:#e8f5e9;">
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>9</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Production (v11)</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Pose expanded to 42 dims. Block annotation fix. Horizontal flip augmentation. TensorRT FP16, parallel threads, RollingFeatureBuffer.</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">96.8% &mdash; Deployed.</strong> Correct live block detection.</td>
-        </tr>
-      </tbody>
-    </table>
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.88rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd; text-align:center; width:30px;">#</th>
+ <th style="padding:8px; border:1px solid #ddd; width:180px;">Approach</th>
+ <th style="padding:8px; border:1px solid #ddd;">Features &amp; Architecture</th>
+ <th style="padding:8px; border:1px solid #ddd; width:160px;">Outcome</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">1</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>2D Pose + LSTM/GCN</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">17 COCO keypoints via YOLO-Pose, 12-channel skeleton features. Models: LSTM, AAGCN (~2.5M params), ST-GCN, ST-GCN++</td>
+ <td style="padding:8px; border:1px solid #ddd;">Pipeline validated. <span style="color:#c62828;">Training data angles did not match robot camera.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>3D Pose</strong> (depth lifting)</td>
+ <td style="padding:8px; border:1px solid #ddd;">2D keypoints lifted to 3D via depth maps with skeleton constraints. Models: AAGCN, MotionBERT, PoseC3D</td>
+ <td style="padding:8px; border:1px solid #ddd;">~67%. <span style="color:#c62828;">Glove occlusion blocks wrists at punch extension.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Raw RGBD + 3D CNNs</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">4-channel input (RGB + depth), 112&times;112 crops. Models: Swin3D-B (~88M), MViT V2, R3D-18 (~33M)</td>
+ <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">33&ndash;88M params, too large for edge. Batch size 2 on Colab.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>RGBD + Segmentation + Causal Transformer</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">YOLO segmentation + frozen EfficientNet-B2 (512-dim). CausalActionTransformer: 6 layers, 8 heads, ~3M trainable / ~35M total. Progressive prediction loss at all timesteps.</td>
+ <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">Still pixel-based, still required Colab.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Z-Mask</strong> (depth grid)</td>
+ <td style="padding:8px; border:1px solid #ddd;">1,156 dims/frame: 12&times;12 depth grid, RGB grid, centre of mass, velocity derivatives. BoxingCAT: 1D conv + 4 causal transformer layers + future prediction head.</td>
+ <td style="padding:8px; border:1px solid #ddd;"><span style="color:#c62828;">2D grid lost 3D spatial info. Hooks vs uppercuts indistinguishable.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">6</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Colour Tracking</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">1,749 dims/frame: 12&sup3; voxel delta + optical flow + glove colour tracking (18 dims). VoxelFlowModel (~1.2M): Conv3D + MLP branches, concatenation fusion.</td>
+ <td style="padding:8px; border:1px solid #ddd;">~96%. <span style="color:#c62828;">Required coloured gloves. HSV unreliable in variable lighting.</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">7</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel-Only Transformer</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">55,296 dims/frame: 24&sup3; grid &times; 4 channels (delta + directional gradients). CausalVoxelTransformerModel (~2M): Conv3D stem, 4-layer causal transformer.</td>
+ <td style="padding:8px; border:1px solid #ddd;">80.6%. <span style="color:#c62828;">19/56 jabs &rarr; cross (34% L/R error).</span> <span style="color:#e65100;">Insight: need pose for L/R.</span></td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">7b</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel Optimisation</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Grid 24&sup3; &rarr; 12&sup3; (55,296 &rarr; 17,280 dims). Multi-scale deltas (67ms + 267ms). Channel_p90 normalisation.</td>
+ <td style="padding:8px; border:1px solid #ddd;"><span style="color:#2e7d32;">Real-time capable. Established 12&sup3; grid for all subsequent iterations.</span></td>
+ </tr>
+ <tr style="background:#e8f5e9;">
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>8</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Pose Fusion</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">3,480 dims/frame: 12&sup3; &times; 2ch voxel (3,456) + 24-dim YOLO pose. Gradients removed (5&times; reduction). Confidence gating, pose dropout (30% clip + 20% joint).</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">97.3%, Breakthrough.</strong> L/R confusion eliminated. Crucially, this also unlocked <strong>glove-agnostic deployment</strong>, YOLO Pose locates wrists visually, so the model now works with any boxing gloves (or even bare hands), without the iter 6 constraint of needing red/green colour markers. Full circle, pose returned.</td>
+ </tr>
+ <tr style="background:#e8f5e9;">
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;"><strong>9</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Production (v11)</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Pose expanded to 42 dims. Block annotation fix. Horizontal flip augmentation. TensorRT FP16, parallel threads, RollingFeatureBuffer.</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong style="color:#2e7d32;">96.8%, Deployed.</strong> Correct live block detection.</td>
+ </tr>
+ </tbody>
+ </table>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- B. FULL UNIT TEST BREAKDOWN -->
-    <h3>B. Full Unit Test Breakdown</h3>
-    <p>
-      146 unit tests across 3 test files, supported by 12 shared pytest fixtures
-      in <code>conftest.py</code>.
-    </p>
+ <!-- B. FULL UNIT TEST BREAKDOWN -->
+ <h3>B. Full Unit Test Breakdown</h3>
+ <p>
+ 146 unit tests across 3 test files, supported by 12 shared pytest fixtures
+ in <code>conftest.py</code>.
+ </p>
 
-    <h4>Shared Test Fixtures</h4>
-    <div class="fixture-grid">
-      <div class="fixture-item"><code>db_manager</code> <span>Fresh database per test</span></div>
-      <div class="fixture-item"><code>sample_user</code> <span>Test account (testuser)</span></div>
-      <div class="fixture-item"><code>sample_profiles</code> <span>Beginner / intermediate / coach</span></div>
-      <div class="fixture-item"><code>sample_session</code> <span>Training session, 87 punches</span></div>
-      <div class="fixture-item"><code>sample_sparring_session</code> <span>Sparring, 210 punches</span></div>
-      <div class="fixture-item"><code>sample_punch_events</code> <span>CV + IMU + confirmed punches</span></div>
-      <div class="fixture-item"><code>sample_defense_data</code> <span>Defense evaluation scenarios</span></div>
-    </div>
+ <h4>Shared Test Fixtures</h4>
+ <div class="fixture-grid">
+ <div class="fixture-item"><code>db_manager</code> <span>Fresh database per test</span></div>
+ <div class="fixture-item"><code>sample_user</code> <span>Test account (testuser)</span></div>
+ <div class="fixture-item"><code>sample_profiles</code> <span>Beginner / intermediate / coach</span></div>
+ <div class="fixture-item"><code>sample_session</code> <span>Training session, 87 punches</span></div>
+ <div class="fixture-item"><code>sample_sparring_session</code> <span>Sparring, 210 punches</span></div>
+ <div class="fixture-item"><code>sample_punch_events</code> <span>CV + IMU + confirmed punches</span></div>
+ <div class="fixture-item"><code>sample_defense_data</code> <span>Defense evaluation scenarios</span></div>
+ </div>
 
-    <h4>Complete Test Suite</h4>
+ <h4>Complete Test Suite</h4>
 
-    <table class="test-table">
-      <thead>
-        <tr>
-          <th>Test Class</th>
-          <th>Tests</th>
-          <th>What It Verifies</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="test-file-header">
-          <td colspan="3"><code>test_punch_fusion.py</code> &mdash; 44 tests (sensor fusion)</td>
-        </tr>
-        <tr><td>TestRingBuffer</td><td>7</td><td>Buffer eviction at max capacity, time-based expiry, pop_match retrieval</td></tr>
-        <tr><td>TestCVIMUFusion</td><td>3</td><td>Temporal matching within/outside &pm;500ms window, closest-first priority</td></tr>
-        <tr><td>TestPadConstraints</td><td>10</td><td>Each punch type only accepted on valid pads (jab&rarr;centre, left_hook&rarr;left, etc.)</td></tr>
-        <tr><td>TestReclassification</td><td>8</td><td>Secondary prediction fallback when primary violates pad constraint</td></tr>
-        <tr><td>TestExpiredEvents</td><td>4</td><td>CV and IMU events correctly discarded after timeout</td></tr>
-        <tr><td>TestDefenseClassification</td><td>8</td><td>Priority ordering: HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN</td></tr>
-        <tr><td>TestSessionStats</td><td>4</td><td>Punch accumulation, peak force tracking, defense statistics</td></tr>
+ <table class="test-table">
+ <thead>
+ <tr>
+ <th>Test Class</th>
+ <th>Tests</th>
+ <th>What It Verifies</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr class="test-file-header">
+ <td colspan="3"><code>test_punch_fusion.py</code>, 44 tests (sensor fusion)</td>
+ </tr>
+ <tr><td>TestRingBuffer</td><td>7</td><td>Buffer eviction at max capacity, time-based expiry, pop_match retrieval</td></tr>
+ <tr><td>TestCVIMUFusion</td><td>3</td><td>Temporal matching within/outside &pm;500ms window, closest-first priority</td></tr>
+ <tr><td>TestPadConstraints</td><td>10</td><td>Each punch type only accepted on valid pads (jab&rarr;centre, left_hook&rarr;left, etc.)</td></tr>
+ <tr><td>TestReclassification</td><td>8</td><td>Secondary prediction fallback when primary violates pad constraint</td></tr>
+ <tr><td>TestExpiredEvents</td><td>4</td><td>CV and IMU events correctly discarded after timeout</td></tr>
+ <tr><td>TestDefenseClassification</td><td>8</td><td>Priority ordering: HIT &gt; BLOCK &gt; SLIP &gt; DODGE &gt; UNKNOWN</td></tr>
+ <tr><td>TestSessionStats</td><td>4</td><td>Punch accumulation, peak force tracking, defense statistics</td></tr>
 
-        <tr class="test-file-header">
-          <td colspan="3"><code>test_gamification.py</code> &mdash; 30 tests (progression system)</td>
-        </tr>
-        <tr><td>TestRankSystem</td><td>10</td><td>All 6 rank tiers (Novice&rarr;Elite), XP boundary conditions, rank transitions</td></tr>
-        <tr><td>TestSessionXP</td><td>7</td><td>Base XP per mode, completion bonus, difficulty multiplier, streak bonus, minimum floor</td></tr>
-        <tr><td>TestSessionScore</td><td>5</td><td>Perfect, zero, and partial score calculations, boundary edge cases</td></tr>
-        <tr><td>TestAchievements</td><td>5</td><td>Unlock conditions, duplicate prevention, achievement listing</td></tr>
-        <tr><td>TestLeaderboard</td><td>3</td><td>Ranking computation, tie-breaking rules, empty leaderboard handling</td></tr>
+ <tr class="test-file-header">
+ <td colspan="3"><code>test_gamification.py</code>, 30 tests (progression system)</td>
+ </tr>
+ <tr><td>TestRankSystem</td><td>10</td><td>All 6 rank tiers (Novice&rarr;Elite), XP boundary conditions, rank transitions</td></tr>
+ <tr><td>TestSessionXP</td><td>7</td><td>Base XP per mode, completion bonus, difficulty multiplier, streak bonus, minimum floor</td></tr>
+ <tr><td>TestSessionScore</td><td>5</td><td>Perfect, zero, and partial score calculations, boundary edge cases</td></tr>
+ <tr><td>TestAchievements</td><td>5</td><td>Unlock conditions, duplicate prevention, achievement listing</td></tr>
+ <tr><td>TestLeaderboard</td><td>3</td><td>Ranking computation, tie-breaking rules, empty leaderboard handling</td></tr>
 
-        <tr class="test-file-header">
-          <td colspan="3"><code>test_database.py</code> &mdash; 45+ tests (data persistence)</td>
-        </tr>
-        <tr><td>TestUserManagement</td><td>13</td><td>Create, duplicate prevention, password verify, get/list users, coach account type</td></tr>
-        <tr><td>TestPatternLock</td><td>5</td><td>Set/verify pattern (SHA-256), wrong pattern rejection, overwrite</td></tr>
-        <tr><td>TestGuestSessions</td><td>5</td><td>Create guest token, claim by registered user, double-claim prevention</td></tr>
-        <tr><td>TestPresets</td><td>7</td><td>CRUD operations, invalid field rejection, use count tracking, favourites</td></tr>
-        <tr><td>TestTrainingSessions</td><td>8</td><td>Save/retrieve sessions, mode filtering, event logging, config persistence</td></tr>
-        <tr><td>TestGamification</td><td>7</td><td>XP addition, rank progression, personal records, streaks, achievement persistence</td></tr>
-      </tbody>
-    </table>
+ <tr class="test-file-header">
+ <td colspan="3"><code>test_database.py</code>, 45+ tests (data persistence)</td>
+ </tr>
+ <tr><td>TestUserManagement</td><td>13</td><td>Create, duplicate prevention, password verify, get/list users, coach account type</td></tr>
+ <tr><td>TestPatternLock</td><td>5</td><td>Set/verify pattern (SHA-256), wrong pattern rejection, overwrite</td></tr>
+ <tr><td>TestGuestSessions</td><td>5</td><td>Create guest token, claim by registered user, double-claim prevention</td></tr>
+ <tr><td>TestPresets</td><td>7</td><td>CRUD operations, invalid field rejection, use count tracking, favourites</td></tr>
+ <tr><td>TestTrainingSessions</td><td>8</td><td>Save/retrieve sessions, mode filtering, event logging, config persistence</td></tr>
+ <tr><td>TestGamification</td><td>7</td><td>XP addition, rank progression, personal records, streaks, achievement persistence</td></tr>
+ </tbody>
+ </table>
 
-    <p style="text-align:center; font-style:italic; font-size:0.88rem; color:#666;">
-      Table: Complete breakdown of 146 unit tests across 3 test files and 18 test classes
-    </p>
+ <p style="text-align:center; font-style:italic; font-size:0.88rem; color:#666;">
+ Table: Complete breakdown of 146 unit tests across 3 test files and 18 test classes
+ </p>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- C. REPOSITORY LINKS -->
-    <h3>C. Repository Links</h3>
+ <!-- C. REPOSITORY LINKS -->
+ <h3>C. Repository Links</h3>
 
-    <div style="display:flex; flex-direction:column; gap:16px; max-width:600px; margin:16px auto;">
-      <div style="display:flex; align-items:center; gap:16px; padding:14px 20px; border:1px solid #ddd; border-radius:8px;">
-        <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none; flex-shrink:0;">
-          <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="github"></sl-icon>
-            Action Recognition
-          </sl-button>
-        </a>
-        <span style="font-size:0.9rem; color:#555;">CV model training, feature extraction, annotation tools, data pipeline</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:16px; padding:14px 20px; border:1px solid #ddd; border-radius:8px;">
-        <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none; flex-shrink:0;">
-          <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="github"></sl-icon>
-            Robot Workspace
-          </sl-button>
-        </a>
-        <span style="font-size:0.9rem; color:#555;">ROS 2 system, all nodes, GUI, phone dashboard, tests, deployment</span>
-      </div>
-    </div>
+ <div style="display:flex; flex-direction:column; gap:16px; max-width:600px; margin:16px auto;">
+ <div style="display:flex; align-items:center; gap:16px; padding:14px 20px; border:1px solid #ddd; border-radius:8px;">
+ <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none; flex-shrink:0;">
+ <sl-button variant="default" size="small">
+ <sl-icon slot="prefix" name="github"></sl-icon>
+ Action Recognition
+ </sl-button>
+ </a>
+ <span style="font-size:0.9rem; color:#555;">CV model training, feature extraction, annotation tools, data pipeline</span>
+ </div>
+ <div style="display:flex; align-items:center; gap:16px; padding:14px 20px; border:1px solid #ddd; border-radius:8px;">
+ <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none; flex-shrink:0;">
+ <sl-button variant="default" size="small">
+ <sl-icon slot="prefix" name="github"></sl-icon>
+ Robot Workspace
+ </sl-button>
+ </a>
+ <span style="font-size:0.9rem; color:#555;">ROS 2 system, all nodes, GUI, phone dashboard, tests, deployment</span>
+ </div>
+ </div>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- BOTTOM NAVIGATION -->
-    <div class="page-nav-row">
-      <a href="robot-intelligence-testing.html">
-        <sl-button variant="default" size="medium">
-          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-          Back: Testing & Validation
-        </sl-button>
-      </a>
-      <div></div>
-    </div>
+ <!-- BOTTOM NAVIGATION -->
+ <div class="page-nav-row">
+ <a href="robot-intelligence-testing.html">
+ <sl-button variant="default" size="medium">
+ <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+ Back: Testing & Validation
+ </sl-button>
+ </a>
+ <div></div>
+ </div>
 
-  </div>
+ </div>
 
-  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
-    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
-  </sl-button>
+ <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+ <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+ </sl-button>
 </body>
 </html>

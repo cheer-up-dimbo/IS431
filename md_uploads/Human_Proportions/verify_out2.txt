@@ -1,0 +1,47 @@
+=== LIVER CENTRE ù MALAYSIAN SPAN APPROACH ===
+
+Xiphoid fraction (D&C): 0.618
+Right MCL offset below xiphoid: 3.0 cm
+Body stance correction: 8.0 cm
+
+150F: H=150, span=11.7
+  Xiphoid:          92.7 cm
+  Costal margin MCL:89.7 cm
+  Liver ctr (erect): 95.5 cm
+  Liver ctr (stance):87.5 cm
+
+150M: H=150, span=12.2
+  Xiphoid:          92.7 cm
+  Costal margin MCL:89.7 cm
+  Liver ctr (erect): 95.8 cm
+  Liver ctr (stance):87.8 cm
+
+190F: H=190, span=11.7
+  Xiphoid:          117.4 cm
+  Costal margin MCL:114.4 cm
+  Liver ctr (erect): 120.3 cm
+  Liver ctr (stance):112.3 cm
+
+190M: H=190, span=12.2
+  Xiphoid:          117.4 cm
+  Costal margin MCL:114.4 cm
+  Liver ctr (erect): 120.5 cm
+  Liver ctr (stance):112.5 cm
+
+Mean liver centre (stance) across all profiles: 100.0 cm
+
+=== COMPARISON: old vs new ===
+150F: old=86.5 cm | new(Malaysian)=87.5 cm | diff=1.0 cm
+150M: old=87.7 cm | new(Malaysian)=87.8 cm | diff=0.1 cm
+190F: old=111.7 cm | new(Malaysian)=112.3 cm | diff=0.6 cm
+190M: old=113.2 cm | new(Malaysian)=112.5 cm | diff=-0.7 cm
+
+=== SOLAR PLEXUS REFERENCE (unchanged) ===
+150F: SP stance = 79.3 cm
+150M: SP stance = 80.5 cm
+190F: SP stance = 102.6 cm
+190M: SP stance = 104.1 cm
+Mean SP: 91.6 cm
+
+Mean liver: 100.0 cm
+Liver - SP gap: 8.4 cm

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: Testing &amp; Evaluation â GUI</title>
+  <title>IS-431: Testing &amp; Evaluation - GUI</title>
   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -18,6 +18,15 @@
       justify-content: space-between;
       align-items: center;
       margin-top: 32px;
+    }
+    .validation-loop {
+      margin: 22px 0 18px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+      overflow-x: auto;
     }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>
@@ -36,15 +45,62 @@
     <p>
       This section presents the functional testing conducted during development iterations and user testing observations from the public showcase event.
     </p>
+    <p>
+      <strong>V-Model alignment:</strong> This page corresponds to the right side of the V,
+      where GUI requirements are verified against measurable outcomes.
+    </p>
+    <p>
+      The test results are also product feedback. They show whether the GUI felt usable as a
+      training tool, not just whether the implementation was technically correct.
+    </p>
+
+    <div class="validation-loop">
+      <svg viewBox="0 0 980 180" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:780px; height:auto; display:block;" aria-label="GUI validation loop">
+        <rect x="0" y="0" width="980" height="180" rx="12" fill="#f8fafc"/>
+        <text x="490" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Validation Loop</text>
+        <text x="490" y="43" text-anchor="middle" font-size="11" fill="#64748b">Testing closed the loop between requirements, user feedback, and the final training experience.</text>
+
+        <defs>
+          <marker id="gui-validation-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+          </marker>
+        </defs>
+
+        <rect x="40" y="72" width="170" height="68" rx="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.4"/>
+        <text x="125" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">GUI requirements</text>
+        <text x="125" y="118" text-anchor="middle" font-size="10.5" fill="#1e40af">defined in Section 5.1</text>
+
+        <rect x="260" y="72" width="170" height="68" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+        <text x="345" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">Functional tests</text>
+        <text x="345" y="118" text-anchor="middle" font-size="10.5" fill="#9a3412">pass/fail behavior checks</text>
+
+        <rect x="480" y="72" width="170" height="68" rx="16" fill="#dcfce7" stroke="#86efac" stroke-width="1.4"/>
+        <text x="565" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">User testing</text>
+        <text x="565" y="118" text-anchor="middle" font-size="10.5" fill="#166534">showcase observations</text>
+
+        <rect x="700" y="72" width="240" height="68" rx="16" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.4"/>
+        <text x="820" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">Design revision</text>
+        <text x="820" y="118" text-anchor="middle" font-size="10.5" fill="#6b21a8">larger display, clearer hierarchy, verified flow</text>
+
+        <line x1="212" y1="106" x2="252" y2="106" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-validation-arrow)"/>
+        <line x1="432" y1="106" x2="472" y2="106" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-validation-arrow)"/>
+        <line x1="652" y1="106" x2="692" y2="106" stroke="#64748b" stroke-width="2.2" marker-end="url(#gui-validation-arrow)"/>
+      </svg>
+    </div>
 
     <!-- FUNCTIONAL TESTING -->
     <div>
       <h3>Functional Testing</h3>
       <p>
         Functional testing was conducted on the features available at the time of the
-        "Robotics Meets AI Showcase" event in late January 2025. The features tested were
+        "Robotics Meets AI Showcase" event in late January 2026. The features tested were
         the combo curriculum system, the reaction time test, and the navigation stack. Test
         scenarios verified correct behaviour under normal use conditions.
+      </p>
+      <p>
+        The focus was on whether the product supported training flow cleanly. Each test asked
+        a practical question: can the boxer start quickly, stay in the session, and get back
+        to progress review without friction?
       </p>
 
       <table-component id="gui-functional-testing" subtitle="Table: Functional Test Results"></table-component>
@@ -59,16 +115,44 @@
 
     <sl-divider></sl-divider>
 
+    <!-- AUTOMATED TEST SUITE -->
+    <div>
+      <h3>Automated Test Suite</h3>
+      <p>
+        The project runs 146 pytest tests across all subsystems. The GUI-relevant tests cover
+        the following areas:
+      </p>
+      <ul style="line-height:1.8; font-size:0.92rem;">
+        <li><strong>Navigation stack:</strong> arbitrary-depth push and pop sequences verify correct reverse-order page return</li>
+        <li><strong>Multi-user data isolation:</strong> five parallel test accounts confirm zero cross-contamination across user data</li>
+        <li><strong>Combo curriculum mastery algorithm:</strong> score accumulation, unlock threshold, and tier advancement logic</li>
+        <li><strong>Gamification:</strong> XP calculation and rank thresholds across all six rank tiers</li>
+        <li><strong>Pattern lock authentication:</strong> SHA-256 hash encode and verify round-trip</li>
+        <li><strong>GuiBridge offline degradation:</strong> all service calls return failure cleanly when the ROS stack is unavailable, confirming the mock interface functions correctly</li>
+      </ul>
+      <p>
+        Tests are executed from the project's master Jupyter notebook and run independently
+        of hardware. All GUI tests pass without a connected Jetson or ROS environment.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- USER TESTING -->
     <div>
       <h3>User Testing: Robotics Meets AI Showcase</h3>
       <h4>Setup</h4>
       <p>
         Members of the public physically interacted with BoxBunny at the "Robotics Meets AI
-        Showcase" event in late January 2025, specifically within the Robotics and AI in Work
+        Showcase" event in late January 2026, specifically within the Robotics and AI in Work
         and Play segment. Two displays were available during the demonstration: the original
         7-inch touchscreen mounted directly on the robot, and a larger external monitor
-        connected to the same Jetson Nano showing the same GUI output.
+        connected to the same Jetson Orin NX showing the same GUI output.
+      </p>
+      <p>
+        This setup was useful because it exposed the product under real user conditions. The
+        event showed how the GUI performed when people approached it as a training tool rather
+        than as a demo screen.
       </p>
       <div style="margin-top:16px;">
         <image-component
@@ -87,6 +171,11 @@
         comfortably while also focusing on technique. Users who switched to the larger monitor
         did not report the same issues.
       </p>
+      <p>
+        This confirmed that the product needed stronger readability and a clearer information
+        hierarchy during active training. The issue was not only display size, but how well the
+        GUI supported attention split between movement and screen reading.
+      </p>
       <h4>Display Upgrade Decision</h4>
       <p>
         These observations validated a hardware revision. The 7-inch display was replaced with
@@ -96,6 +185,70 @@
         coordinates, the existing interface scaled to the new resolution without requiring a
         redesign cycle.
       </p>
+      <p>
+        The decision followed the user evidence rather than the hardware preference. It was a
+        product change driven by how boxers actually used the interface in training.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- PERFORMANCE CRITERIA ASSESSMENT -->
+    <div>
+      <h3>Performance Criteria Assessment</h3>
+      <p>
+        The table below maps each GUI requirement to its target, verification method,
+        and outcome.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Verification</th>
+            <th style="padding:8px; border:1px solid #ddd;">Met?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and physical button operable: large touch targets, minimal text input, IMU-based button navigation</td>
+            <td style="padding:8px; border:1px solid #ddd;">All interactive elements &ge;60px; full navigation via 4 pads</td>
+            <td style="padding:8px; border:1px solid #ddd;">Functional test; showcase observation; IMU nav confirmed in live session</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Multi-user accounts with complete data isolation between users</td>
+            <td style="padding:8px; border:1px solid #ddd;">Zero cross-contamination across accounts</td>
+            <td style="padding:8px; border:1px solid #ddd;">5 test accounts; pytest isolation tests; no cross-user data observed</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Structured training progression through a 50-combo curriculum with mastery-based advancement</td>
+            <td style="padding:8px; border:1px solid #ddd;">Unlock after 5 sessions with average score &ge;3.0/5.0</td>
+            <td style="padding:8px; border:1px solid #ddd;">Curriculum algorithm pytest; multiple complete training cycles observed</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Real-time session data display (combo prompts, round timers, performance metrics)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combo prompt, timer, and punch counter update within one display frame</td>
+            <td style="padding:8px; border:1px solid #ddd;">Functional observation during live sessions; interface event-update checks</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">GUI-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hardware-independent development via an abstracted integration layer with mock interfaces</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full GUI runs on Windows laptop with no connected robot hardware</td>
+            <td style="padding:8px; border:1px solid #ddd;">Entire development cycle conducted on laptop; mock-interface tests confirmed expected behavior</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI Performance Criteria Assessment</p>
     </div>
 
     <sl-divider></sl-divider>
@@ -118,7 +271,12 @@
           Back: Implementation
         </sl-button>
       </a>
-      <div></div>
+      <a href="../robot-mechanism.html">
+        <sl-button variant="default" size="medium">
+          Next: 5.2 Robot Mechanism
+          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+        </sl-button>
+      </a>
     </div>
 
   </div>

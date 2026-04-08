@@ -1,0 +1,146 @@
+
+============================================================
+Processing: Anthropometry of Brazilian Air Force pilots.pdf
+============================================================
+Total pages: 14
+Relevant pages (containing keywords): [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13]
+Full text saved to: extracted_pilots.txt
+
+--- RELEVANT CONTENT (first 3 relevant pages) ---
+
+[PAGE 2]
+Ergonomics, 2017
+VoL. 60, no. 10, 1445û1457
+https://doi.org/10.1080/00140139.2017.1301575
+Anthropometry of Brazilian Air Force pilots
+Gilvan V. da Silvaa,b, Manny Halpernb and Claire C. Gordonc
+aoperational Human Performance graduate Program, The Brazilian Air Force University, rio de Janeiro, Brazil; bDepartment of Environmental
+medicine, Program of Ergonomics and Biomechanics, new York University, new York, nY, UsA; cconsortium for science, Policy & outcomes,
+Arizona state University, Tempe, AZ, UsA
+ABSTRACT ARTICLE HISTORY
+Anthropometric data are essential for the design of military equipment including sizing of aircraft received 11 november 2016
+cockpits and personal gear. Currently, there are no anthropometric databases specific to Brazilian Accepted 22 February 2017
+military personnel. The aim of this study was to create a Brazilian anthropometric database of Air
+KEYWORDS
+Force pilots. The methods, protocols, descriptions, definitions, landmarks, tools and measurements
+Anthropometry; cockpit
+procedures followed the instructions outlined in MeasurerÆs Handbook: US Army and Marine
+design; flight deck, pilot
+Corps Anthropometric Surveys, 2010û2011 û NATICK/TR-11/017. The participants were measured accommodation; Brazilian
+countrywide, in all five Brazilian Geographical Regions. Thirty-nine anthropometric measurements Air Force
+related to cockpit design were selected. The results of 2133 males and 206 females aged 16û52 years
+constitute a set of basic data for cockpit design, space arrangement issues and adjustments,
+protective gear and equipment design, as well as for digital human modelling. Another important
+implication is that this study can be considered a starting point for reducing gender bias in womenÆs
+career as pilots.
+Practitioner Summary: This paper describes the first large-scale anthropometric survey of the
+Brazilian Air Force pilots and the development of the related database. This study provides critical
+data for improving aircraft cockpit design f
+
+[PAGE 3]
+1446 G. V. DA SILVA ET AL.
+operate, but also in which the userÆs safety and the basic Therefore, the lack of current, accurate data describing the
+mission of the aircraft can be compromised. body dimensions of its aircrew prompted the Brazilian Air
+The following six dimensions have been considered crit- Force Command Staff (EMAER) to initiate a large-scale
+ical to cockpit design for aircraft ejection seats in several anthropometric survey of aircrew. In May 2013, the EMAER
+studies, and are also currently used to evaluate cockpit issued an Ordinance (number 17/3SC, 06/05/2013)2 for-
+accommodation and for pilot selection in many Air Forces malising the survey and providing knowledge to all mili-
+worldwide: sitting height; eye height, sitting; shoulder tary organisations in the Brazilian Air Force (in Portuguese,
+height, sitting; knee height, sitting; buttock-knee length; Forþa AÚrea Brasileira û FAB) (Ministry of Defense 2013).
+and functional reaching (Department of Defense 2008; At the beginning of the plan, it was intended to have a
+Hudson, Zehner, and Meindl 1998; Kennedy and Zehner census covering 100% (3350 subjects) of the FAB aircrew,
+1995; Roebuck 1995; Zehner 1996; Zehner, Meindl, and but it was not feasible due to the complexities of general
+Hudson 1993). These body dimensions are related to pro- military duties, as well as military operations. A sample of
+vide appropriate internal and external field of view, to the target population needed to be constructed.
+maintain a safe clearance of the cabin structures, mainly This study aimed to create a Brazilian anthropomet-
+in case of ejection, and to reach all the controls. Since, in ric database of FAB pilots for improving aircraft cockpit
+aviation most controls request grasping and handling pre- design for ergonomics and comprehensive pilot accom-
+cision, the use of the thumb is crucial as stated by Melmoth modation, protective gear and uniform design, as well as
+and Grant (2012). digital human modelling.
+The er
+
+[PAGE 4]
+ERGONOMICS 1447
+miscegenation, the large European and Asian immigra- A worst case approach is taken by choosing those crit-
+tion, and the huge variability in socio-economic conditions ical body dimensions with the highest CVs to establish
+in Brazil, it is necessary to know the parentsÆ racial/ethnic minimum sample sizes, knowing that the results will be
+background since some specific racial features could mis- more than sufficient for less variable body dimensions. As
+lead the data interpretation (e.g. white person with short stated by Gordon et al. (2013), previous military surveys
+torso and long limbs). The parentsÆ profession is a way to have shown that of the most commonly used body dimen-
+figure out the social level the participant came from, since sions, the two with the largest CVs (therefore requiring the
+the socio-economic situation can be associated with quan- largest sample sizes for precise parameter estimates) are
+tity and quality of dietary intake during childhood and this Waist Circumference and Chest Circumference. Since the
+maybe could influence growth and anthropometric data main objective of the study concerns cockpit design, the
+(Gross et al. 1990). This specific demographic feature will six critical dimensions for this purpose were also used for
+be further investigated in a future study. minimum sample size calculation.
+The participants were measured countrywide, in all The sampled male population was well above the calcu-
+five Brazilian Geographical Regions (North, Northeast, lated requirement using both equations for all dimensions.
+South, Southeast and Central-west), at 80 Administrative For the female population, the requisite minimum sample
+Military Organizations, two Formation Schools, 14 Air Force size also has been fulfilled for the six critical dimensions
+Bases and 35 Squadrons, thus the sample included female using both equations, but in the æworst scenarioÆ û waist
+administrative officers, cadet pilots and non-pilots, and circumferenc
+
+============================================================
+Processing: Bodyspace_26_04_08_16_00_15.pdf
+============================================================
+Total pages: 351
+Relevant pages (containing keywords): [14, 15, 16, 17, 23, 26, 27, 30, 31, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 58, 60, 61, 62, 63, 64, 66, 67, 73, 74, 75, 76, 77, 78, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 101, 106, 107, 110, 111, 112, 117, 118, 119, 123, 126, 127, 128, 130, 132, 133, 135, 136, 137, 138, 142, 147, 150, 151, 152, 153, 154, 159, 164, 165, 168, 169, 176, 177, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 192, 193, 198, 199, 202, 203, 204, 205, 206, 208, 209, 210, 211, 212, 213, 214, 215, 216, 218, 219, 220, 228, 231, 233, 234, 235, 236, 238, 239, 240, 241, 250, 258, 259, 260, 261, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 301, 304, 305, 306, 311, 312, 313, 316, 317, 320, 321, 322, 324, 325, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 344, 345, 346, 347, 348, 349, 350, 351]
+Full text saved to: extracted_bodyspace.txt
+
+--- RELEVANT CONTENT (first 3 relevant pages) ---
+
+[PAGE 14]
+CONTENTS
+PART I Ergonomics, Design and Anthropometry
+Chapter 1 Introduction to Ergonomic Design......................................................3
+1.1 Introduction......................................................................................................3
+1.2 What Is Ergonomics?.......................................................................................4
+1.2.1 What Criteria Define a Successful Match?.........................................5
+1.2.2 What If These Criteria Prove Incompatible?.......................................6
+1.3 Anthropometrics...............................................................................................7
+1.4 Human Proportion: An Historical Perspective................................................7
+1.5 Ergonomics and Design...................................................................................9
+1.6 The User-Centred Approach..........................................................................13
+Chapter 2 Principles and Practice of Anthropometrics......................................17
+2.1 Introduction....................................................................................................17
+2.2 The Statistical Description of Human Variability.........................................18
+2.2.1 Frequency Distribution of a Dimension Within a Population..........18
+2.2.2 Calculating Percentile Values for a Body Dimension.......................20
+2.2.3 Effects of Deviation from a Normal Distribution.............................21
+2.3 Design Limits: Accommodation Provided by a Design Decision................22
+2.4 Design Constraints and Criteria.....................................................................25
+2.4.1 Clearance............................................................................................26
+2.4.2 Reach..................................................................................................26
+2.4.3 Posture....................................
+
+[PAGE 15]
+2.7.6 Body Proportions...............................................................................44
+2.8 Body Dimensions...........................................................................................47
+Chapter 3 Human Diversity................................................................................55
+3.1 Introduction....................................................................................................55
+3.2 Sex Differences..............................................................................................56
+3.2.1 Variation in Body Proportions...........................................................58
+3.2.2 Variation in Strength..........................................................................59
+3.3 Ethnic Differences..........................................................................................62
+3.4 Growth and Development..............................................................................66
+3.5 The Secular Trend..........................................................................................70
+3.6 Social Class and Occupation.........................................................................76
+3.7 Ageing............................................................................................................78
+PART II Application of Anthropometry in Design
+Chapter 4 Workspace Design..............................................................................85
+4.1 Introduction....................................................................................................85
+4.2 Clearance........................................................................................................86
+4.2.1 Whole Body Access...........................................................................87
+4.2.2 Circulation Space...............................................................................90
+4.2.3 Safety Clearances.....................................................
+ERROR processing Bodyspace_26_04_08_16_00_15.pdf: 'charmap' codec can't encode character '\u03b1' in position 1318: character maps to <undefined>
+
+============================================================
+Processing: Optimizing CPR performance the role of body.pdf
+============================================================
+Total pages: 7
+Relevant pages (containing keywords): [2, 4, 5, 6, 7]
+Full text saved to: extracted_cpr.txt
+
+--- RELEVANT CONTENT (first 3 relevant pages) ---
+ERROR processing Optimizing CPR performance the role of body.pdf: 'charmap' codec can't encode character '\u015e' in position 952: character maps to <undefined>

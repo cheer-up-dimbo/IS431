@@ -1,0 +1,22 @@
+=== STANCE POSITIONS (body=-8, head=-15) ===
+150F: Head=125.25, SP=79.3, Liver=86.5 | RA=1.579, GA=45.95 | RB=0.917, GB=7.2
+150M: Head=125.25, SP=80.5, Liver=87.7 | RA=1.556, GA=44.75 | RB=0.918, GB=7.2
+190F: Head=162.65, SP=102.58, Liver=111.7 | RA=1.586, GA=60.07 | RB=0.918, GB=9.12
+190M: Head=162.65, SP=104.1, Liver=113.22 | RA=1.562, GA=58.55 | RB=0.919, GB=9.12
+
+Mean SP=91.6cm
+Mean Liver=99.8cm
+Mean Head (at span midpoint 170cm)=144.0cm
+Mean RA=1.571, Mean GapA=52.3cm
+Mean RB=0.918, Mean GapB=8.2cm
+
+ROBOT POSITIONS:
+  Solar plexus centre: 91.6cm
+  Liver centre:        99.8cm
+  Head centre:         143.9cm
+
+=== ERECT (no correction) ===
+150F: Head=140.2, SP=87.3, Liver=94.5
+150M: Head=140.2, SP=88.5, Liver=95.7
+190F: Head=177.7, SP=110.6, Liver=119.7
+190M: Head=177.7, SP=112.1, Liver=121.2
