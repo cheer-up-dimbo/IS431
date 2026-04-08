@@ -6,6 +6,13 @@ body {
   font-family: var(--sl-font-sans);
 }
 
+.report-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 40px;
+  box-sizing: border-box;
+}
+
 .content {
   max-width: 800px;
   margin: auto;
