@@ -5,13 +5,16 @@
 
     const labels = [
       "Pad Work",
-      "Sparring",
       "Defense Drills",
       "Technique Drills",
+      "Sparring",
       "Bag Work"
     ];
 
-    const values = [3, 2, 2, 1, 1];
+    // Values scaled by priority (lower average rank = higher priority)
+    // All 10 support stakeholders answered drill rankings
+    const values = [10, 6, 6, 4, 2];
+    const totalRespondents = 12;  // Total support stakeholders surveyed
 
     new Chart(ctx, {
       type: "pie",
@@ -24,10 +27,8 @@
           tooltip: {
             callbacks: {
               label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
                 const value = context.raw;
-                const percent = ((value / total) * 100).toFixed(1);
-                return `${context.label}: ${percent}% (${value})`;
+                return `${context.label}: priority score ${value}/5`;
               }
             }
           }
