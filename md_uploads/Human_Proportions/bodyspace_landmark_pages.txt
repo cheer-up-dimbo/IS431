@@ -1,0 +1,2497 @@
+
+==================================================
+PAGE 36
+==================================================
+2 Principles and Practice of
+Anthropometrics
+2.1 INTRODUCTION
+There are a few situations in which it is possible to design a product or workstation
+for a single user: bespoke tailoring, haute couture, the customised seats used by
+racing drivers and the workstations of astronauts are examples. These are all essen-
+tially luxury goods. For a very small number of especially unfortunate individuals,
+the luxury of custom design becomes a necessity. The physical characteristics of the
+very severely disabled are so diverse that aids to mobility and independence must
+often be made for the individual concerned. However, in the great majority of real-
+world design problems our concern will be with a population of users. The product
+must therefore be designed to be adequate for all the population, include adjustability
+or be produced in a range of sizes.
+We all acknowledge the necessity of manufacturing garments in a range of sizes,
+but would it be true to say that chairs and tables, for example, should be supplied
+in a range of sizes as well? The answer is ‘only to a limited extent’. We do not
+expect adults and children to use the same-sized writing desks in their offices and
+schools, although they seem to cope perfectly well with the same dining table at
+home. We commonly supply typists with adjustable chairs, but their desks are usually
+of fixed height. Obviously, we are prepared to accept a less accurate fit from a table
+and chair than from a shirt and trousers. What is rather less obvious is how we
+should choose the best compromise dimensions for equipment to be employed by
+a range of users, and at what point we should conclude that adjustability is essential.
+In order to optimise such decisions we require three types of information:
+1. The anthropometric characteristics of the user population.
+2. The ways in which these characteristics might impose constraints upon
+the design.
+3. The criteria that define an effective match between the product and the
+user.
+Before discussing these matters further we shall need to establish some of the
+mathematical foundations upon which the applied science of anthropometrics rests.
+In the section that follows we have endeavoured to do this with the minimum possible
+recourse to the use of mathematical equations and formulae. The reader who requires
+a more detailed mathematical treatment of the subject is referred to the Appendix.
+17
+
+==================================================
+PAGE 37
+==================================================
+18 Anthropometry, Ergonomics and the Design of Work
+2.2 THE STATISTICAL DESCRIPTION OF HUMAN
+VARIABILITY
+2.2.1 FREQUENCY DISTRIBUTION OF A DIMENSION WITHIN A
+POPULATION
+In order to establish the statistical concepts that describe human variability, let us
+conduct what earlier scientific writers would have called an experiment of the
+imagination. Supposing you are in a large public building frequented by a fairly
+typical cross-section of the population. A companion, who is an inveterate gambler,
+offers to take bets on the stature (standing height) of the next adult man to walk
+down the corridor. (We could just as well bet on women, children or everyone taken
+together, but it is a little easier to deal with the problem mathematically if we only
+consider adults of one sex.) On what height would you be best advised to place your
+money (assuming of course that you have no prior knowledge of people who happen
+to be in the area)? You will probably pick a stature that is somewhere near the
+average, since experience has told you that middling-sized people are relatively
+common, whilst tall or short people are rare by comparison. You have in essence
+made a judgement as to the relative probability of people of different statures, or
+the relative frequency with which such people are encountered by chance. Average
+people are more probable than extremes, in that you encounter them more frequently.
+The statistically minded punter, offered a bet of this kind, could optimise the
+chance of winning by going out and measuring all the men in the building. With
+these data we could plot a chart like the one shown in Figure 2.1, in which probability
+(frequency of encounter) is plotted vertically against stature, which is plotted hori-
+zontally. The smooth curve on this chart is known as a probability density function
+or a frequency distribution. The particular curve we have drawn here is symmetrical
+about its highest point; this is the average stature, otherwise known as the mean,
+and is also the most probable stature. Since the curve is symmetrical, it follows that
+50% of the population are shorter than average and 50% are taller. We would say,
+therefore, that in this distribution the mean is equal to the fiftieth percentile (com-
+monly abbreviated as 50th %ile). In general, n% of people are shorter that the nth
+%ile. Hence, somewhere near the left-hand end of the horizontal axis there is a
+point, known as the fifth percentile (5th %ile), of which we could say ‘exactly 5%
+of men are shorter than this’ or ‘there is only a one-in-twenty chance of encountering
+a man shorter than this’. Similarly, an equal distance from the mean towards the
+right of the chart is a point known as the 95th %ile, of which we could say ‘only
+5% of men are taller than this’. Ninety percent of the population are between the
+5th and 95th %ile in stature — but the same could be said for the 2nd and 92nd
+%ile or the 3rd and 93rd %ile. It is important to note that, by virtue of their
+symmetrical positions about the mean, the 5th and 95th %ile define the shortest
+distance (or range) along the horizontal axis to enclose 90% of the population.
+Two further points must be borne in mind when discussing percentiles. Firstly,
+percentiles are specific to the populations that they describe. Hence, the 95th %ile
+stature for the general public might only be the 70th %ile for a specially selected
+occupational group like the police force or perhaps the 5th %ile for a sample made
+
+==================================================
+PAGE 38
+==================================================
+Principles and Practice of Anthropometrics 19
+1550 1650 1750 1850 1950
+Stature (mm)
+1 5 10 20 30 4050 60 70 80 90 95 99
+Percentile
+FIGURE 2.1 The frequency distribution (or probability density function) for the stature of
+adult British men. This is an example of the normal or Gaussian distribution.
+up from the Harlem Globetrotters and other professional basketball teams. Secondly,
+percentiles are specific to the dimension that they describe. Hence, a person who is
+a particular percentile in stature may or may not be the same percentile in shoulder
+breadth or waist circumference, since people differ in shape and proportions as well
+as in size.
+The frequency distribution shown in Figure 2.1, with its characteristic symmet-
+rical bell-shaped curve, is very common in biology in general and anthropometry
+in particular. It is usually known as the normal distribution. We should not, however,
+infer from this name that the distribution is in some way associated with normal
+people as against abnormal ones. We might conveniently think of the term as meaning
+something like the distribution which you will find most useful in practical affairs.
+To avoid this possibility of confusion, some statisticians prefer to call it the ‘Gaussian
+distribution’, after the German mathematician and physicist Johann Gauss
+(1777–1855), who first described it (in the context of random errors in the measure-
+ment of physical quantities). It is possible to predict that a variable such as stature
+will be normally distributed in the general population if we are prepared to make
+certain plausible assumptions concerning the way it is inherited from one generation
+to the next (see any textbook of genetics).
+Indeed, it is empirically true that most anthropometric variables conform quite
+closely to the normal distribution (at least within reasonably homogeneous popula-
+tions). This is an exceedingly convenient state of affairs since the normal distribution
+may be described by a relatively simple mathematical equation. The exact form of
+this equation need not concern us here since we are unlikely to employ it in practice.
+The important thing is that it has only two parameters. (In mathematics a parameter
+is a quantity that is constant in the case considered but variable in different cases.)
+One of these parameters is the mean, which tells us where the distribution is located
+
+==================================================
+PAGE 39
+==================================================
+20 Anthropometry, Ergonomics and the Design of Work
+on the horizontal axis. The other is a quantity known as the standard deviation (SD),
+which is an index of the degree of variability in the population concerned, that is
+the ‘width’ of the distribution or the extent to which individual values are scattered
+about or deviate from the mean. If we were to compare, for example, the general
+male population with the police force, we would find that the latter had a greater
+mean but a smaller standard deviation; that is, they are on average taller than the
+rest of us, and they are less variable amongst themselves. The SD of a population
+is usually estimated from a sample of individuals drawn from the population, when
+it is given by the equation
+∑
+(x−m)2
+SD = (2.1)
+n−1
+where m is the mean, x is the value of the dimension concerned for any individual
+in the sample, and n is the number of subjects in the sample. (We use n − 1 in the
+equation in the hope of correcting any bias introduced by the finite size of our sample
+and making a better prediction of the standard deviation of the population from
+which it was drawn, since this is what in general concerns us.)
+In this book we shall, in the interests of brevity, commonly adopt a convention
+for describing the parameters of normal distributions. Whenever a figure is followed
+by another in square brackets [ ] it refers to a mean and standard deviation. Hence,
+the statement that ‘the stature of British men is 1740 [70] mm’ should be taken as
+meaning ‘the stature of British men is normally distributed, with a mean of 1740
+mm and a standard deviation of 70 mm’. (This is a purely local convention; you
+will not encounter it outside this book.)
+2.2.2 CALCULATING PERCENTILE VALUES FOR A BODY DIMENSION
+A normal distribution is fully defined by its mean and standard deviation. If these
+are known, any percentile may be calculated without further reference to the raw
+data (i.e., the original measurements of individual people). The pth %ile of a variable
+X is given by
+X = m + zSD (2.2)
+p
+where z is a constant for the percentile concerned, which we look up in a statistical
+table. A selection of z values for some important percentiles is given in Table 2.1.
+For a more detailed table of p and z, turn to the beginning of the Appendix.
+Suppose we wish to calculate the 90th %ile of stature for the adult male popu-
+lation of Britain. It happens that British men have a mean stature of 1740 mm with
+a standard deviation of 70 mm (as shown later in Table 2.5). From Table 2.1 we see
+that for p = 90, z = 1.28. This simply means that the 90th %ile is greater than the
+mean by 1.28 times the standard deviation. Therefore, using Equation 2.2, the 90th
+%ile value of stature = 1740 + 70 x 1.28 = 1830 mm. Taking another example, if
+we wish to calculate the 25th %ile male stature, Table 2.1 shows us that for p = 25,
+
+==================================================
+PAGE 40
+==================================================
+Principles and Practice of Anthropometrics 21
+TABLE 2.1
+Values of z for Selected
+Percentiles (p)
+p z p z
+1 −2.33 99 2.33
+2.5 −1.96 97.5 1.96
+5 −1.64 95 1.64
+10 −1.28 90 1.28
+25 −0.67 75 0.67
+50 0.00
+0.1 −3.09 99.9 3.09
+0.01 −3.72 99.99 3.72
+0.001 −4.26 99.999 4.26
+z = −0.67; that is, the 25th %ile is less than the mean by 0.67 times the standard
+deviation, and the 25th %ile value would be 1693 mm.
+Alternatively, we might wish to do the calculation in reverse and determine the
+percentile value for a person of a particular stature. Hence, a stature of 1625 mm is
+115 mm below the mean, for which Equation 2.2 tells us z = −1.64. Looking this
+up in Table 2.1, we find that this is equivalent to the 5th %ile male stature.
+2.2.3 EFFECTS OF DEVIATION FROM A NORMAL DISTRIBUTION
+Most linear dimensions of the body are normally distributed, and this certainly makes
+life easier for the user of anthropometric data. There are, however, other kinds of
+frequency distribution which turn up occasionally in anthropometric practice. Some
+other possibilities are shown in Figure 2.2. In most populations body weight and
+Positive Skew Negative Skew
+F F
+Bimodal Leptokurtic Platykurtic
+F F F
+FIGURE 2.2 Deviations from normality in the statistical distributions of anthropometric data.
+
+==================================================
+PAGE 41
+==================================================
+22 Anthropometry, Ergonomics and the Design of Work
+muscular strength show a modest positive skew; it seems that there are a dispropor-
+tionate number of heavy, strong people and a dearth of light, weak ones. The
+combination of two normal distributions, such as a mixed population of men and
+women or of adults and children, will give us a new distribution that is flat-topped
+(platykurtic) or even double-peaked (bimodal).
+What will happen, in these cases, if we work on the erroneous assumption that
+such a combined distribution is normal and go ahead and calculate percentiles by
+the means described above? Errors will accrue, the magnitude of which will be
+determined by the extent of the deviation from normality in the population distri-
+bution. In practice, however, the errors will in many circumstances be negligible.
+Combining data for adult men and women is a case in point. In theory, the resultant
+unisex distribution is platykurtic. In practice, the deviations from normality are so
+small that we can ignore them. The only alternative, which avoids the assumption
+of normality, is to determine percentiles directly by simply counting heads, but since
+this requires large numbers of subjects, it is rarely feasible and few datasets in the
+literature have been established with this degree of certainty. In general, the best
+practice is to assume normality but to proceed with circumspection in those situations
+(mentioned above) where we have reason to doubt the assumption. From now on,
+our discussion will be almost entirely confined to normal distributions.
+2.3 DESIGN LIMITS: ACCOMMODATION PROVIDED
+BY A DESIGN DECISION
+For some purposes it may be especially informative to plot out the normal distribution
+in its cumulative (or integral) form. In this version percentiles are plotted against
+values of the dimension concerned (or, if we calibrate the horizontal axis in standard
+deviations, we have in effect a plot of p against z). The curve that we obtain is known
+as the normal ogive, as in Figure 2.3, which is the cumulative form of the data in
+Figure 2.1. The advantage of such a plot is that, since we may read off percentiles
+directly, it enables us to evaluate the consequences of a design decision in terms of
+the percentage of users accommodated. To take a simplistic example, Figure 2.3
+would tell us directly the percentage of British men who could pass beneath an
+obstruction of a given height without stooping or banging their heads.
+The slope of the normal ogive is greatest at the mean value (i.e., the point of
+maximum probability) and steadily diminishes as we approach the extreme tails of
+the distribution. The curve is asymptotic to the horizontal axis at 0 and 100% (i.e.,
+in theory meets these axes at infinity). Hence, it is increasingly difficult to accom-
+modate extreme percentiles. (We note in Figure 2.1 that the percentiles are densely
+packed near the centre and thinly spread at the extremes.) The practical consequence
+of this is that each successive percentage of the population we wish to accommodate
+imposes a more severe requirement upon our design. In cost-benefit terms we are
+in a condition of steadily diminishing returns.
+Figure 2.4 illustrates this design problem with respect to the case of the adjust-
+ability of a seat. The graph shows the benefit to be gained (in terms of percentage
+of the population accommodated) by providing seat adjustment of a particular range.
+
+==================================================
+PAGE 42
+==================================================
+Principles and Practice of Anthropometrics 23
+FIGURE 2.3 The frequency distribution of the stature of adult British men, plotted in cumu-
+lative form.
+The cost in this example is represented by the length of the range of adjustment.
+Calculations were based on the criterion that seat height should be equal to the
+vertical distance from the sole of the foot to the crook of the knee (popliteal height),
+which for the unisex distribution of adult British men and women (shod) is 455 [30]
+mm.
+FIGURE 2.4 Anthropometric cost-benefit function showing the percentage of members of a
+target population accommodated by various ranges of adjustment in the height of a seat. When
+this information is applied to the seat itself, the adjustment range chosen should be ‘centred’
+at a height of 455 mm.
+)p(
+elitnecreP
+100
+50
+0
+1550 1650 1750 1850 1950
+Stature (mm)
+−3 −2 −1 0 1 2 3
+z
+100
+50
+0
+0 50 100 150
+Cost (mm adjustment)
+)detadommocca
+sresu
+%(
+tfieneB
+90%
+Design
+Limit
+
+==================================================
+PAGE 43
+==================================================
+24 Anthropometry, Ergonomics and the Design of Work
+How then should we draw the line in this increasingly costly and constraining
+process of accommodating the extreme members of the user population? In other
+words, where should we set our design limits? A purely arbitrary answer to this
+question, which has been found to work well enough in practice for many purposes,
+is to design for the 5th to 95th %ile range, that is, for the middle 90% of the user
+population. When using this rule of thumb, however, we must always bear in mind
+the consequences of a mismatch for those 5% smaller and 5% larger members of
+the user population who are outside our design limits. Will a mismatch merely cause
+mild discomfort and inconvenience or might it compromise overall working effi-
+ciency? Are there implications for the health and safety of the user, in either the
+short or long term? A less than 5th %ile person sitting at a dining chair that is too
+high may be mildly uncomfortable over dinner but if he or, more probably, she has
+to work at a desk that is too high for seven hours a day, five days a week, the
+consequences may be much more severe (see Chapters 7 and 9). In the latter case,
+there is a stronger argument for setting the design limit to accommodate more than
+90% of the user population.
+In practice, when designing for a mixed user population of adult men and
+women, it is very common to take the 5th %ile female and 95th %ile male
+dimensions as the lower and upper design limits. If these were applied to the
+seat adjustment range in the example above, 95% of the user population would
+be accommodated. Other design limits may be used under certain circumstances
+(and some guidance on the selection of representative samples of users is given
+in ISO 15537 [ISO 2004]). Supposing we were asked to specify dimensions for
+an escape hatch in a confined working area. A hatch width based upon the
+appropriate body dimension of a 99th %ile user would mean that one person in
+100 would get stuck. This would clearly not be acceptable. (Actually the problem
+is further compounded by the fact that the distributions of the body bulk dimen-
+sions involved will probably be positively skewed, so that accommodating larger
+percentiles would require increasingly larger increments to the dimension.) In
+safety-critical applications of this sort, each individual case must be judged on
+its own merits. We might, for example, decide, as a matter of policy, that less
+than one user in 10,000 should be mismatched, and set our design limits at around
+four standard deviations from the mean (see Table 2.1).
+In a more general sense, it is only possible to specify percentiles at all if we
+can first define the user population. This would be simple enough in the case of
+a fighter aircraft, for example, where the numbers of pilots are small and they
+are a well-defined population, but the users of a public transport system would
+be quite another matter. They are a much more diverse population. Here we must
+consider children as well as adults, the elderly and infirm, pregnant women and
+wheelchair users. These people may not fit readily into the percentile tables of
+the anthropometrist, but can they legitimately be excluded from participation in
+the system or environment in question? We shall return to the issue of barrier-
+free design in due course, but first we shall deal with the narrower problem of
+designing for the majority.
+
+==================================================
+PAGE 44
+==================================================
+Principles and Practice of Anthropometrics 25
+2.4 DESIGN CONSTRAINTS AND CRITERIA
+The design problem therefore requires us to identify the user population and its
+characteristics (particularly the anthropometric distributions of the relevant dimen-
+sions) and to understand how these characteristics may impose constraints on the
+design, and then to set criteria which can be used to assess whether a satisfactory
+match has been achieved in the design. The foregoing discussion of the statistics of
+anthropometric distributions (defining the variability within the user population)
+provides us with the tools with which we can calculate values for the various design
+parameters (such as the range of seat adjustment and the escape hatch width in the
+earlier examples). The aim is to follow the fourth and fifth principles of user-centred
+design (Table 1.2) and achieve the best possible match for the greatest possible
+number of people.
+In anthropometrics a constraint is an observable, preferably measurable, char-
+acteristic of human beings, which has consequences for the design of a particular
+artefact. A criterion is a standard of judgement against which the match between
+user and artefact may be measured. We may distinguish various hierarchic levels of
+criteria. Near the top are overall desiderata such as comfort, safety, efficiency,
+aesthetics, etc., which we may call high-level, general or primary criteria. In order
+to achieve these goals, numerous low-level, special or secondary criteria must be
+satisfied. The relationship between these concepts may be illustrated by way of an
+example. In the design of a chair, comfort would be an obvious primary criterion;
+the lower leg length of the user imposes a constraint upon the design since, if the
+chair is too high, pressure on the underside of the thigh will cause discomfort. This
+leads us to propose a secondary criterion: that the seat height must not be greater
+than the user’s popliteal height (shod). A table of data will tell us the distribution
+of this dimension. It would seem reasonable to choose the 5th %ile value, since if
+a person this short in the leg is accommodated, the 95% of the population who are
+longer-legged will also be accommodated, providing they have room in front to
+stretch their legs. This leads more or less directly to a design specification or tertiary
+criterion: that the height of the seat shall not be greater than 406 mm. (Note that if
+we propose an adjustable seat we will use our criterion differently, as in Figure 2.4;
+see Chapter 5 for a more general discussion of this particular problem.)
+Taken in isolation, the primary criterion will usually be what is known, amongst
+certain ergonomists, as a stunning glimpse of the obvious (SGO). In general, it is
+necessary to work down through successive levels of the hierarchy of criteria before
+defining any operationally useful recommendations (which is the top down approach
+of working from the general to the specific).
+However, it is rare that there is only one criterion or one constraint on a design,
+and the interactions between different criteria need to be considered in arriving at
+a combined design solution. Thus, at any level in the hierarchy conflicts between
+criteria may arise, which will necessitate trade-offs. Hence, in the example we took
+above, our secondary criterion tells us when a seat is too high but not when it is too
+low. The criteria for this latter case are less well defined — we might call them
+fuzzy rather than sharp. None the less, it is perfectly possible that a tall man might
+feel uncomfortably cramped in a seat designed to accommodate the lower leg length
+
+==================================================
+PAGE 45
+==================================================
+26 Anthropometry, Ergonomics and the Design of Work
+of a 5th %ile woman, and some suitable compromise might have to be reached in
+the interest of the greatest comfort for the greatest number. Similarly, there might
+be circumstances in which it was necessary to trade off, say, comfort against effi-
+ciency or safety. These latter circumstances are probably few, but they raise the
+interesting point of what superordinate criterion could be used to measure both.
+In practical matters, the middle of the hierarchy is often the best place to start
+(which some call the ‘middle-out’ approach). We shall therefore consider four sets
+of constraints which between them account for the vast majority of everyday prob-
+lems in anthropometrics per se and, hence, a sizeable portion of ergonomics. We
+shall call them the four cardinal constraints of anthropometrics: clearance, reach,
+posture and strength.
+2.4.1 CLEARANCE
+In designing workstations it is necessary to provide adequate head room, elbow
+room, leg room, etc. Environments must provide adequate access and circulation
+space. Handles must provide adequate apertures for the fingers or palm. These are
+all clearance constraints. They are one-way constraints and usually determine the
+minimum acceptable dimension in the object. If such a dimension is chosen to
+accommodate a bulky member of the user population (e.g., 95th %ile in height,
+breadth, etc.), the remainder of the population, smaller than this, will necessarily be
+accommodated.
+In a few safety-critical circumstances, a related criterion of maximum acceptable
+dimension to exclude people (or some part of their body) is needed. An example of
+this would be gaps between bars in a safety guard on a machine tool, where a
+maximum gap size would be specified to prevent fingers contacting the moving parts
+of the machine. Here a 1st %ile criterion (or even smaller) would probably be set.
+2.4.2 REACH
+The ability to grasp and operate controls is an obvious example of a reach constraint,
+as is the constraint mentioned above on the height of a seat or the ability to see over
+a visual obstruction. Another example of a visual reach constraint is the distance at
+which a display screen should be placed so that text on the screen can be read
+comfortably. Reach constraints determine the maximum acceptable dimension of
+the object. They are again usually one-way constraints but this time are determined
+by a small member of the population, for example, 5th %ile.
+2.4.3 POSTURE
+A person’s working posture will be determined (at least in part) by the relationship
+between the dimensions of his or her body and those of the workstation. Postural
+problems are commonly more complex than problems of clearance and reach, since
+posture will almost certainly be affected by more than one dimension of the work-
+place (not to mention the task being performed). Moreover, the needs of one person
+may conflict with those of another person. For example, a working surface that is
+too high for a small person is just as undesirable as one that is too low for a tall
+
+==================================================
+PAGE 46
+==================================================
+Principles and Practice of Anthropometrics 27
+person (see Sections 2.6.1 and 4.7). Hence we have a two-way constraint in which
+both a maximum and a minimum value of a workstation dimension must be specified.
+There are several ways of satisfying such design requirements, and these are dis-
+cussed in Sections 2.5 and 2.6.
+2.4.4 STRENGTH
+A fourth constraint concerns the application of force in the operation of controls
+and in other physical tasks. Often, limitations of strength impose a one-way con-
+straint, and it is sufficient to determine the level of force that is acceptable to a weak
+user. There are cases, however, where this may have undesirable consequences for
+the heavy-handed (or heavy-footed) user, or in terms of the accidental operation of
+a control, etc. In these cases a two-way constraint may apply.
+2.5 DEFINING DESIGN REQUIREMENTS TO SATISFY
+THE FOUR CARDINAL CONSTRAINTS
+In practice, a design specification must define specific design requirements (the
+‘tertiary criteria’) in terms of dimensions of the design parameters, and the specifi-
+cation should also state ways in which a judgement may be made as to whether or
+not each criterion has been satisfied. In making this judgement for one-way criteria,
+it may be sufficient to compare an objective measure of a dimension (clearance,
+reach or control operating force) with the design requirement, but for two-way
+criteria further analysis is often required; appropriate methods are introduced in this
+section.
+All four cardinal constraints are influenced by the task being performed as well
+as by body dimensions. Thus the need for elbow room when sitting still in a bus is
+quite different from the clearance needs of packers at an assembly line conveyor
+belt, who not only need adequate elbow room to perform the task but may well on
+occasions need additional space to work ahead of their station to gain extra time or
+fall behind their station if they become fatigued and slow down. Posture in particular
+is influenced by the task being performed at the workstation, and the criteria must
+be defined with this in mind. For example, if the task involves exerting force, the
+work surface will need to be lower so that the person can lean forward to use body
+weight to assist the force exertion.
+When choosing the appropriate criterion it is often helpful to think in terms of
+the limiting user. The limiting user is that hypothetical member of the user population
+who, by virtue of his or her physical (or mental) characteristics, imposes the most
+severe constraint on the design of the artefact. In clearance problems the bulky
+person is the limiting user; in reach problems the small person is the limiting user.
+One of the reasons that postural design problems are commonly more complex than
+problems of clearance and reach is that we may have limiting users in both tails of
+the distribution, resulting in a two-way constraint.
+In summary, two of the main issues that need to be considered in finding a
+design solution are how best to achieve a match between the workstation dimensions
+and the user’s anthropometry and whether the task will have a significant influence
+
+==================================================
+PAGE 47
+==================================================
+28 Anthropometry, Ergonomics and the Design of Work
+on this. Common criteria for judging the match (the resulting fit or posture) relate
+to whether it is comfortable, efficient and safe.
+There are three types of design solution (or design strategy):
+1. Design for the limiting user.
+2. Define an area of common fit.
+3. Provide adjustment.
+The first strategy can be applied to a one-way constraint, while the other two
+strategies can be considered for two-way constraints. An area of common fit is a
+range of a given design dimension within which all users (or the 90% of users
+between the 5th %ile and 95th %ile) can be satisfied, few having their preferred or
+optimal solution but all finding it acceptable. The design dimension can then be
+specified anywhere within the area of common fit. This solution can often be found
+for objects or workplace parameters which are not used repetitively or for long
+periods of time. An example might be the diameter of a handle. However, the more
+frequently this is used or the longer the period of use, the more critical the choice
+of dimension and the less likely it is that an area of common fit will be found to
+satisfy the design criterion. Where an area of common fit cannot be found, adjust-
+ability should be provided or the object should be produced in a range of sizes.
+2.6 METHODS FOR ANALYSIS OF DESIGN PROBLEMS
+Some analysis and possibly some experimentation is often needed to find design
+solutions. Three simple methods — fitting trials, the method of limits and body link
+diagrams — will be described. Such experimentation can be carried out in trials
+either with representative samples of users or as virtual trials with digital human
+models using workspace simulation software.
+2.6.1 FITTING TRIALS
+A fitting trial is an experimental study in which a sample of subjects use an adjustable
+mock-up of a workstation in order to make judgements as to whether a particular
+dimension is ‘too big’, ‘too small’ or ‘just right’. During the fitting trial they can
+simulate performing the tasks, or critical aspects of the tasks, to make their judge-
+ments more realistic.
+Figure 2.5 shows the results of a simple fitting trial, the purpose of which was
+to determine the optimum height for a lectern in a lecture theatre. Ten people (five
+male, five female) acted as subjects in the fitting trial. A music stand served as the
+adjustable mock-up simulating the lectern. Each subject set the music stand to the
+lowest and highest heights that he or she considered acceptable and then to their
+own personally preferred optimum height. The means and the standard deviations
+of the lower and upper limits for all ten subjects were calculated. These were used
+to plot the smooth curves (cumulative distributions) which define the thresholds of
+‘too low’ and ‘too high’ shown in Figure 2.5 (by using z and p values in the same
+
+==================================================
+PAGE 48
+==================================================
+Principles and Practice of Anthropometrics 29
+FIGURE 2.5 Results of a fitting trial to determine the optimal height of a lectern. (From A.
+S. Nicholson and J. E. Ridd, Health, Safety and Ergonomics, Butterworth-Heinemann, 1988,
+Figure 7.2. Reproduced with kind permission.)
+way as for the construction of Figure 2.3). These cumulative distributions represent
+the best estimates for a population represented by the subject sample.
+Another smooth curve for ‘satisfactory’ is plotted in a similar way in Figure 2.5
+by calculating the percentage of people for whom each height was neither ‘too low’
+nor ‘too high’. (Thus for any given height, the responses ‘too low’ + ‘too high’ +
+‘satisfactory’ = 100%.) In can be seen that the majority of subjects in the sample
+could be ‘satisfied’ by lectern heights between approximately 1050 mm and 1250
+mm. Obviously, few of the subjects found these heights ‘just right’, but this is
+naturally the case when trying to find a design solution for a population rather than
+an individual. The distribution for the subjects’ preferred optimum heights (‘just
+right’) was derived directly from their responses (i.e., without calculating the cumu-
+lative distribution), rounding off each individual subject’s response to the nearest 50
+mm and plotting these as the dashed curve shown in Figure 2.5. It is interesting to
+compare the curves for ‘just right’ and for ‘satisfactory’. Subjects could accept a
+range of lectern heights for the given task even though most heights within the range
+were not ideal for them. Thus, in this case, there is some flexibility in choosing a
+design solution which will satisfy the majority of users. Were this not the case, it
+would be necessary to build adjustability into the lectern. In fact, in this experiment,
+a clear optimal height of 1150 mm emerged (at least for this group of subjects). At
+this height, more than 50% of users regarded the lectern as ‘just right’ (within ± 25
+mm), and over 95% considered it satisfactory.
+The design of the experiment could perhaps have been improved, although a
+relatively crude experiment of this nature will suffice for many real-world design
+problems. We could also question the extent to which the subjects in this experiment
+(students) were a representative sample of the true population of end-users of the
+lectern. If the problem were more critical it would merit a more detailed investigation.
+sresu
+fo
+egatnecreP
+100
+Too low
+Too high
+Just right
+50
+Satisfactory
+0
+800 900 1000 1100 1200 1300 1400 1500
+Lectern height (mm)
+
+==================================================
+PAGE 49
+==================================================
+30 Anthropometry, Ergonomics and the Design of Work
+A fitting trial is a type of psychophysical experiment in which people make
+subjective (i.e., psychological) judgements concerning the objective properties of
+physical objects or events. The form that the plotted results of the lectern experiment
+(Figure 2.5) took is characteristic of psychophysical experiments. It is made up from
+the ogival curves of two normal distributions, facing each other, which define a third
+normal distribution by subtraction of their summed values from 100%. Similar results
+may be found in other areas of ergonomics. Judgements about thermal comfort —
+for example ‘too hot’, ‘too cold’, ‘just right’ — are distributed in this way (see
+Grandjean 1988). In principle we might expect to encounter this form in any situation
+in which people are asked to express a subjective preference on a bipolar continuum:
+too fat/too thin, too young/too old, and so on.
+A more systematic method of obtaining the judgements in a fitting trial was
+developed by Jones (1963) to take account of human biases and uncertainties in
+making judgements. (It was adapted from the ‘method of limits’ which is discussed
+in more detail, in an analytical rather than an experimental application, in the next
+section.) Jones’ method for conducting the fitting trial to determine the best height
+for the lectern would be to adjust the lectern to set heights, in steps of perhaps 25
+or 50 mm, and at each height to ask the subject to say whether or not it was
+‘acceptable’ (i.e., for performing the given task). Responses of ‘not sure’ would not
+be allowed; it can be difficult to make a definite judgement close to a threshold of
+acceptability (or comfort), but it is better to press the subject for a decision rather
+than allow hesitation or opting out (and the analysis of the results is also simpler).
+The sequence of heights would be presented twice, once in ascending order and
+once in descending order, these being alternated between subjects to minimise
+systematic bias. The ascending sequence would start with a very low lectern, and it
+would then be raised in the steps until a point was reached at which the lectern was
+definitely too high. This would be repeated in the descending sequence until a point
+was reached at which it was definitely too low. Curiously enough, the ascending
+and descending trials tend to give slightly different answers, with the thresholds
+between unacceptable and acceptable (or vice versa) being lower in the descending
+trial. This can be seen in the data from the hypothetical fitting trials shown in Figure
+2.6. The reason for this is that we all find it difficult to change from a negative
+judgement to a positive judgement (or vice versa) at a threshold, being influenced
+by the judgement we made in the previous condition (a carry-over effect). This is
+the main reason for including both ascending and descending trials. The upper and
+lower thresholds of acceptability are calculated for each subject by averaging the
+threshold values found in their ascending and descending trials. The general proce-
+dure for conducting a fitting trial is shown in Table 2.2.
+The data collected by using Jones’ method for fitting trials (as in Figure 2.6)
+could be processed to present the results in the same way as for the original lectern
+experiment in Figure 2.5. However, even the raw results in Figure 2.6 allow us to
+reach some conclusions about the design solution, and specifically to decide that
+there is an area of common fit, which (for this user population) indicates that a fixed
+height lectern would be satisfactory and that adjustability is not essential. The form
+of presentation in Figure 2.5 goes further than this and provides the results from
+which cost-benefit analyses could be made.
+
+==================================================
+PAGE 50
+==================================================
+Principles and Practice of Anthropometrics 31
+dna
+reppu
+eht
+etacidni
+sworra
+ehT
+.dohtem
+’senoJ
+gnisu
+lairt
+gnittfi
+a
+ni
+stcejbus
+morf
+deniatbo
+eb
+thgim
+hcihw
+sesnopser
+lacitehtopyH
+6.2
+ERUGIF
+s’tcejbus
+eht
+rof
+eulav
+egareva
+eht
+si
+nwohs
+dlohserht
+hcae
+erehw(
+tcejbus
+hcae
+yb
+elbatpecca
+degduj
+sthgieh
+nretcel
+fo
+egnar
+eht
+fo
+sdlohserht
+rewol
+.)slairt
+gnidnecsed
+dna
+gnidnecsa
+
+[TABLES ON PAGE 50]:
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+ |  |  |  | 
+
+==================================================
+PAGE 51
+==================================================
+32 Anthropometry, Ergonomics and the Design of Work
+TABLE 2.2
+Procedure for Conducting a Fitting Trial
+Construct a mock-up of the workplace (with adjustability for all components representing the features
+being evaluated).
+Include a simulation of the task(s) which will be performed in the workplace.
+Select a sample of subjects to represent the relevant characteristics of the eventual user population.
+Decide the order of presentation of the workplace features being evaluated (an important decision
+when assessing whether adjustability will be essential for more than one of the features).
+Determine the range which will be tested for each component, which should extend beyond the
+expected minimum and maximum thresholds of acceptability.
+Determine the interval between settings which will be tested over this range, depending on the
+sensitivity required of the evaluation.
+For each subject:
+Decide the order of ascending and descending presentation for each component (which should vary
+between subjects to minimise bias due to any systematic effects); usually there will be several
+repetitions.
+Set the component at the specified intervals throughout its range.
+At each setting:
+Where appropriate, ask the subject to perform the real or simulated task(s).
+Ask the subject to judge whether the setting is acceptable.
+Plot the results for all subjects.
+Determine which features need to be adjustable and which can be fixed.
+Specify the best design compromise — dimension (or range of adjustability) of each feature of the
+workplace.
+Evaluate the final design solution, initially perhaps with the mock-up but ultimately in the workplace
+itself, and with the actual user population.
+2.6.2 ANALYTICAL APPLICATION OF THE METHOD OF LIMITS
+Consider now the problem of seat height which we discussed in Section 2.4. We
+could in principle have solved this empirically by conducting a fitting trial, but
+instead we solved it analytically by the application of anthropometric data. The line
+of reasoning that we adopted could be written out in a formal way as follows:
+• Criterion: seat height ≤ popliteal height
+• Limiting user: 5th %ile woman, shod popliteal height = 406 mm
+• Design specification: maximum seat height = 406 mm
+Let us now apply a similar line of reasoning to the analysis of a more complex
+problem involving a two-way postural constraint. The technique we are going to use
+is called the method of limits. (The name is borrowed from that of a technique in
+psychophysics which is equivalent in form.) In essence this technique is a model or
+analogue of the fitting trial, in which anthropometric criteria and data are used as
+
+==================================================
+PAGE 52
+==================================================
+Principles and Practice of Anthropometrics 33
+TABLE 2.3
+Calculation of Percentage of Men Accommodated
+by a Workbench that is 1000 mm in Height
+Criterion Distribution Percentile Conclusion
+EH − 150 965 [52] 75 25% — much too low
+EH − 100 1015 [52] 39 61% — too low
+EH − 50 1065 [52] 11 11% — too high
+EH 1115 [52] 1 1% — much too high
+28% — just right
+EH, elbow height
+substitutes for the subjective judgements of real people. The problem is to determine
+the optimum height for a workbench to be used in a certain industrial task which
+involves a moderate degree of both force and precision. (It is assumed in this example
+that the object being handled is small, so that the workbench height and the working
+height are essentially the same; this is not always the case, and analyses should
+always be made for the working height — the height of the hands when performing
+the task.) To simplify the calculation we shall also assume that the task will be
+performed by male workers. The workers will be standing.
+According to Grandjean (1988), the optimum working height for a task involving
+moderate force and precision is between 50 and 100 mm below the person’s elbow
+height. We note that it is a two-way criterion since there may be a mismatch in either
+direction (with the workbench height too low or too high). The elbow height (EH)
+of British men is 1090 [52] mm (as shown later in Table 2.5). To this we must add
+a 25 mm correction for shoes, giving 1115 [52] mm (see Section 2.7.4). Combining
+these data with the above criterion from Grandjean (1988) gives us the upper and
+lower limits of optimal working level: EH − 50 = 1065 [52]; EH − 100 = 1015 [52].
+We can treat these just as if they were new normally distributed anthropometric
+dimensions and calculate the percentile in these distributions to which any particular
+workbench height corresponds (as in Table 2.3 for a workbench height of 1000 mm).
+However, we should bear in mind that the criterion refers to a zone of ‘optimal’
+bench heights. Since we may reasonably assume that users may be prepared to accept
+less than absolute perfection, we may find it useful to consider two further zones
+extending 50 mm above and 50 mm below the optimum, which we would charac-
+terize as ‘acceptable’ but not perfect (see Figure 2.7). We choose 50 mm pragmat-
+ically because it seems reasonable rather than on the basis of any particular scientific
+evidence.
+Table 2.3 shows a set of calculations performed for a workbench height of 1000
+mm. We find that this workbench height corresponds to the 75th %ile in the lowest
+criterion (EH-150) distribution, from which we infer that a workbench of 1000 mm
+would be ‘much too low’, or ‘unsatisfactory’, for the 25% of men who are larger
+than this. Similarly, the central criteria (EH-100 and EH-50, bounding the optimal
+zone) correspond to the 39th and llth %iles, respectively, from which we infer that
+
+==================================================
+PAGE 53
+==================================================
+34 Anthropometry, Ergonomics and the Design of Work
+FIGURE 2.7 Criteria for optimal and satisfactory working heights in an industrial assembly
+task.
+the 28% of men between these heights would find the workbench ‘just right’ or
+‘optimal’.
+We could keep on performing such calculations for different workbench heights
+until we homed in on a value that maximised the percentage optimally matched and
+minimised the unsatisfactory matches. (Here, of course, the computer would help.)
+At this point we are like the statistically minded punter searching for the best bet.
+The full results of a series of such calculations are plotted in Figure 2.8. It comes
+as no surprise to discover that the ‘optimal’ figures describe a normal curve (e),
+whereas the ‘too high’ and ‘too low’ figures yield normal ogives facing in opposite
+directions (a, b, c, d). We might also lump together those who were optimally
+matched with those who were a little too high and a little too low into an ‘acceptable’
+category (f), leaving a residual ‘unacceptable’ category (g) outside these limits
+(which would be 26% unacceptable and 74% acceptable for a workbench height of
+1000 mm). The statistically minded punter looking at Figure 2.8 should settle for a
+working height of a little less than 1050 mm.
+This is not quite the end of the process, since at the best compromise height
+15% of users will have an ‘unsatisfactory’ match. Is this an acceptable (or tolerable)
+situation or will they be severely uncomfortable or suffer long-term damage? Is it
+better to have a bench that is too high or one that is too low? Do we require an
+adjustable workbench or some similarly varied solution? In order to make such
+judgements, more information would be needed about the demands of the tasks
+performed and about the duration and frequency of use of the workbench. In general,
+neither a work surface that is too low nor one that is too high can be said to be the
+mm
+5001:eli%5
+mm
+0901:eli%05
+mm
+0811:eli%59
+mm
+52
+Unacceptable
+Acceptable
+Optimal Elbow height (EH)
+Acceptable
+EH–50 mm
+EH–100 mm
+EH–150 mm
+Unacceptable
+
+==================================================
+PAGE 54
+==================================================
+Principles and Practice of Anthropometrics 35
+100
+50
+0
+850 1050 1250
+Working height (mm)
+FIGURE 2.8 The anthropometric method of limits, applied to the determination of the opti-
+mal working height for an industrial assembly task. Curves show the percentage of users
+accommodated or otherwise: (a) much too low; (b) too low; (c) too high; (d) much too high;
+(e) just right; (f) acceptable; (g) unacceptable. See text for definition of categories and
+discussion of technique.
+better compromise — the effects will differ, but both can be uncomfortable or
+potentially harmful under some working conditions.
+If a fixed height solution is chosen, the best possible compromise height is 75
+mm below the elbow height of the average user (i.e., at the mid-point of the optimum
+range). With the wisdom of hindsight we can see that this follows necessarily from
+the shape of the normal distribution. Having laboriously analysed the problem, we
+find that it could have been solved by inspection. We could write out our reasoning
+as follows:
+• Criterion: elbow height – 100 mm ≤ bench height ≤ elbow height − 50 mm
+• Best possible compromise: bench height = average elbow height − 75 mm
+• Design specification: bench height = 1040 mm
+Again, a solution can be found through simple reasoning, but the full analysis
+of Figure 2.8 is needed to establish the extent of mismatches and the severity of the
+consequences and to provide a cost-benefit justification to argue for the design
+solution.
+2.6.3 BODY LINK DIAGRAM
+Another way of analysing a workplace layout to accommodate a range of people of
+different sizes is by using a body link diagram. An example of this approach is
+shown in the layout of a driver’s workstation in Figure 2.9. The analysis, based on
+an original study by Rebiffé et al. (1969), shows the zones within which the grip
+point on a steering wheel should be located for a small woman and a tall man, and
+similarly the eye levels which result when they have adopted the posture considered
+sresu
+fo
+egatnecreP
+f
+a b c d g
+e
+850 1050 1250
+
+==================================================
+PAGE 55
+==================================================
+36 Anthropometry, Ergonomics and the Design of Work
+95 %ile
+Eye level
+5 %ile
+H
+H
+SRP
+95 %ile
+SRP 5 %ile
+Floor level
+FIGURE 2.9 Body link diagram used to analyse the layout of a driver’s workstation, based
+on the following postural criteria: thigh angle (i.e., seat angle) to horizontal = 15°; knee angle
+= 110°; ankle-foot angle = 90°; seat back reclined at 20° to the vertical. The hand position
+zones are defined by the ranges of shoulder and elbow postures: shoulder flexion 0 to 45°;
+elbow flexion 60 to 110°.
+to be comfortable (as defined by the postural criteria — Rebiffé’s (1966) ranges of
+comfortable angles of joints [see Section 4.5] — used in constructing the link
+diagram). From this analysis, the car designer has information related to vision,
+helping to set limits on the upper and lower boundaries for the windscreen and
+location of the rear view mirror, an area of common fit for locating the steering
+wheel and the ranges of adjustment necessary for horizontal and vertical positioning
+of the seat. In the figure, a relatively small 360 mm steering wheel set at 45˚ has
+been drawn, centred on the area of common fit for the hand grips. In this position
+it appears possible that it only just provides sufficient abdominal and knee clearance.
+Hence there is a strong argument for making the steering column adjustable. Another
+example of the use of a link diagram is the definition of the zones of reach on a
+work surface which is illustrated in Figure 4.6 and Figure 4.7.
+In a link diagram, the human body is represented by links (bony segments)
+articulating (pivoting) about joint centres. For many purposes, the lengths of the
+links can be approximated from known anthropometric data, such as knee height,
+buttock–knee length or seated shoulder height, with corrections estimated for the
+location of the joint within the skin surface dimensions. Tabulations of link lengths
+can be found in biomechanics textbooks, often based on regression analysis of data
+on internal and external skeletal dimensions, and other research has defined locations
+of joint centres from studies of motion (Seitz and Bubb, 1999). While there is
+obviously a degree of error in any of these estimations, a link diagram is an effective
+
+[TABLES ON PAGE 55]:
+ | le
+
+==================================================
+PAGE 56
+==================================================
+Principles and Practice of Anthropometrics 37
+means of helping a designer to visualise the design problem in its entirety and to
+appreciate the interactions between the various design criteria.
+More accurate data on joint centres, link lengths and locations of centres of
+gravity of the body segments represented by the links has been collected. Historically,
+the parameters of body segments have been determined by the careful and systematic
+dissection of cadavers. The collection of data by this means commenced with the
+work of German anatomists such as Harless, Braune and Fischer at the end of the
+nineteenth century. The definitive study of the subject was that of Dempster (1955),
+whose data have been quoted and requoted and applied in applications ranging from
+astronautics to industrial safety, automobile crash test dummies and sport. It is
+sobering to record that Dempster’s work was based upon only eight cadavers.
+Subsequent studies increased this number to 65 (Reynolds, 1978). More recently,
+data has been collected from x-rays and other medical scans. Where accuracy is
+important for a body link diagram, a compilation of this data can be found in Chaffin
+et al. (1999).
+Information is also needed on ranges of joint movements and, for setting the
+posture criteria, on the comfortable range within the maximum limits of movement
+at a particular joint. These data are discussed in Chapter 4.
+2.6.4 WORKSPACE SIMULATION AND DIGITAL HUMAN MODELS
+The analysis of design problems can now made through simulation with digital
+human models in virtual environments as well as by the empirical and analytical
+methods just described. Anthropometrics is developing very rapidly with advances
+in computer simulation, automated measurement technology and image processing
+techniques. The effects of this on applications of anthropometrics will be important
+and are briefly discussed below. For a more comprehensive overview of these, and
+of digital human models in general, the reader is recommended to turn to Chaffin
+(2001, 2004) and Robinette et al. (2004). The underlying principles of anthropomet-
+rics, as given in Bodyspace, are fundamental and will continue to apply even as the
+practice changes and the power of analysis increases.
+Anthropometric data collection surveys have been greatly enhanced in the types
+and quantity of anthropometric dimensions which can be measured and in the speed
+with which data can be collected (which in turn has improved accuracy by reducing
+the extent of postural changes made by subjects while they are being measured).
+Whole body scanners (reviewed together with other technologies such as landmark
+capture and tracking devices by Rioux and Bruckart 1997) provide three-dimensional
+(3-D) anthropometric data which capture the contours and shape of the body surface.
+This opens up possibilities for entirely new types of measurements (termed 3-D
+anthopometry) and ones which are being collected for very large population surveys.
+In the international CAESAR study, the 3-D surface anthropometry of diverse
+populations from North America and Europe have been surveyed, and data from
+approximately 4400 individuals have been collected (Robinette, 2000; Robinette et
+al., 2002; Blackwell et al., 2002). Human motion can also be captured and analysed
+to investigate both task behaviour and workspace parameters (Chaffin et al., 2000).
+
+==================================================
+PAGE 57
+==================================================
+38 Anthropometry, Ergonomics and the Design of Work
+Stature = 1625 mm Radial Difference Map
+Back Front
+Difference
+<20 mm
+20–40 mm
+40–60 mm
+60–80 mm
+80–100 mm
+Mass = 51.9 kg Mass = 91.4 kg >100 mm
+FIGURE 2.10 Radial differences between the torsos of two women with the same torso
+height but different masses (Robinette et al., 2004).
+Figure 2.10 shows one example of the potential applications for 3-D anthropo-
+metric data, taken from the work of Robinette et al. (2004), in which the 3-D
+differences in shape between people of different sizes and body proportions were
+mapped and defined in quantitative terms and the consequences for design evaluated.
+The superposition of scans can similarly be used to assess the fit of apparel or of
+personal protective equipment. 3-D scans have even been used to estimate functional
+lung capacity and to show that the radial differences at shoulder level and in the
+chest exceed 1 cm in different phases of the breathing cycle (Kovatz et al., 1988).
+Jones and Rioux (1997) have described other applications, including human recog-
+nition and design of prostheses. The increased power of such analyses is apparent
+when it is further realised that the variation within a whole population sample can
+be mapped in this way, no longer requiring the artificial representation by percentiles
+of dimensions or manikins. The measurement of changes over time is also facilitated,
+whether for the tracking of movements while performing tasks (from which dynamic
+reach or space envelopes can be derived) or longer-term bodily changes such as
+those occurring during pregnancy. Volume scanners, using ultrasound imaging, x-
+ray computed tomography and magnetic resonance imaging offer further potential
+for recording dimensions and movements of the internal structures of the body. These
+latter applications are largely beyond the scope of the design applications of anthro-
+pometry, but some of the possibilities can be imagined from the anatomical cross-
+sectional scanned images of the male and female bodies recorded in the National
+Library of Medicine’s Visible Human Project® (Patrias, 2000).
+Computer aided design (CAD) has long been used to simulate workspaces and
+equipment, but realistic digital human models (also known as avatars) have now
+been incorporated in these computer simulations (Chaffin, 2004), and animation
+techniques allow the analysis and evaluation of movements performed during work
+tasks, as well as consideration of the interactions between pairs and teams of workers.
+The human models extend the body link diagram approach described earlier by
+displaying the body form (or ‘skin’) within which there is a representation of the
+skeleton or musculoskeletal system. The construction of the digital human models
+relies on knowledge (and representation through algorithms) of body linkages, joint
+motion centres and joint ranges of motion, but they are subject to similar errors of
+
+==================================================
+PAGE 58
+==================================================
+Principles and Practice of Anthropometrics 39
+approximation as in the more traditional approaches (and perhaps less obviously so
+where algorithms simplify the reality that they represent or are based on incomplete
+knowledge of human behaviour). Effects of skin compression artefacts and iden-
+tification of comfort thresholds pose much the same difficulties.
+As Chaffin (2001) notes, an important attribute of these human models will be
+their ability to use either inverse kinematics or motion capture data to predict the
+postures that people use when performing a task. At present these methods can be
+used to create realistic static postures and some simple motions for a variety of
+common tasks, (e.g., walking, kneeling, stooping, etc.). However, knowledge of
+postural behaviour while performing work tasks needs much further study, but
+predictive modeling of some dynamic actions is underway (Zhang et al., 1997;
+Chaffin, 2002). Few validation studies have yet been reported of the algorithms
+controlling posture adjustment and animation of actions of digital human models.
+Their users should be aware of the possibility of such limitations and of the effect
+of user’s background and experience on their interpretation of the results (Che Doi
+and Haslegrave, 2003; Dukic et al., 2002). User trials with real human subjects,
+performing their real tasks, are just as necessary to evaluate and confirm design
+solutions following computer simulation as when following the more traditional
+anthropometric analysis techniques.
+The opportunities offered by 3-D anthropometry and digital human modeling
+are intensely exciting. The former is already introducing possibilities of mass cus-
+tomisation to replace the mass production of consumer goods, with its disadvantages
+of ill-fitting clothes, inappropriate work surface heights, inefficient tools, etc.
+Bespoke tailoring or footwear, for example, could become available for everyone.
+Perhaps, too, workstations and conveyors on industrial production lines could be
+designed to be reconfigured to fit the incoming operators at shift changes. Already
+the digital human models and workspace simulations (virtual mock-ups) provide
+designers with tools to evaluate alternative design solutions both rapidly and at an
+early stage in the design process (exploring a wide variety of task scenarios and
+performing ‘what if’ exercises) (Robertson and Bedford, 1999; Chaffin, 2001).
+Currently, designers are mainly using these to investigate fit, clearance and line of
+sight issues and for solving problems related to strength (Chaffin, 2001), but, as
+more knowledge of task behaviour is developed, it will be possible to use them to
+assess comfort or endurance and to model motion in simulated activities.
+2.7 USING ANTHROPOMETRIC DATA
+Whether for traditional or 3-D anthropometry, the basis of the foregoing discussion
+and analysis is that the user population of interest is known (or that a similar surrogate
+population can be found) and that its anthropometric characteristics have been
+measured. Apart from a few special small populations who are completely known
+(such as astronauts or Formula One racing drivers), it is rare to have anthropometric
+data directly applicable to a target population (such as production line operators
+within a particular factory or purchasers of a particular product). Usually the general
+(civilian) population anthropometric statistics for the appropriate nationality will be
+used (although the choice of data source is obviously more complicated for design
+
+==================================================
+PAGE 59
+==================================================
+40 Anthropometry, Ergonomics and the Design of Work
+of products that are to be marketed internationally). The following sections give
+guidance on the points to consider when applying anthropometric data for a specific
+design question (and user population).
+2.7.1 SOURCES OF ANTHROPOMETRIC DATA
+The anthropometric data available for different populations vary greatly, in both
+quantity and quality. Students in ergonomics and design courses are often critical
+and surprised by this, but the reality is that the collection of anthropometric data is
+extremely time-consuming and expensive, particularly when surveys attempt to be
+truly representative. Few countries have yet attempted to collect representative and
+comprehensive anthropometric data, although many countries are currently under-
+taking surveys. Moreover, we know that secular changes can occur quite rapidly in
+populations (see Chapter 3), but surveys are much too expensive to repeat at frequent
+intervals. As a result, we are normally using anthropometric data that is 10, 20 or
+more years old and which may only be the best approximation available for the
+actual user population. Corrections may need to be made for this, as well as predic-
+tions of future secular trends when products are expected to remain in use for many
+years into the future (e.g., when designing buses or aircraft). Few organizations
+outside the military have the resources to mount a full-scale anthropometric survey.
+As a consequence, we have extensive and detailed anthropometric data for many of
+the world’s armed services but relatively few data for the civilian populations from
+whom they were recruited and of whom they may or may not be representative
+samples. Military data should be used with caution when applied to a civilian target
+population — the military populations surveyed tend to be young, fit and subject to
+selection biases.
+Despite these cautions, there are many sources of anthropometric data for
+national populations, which can be found in papers in scientific journals, in compi-
+lations such as the Anthropometric Source Book (Webb Associates, 1978), Jurgens
+et al. (1990), ADULTDATA (and its companion volumes CHILDATA and OLDER
+ADULTDATA [Peebles and Norris, 1998; Norris and Wilson 1995; Smith et al. 2000])
+and in the anthropometric database PeopleSize 2000 (Open Ergonomics Ltd., 2000).
+However, few of the surveys for either national or special populations provide a
+comprehensive set of anthropometric dimensions (if such a set were possible), and
+designers are often faced with the need to estimate dimensions for some design
+parameters even when using the most comprehensive data set. Approaches to dealing
+with this are discussed in Section 2.8.
+At the end of this chapter you will find a table of best estimate figures for the
+body dimensions of the adult population of the United Kingdom aged 19 to 65 years
+(Table 2.5). In the chapters that follow we shall treat this as the standard reference
+population on which we shall base our design recommendations and other anthro-
+pometric calculations. Data for other target populations and details of sources, etc.,
+can be found in Chapter 10.
+
+==================================================
+PAGE 73
+==================================================
+54 Anthropometry, Ergonomics and the Design of Work
+TABLE 2.5
+Anthropometric Estimates for British Adults Aged 19 to 65 Years (all
+dimensions in millimetres, except for body weight, given in kilograms)
+Men Women
+5th 50th 95th 5th 50th 95th
+Dimensiona %ile %ile %ile SD %ile %ile %ile SD
+1. Stature 1625 1740 1855 70 1505 1610 1710 62
+2. Eye height 1515 1630 1745 69 1405 1505 1610 61
+3. Shoulder height 1315 1425 1535 66 1215 1310 1405 58
+4. Elbow height 1005 1090 1180 52 930 1005 1085 46
+5. Hip height 840 920 1000 50 740 810 885 43
+6. Knuckle height 690 755 825 41 660 720 780 36
+7. Fingertip height 590 655 720 38 560 625 685 38
+8. Sitting height 850 910 965 36 795 850 910 35
+9. Sitting eye height 735 790 845 35 685 740 795 33
+10. Sitting shoulder height 540 595 645 32 505 555 610 31
+11. Sitting elbow height 195 245 295 31 185 235 280 29
+12. Thigh thickness 135 160 185 15 125 155 180 17
+13. Buttock–knee length 540 595 645 31 520 570 620 30
+14. Buttock–popliteal length 440 495 550 32 435 480 530 30
+15. Knee height 490 545 595 32 455 500 540 27
+16. Popliteal height 395 440 490 29 355 400 445 27
+17. Shoulder breadth (bideltoid) 420 465 510 28 355 395 435 24
+18. Shoulder breadth (biacromial) 365 400 430 20 325 355 385 18
+19. Hip breadth 310 360 405 29 310 370 435 38
+20. Chest (bust) depth 215 250 285 22 210 250 295 27
+21. Abdominal depth 220 270 325 32 205 255 305 30
+22. Shoulder–elbow length 330 365 395 20 300 330 360 17
+23. Elbow–fingertip length 440 475 510 21 400 430 460 19
+24. Upper limb length 720 780 840 36 655 705 760 32
+25. Shoulder–grip length 610 665 715 32 555 600 650 29
+26. Head length 180 195 205 8 165 180 190 7
+27. Head breadth 145 155 165 6 135 145 150 6
+28. Hand length 175 190 205 10 160 175 190 9
+29. Hand breadth 80 85 95 5 70 75 85 4
+30. Foot length 240 265 285 14 215 235 255 12
+31. Foot breadth 85 95 110 6 80 90 100 6
+32. Span 1655 1790 1925 83 1490 1605 1725 71
+33. Elbow span 865 945 1020 47 780 850 920 43
+34. Vertical grip reach (standing) 1925 2060 2190 80 1790 1905 2020 71
+35. Vertical grip reach (sitting) 1145 1245 1340 60 1060 1150 1235 53
+36. Forward grip reach 720 780 835 34 650 705 755 31
+Body weight 55 75 94 12 44 63 81 11
+a Definitions of the dimensions are given in Table 2.4 and Figure 2.11.
+
+==================================================
+PAGE 74
+==================================================
+3 Human Diversity
+3.1 INTRODUCTION
+In this chapter we shall consider the principal ways in which samples and populations
+of human beings differ in their anthropometric characteristics — and the biosocial
+factors that underlie these differences.
+The sizes, shapes and strengths of human beings are very often broken down
+by age and sex when they are tabulated in anthropometric databases. In defining a
+target user population for anthropometric purposes, we must also take into account
+ethnicity (and sometimes regional differences within the relatively homogeneous
+population of a country), social class and occupation. Superimposed over these
+differences are changes occurring within populations over a period of time. Some
+of these are attributable to the migration and genetic admixture of hitherto distinct
+ethnic groups and others to more complex historical processes, which over the past
+century or so have led to an almost worldwide increase in stature, which is referred
+to as the ‘secular trend’.
+The extent to which these measurable differences between populations of human
+beings are determined by biological (or genetic) factors, as against social (or envi-
+ronmental) ones, poses a difficult set of questions. This nature/nurture controversy
+has ramifications in many branches of the human sciences. In reality, asking whether
+a given characteristic is determined by inheritance or by upbringing and lifestyle is
+probably a bit like asking whether the area of a field is determined by its length or
+its breadth. Where anthropometric dimensions are concerned, the environment —
+health and conditions — of mothers (and perhaps even of preceding generations) is
+also likely to have had a strong influence.
+One further point must be stressed. When comparing and contrasting the mea-
+surable characteristics of different groups of people, we will always be dealing with
+within-group variability as well as between-group variability. The greater the former
+compared with the latter, the less significant will be the difference between the
+groups (both in terms of statistical theory and in terms of ergonomics practice).
+Consider humankind as a whole. It is debatable whether anthropometric data
+available at the present time, even if they could be assembled in one place, would
+constitute a representative sample of all human beings living at the present time.
+Anthropometric databases come from surveys which have been carried out at dif-
+ferent times, and secular trends vary greatly between countries (as discussed later).
+Such indications as we have, however (see Tildesley, 1950), suggest that, in round
+figures, the stature of all adult living male adults has a mean value of about 1650
+mm with a standard deviation of 80 mm, which, as the reader will recall from Chapter
+2, we write as 1650 [80] mm. Assuming a sex difference in average stature of 7%
+and an equal coefficient of variation, the stature of living female adults will have a
+55
+
+==================================================
+PAGE 75
+==================================================
+56 Anthropometry, Ergonomics and the Design of Work
+distribution of about 1535 [75] mm. (These figures could doubtless be improved by
+anyone with the patience to do so but will serve as a starting point.)
+The adult population of Great Britain (represented in Table 2.5 as the standard
+population throughout this book) is well into the taller half of the human race, with
+stature 1740 [70] mm for men and 1610 [62] mm for women. Hence the average
+British adult male is about 87th %ile for the human race as a whole.
+According to Roberts (1975), the shortest people in the world are the Efe and
+Basua ‘pygmies’ of Central Africa, whose average stature is 1438 [70] mm for men
+and 1372 [78] mm for women. The tallest are the Dinka Nilotes of the southern
+Sudan: 1829 [61] mm for men and 1689 [58] mm for women. However, differences
+almost as great as these may be found between particular samples drawn from the
+British population (representing occupational or age groups). Guardsmen (Gooder-
+son and Beebee, 1977) stand at some 1803 [63] mm, whereas a sample of elderly
+women measured by Harris and her colleagues (Institute for Consumer Ergonomics,
+1983) had a stature of 1515 [70] mm (deducting a modest 20 mm for shoes since
+the subjects were measured shod).
+The human race is more varied still. The limits of what is normally considered
+to be clinical normality are set at an adult stature of something in the order of
+between 1370 and 2010 mm. (The exact figures quoted vary somewhat, being
+essentially arbitrary.) According to the best information available at the time of
+writing (supported by evidence and as set out in Guinness World Records 2004),
+the shortest living adult man in the twentieth century was 570 mm tall, and the tallest
+was 2720 mm.
+3.2 SEX DIFFERENCES
+It has become fashionable of late to refer to the differences between men and women
+as ones of ‘gender’ rather than ‘sex’. This is incorrect. The word gender applies to
+the distinction that exists in most European languages (other than English) between
+masculine and feminine nouns, rather than the differences between male and
+female living organisms. The human species, like all the higher animals, is sexually
+dimorphous.
+Are the anthropometric differences between men and women attributable to
+underlying biological (i.e., genetic and physiological) differences or to cultural
+differences in upbringing and lifestyle? We can be fairly sure that sex differences
+in stature and related body dimensions and most differences in bodily proportions
+are almost entirely biological in their origin, although there may be a small overlay
+of differences attributable to lifestyle, etc. In the case of muscular strength, however,
+the position is more evenly balanced, and although the male of the species has the
+greater physiological propensity to the acquisition of muscle strength, the overlay
+of differences associated with physical training and lifestyle is considerable.
+What is the best way of describing sex differences statistically? The most
+frequent way found in the literature is a straightforward comparison of means. Hence,
+we read statements like ‘on average women are 7% shorter than men’ or ‘on average
+women are 66% as strong as men’. Let us call the average female dimension (or
+strength) divided by the average male dimension (or strength) the F/M ratio.
+
+==================================================
+PAGE 76
+==================================================
+Human Diversity 57
+Mean 1625 mm Mean 1738 mm
+SD 56 mm SD 68 mm
+15
+10
+Men
+Women
+5
+0
+FIGURE 3.1 Comparison of the stature distributions of U.K. female and male car drivers.
+(Data from Haslegrave, C. M. (1986). Ergonomics, 29(2), 281–301.)
+However, for all the variables we are likely to consider in this text, there is consid-
+erable overlap between the male and female distributions, as can be seen in the
+stature distributions shown in Figure 3.1. The F/M ratio of means tells us very little
+about this combined distribution. (Among many other equally interesting descrip-
+tions we might include the ratio of the 95th %ile female to the 5th %ile male values
+or the 5th %ile female to the 95th %ile male, the percentage of women taller than
+the 5th %ile man or men shorter than the 95th %ile woman, etc.)
+At the very least, a descriptive index should reflect both the difference between
+the means and the magnitude of the variances of the male and female distributions
+under consideration. It would be useful and informative to know the proportion in
+the total variance in stature (i.e., in the combined unisex distribution) which is
+attributable to sex. Afficionados of the one-way analysis of variances will understand
+that this index is given by the equation for the coefficient of determination R2 :
+(3.1)
+(If this equation is absolute gibberish to you, don’t worry too much. Alternatively
+turn to any textbook of statistics.)
+What does the layperson have in mind when he (or she) asks a question such
+as ‘How true is it that men are stronger than women?’ Consider a population of men
+and a population of women. Suppose we select a man at random followed by a
+woman at random and compare their strengths. We will call such a comparison a
+noitalupop
+elamef/elam
+fo
+egatnecreP
+1410 1490 1590 1690 1790 1890 1990
+Stature, mm
+betweensexsumofsquares
+R2 =
+totalsumofsqquares
+
+[TABLES ON PAGE 76]:
+Men
+Women
+
+
+==================================================
+PAGE 77
+==================================================
+58 Anthropometry, Ergonomics and the Design of Work
+chance encounter. If we perform an infinite number of such comparisons we may
+generate a statistical distribution of chance encounters. The F/M ratio is equivalent
+to an encounter between an average woman and an average man. Both the layperson
+and the human scientist wish to know about the remainder of the distribution. For
+reasons that would only be comprehensible to a competent mathematical statistician,
+the distribution of the ratios of two normal distributions is not itself normally
+distributed. If, however, we forget about ratios and consider absolute differences,
+the problem becomes much more tractable. If differences are used, the distribution
+of chance encounters M [s] is normal, and its parameters are given by
+e e
+M =M −M (3.2)
+e m f
+s2 =s2 +s2 (3.3)
+e m f
+where M and s are the mean and standard deviation; the subscripts m and f refer to
+men and women, respectively. The value of zero in this distribution represents a
+chance encounter between a man and a woman of equal strength. It is simple to
+calculate the proportions of the distribution lying on either side of this point (by
+calculating z and looking up a table as described in Chapter 2). We therefore know
+the percentage of chance encounters in which the female is stronger or, in the more
+general case, the percentage of chance encounters in which the female exceeds the
+male (% CEFEM). This index is as close as we can reasonably get to the layperson’s
+conception of the question posed.
+Obviously, any investigation of sex differences will founder if the samples of
+men and women who are studied are not truly comparable. Thus a comparison of
+male navvies with female secretaries or of male secretaries with female navvies, is
+not solely an investigation of sex differences per se.
+In general, men will exceed women in all linear body dimensions except hip
+breadth (as shown in the data in the tables in Chapter 10). There are ethnic differences
+in the magnitude of these sex differences — at least for stature. Eveleth (1975) found
+greater differences between the sexes in Amerindians than in Europeans, who in
+turn showed greater differences than black Africans.
+3.2.1 VARIATION IN BODY PROPORTIONS
+Many sex differences in body proportion are too well known to require further
+comment. In general, the lengths of the upper and lower limbs are proportionally
+as well as absolutely greater in men. Thus the ratio of sitting height to stature
+(sometimes called ‘sitting height index’ and used as an index of relative trunk length)
+will be greater in women than in men. The only limb dimension that is proportionally
+greater in women is buttock–knee length, due to differences in the forms of the male
+and female buttock. There is no difference between men and women in the propor-
+tional values of either head length or head breadth.
+
+==================================================
+PAGE 78
+==================================================
+Human Diversity 59
+In addition to the dimensional anthropometrics described above, men and women
+differ in their bodily composition. In general, fat represents a greater proportion of
+body weight in the adult female than in the male. (Subcutaneous fat is also distributed
+differently, women having a propensity to accumulate fat in the breasts, hips, thighs
+and upper arms. Abdominal fat accumulates above the umbilicus in men and below
+the umbilicus in women.) The most direct way of measuring body fat is by densit-
+ometry. Fat is a good deal less dense than lean tissue, so if the density of the body
+is determined (usually by underwater weighing) it is possible to calculate the per-
+centage that fat contributes to the weight of the body. Durnin and Rahaman (1967)
+found this percentage to be 13.5 [5.8] for adult men and 24.2 [6.5] for adult women
+(F/M ratio = 179%, R2 = 43%; % CEFEM = 89).
+Data from three-dimensional (3-D) body scanning surveys have now facilitated
+more detailed study of body shape variation and its relationship with size variation
+(allometry, relative growth). Recent research has shown how the variation arises
+from size differences, shape differences and allometry differences between the sexes
+(Cerney and Adams, 2004). For example, the difference in allometry between males
+and females was found to be characterised as a lengthening of the torso, an increase
+in the proximal positioning of the sellion (top of the nose), and the locations of the
+elbow, wrist and hand being further from the body. Thus body shape changes in a
+different way with respect to body size for the two sexes. As Cerney and Adams
+point out, this needs to be considered when characterising the extremes of a mixed
+population.
+Friess and Corner (2004) have studied allometeric change in body shape and
+proportions under the influence of weight. They found that, as body mass index (or
+relative body weight) increases, there is more pronounced abdominal and gluteal
+protrusion and an increase in cross-sectional dimensions throughout the leg, although
+the strongest effect is in the upper thigh. However, women show an increase in the
+waist and hip regions that is not seen in men and a greater increase in shoulder
+breadth. Thus the male body becomes more "barrel-shaped" in front view, producing
+a more even distribution of the excess weight than in women. In side view men
+carry some excess weight in the lower chest in contrast to in the abdomen for women.
+3.2.2 VARIATION IN STRENGTH
+Pheasant (1983) published a detailed analysis of sex differences in strength. A survey
+of the literature located a total of 112 datasets in which a direct and, presumably,
+valid comparison of the performances of men and women in some test of static
+strength could be made. Indices of sex differences were calculated for each of these
+datasets (see Table 3.1). Although the average value of the F/M ratio is 61% — very
+close to commonly quoted figures of women being two-thirds as strong as men —
+the ratios found in the whole series range from 37 to 90%. The other indices tell a
+similar story: sex can account for a major (85%) or a negligible (3%) proportion of
+the total variance in strength.
+An interesting pattern emerges if we divide the datasets into groups according
+to the part of the body tested. Upper limb tests show greater sex differences than
+lower limb tests or tests of pushing, pulling and lifting actions, with tests of trunk
+
+==================================================
+PAGE 79
+==================================================
+60 Anthropometry, Ergonomics and the Design of Work
+1.3
+ELBAT
+)detseT
+noitrexE
+fo
+epyT
+ro
+ydoB
+fo
+traP
+yb
+defiissalC(
+htgnertS
+ni
+secnereffiD
+xeS
+MEFEC
+%
+)%(
+2R
+)%(
+oitar
+M/F
+rebmuN
+mumixaM
+egarevA
+muminiM
+mumixaM
+egarevA
+muminiM
+mumixaM
+egarevA
+muminiM
+stseT
+fo
+ydoB
+fo
+traP
+82
+21
+4
+26
+34
+11
+18
+66
+05
+71
+bmil
+rewoL
+73
+41
+1
+27
+33
+3
+09
+56
+83
+14
+tfil/llup/hsuP
+31
+6
+1
+16
+45
+53
+86
+26
+73
+11
+knurT
+53
+8
+1
+77
+35
+7
+68
+85
+44
+92
+bmil
+reppU
+61
+5
+0
+58
+36
+53
+16
+35
+34
+41
+suoenallecsiM
+73
+01
+0
+58
+54
+3
+09
+16
+73
+211
+stset
+llA
+.11–502
+,41
+,scimonogrE
+deilppA
+.)3891(
+.T
+.S
+,tnasaehP
+morf
+ataD
+:ecruoS
+elam
+eht
+sdeecxe
+elamef
+eht
+hcihw
+ni
+sretnuocne
+ecnahc
+fo
+egatnecrep
+eht
+,MEFEC
+%
+;htgnerts
+elam
+yb
+dedivid
+htgnerts
+elamef
+,oitar
+M/F
+
+==================================================
+PAGE 80
+==================================================
+Human Diversity 61
+strength being somewhere between the two. Subdivision of the upper limb category
+reveals that tests of hand and forearm muscles give lesser sex differences than tests
+of upper arm and shoulder muscles. Taking all three indices together, the least sex
+differences were found in the push/pull/lift category. (The factors that determine
+performance in a task of this kind are numerous and complex. The coordinated
+activity of many muscles may be involved, and in some cases the limiting factor
+may be body weight and its leverage.) Hettinger (1961), considering the magnitude
+of the F/M ratio in various muscle groups, suggested that the sex difference is small
+in those muscle groups that are under-used in everyday life. In the present authors’
+view it would be just as reasonable to propose the opposite hypothesis on the basis
+of the available data — and the opposite would be just as biologically plausible!
+What is the underlying physiology of sex differences in strength? The strength
+of a muscle is directly proportional to the effective cross-sectional area of its con-
+tractile tissue. The cross-sectional area of a muscle must be closely related to the
+bulk that is visible to the casual observer or can be measured with a tape. Ikai and
+Fukunaga (1968), using a sophisticated ultrasound measurement of a cross-sectional
+area, found strength to be approximately 64 N per cm2 of muscle tissue, which was
+independent both of sex and of age from 12 years upwards. Trained judo men had
+the same strength per unit area as untrained people. In general then, it is the quantity
+not the quality of muscle that counts, at least in strength measurements of short
+duration.
+It is widely accepted that the secondary sex differences of fat distribution and
+muscle bulk result from the relative concentrations of the sex hormones — androgens
+in the male and oestrogens and progestogens in the female. Testosterone, the most
+important of the androgens, is produced in large quantities in the testes but also in
+very small quantities in the ovaries. (The level of testosterone in the blood plasma
+of men is 20 to 30 times that of women.) In response to a given training programme,
+men show a faster and greater increase in strength than women; this difference is
+generally attributed to the effects of testosterone (Hettinger, 1961; Klafs and Lyon,
+1978). Brown and Wilmore (1974) monitored a small group of female throwing-
+event athletes over a six months’ maximal resistance training programme. Strength
+increased by 15 to 53%, but there was little evidence of muscular hypertrophy
+(increase in bulk). How this latter finding is to be reconciled with the results of Ikai
+and Fukunaga (1968) is not yet clear.
+Klafs and Lyon (1978) speculate that women who have a relatively high level
+of plasma testosterone will ‘bulk up’ like men in response to intense weight training,
+and, indeed, the current vogue for female body building shows that a striking degree
+of muscular hypertrophy may occur in some individuals. It has often been suggested
+that female athletes are in one respect or another more masculine than their more
+sedentary sisters. Malina and Zavaleta (1976) calculated an ‘androgyny index’ as
+follows:
+Androgeny Index =
+[3 × biacromial (shoulder) breadth] − bicristal (pelvic) breadth (3.4)
+
+==================================================
+PAGE 81
+==================================================
+62 Anthropometry, Ergonomics and the Design of Work
+Hence a high score on this index is indicative of a masculine skeletal frame and
+a low score of a feminine frame. Runners (both long and short distance) were not
+found to differ from nonathletes in androgyny scores, but jumpers and throwers were
+found to be significantly more masculine according to this criterion. Is this a training
+effect or does it represent self-selection? The latter is generally believed to be the
+case amongst physical educationalists (Klafs and Lyon, 1978). Adams (1961) com-
+pared young black women who had been engaged in heavy farm labour all their
+lives with ones who had not. Although the labourers were larger in overall size and
+muscular development than the controls, the androgyny index was similar for the
+two groups.
+Our discussion of these matters would not be complete without some passing
+reference to ‘norms’, ‘ideals’, ‘cultural expectations’ and the elusive phenomenon
+of preference. These can exert extraordinarily strong influences on some members
+of any particular population to control or change their anthropometric characteristics,
+as witnessed by the incidence of disorders such as anorexia, discrimination experi-
+enced by middle-aged workers in some service industry jobs or the vogue for body
+building. The cultural expectations do, however, vary between countries and over
+time. The history of European art reveals considerable diversity in the ideal female
+form. Consider, for example, the way that Venus was depicted by Rubens, Titian,
+Botticelli and Cranach, to name but four in order of decreasing radius of her
+curvature. The ideal male form (Mars, Adam, etc.) seems to have remained remark-
+ably constant by comparison. One of the relatively few empirical studies of such
+ideals and fashions is that of Garner et al. (1980), who took the strikingly original
+approach of analysing the recorded heights, weights and bodily circumferences of
+all Playboy magazine centrefolds between 1959 and 1978. The trend over the period
+was for an increase in height, reduction in weight for height, bust circumference,
+and hip circumference and increase in waist circumference, indicating a move
+towards a body form that the authors characterized (somewhat oddly) as ‘tubular’.
+3.3 ETHNIC DIFFERENCES
+An ethnic group is a population of individuals who inhabit a specified geographical
+distribution and who have certain physical characteristics in common which serve,
+in statistical terms, to distinguish them from other such groups of people. These
+characteristics may be presumed to be predominantly hereditary, although the extent
+to which this is the case is sometimes contentious.
+Ethnic groups may or may not be co-extensive with national, linguistic or other
+boundaries — hence the various ethnic types to be found within the population of
+Europe are distributed across national (and linguistic) boundaries and emigrants
+from an ethnic group may be resident in a different part of the world — and the
+frequency with which a given ethnic type is encountered will vary from place to
+place. To some extent, ethnic groups fall into more or less natural clusters, which
+may be referred to as the Negroid, Caucasoid and Mongoloid divisions or major
+groups of humankind. The term race has tended to disappear from the scientific
+literature, due, one might suppose, to a collective embarrassment occasioned by its
+
+==================================================
+PAGE 82
+==================================================
+Human Diversity 63
+misuse for dogmatic and propagandist purposes. As Gould (1984) has clearly shown,
+supposedly objective scientific writers have colluded in this misuse.
+The Negroid division includes most of the dark-skinned peoples of Africa,
+together with certain minor ethnic groups of Asia and the Pacific islands. The
+Caucasoid division includes both light- and dark-skinned peoples resident in Europe,
+North Africa, Asia Minor, the Middle East, India and Polynesia (together with the
+indigenous population of Australia and some other ethnic groups who form a sub-
+division of their own). The Mongoloid division comprises a large number of ethnic
+groups distributed across central, eastern and south-eastern Asia, together with the
+indigenous populations of the Americas.
+Samples of adults may vary from each other either in overall size (as measured
+by stature or weight) or in bodily proportions. The most characteristic ethnic differ-
+ences are of the latter kind since the major divisions of humankind include both tall
+and short populations. Figure 3.2 illustrates some salient features. Average sitting
+height (measured from the seat surface) has been plotted against average stature.
+The ratio of the two (relative sitting height) is plotted as oblique lines on the chart.
+When relative sitting height is large, the sample is ‘short legged’ and vice versa.
+The data points are all male samples taken from Eveleth and Tanner (1976) and
+Webb Associates (1978). Samples drawn from the civilian or military populations
+of the United States (of which there are a considerable number in the literature)
+have been included as ‘of predominantly European descent’, notwithstanding that
+around 10% of the membership of such samples are of identifiably different ethnic
+origins (see Section 2.7.2).
+Black Africans have proportionally longer lower limbs than Europeans; Far
+Eastern samples have proportionally shorter lower limbs, the difference being most
+950
+900
+850
+1600 1650 1700 1750 1800
+Stature (mm)
+FIGURE 3.2 Ethnic differences in the relationship between average sitting height and average
+stature in samples of adult men. ● = European (including samples of predominantly European
+descent); (cid:3) = Indo-Mediterranean; ▫ = African; (cid:5) = far Eastern.
+)mm(
+thgieH
+gnittiS
+55 54 53
+52
+51
+50
+Relative
+Sitting
+Height
+(%)
+
+[TABLES ON PAGE 82]:
+ | 
+ | 
+
+==================================================
+PAGE 83
+==================================================
+64 Anthropometry, Ergonomics and the Design of Work
+marked in the Japanese, less in the Chinese and Koreans and least in the Thai and
+Vietnamese. These differences of proportion occur throughout the stature range. If
+we consider the European data only, there is a tendency for the ratio of sitting height
+to stature to be slightly greater for short samples than tall ones, suggesting the
+interesting hypothesis that the lower limbs contribute more to differences in stature
+than the trunk. The populations of Turkey, the Middle East and India (labelled ‘Indo-
+Mediterranean’), have proportions similar to Europeans but, typically, a lesser overall
+stature.
+Do these ethnic differences in size and proportion have any evolutionary signif-
+icance? Zoologists have identified two rules concerning morphological variations of
+warm-blooded polytypic species, of which humankind is an example. Bergman’s
+rule states that the body size of varieties increases with decreasing mean temperature
+of the habitat. Alien’s rule states that the relative size of exposed portions of the
+body decreases with decreasing temperature. Roberts (1973), in an extensive survey
+of the anthropometric literature concerning the world’s indigenous populations,
+showed that these rules are in general applicable to humankind. Body weight is
+negatively correlated with mean annual temperature. Samples with the lowest body
+weights are not found outside the tropics, and the highest body weights are not found
+at latitudes lower than 30˚. Furthermore, linearity of bodily form (as indicated by
+high values for relative limb lengths) shows a strong positive correlation with mean
+annual temperature. Taken together, these findings indicate that ethnic groups inhab-
+iting hot climates tend to have a high ratio of surface area to body mass, which is
+advantageous for the loss of heat. Similarly, the inhabitants of cold regions are
+adapted for heat retention. Roberts concluded, however, that there were differences
+in form between the major ethnic divisions of humanity even when the effects of
+temperature had been taken into account.
+The relative lengths of the upper limbs show a similar pattern of ethnic differ-
+ences to the lower limbs, and there is some evidence to suggest that the differences
+are more due to a lengthening or shortening of the distal segment of the limb (i.e.,
+the forearm or shank) than of the proximal segment (i.e., the upper arm or thigh).
+The shoulders are a little narrower relative to stature in Africans than Europeans
+and the hips are considerably narrower in both sexes. In general, African bodily
+proportions are best described as ‘linear’.
+It would be a mistake to consider these differences in bodily size or shape to
+be fixed and immutable characteristics of ethnic groups. Several studies of migrant
+samples have shown significant differences between the growth patterns or adult
+dimensions of individuals born in the new environment and equivalent samples in
+the ‘old country’. Boas (1912) and Shapiro (1939) are classic studies of this kind,
+and subsequent investigations include Kaplan (1954), Greulich (1957) and, more
+recently, Koblianski and Arensburg (1977). Shapiro (1939) studied Japanese immi-
+grants to Hawaii. He showed that although the Hawaiian-born generation are taller
+than the immigrants and larger in most other dimensions, the ratios of the major
+bodily dimensions (i.e., relative sitting height and relative biacromial breadth) are
+not very different. This relative constancy of proportion has been confirmed by Miller
+(1961).
+
+==================================================
+PAGE 84
+==================================================
+Human Diversity 65
+This led Roberts (1975) to conclude that ‘the data suggest a strong genetic
+component to body proportion, and a more labile overall size’. Things are not quite
+this simple, however. There is evidence, for example, that the Japanese are becoming
+more like Europeans in terms of their relative limb lengths (Tanner et al., 1982, see
+below) but less like Europeans in terms of their head shapes (Yanagisawa and Kondo,
+1973). This seems very curious indeed, but leads into the consideration of the effects
+of secular and social (environmental) changes in Sections 3.5 and 3.6.
+In practical terms, it has to be emphasised that the anthropometric differences
+between many ethnic groups are sufficiently great that a product or item of equipment
+designed for one group will be unsuitable for another (and the same caution must
+be taken with the use of standards and guidelines). Although within-group variability
+may be large, between–ethnic group variation is generally significantly larger. The
+types of problems encountered by different populations attempting to use the same
+equipment are exemplified by two contrasting situations. In the first, when some
+(second-hand) European buses were first exported to a Southeast Asian country,
+many drivers found it very difficult even to reach the pedals. The second example
+relates to the consequences of investment from one country in the industry of another
+country (in this case from Japan to the United Kingdom). This can lead to importation
+of organisational systems and designs for facilities as well as of equipment. When
+Japanese companies set up their first plants in the United Kingdom, some installed
+identical equipment and facilities to those used in the home country and failed to
+appreciate the anthropometric (as well as the many other) differences. As a result,
+some British workers found themselves using machinery with work surfaces that
+were much too low and started to experience musculoskeletal problems.
+Both examples show that managers and policy makers, as well as designers,
+must consider the effects of anthropometric differences. Sen (1984) gives other
+examples of similar problems experienced by workers in industrially developing
+countries and argues cogently for designers and manufacturers of products and
+equipment, and planners and purchasing managers of international companies, to
+take responsibility for identifying the relevant characteristics of the user/worker
+population and their task demands. Often, the local managers and purchasing depart-
+ments in industrially developing countries do not have the necessary knowledge and
+expertise to do this.
+In the case of ethnic minorities within a working population which is predom-
+inantly from another ethnic group, the situation is less clear; however given the
+relative magnitudes of the within-group and between-group variation concerned, we
+should not in general expect their presence to be significant in ergonomic and design
+terms unless they make up more than about one-third of the total. This is only a
+rough rule of thumb, however, and there may be circumstances in which the presence
+of ethnic minorities in a working population is more critical. Thompson and Booth
+(1982), for example, show that there are circumstances in which people from certain
+ethnic groups may be more at risk if industrial safety guarding standards are not
+modified to take into account their particular anthropometric characteristics.
+
+==================================================
+PAGE 85
+==================================================
+66 Anthropometry, Ergonomics and the Design of Work
+3.4 GROWTH AND DEVELOPMENT
+At birth we weigh some 3.3 [0.4] kg, and we are 500 [20] mm in length, of which
+our trunk represents some 70%. In the two decades that follow, our body length
+increases between three- and four-fold, our weight increases around 20-fold and our
+linear proportions change so that in the adult state the length of the trunk accounts
+for only 52% of the stature. However, the adult condition is by no means stationary.
+Our bodily proportions are modified by our lifestyles and the inevitable processes
+of ageing. The anthropometrist who wishes to chart this course (or part of it) may
+be tempted to do so by a cross-sectional study in which several samples of individ-
+uals, representative of different age bands, are measured at the same time. (A cross-
+sectional age-band sample is known as a ‘cohort’.) However, data gathered by this
+means have certain limitations. In the case of children, only a very crude estimate
+can be obtained of the rate at which changes are taking place. Furthermore, our
+differences will be confounded by the effects of any secular trend that is taking place
+within the population. To disentangle these effects it is necessary to conduct longi-
+tudinal studies in which a sample of people are followed over an extended period
+of time.
+The genetic and environmental factors that control human growth have been
+documented in detail by Tanner (1962, 1978), who has also published standards for
+the height and weight of British children which have been widely adopted in medical
+practice (Tanner et al., 1966, Tanner and Whitehouse 1976). The pattern of growth
+of a ‘typical’ boy and girl based on these data is shown in Figure 3.3. (The typical
+child is a purely fictitious individual who is average in all respects at all ages.) At
+ages up to 2 years measurements are made on a supine infant, and subsequently in
+a standing position. The rate of growth in boys is very rapid during infancy, declining
+steadily to reach its minimum at 111/ years; it then accelerates again to reach its
+2
+peak at 14 years before steadily decelerating as maturity is approached. The velocity
+peak around 14 years for boys (earlier for girls), known as the ‘adolescent growth
+spurt’, is associated with the events of puberty.
+The peak in the chart is broader and lower than it would be for any actual child
+since it represents the average of a sample of children, all of whom are accelerating
+at different times. Hence, at 14 years some boys will have almost completed their
+growth spurt, whereas others will scarcely have commenced it. As a consequence
+the standard deviations of the bodily dimensions of samples of adolescents are very
+large (see the tables in Chapter 10). The typical girl is a little shorter than the typical
+boy from birth to puberty, but the growth spurt commences earlier in girls — at
+around 9 years, reaching its maximum velocity at around 12 years and growth being
+more or less complete by 16 years. Hence, there is a period from about 11 to 13 1/
+2
+years when the typical girl is taller than the typical boy. The typical boy reaches
+half his adult stature a few months after his second birthday and the typical girl a
+few months before, although these figures will, of course, be subject to considerable
+variations in the population as a whole.
+In addition to increasing in size, the human body changes considerably in shape.
+If the shape and composition of the body were the same throughout life, we would
+expect body weight to grow with the cube of stature (since weight is directly
+
+==================================================
+PAGE 86
+==================================================
+Human Diversity 67
+Stature (mm) Velocity (mm per year)
++
+1500 100
+1000 50
++
+500 0
+B 6 12 18 B 6 12 18
+Age (years) Age (years)
+FIGURE 3.3 Growth from birth (B) to maturity of a typical boy and girl: stature (left) and
+velocity (i.e., rate) of growth in stature (right). (Data from Tanner, J. M., Whitehouse, R. H.,
+and Takaishi, M. (1966). Archives of Diseases of Childhood, 41, 454–71; 41, 613–35.)
+proportional to volume, assuming constant density). That would give an individual
+of average birth size, who achieved an average male adult stature of 1740 mm, a
+body weight of 139 kg, which is close to twice the correct figure. In reality, growth
+is accompanied by an attenuation of bodily proportions.
+Tanner (1962) has pointed out that there are various ‘maturity gradients’ which
+are superimposed upon the growth curve of the body as a whole; hence, at any point
+in time the upper parts of the body (particularly the head) are closer to their adult size
+than the lower parts; the upper limbs are further developed than the lower, but the
+distal segments of the limbs (hands, feet) are ahead of the proximal segments (thighs,
+arms). Cameron et al. (1982) also showed differences in the timing of the adolescent
+growth spurt for different parts of the body. It is generally assumed that these gradients
+operate to give a steady unidirectional transition from the large-headed, short-legged
+form of the child to the typical proportions of the adult. Tanner (1962) copied an
+illustration of this from Medawar (1944), who in turn took his from an anatomy
+textbook of 1915, which in turn is based on nineteenth-century data. Medawar (1944)
+made the following statement: ‘Just as the size of the human being increases with age,
+so, in an analogous but as yet unformulated way, does his shape. The property is best
+expressed by saying that change of shape keeps a certain definite trend, direction or
+“sense” in time; like size, it does not retrace its steps.’ Numerous authors have fitted
+mathematical equations to these supposedly simple transformations, and some have
+attached biological significance to the constants in the equations.
+Whilst compiling anthropometric estimates for British schoolchildren, Pheasant
+chanced on certain discrepancies which led him to believe that the assumption of a
+simple unidirectional change in shape was incorrect. Figure 3.4, previously published
+in Pheasant (1984), is based upon the cross-sectional study of the under-18-year-old
+
+==================================================
+PAGE 87
+==================================================
+68 Anthropometry, Ergonomics and the Design of Work
+24
+70 SH % HL
+%
+10
+18 FL
+%
+50
+13
+30
+BD
+36 BK %
+%
+BA
+KH
+20
+24
+HB
+%
+20 18
+B 16 20 80 B 16 20 80
+Age (years) Age (years)
+FIGURE 3.4 Effects of age on bodily proportions expressed as the relative values of various
+dimensions (% stature). SH = sitting height; BK = buttock–knee length; KH = knee height;
+HL = head length; FL = foot length; BD = bideltoid breadth; BA = biacromial breadth; HB
+= hip breadth; ● = boys and men; (cid:3) = girls and women. (Original data from Snyder, R. G.,
+Schneider, L. W., Owings, C. L., Reynolds, H. M., Golomb, D. H. and Schork, M. A. (1977).
+Anthropometry of infants, children and youths to age 18 for product safety design. Consumer
+Product Safety Committee, U.S. Department of Commerce, Bethesda, MD; Stoudt, H. W.,
+Damon, A., McFarland, R. and Roberts, J. (1965). Weight, height and selected body dimensions
+of adults, United States 1961-1962. U.S. Department of Health and Human Services, National
+Center for Health Statistics, Hyattsville, MD; Stoudt, H. W., Damon, A. and McFarland, R.
+A. (1970). Skinfolds, body girths, biacromial diameter and selected anthropometric indices
+of adults. U.S. Department of Health and Human Services, National Center for Health
+Statistics, Hyattsville, MD; Webb Associates, (1978). Anthropometric Source Book. U.S.
+National Aeronautics and Space Administration, Lyndon B. Johnson Space Center, Houston.)
+population of the United States published by Snyder et al. (1977). The mean value
+of each dimension for each age cohort has been divided by the mean value of stature
+(or supine crown–heel length for the under-2-year-olds). In some dimensions, such
+as head length, we may observe the smooth unidirectional approach towards adult
+proportions which we have been led to expect, but these are the exceptions rather than
+the rule. Most dimensions show what might be termed a ‘developmental overshoot’.
+
+==================================================
+PAGE 88
+==================================================
+Human Diversity 69
+Sitting height, for example, has achieved its adult percentage of stature by 9 years
+in girls and 11 years in boys; it then over-shoots and reaches a minimum at the time
+when the adolescent growth spurt is at its peak (12 years in girls, 14 years in boys),
+before climbing back to its adult proportions. Knee height, as one might expect,
+shows a pattern that is similar but inverted, as to a lesser degree do shoulder–elbow
+and elbow–fingertip lengths (not shown in the figure). Both shoulder and hip breadths
+are proportionally large in early infancy and pass through a proportional minimum
+— during adolescence in the former case and childhood in the latter. Foot length
+has a long plateau of elevated proportions in childhood before commencing a descent
+during adolescence. In summary, the data confirm the popular stereotypes of the
+‘dumpy’ infant and the ‘gangling’ adolescent.
+The data of Figure 3.4 are also interesting with respect to sex differences and
+the ages at which the bodily proportions of boys and girls first diverge. In the case
+of sitting height, knee height and foot length the divergence is associated with the
+events of puberty and the developmental overshoot. The bony pelvis of the female
+is broader than that of the male at birth (Tanner, 1978), and there is a slight sex
+difference in proportional hip breadth at the youngest age for which we have data.
+Hip breadth also shows a slight divergence at around 6 years and a pronounced one
+at adolescence, which continues well into adulthood. (Buttock–knee length is quite
+similar, so we are certainly dealing with soft-tissue upholstery to a large extent.) By
+contrast, shoulder breadth (bideltoid, biacromial) does not show any measurable
+divergence until as late as 17 years.
+The muscular strengths of boys and girls are similar during childhood and
+diverge at around the time of puberty, as shown in Figure 3.5, which is based on
+the data of Montoye and Lamphier (1977).
+Men
+80
+60
+40 Women
+20
+10 12 14 16 18 20 30 40 50 60
+Age (years)
+FIGURE 3.5 Effects of age and sex on grip strength. (Data from Montoye, H. J. and Lam-
+phier, D. E. (1977). Research Quarterly of the American Association for Health, Physical
+Education and Recreation, 48, 109–20.)
+
+==================================================
+PAGE 89
+==================================================
+70 Anthropometry, Ergonomics and the Design of Work
+The age at which we reach ‘anthropometric adulthood’ is by no means as clear-
+cut as one might suppose. Growth standards conventionally stop at 16 years for girls
+and 18 years for boys. The growth of a long bone occurs by cell division in plates
+of cartilage which separate the ends (epiphyses) from the shaft (diaphysis). When
+this cartilage finally turns into bone, growth ceases (eiphyseal fusion). The clavicles
+continue to grow well into the twenties and so, to a lesser extent, do the bones of
+the spine. Andersson et al. (1965) demonstrated an increase in sitting height in a
+majority of boys after 18 years and girls after 17 years, as well as in some boys
+after 20 years. A sample of Americans studied by Roche and Davila (1972) reached
+their adult stature at a median age of 21.2 years for boys and 17.3 years for girls,
+but some 10% of boys grew after 23.5 years and 10% of girls after 21.1 years.
+According to Roche and Davila (1972), this was partially due to late epiphyseal
+fusion in the lower limbs and partially to lengthening of the spine. Miall et al. (1967),
+in a longitudinal study of two Welsh communities, found evidence that men might
+grow slightly in stature well into their thirties.
+3.5 THE SECULAR TREND
+Human biologists use the term secular trend to describe alterations in the measurable
+characteristics of a population of human beings occurring over a period of time.
+Over a period of at least a century biosocial changes have been occurring in the
+population of much of the world which have led to:
+• An increase in the rate of growth of children
+• Earlier onset of puberty, as indicated by menarche (the onset of the
+menstrual cycle) in girls and the adolescent growth spurt in both boys and
+girls
+• An increase in adult stature, with a possible decrease in the age at which
+adult stature is reached
+The extensive statistical evidence concerning these changes has been reviewed by,
+amongst others, Tanner (1962, 1978), Meredith (1976) and Roche (1979).
+Tanner (1962, 1978) summarised the available evidence and concluded that from
+around 1880 to at least 1960, in virtually all European countries (including Sweden,
+Finland, Norway, France, Great Britain, Italy, Germany, Czechoslovakia, Poland,
+Hungary, the Soviet Union, Holland, Belgium, Switzerland and Austria), together
+with the United States, Canada and Australia, the magnitude of the trend had been
+similar. The rate of change had been approximately:
+• 15 mm per decade in stature and 0.5 kg per decade in weight at 5 to 7
+years of age
+• 25 mm and 2 kg per decade during the time of adolescence
+• 10 mm per decade in adult stature
+
+==================================================
+PAGE 90
+==================================================
+Human Diversity 71
+This had been accompanied by a downward trend of 0.3 years per decade in the age
+of menarche. Roche (1979) pointed out that secular changes in size at birth had been
+small or nonexistent.
+Although the magnitudes of changes in Europe and North America have been fairly
+uniform, they are by no means universal. Japan, for example, has shown a particularly
+dramatic secular trend. The data of Tanner et al. (1982) show that in the decade
+between 1957 and 1967 Japanese boys increased in stature by:
+• 31 mm at 6 years
+• 62 mm at 14 years
+• 33 mm at 17 years
+In the 1967 to 1977 period, however, the rate of increase had declined to:
+• 17 mm at 6 years
+• 35 mm at 14 years
+• 19 mm at 17 years
+This suggests that the explosive biosocial forces driving the change may be
+beginning to wear themselves out. The effects of these changes will still, however,
+continue to be felt as these children progress through adulthood. In contrast, Roche
+(1979) cited evidence that in India, and elsewhere in the Third World, there had
+actually been a secular decrease in adult stature.
+If people are increasing in size, are they also changing in shape? The remarkable
+Japanese secular trend seems to be associated with an increase in the relative length
+of the leg, as the data of Tanner et al. (1982), plotted in Figure 3.6, show. It is
+doubtful, however, whether such a change of proportion is general. Figure 3.7 shows
+the relative sitting heights of samples of young American males (average ages
+between 18 and 30 years) plotted against the year in which the measurement was
+taken. There is no evidence of a secular trend in adult proportions. (This conclusion
+has been confirmed by Borkan et al., 1983.)
+It is interesting to speculate as to whether our distant forebears were as short as
+we might imagine from recent secular trends. Anecdotal evidence concerning a range
+of artefacts from doorways to suits of armour abounds. Although it is not possible to
+calculate stature accurately from poorly preserved skeletal remains, the long bones of
+ancient burials allow us to make a reasonable estimate. The archaeological evidence
+summarised by Wells (1963) suggests that the statures of British males from neolithic
+to medieval times have always fallen within the taller part of the present-day human
+race. Indeed, figures quoted include average heights of 1732 mm for Anglo-Saxons
+and 1764 mm for Round Barrow burials, the latter actually exceeding the average
+height of present-day young men. The secular trend then seems to be a recovery from
+a setback which occurred somewhere in post-medieval times. Tanner (1978) cites
+various evidence that in the earlier part of the nineteenth century trends were small or
+absent and plausibly associates them with the Industrial Revolution.
+
+==================================================
+PAGE 91
+==================================================
+72 Anthropometry, Ergonomics and the Design of Work
+57
+%
+55
+53
+51
+6 8 10 12 14 16 18 6 8 10 12 14 16 18
+Age (years) Age (years)
+FIGURE 3.6 Secular trend in the bodily proportions of Japanese children (JA) compared
+with those of U.S. children. (Original data from Tanner, J. M., Hayashi, T., Preece, M. A.
+and Cameron, N. (1982). Annals of Human Biology, 9, 411–23; Snyder, R. G., Schneider, L.
+W., Owings, C. L., Reynolds, H. M., Golomb, D. H. and Schork, M. A. (1977). Anthropometry
+of infants, children and youths to age 18 for product safety design. Consumer Product Safety
+Committee, U.S. Department of Commerce, Bethesda, MD.)
+FIGURE 3.7 Relative sitting heights of samples of young adult U.S. men measured
+between the years 1930 and 1980. Note the absence of any detectable secular trend in bodily
+proportions.
+What then are the determining factors that have led to the phenomenon of the
+secular change? Speculation has been intense on this subject, most writers main-
+taining a cautious tone in their conclusions. Social and environmental influences
+such as the improved nutritional quality of diet and the reduction of infectious disease
+thgieH
+gnittiS
+evitaleR
+Boys Girls
+JA ’57
+JA ’57
+JA ’77
+JA ’77
+US ’75
+US ’75
+53
+%
+52
+51
+thgieH
+gnittiS
+evitaleR
+1930 1940 1950 1960 1970 1980
+
+==================================================
+PAGE 92
+==================================================
+Human Diversity 73
+by improved hygiene and health care are the factors that most readily spring to mind,
+to which we might add the effects of urbanization and reduced family size, but we
+cannot ignore the possible influences of genetic factors such as heterosis, the ben-
+eficial effects that are said to derive from outbreeding and the breaking up of genetic
+isolates. A century ago most people married and raised their children within the
+confines of isolated communities; today we are approaching the condition of the
+‘global village’. As Tanner (1962) perspicaciously observed, ‘it has been shown in
+several West European countries that outbreeding has in fact increased at a fairly
+steady rate since the introduction of the bicycle’.
+The consensus view amongst human biologists tends to favour the environmental
+rather than the genetic causes. It seems most likely that genetic endowment sets a
+ceiling level to an individual’s potential for growth and that environmental circum-
+stances determine whether this ceiling is actually reached. If this is indeed the case,
+the end of the secular trend is in sight, at least in the economically developed
+countries of Europe, North America and elsewhere, since we could reasonably argue
+that the further amelioration of environmental conditions, beyond those adequate
+for the achievement of full genetic potential, cannot lead to any further changes.
+Considerable evidence published in the 1960s, 1970s and 1980s suggests that
+this limit may have indeed been reached, at least in some communities. Backwin
+and McLaughlin (1964) showed that Harvard freshmen from relatively modest social
+backgrounds increased in stature by around 40 mm from 1930 to 1958, whereas
+those from wealthy backgrounds showed no change. Cameron (1979) published data
+showing, very convincingly, that the secular trend for stature had levelled off for
+children attending schools in the London area by about 1960 (Figure 3.8). Tanner
+1700
+1600
+1500
+1400
+1300
+1200
+1100
+1000
+1905 1935 1965 1905 1935 1965
+FIGURE 3.8 Secular trend in the average stature of children in the London area between the
+years 1904 and 1966. Note that changes were minimal after 1960. (Data from Cameron, N.
+(1979). Annals of Human Biology, 6, 505–25.)
+)mm(
+erutatS
+Boys 15 Girls
+Age Age
+15
+13 13
+11
+11
+9 9
+7 7
+5 5
+
+==================================================
+PAGE 93
+==================================================
+74 Anthropometry, Ergonomics and the Design of Work
+(1978) also showed that the secular decrease in the age of menarche had come to a
+halt by about this time both in London and in Oslo. The subsequent national survey
+of Rona and Altman (1977) confirms the impression that in Great Britain the secular
+trend had reached a steady state. Rona (1981) was prepared to conclude that ‘there
+is no evidence that the secular trend in growth has continued after 1959 in the UK’.
+Similarly, Roche (1979) reported that national surveys of U.S. children and youths
+in 1962 and 1974 showed constancy of stature (except at the 5th and 10th %ile
+levels, where small increases had occurred.) More recently, Chinn et al. (1989)
+analysed the evidence for a continued secular trend in the heights of English and
+Scottish children over the years 1972 to 1986. The conclusion that they reached was
+that in the 5- to 11-year-old age group the secular trend had ceased and that the
+probability was that the upward trend in adult stature had likewise come to a halt.
+Overall then, the consensus view of anthropometrists and human biologists was
+that in the industrialised societies of Europe and North America, the upward secular
+trend in human stature had now come to a halt. Many people seem to find this
+surprising, however. The experiences of many schoolteachers, for example, tell
+them otherwise, and they are quite convinced in their own minds that the children
+they teach are still getting taller. It is difficult to account for this disparity between
+popular opinion and the available statistical evidence. In reality it is difficult to be
+absolutely certain either way. The differences that are known to exist between
+different parts of the United Kingdom and different social classes indicate that
+conclusions based upon small-scale or regional studies involving what may be
+nonrepresentative samples may be confusing. If the secular trend has indeed come
+to a halt, then its absence admits of two possible interpretations. The optimistic is
+that conditions for growth have been optimised and that all children are now
+reaching their genetic ceilings. The pessimistic is that the percentage of children
+raised under optimal environmental conditions has ceased to increase. The contin-
+ued existence of significant social class differences in growth (see the next section)
+tends towards the pessimistic interpretation.
+More recent studies indicate that there may still be a slightly increasing secular
+trend in economically developed countries, although less than the 10 mm per decade
+of the earlier part of the 20th century. Chinn and Rona (1994) brought up to date
+the series of surveys of English and Scottish children already mentioned and had to
+reverse the earlier conclusions that the secular trend in height had ceased. By 1990,
+statures of both boys and girls had increased, the greatest increase having occurred
+between 1986 and 1990. Smith and Norris (2004) reviewed the data from two studies
+of U.K. children’s anthropometry 25 years apart, measurements made in 1970 to
+1971 for the Department of Education and Science (1972) and in 1995 to 1997 for
+the Department of Health (1999). They found that stature had increased at all ages,
+on average by about 1% for boys and 1.5% for girls, but that the increase was small
+by age 18 years. They suggest that the increases can be accounted for by an earlier
+onset of menarche and puberty and an earlier growth spurt; children were reaching
+a given height approximately one year sooner than they were 25 years earlier, but
+at 18 years the boys’ mean stature was only 4 mm greater and the girls’ 14 mm.
+Peebles and Norris (1998) found that the mean stature of U.K. adults had increased
+by 17 mm for men and 12 mm for women between 1981 and 1995. It is possible
+
+==================================================
+PAGE 94
+==================================================
+Human Diversity 75
+that the U.K. population trend reached a temporary plateau around 1960, but that
+an upward trend has begun again since 1980. Molenbroek (1994) found that stature
+in the Netherlands increased between 1965 and 1980 more rapidly than at least since
+the mid-nineteenth century but that the growth rate decreased between 1980 and
+1992 to the level of before the second World War.
+In many other countries, of course, and particularly in some rapidly developing
+countries, a secular increase begun much later than in North America and Europe
+is continuing (Hauspie et al., 1996). One conclusion that can be reached from the
+somewhat confusing research evidence is that secular anthropometric changes can
+happen relatively quickly under certain circumstances and that population anthro-
+pometric and allometric characteristics are dynamic. Hauspie et al. refer to Tanner’s
+belief that growth is “a mirror of conditions in society”; the trend tends to slow
+down or reverse during times of economic decline and wars.
+One secular trend that has become very apparent in economically developed
+countries is the increase in weight and prevalence of obesity among both adults and
+children. High rates of obesity are also emerging in children of some developing
+countries, and approximately 30% of obese children become obese adults (WHO,
+1998b).
+The secular changes are rapid. Large-scale cross-sectional surveys carried out
+regularly every year between 1991 and 1998 show an increase in obesity (body mass
+index > 30) from 12 to 17.9% among U.S. adults (Mokdad et al., 1999). In a
+comparison of surveys of 16 year olds in Sweden carried out in 1974 and 1995,
+Westerstahl et al. (2003) found increases in mean weight of 1.9 kg (3.4%) for girls
+and 4.1 kg (6.6%) for boys. More of these adolescents were classed as overweight
+(BMI > 25) in 1995 than in 1974 (9 versus 3% for girls, 7 versus 3% for boys).
+Physical fitness (measured by a running-walking test of aerobic fitness, sit-ups testing
+dynamic abdominal and hip flexor muscle endurance, and bench-press tests of
+dynamic arm muscle endurance) had considerably deteriorated. Muscle strength, by
+contrast, had improved (as measured by a two-handed lift). Similar secular trends
+in weight and body mass index were found by the NHES and NHANES surveys
+between 1960 and 1991 in the United States (Troiano et al., 1995). Smith and Norris
+(2004) found that U.K. children’s mean weight had increased on average by 7.9%
+for girls and 6.6% for boys between the 1970-1971 and 1995-1996 surveys, while
+the 95th %ile weight had increased considerably more (by 15.6 and 13.3%, respec-
+tively).
+The results for this rapid trend are debated but, interestingly, Mokdad et al.’s
+(1999) analysis suggests that it cannot be attributed simply to a reduction in physical
+exercise. Their data showed that the level of physical inactivity had not changed
+substantially between 1991 and 1998. Antipatis and Gill (2001) discuss the various
+possible causative factors of the obesity ‘epidemic’ which, given the timescale, seem
+to be environmental rather than genetic. While improved standards of living are
+likely to be an important factor, societal changes (such as urban crowding, family
+and community breakdown, technological development leading to a sedentary life-
+style and global markets for foodstuffs) may influence people’s dietary and exercise
+habits.
+
+==================================================
+PAGE 95
+==================================================
+76 Anthropometry, Ergonomics and the Design of Work
+Is the continuance or otherwise of these secular trends important in terms of
+practical ergonomics? The increasing prevalence of obesity is certainly of signifi-
+cance for design of apparel and clearance dimensions in a wide range of situations,
+as well as for health, and may have a detrimental influence on working postures. If
+the upward trend in the stature of children is still increasing, it could be great enough
+to invalidate the anthropometric assumptions upon which design standards for school
+furniture and children’s clothing and equipment are currently based. As Smith and
+Norris (2001) have shown, it is the larger children who will experience problems,
+the 95th %ile dimensions (for example) being significantly underestimated. Even if
+the upward trend in stature of young adults had now ceased, the upward trend in
+the stature of the adult population as a whole might well continue to increase for
+one or two decades. It is difficult to predict the likely magnitude of changes, since
+the effects of the secular trend are confounded with those of the ageing process per
+se and with demographic changes in the ethnic background and age structure of the
+population. The dynamic nature of secular trends and the current rapidity of the
+changes in many countries emphasise the desirability of undertaking anthropometric
+surveys at shorter intervals than has been common in the past. Design standards too
+will need to be updated at relatively frequent intervals.
+3.6 SOCIAL CLASS AND OCCUPATION
+Social class and occupation are inextricably linked — so much so that the latter is
+generally used as an operational measure of the former. The widely used system of
+the Office of Population Censuses and Surveys in the United Kingdom, known as
+the Registrar-General’s Classification, divides occupations into six categories: (I)
+professional, (II) intermediate, (IIIA) skilled non-manual, (IIIB) skilled manual, (IV)
+semi-skilled manual and (V) unskilled manual. Every so often it is necessary to
+reclassify an occupation as its perceived status changes.
+Both social class (through social and environmental effects) and occupation
+(through training and health effects as well as social effects) can influence anthro-
+pometry and secular trends. In a fascinating study of primiparae (women pregnant
+for the first time) in Aberdeen in which stature was stratified by the occupation of
+the woman’s father, by her own occupation and by her husband’s occupation, Thom-
+son (1959) found, remarkably, that tall women had a stronger tendency to marry
+upwards (with respect to their father’s and their own occupations) than did short ones.
+Social class differences in stature remain marked. Knight (1984), in a nationwide
+study of the adult population of Great Britain, found an average stature of 1755 mm
+for men and 1625 mm for women in social classes I and II as against 1723 and 1596
+mm in social classes IV and V. The differences were of similar magnitude for all
+age cohorts. The pattern was less clear for body weight.
+The same survey also showed regional differences, ranging from an average
+stature of 1751 mm for men and 1619 mm for women in southwest England to 1719
+and 1594 mm in Wales. Regional differences can, of course, arise from complex
+ethnic, social, occupational and environmental influences. Without attempting to
+separate these interacting effects, it is clear that the resulting differences can be
+considerable.
+
+==================================================
+PAGE 96
+==================================================
+Human Diversity 77
+Extensive British data show social class differences in the growth of schoolchil-
+dren. Rona (1981) reviewed the evidence of British surveys over the previous 30
+years or so. A difference of between 10 and 20 mm in average stature between
+classes I and V in the Registrar-General’s Classification table already exists by the
+age of 2 years. By 7 years this has widened to 30–40 mm, a gap that remained
+constant over 30 years. In the most recent of these surveys (Goldstein, 1971; Rona
+et al., 1978) the differences between classes I to IV were relatively modest, which
+suggested that the differences in primary-school children were then mainly due to
+those in social class V. Rona et al. (1978) showed that the children of unemployed
+fathers were shorter in stature, but that the parents of these children were also shorter
+within each social class. Lindgren (1976) reported an extensive survey of urban
+children in Sweden between 10 and 18 years of age. There was no difference in
+height, at any age, between the social classes as defined either by the father’s
+occupation or family income. Sweden is the only country in the world where this
+is known to be the case — a fact that Tanner (1978) takes to be an operational and
+biological measure of the existence of a ‘classless society’.
+Despite the close links between social class and occupation, occupation can have
+direct and separate influences on the anthropometric characteristics of a user popu-
+lation in a particular occupation or industry. In some circumstances ‘self-selection’
+may occur, with individuals gravitating towards occupations to which their physiques
+are well suited. The physical content of the occupation itself may also exert a training
+effect (sometimes referred to as task fitness) — or, perhaps more detrimentally, a
+de-training effect in the case of sedentary lifestyles. The most extreme examples of
+training effects are provided by athletes, as discussed by Wilmore (1976). The
+consequences of sedentary occupations are discussed elsewhere in this book, but the
+more general consequences of a sedentary lifestyle are a serious current concern in
+relation to the health of our populations (especially in terms of the increase in
+obesity). Finally, the physical aspects of work may have detrimental effects on health
+and functional capacity. Era et al. (1992), for example, found that elderly people
+who had had a higher occupational status at working age had better physical, sensory,
+psychomotor and cognitive functions. Savinainen et al. (2004) found similar results
+when comparing older people who had had a high physical workload during their
+working life with those who had had a low workload. The only physical capacities
+that they found to be better in the high workload group were flexibility of the spine
+and isometric trunk muscle strength.
+A classic study of selection and de-training is that of Morris et al. (1956), who
+investigated the waist and chest girths of the uniforms of London busmen — both
+drivers and conductors — ranging in age from 25 to 64 years. In addition to seeing
+a steady increase with age in both groups, the girths of the drivers were greater than
+those of the conductors — even in the youngest age group. The authors postulated
+therefore that ‘the men have brought these differences into the jobs with them’.
+Passing from the ridiculous (if we may so term the busmen’s trousers) to the almost
+indisputably sublime, two studies of ballerinas are worth mention. Grahame and
+Jenkins (1972) measured the joint flexibility of a group of female ballet students
+and found it to be greater than for controls, even for joints such as those of the little
+finger which were not trained to be flexible. The authors therefore concluded that
+
+==================================================
+PAGE 97
+==================================================
+78 Anthropometry, Ergonomics and the Design of Work
+only girls gifted with generalised joint flexibility would undertake the rigours of
+ballet training. Vincent (1979) has documented the appalling, and sometimes disas-
+trous, lengths to which these girls will sometimes go in ‘competing with the sylph’
+— that is in pursuit of the unnaturally slender body form which is sufficiently
+otherworldly for their art.
+In more mundane occupations, it is reasonable to expect that workers will
+become ‘task fit’ through (gradual and monitored) practice or through organised
+training, but it is not reasonable to accept bodily distortion or musculoskeletal
+disorders through requiring extreme exertions. Where extreme exertion is necessary
+(and only then), selection procedures may be required to identify individuals who
+are suitable for the job.
+It is clear that anthropometric characteristics may differ between occupational
+groups (whether through self-selection, formal selection or training). Annis and
+McConville (1990), for example, note the findings of Martin et al. (1975) that law
+enforcement officers were larger in most dimensions than almost any other group
+they measured and of Reynolds and Allgood (1975), that air stewardesses were taller
+and lighter than average American women. Hsaio et al. (2002) reported on the
+differences between major occupational groups within the United States, analysing
+the results of the NHANES III survey. Military personnel tend to be larger, stronger
+and fitter than civilians. Care must therefore be taken to choose relevant survey data
+for design purposes.
+3.7 AGEING
+Figure 3.9 shows the average heights and weights of the adult civilian populations
+of Great Britain and the United States plotted against age. A steady decline in stature
+is apparent, whereas weight climbs steadily before subsequently declining at around
+1800
+80
+1700
+70
+1600
+60
+20 30 40 50 60 70
+FIGURE 3.9 Average stature and weight in samples of adults of various ages. (cid:5) = men,
+United States; ● = men, Britain; ▫ = women, United States; (cid:3) = women, Britain.
+)mm(
+erutatS
+)gk(
+thgieW
+ydoB
+20 30 40 50 60 70
+Age (years) Age (years)
+
+==================================================
+PAGE 98
+==================================================
+Human Diversity 79
+50 years in men or 60 years in women. In analysing such a pattern, we must consider
+the combined effects of the ageing process and the secular trend, together with the
+possibilities of differential mortality (i.e., that people with certain kinds of physique
+may tend to die younger.) Damon (1973) showed that men of average height and
+weight had greater longevity than those who deviated strongly in either respect.
+These interactions require multicohort longitudinal studies for their elucidation.
+Investigations of this kind include the Welsh study of Miall et al. (1967) and the
+extensive Boston programme of the Veterans Administration (Damon et al., 1972;
+Friedlander et al., 1977; Borkan et al., 1983).
+Longitudinal studies show that at around 40 years of age we begin to shrink in
+stature, that the shrinkage accelerates with age, and that women shrink more than
+men. The shrinkage is generally believed to occur in the intervertebral discs of the
+spine — resulting in the characteristic round back of the elderly (e.g., Trotter and
+Gleser, 1951) — although Borkan et al. (1983) note some decrease also in the lower
+limbs. Annis (1996) suggests that both this and a change in biacromial breadth may
+be due to changes in skeletal architecture which affect posture. The data show a
+longitudinal increase in weight for height until 55 years, followed by a decline.
+Friedlander et al. (1977) showed a steady longitudinal increase not only in hip
+breadth but also in the bi-iliac breadth of the bony pelvis. The mechanism of the
+latter is obscure but it suggests that ‘middle-age spread’ may not be totally due to
+the accumulation of fat but may also involve changes in the bony pelvis.
+If we assume that no secular change has occurred in the proportions of the body,
+then proportional ratios calculated from cross-sectional studies should be comparable
+with the longitudinal results. Figure 3.4, plotted from the data of Stoudt et al. (1965,
+1970), shows that this is indeed the case. The proportional decrease in sitting height
+is compatible with the spinal shrinkage explanation of stature decline, and the greater
+change in women matches the longitudinal findings of Miall et al. (1967). Dimen-
+sions with a substantial soft-tissue component such as hip breadth and buttock–knee
+length show a proportional increase (until 75 years) which is more pronounced in
+women. The proportional decline in the biacromial breadth of men over 60 years
+old presumably reflects the characteristic rounding of the shoulders of the elderly.
+It is of interest that for both sitting height and biacromial breadth, the ageing process
+finally abolishes the sex difference altogether.
+Cross-sectional studies such as that of Stoudt et al.’s (1970) have shown an
+increase in skinfold thickness followed by a decline at around 40 years in men and
+60 years in women. There is evidence, however, that this represents a redistribution
+rather than a loss of body fat. Durnin and Womersley (1974) showed that the
+relationship between skinfold thickness and whole body fat, as measured by densi-
+tometry, changes with age. It seems there is a transfer of fat from subcutaneous
+positions to deep ones (e.g., around the abdominal organs). The net quantity as a
+percentage of body weight continues to increase, and the longitudinal decline in
+weight that we see late in life is probably due, therefore, to the loss of lean tissue.
+Borkan and Norris (1977) found that the weight of fat was constant with age in a
+cross-sectional sample of middle-aged men, but that lean tissue declined markedly.
+Subcutaneous fat decreased on the trunk but increased on the hips, but this was
+accompanied by an increase of abdominal (waist) circumference indicative of a
+
+==================================================
+PAGE 99
+==================================================
+80 Anthropometry, Ergonomics and the Design of Work
+sagging of the abdominal contents (due presumably to increased internal fat and
+decreased muscular resistance.) A similar redistribution presumably occurs in
+women, but there is little numerical evidence.
+The above studies are all based on the populations of the United States and
+Great Britain, where obesity, consequent upon an abundant food supply and a
+sedentary lifestyle, is prevalent. The situation in other communities will, of course,
+be different, and in societies where food is scarce, adult increase in body weight
+does not occur.
+The loss of lean body weight is due principally to a wasting away of muscles
+(although the bones also become less dense in later life), and this leads to a decrease
+in muscular strength, as shown, for example, in Figure 3.5. According, for example,
+to Asmussen and Heebøll-Nielsen (1962), the decline is more rapid in women than
+in men and more rapid in lower limb muscle groups than in upper limb muscle
+groups. In other words, women age more rapidly than men, and the legs give out
+first. Both of these conclusions have been challenged, however: the first by Montoye
+and Lamphier (1977) and Voorbij and Steenbekkers (2001) and the second by
+Viitasalo et al. (1985). There is also a preferential loss of faster motor units within
+muscles, which reduces the ability to make powerful or rapid movements (Jones and
+McConnell, 1997). Jones and McConnell also note that the elasticity of tendons and
+ligaments changes, which makes absorption of energy less efficient (for instance
+when stepping down stairs).
+We live in a ‘greying’ society. Figure 3.10 shows some demographic predictions.
+In 1971 about one person in six in the United Kingdom was of retirement age (i.e.,
+65 for men, 60 for women); by 2031, it is estimated, the figure will be closer to one
+person in four. The rate of increase is greatest in the oldest age groups, specifically
+the over-75s, who will increase dramatically in numbers. By 2025 it is anticipated
+that approximately one in ten of the world’s population will be over 65 years old,
+and worldwide life expectancy will have reached 73 years (WHO, 1998a). The World
+Health Organization rightfully recognises the increase of life expectancy of popu-
+lations in the twentieth century as ‘one of the greatest achievements of all time’
+(WHO, 1993). Nevertheless it poses serious ergonomics questions for designers and
+researchers.
+Beyond the middle years of life, most of us will tend to suffer from a steady
+diminution in our functional capacities, due partly to the ageing process as such and
+partly to the effects of previous disease or injury from which recovery has been
+incomplete. As a consequence, we experience a steady increase in the number of
+critical mismatches that we encounter in the performance of everyday tasks. The
+net effect of these changes is illustrated in Figure 3.11, which shows the percentage
+of people in different age groups having one or more specific disabilities, that is,
+one or more functional impairments that lead to significant difficulties in performing
+everyday tasks. The figure takes a dramatic upswing beyond the age of 60. As things
+stand at present, therefore, we typically seem to continue working until we reach
+the age when our bodily framework starts to pack up on us. There is something of
+an irony in this.
+The age changes beyond 50 years of age which seem to be most important for
+the design of products are those in anthropometric dimensions, walking velocity and

@@ -1,0 +1,655 @@
+
+==================================================
+PAGE 5
+==================================================
+1448 G. V. DA SILVA ET AL.
+Figure 1. measured dimensions.
+(22) Hand length; (23) Head circumference; (24) Hip standards procedures used in the annual FAB fitness test,
+breadth, sitting; (25) Knee height, sitting; (26) Overhead very familiar with the landmarks and general procedures
+fingertip reach; (27) Palm length; (28) Popliteal height, used for anthropometric data collection. They were trained
+sitting; (29) Shoulder – elbow length; (30) Sitting over a period of two weeks to familiarise them with the
+height; (31) Span; (32) Stature; (33) Thigh circumference; specific measuring technique and the equipment.
+(34)Thigh clearance; (35) Thigh max circumference, sitting; In order to allow further comparisons, the methods,
+(36) Thumbtip reach; (37) Waist circumference (narrower); protocols, descriptions, definitions, landmarks, tools and
+(38) Waist circumference (Omphalion); (39) Weight. measurements procedures followed the instructions out-
+lined in Natick TR-11/017 – Measurer’s Handbook, which is
+also used by the US Air Force (Hotzman et al. 2011). These
+2.4. Measurement procedures
+standard procedures are useful for comparing data-sets
+The measuring team consisted of personnel currently between nations, and are measured according to the pro-
+responsible for the anthropometric measurements tocol in International Organization for Standardization
+
+==================================================
+PAGE 6
+==================================================
+ERGONOMICS 1449
+(ISO) 7250-1:2008 – Basic human body measurements for bicycle shorts) and a sports-bra (halter top). All subjects
+technological design-Part 1-Body measurement defini- were measured between 24 July 2013 and 30 July 2014.
+tions and landmarks and ISO 15535:2012 (Hotzman et al.
+2011; ISO 2008, 2012).
+2.5. Data quality
+Two months before, all FAB organisations were
+requested to access a URL on the Brazilian Air Force Staff In order to enable the measurement teams to acquire
+webpage, linking to information on the Anthropometric the measurements in the same way, and to minimise
+Survey. In addition, all of them were notified in advance, inter-measurer error, an extensive and comprehensive
+whereupon they received the survey schedule and descrip- practical training was undertaken until all the measur-
+tions of the study. On the day before measurement, partici- ers successfully learned the tasks. Prior to conducting
+pants were briefed (a 30 min PowerPoint™ presentation) on the measurer training, the Measurer’s Handbook from
+the general purpose and procedural aspects of the survey, Hotzman et al. (2011) was translated into Portuguese. The
+and filled out the biographic/demographic data form. All first week was online, allowing participants to familiarise
+questionnaires were coded in order to protect the data themselves with the Natick manual and second week train-
+and avoid subject identification. ing was hands on, with about 30 h of practical training,
+There were four distinct measuring stations and two until the criteria for the Natick allowable observer error was
+measurers per station (alternating as measurer and reached, in order to ensure data reproducibility.
+recorder), thus each team consisted, on average, of 12 In the interest of ensuring the quality of the collected
+people, with one ‘substitute measurer’ per station. The data an expert (one physical therapist with experience
+four stations were divided as following: (1) Landmarking; in anthropometric measurement using the Natick proto-
+(2) Standing and sitting measurements (depths, breadths col) was used as Criterion Measurer in order to serve as
+and lengths) with the Beam caliper – including foot meas- a cross-validation method. The Criterion Measurer is an
+urements with the Modified Brannock device; (3) Standing experienced measurer who serves as the standard, in order
+and sitting measurements (heights and lengths) with the to assess the performance of measurers in training and
+anthropometer; and (4) Circumferences and hand measure- during the survey, against the allowable observer error
+ment with the Poech sliding caliper. Measurements in sitting defined in Appendix G of the Natick Measurer’s Handbook
+position were taken using a 70 cm height cushionless table, (Hotzman et al. 2011).
+two wood boxes as footrest (with 40 and 35 cm height), The quality of measurements of each measurer was
+styrofoam pieces of various thicknesses to move the feet gauged by ensuring that their measuring values were kept
+up and down, and a wood buttock plate. Where there was as equal to or below the allowable observer error, when
+a choice of right or left, all measurements were taken on compared to the unique Criterion Measurer. Therefore, it
+the right side unless otherwise specified or in the rare cases can be accepted that the data presented in the results are
+where an injury or anatomical abnormality made it neces- comparable values, regardless of the personal measuring
+sary to measure on the left side, in this case a comment was style of each individual on the team.
+recorded indicating that the dimension was measured on The allowable observer errors were used for three pur-
+the left side. All measurements were made to the nearest poses: during the initial training period, as an indicator
+millimetre. Weight was taken to the nearest 0.1 kg. that measurers had successfully learned their tasks; to
+Before leaving each measuring station, participants ‘recalibrate’ the team at the beginning of each new sur-
+had their datasheet double checked for missing values in vey location; and as a standard for daily error checks (the
+order to ensure complete data collection. In each meas- measuring error could not exceed the allowable observer
+uring station there was a banner with pictures showing error for any given dimension).
+the dimensions to be measured and the right sequence Thus, the Criterion Measurer and the allowable observer
+to be performed. error values established the minimum reliability criteria for
+At each station there was a laptop for digital data entry, the data collected in the survey.
+and the written data sheet was kept as back-up. In order During each measuring day, some randomly chosen
+to double check unusual values (outliers), a filtering pro- measurements were repeated for some subjects to track
+cess for each dimension was created, in Excel™, based on and manage observer error. Each day, a randomly cho-
+databases published on ISO 7250-2:2010 and DOD-HDBK sen subject underwent measurement a second time at
+743A (Department of Defense 1991; ISO 2010). Values were any given station, meaning that three subjects per day
+verified before the subject left the station and if the filter underwent additional measurement (one for each meas-
+identified any atypical values the subject was re-measured. uring station). If the measurement was larger than the
+Males were measured wearing swimsuits, bare-chested. allowable error, then a third measurement had been taken.
+Females were measured wearing tight sports-shorts (like Considering a total of 30–40 participants measured per
+
+==================================================
+PAGE 7
+==================================================
+1450 G. V. DA SILVA ET AL.
+Table 1. sample distribution (n = 2339).
+Males Females Total
+Participants Frequency *Percent Frequency *Percent Frequency *Percent
+Aviation officersa 1286 59.0 18 64.3 1304 59.0
+Administrative officersb 00 00 104 50.3 104 50.3
+cadetsb 643 100 84 100 727 100
+EPcAr studentsb 204 98.6 00 00 204 98.6
+Total 2133 70.4 206 64.6 2339 69.8
+a = current Brazilian Air Force Pilots Population (n = 2209).
+b = Potential Pilot Population (n = 1141).
+*percentage of the whole Air Force Pilots Population (a and b). EPcAr = Preparatory school of Aviator cadets.
+human body measurements for technological design-Part
+Table 2. Age distribution of participants compared to whole FAB
+population. 2-Statistical summaries of body measurements (ISO 2010).
+The minima and maxima for each dimension were re-
+Participants
+examined, comparing them with the minima and maxima
+Male Female
+from other databases, helping to verify the existence of any
+Sample Population Sample Population
+erroneous measurement values and to find any outlying
+(n = 2133) (n = 3031) (n = 206) (n = 319)
+values.
+Age group Percent Percent Percent Percent
+In order to find outliers, in accordance with Annex F
+<21 18.3 17.9 11.2 13.2
+21–25 26.6 19.6 40.8 33.2 of the ISO 15535 (2012), the mean value and the stand-
+26–30 16.1 17.1 24.8 29.2 ard deviation of each age group were used to individu-
+31–35(38)* 15.2 14.7 23.2 24.4
+36–40 7.8 11.1 0 0 ally review the measurements, to identify data that fell
+41–45 11.1 10.7 0 0 outside of the mean ± 3SD. Measurements were plotted
+>45 4.9 8.9 0 0
+in scatterplots and boxplots, in pairs, by age group, and
+Total 100 100 100 100
+minimum age 16 18 visually inspected for anomalies. Subjects identified by
+maximum 52 38
+these definitions as outliers were further investigated. In
+age
+case of any discrepancy, the cause was evaluated and data
+*38 years-old is the highest age among females in the FAB.
+were corrected if the cause was identifiable, and dropped
+if not. If the dropped measurement corresponded to one
+day, approximately 10% of the participants were double of the six cockpit critical dimensions, the entire subject
+checked. was dropped.
+After review and scrutiny of the raw data, correcting
+and dropping data points as necessary following the pro-
+2.6. Anthropometric instrument
+cedures described, the resulting data formed the reference
+A set of traditional anthropometry measurement devices data-set, which was used for the database creation, statis-
+was used to take 39 traditional body measurements. These tical analysis and testing.
+devices were an anthropometer (GPM™, Switzerland),
+a beam caliper (rearranged pieces of the anthropome-
+3. Results
+ter), Poech sliding caliper (GPM™, Switzerland), a Lufkin™
+Executive Diameter metric tape measure-W606PM (Cooper Initially, a census had been planned to measure 100%
+Tools, Apex, NC), a Filizola™ scale PL 200, digital, maximum of the FAB aircrew (3350 subjects – 3031 males and 319
+weight of 200 kg, and 0.1 kg precision, a Modified Brannock females). However, due to the complexities of general
+device, and a Wall chart. The Modified Brannock device for military duties, as well as military operations, 2133 out of
+measuring the foot more easily and precisely, and the wall 3031 (70%) males and 206 out of 319 (65%) females rep-
+chart (sheet of laminated millimetre graph paper) used resent the measured sample (participants). Table 1 shows
+for obtaining measures of functional arm reach and span. the distribution of the sample with respect to occupation
+and gender.
+Tables 2 and 3 summarise the characteristics of the
+2.7. Preparing data and statistics
+FAB anthropometric survey participants, outlining age,
+Prior to the creation of summary statistics tables, all gender and ethnicity. The age distribution of FAB survey
+raw data were reviewed and scrutinised for unusual val- participants ranged from 16 to 52 for males, and from 18
+ues, following the procedures outlined in International to 38 for females. The age ranges for males and females are
+Organization for Standardization (ISO) 7250-2 – Basic quite different, as could be seen in Table 2. It is noteworthy
+
+==================================================
+PAGE 8
+==================================================
+ERGONOMICS 1451
+Table 3. racial/ethnic distribution of FAB survey participants. Table 6. subjects’ constraints of FAB survey non-participation.
+Males Females Total Male non- Female non-
+Race/
+participants participants
+ethnicity Frequency Percent FrequencyPercent FrequencyPercent
+White 1548 72.6 137 66.5 1685 72.0 Constraints Frequency Frequency
+Brown 466 21.8 55 26.7 521 22.3 strategy and Politics 58 0
+Black 93 4.4 9 4.4 102 4.4 course (colonel)
+Asian 20 0.9 4 1.9 24 1.0 Air staff and command 80 0
+indigenous 4 0.2 1 0.5 5 0.22 course (major)
+others 2 0.1 0 0 2 0.08 maneuver captains 43 0
+Total 2133 100 206 100 2339 100 career course (captain)
+Flight missions 313 5
+Vacations 83 21
+Abroad missions 108 0
+military organisations 166 31
+not visited
+that females are recent in the FAB history (Administrative *others 46 48
+Officers since 1996 and Pilots since 2004). Pregnancy 0 8
+Total 897 113
+Table 2 shows both age distributions of FAB popula-
+tion and FAB Survey participants (Sample) for comparison *mourning, paternity, sickness, safety service schedule, military operations,
+otherE courses.
+purpose.
+Comparing the age distribution of FAB survey partic-
+ipants with the FAB population (Table 2) shows a very of the 36–40 and above 45 male age groups. This can be
+similar distribution except for an over-representation of explained by the higher participation of the cadets (100%)
+the 21–25 male age group and an under-representation and by the lower relative participation of about 80 majors,
+Table 4. FAB survey participants by branch.
+Males Females Total
+Rank Branch Frequency Percentage Frequency Percentage Frequency Percentage
+officers Fighter 151 7.08 02 0.97 153 6.54
+Transport 329 15.43 10 4.85 339 14.49
+Helicopter 128 6.00 05 2.43 133 5.69
+instructor 95 4.45 01 0.49 96 4.11
+rec-tacta 41 1.92 00 00 41 1.75
+inspectorb 45 2.11 01 0.49 46 1.97
+sArc 23 1.08 00 00 23 0.98
+Patrol 23 1.08 00 00 23 0.98
+n.o.funcd 451 21.14 00 00 451 19.28
+Administe 00 00 103 50.00 103 4.40
+Subtotal 1286 60.29 122 59.22 1408 60.20
+cadets and students Traineesf 461 21.61 18 8.74 479 20.48
+Administe 101 4.74 66 32.04 167 7.14
+infantry 81 3.80 00 00 81 3.46
+studentsg 204 9.56 00 00 204 8.72
+Subtotal 847 39.71 84 40.78 931 39.80
+Total 2133 100 206 100 2339 100
+a. reconnaissance; b. inspection of the flight aids systems; c. search and rescue; d. Pilots in no operational functions; e. Administrative; f. Pilot trainees; g. Last year
+of the FAB High school and future pilot trainees (cadets).
+Table 5. military ranks of FAB survey participants.
+Males Females Total
+Military rank Frequency Percentage Frequency Percentage Frequency Percentage
+student (third year) 204 9.56 00 00 204 8.72
+First year cadet 177 8.30 09 4.37 186 7.95
+second year cadet 158 7.41 23 11.17 181 7.74
+Third year cadet 164 7.69 26 12.62 190 8.12
+Fourth year cadet 144 6.75 26 12.62 170 7.27
+second Lieutenant 156 7.31 26 12.62 182 7.78
+First Lieutenant 310 14.53 54 26.21 364 15.56
+captain 326 15.29 33 16.02 359 15.35
+major 176 8.25 09 4.37 185 7.91
+Lieutenant colonel 200 9.38 00 00 200 8.55
+colonel 118 5.53 00 00 118 5.05
+Total 2133 100 206 100 2339 100
+
+==================================================
+PAGE 9
+==================================================
+1452 G. V. DA SILVA ET AL.
+Table 7. Height and weight comparison of male and female participants with non-participants.
+Participants Non-participants Comparison
+Weight Stature Weight Stature Delta Delta
+Age group n mean mean n mean mean weight stature
+male <21 391 72 1748 6 70 1754 2 −6
+21–25 567 76 1752 192 77 1755 −1 −3
+26–30 344 82 1758 224 81 1758 1 0
+31–35/38* 325 83 1762 175 82 1761 1 1
+36–40 165 82 1755 105 81 1760 1 −5
+41–45 236 84 1757 103 82 1762 2 −5
+>45 105 85 1762 92 83 1766 2 −4
+Total 2133 897
+Female <21 23 62 1640 0 – – – –
+21–25 84 61 1658 29 61 1659 0 −1
+26–30 51 63 1652 54 63 1651 0 1
+31–35/38* 48 62 1648 30 62 1642 0 6
+36–40 – – – – – – – –
+41–45 – – – – – – – –
+>45 – – – – – – – –
+Total 206 113
+notes: Weight in kg and stature in mm. All female subjects younger than 21 years old were measured.
+*38 years-old is the highest age among females in the FAB. Delta = absolute difference in weight and stature.
+Table 8. summary statistics of anthropometric measurement for female FAB.
+Dimensions n Mean SE mean SD Min Max Skewness Kurtosis CV CI
+Abdominal ext depth, sitting 204 209.7 2.05 29.27 145 351 1.53 4.22 13.96
+*Acromial height, sitting 206 566.2 1.79 25.64 507 635 −0.01 0.06 4.53 ±3.51
+Biacromial breadth 206 351.9 1.31 18.84 295 408 −0.07 0.35 5.35
+Biceps circumference, flexed 204 280.4 1.95 27.86 213 420 1.36 3.78 9.94
+Bideltoid breadth 205 425.1 1.89 27.08 355 526 0.88 1.73 6.37
+Buttock circumference 205 992.5 5.29 75.77 828 1296 1.08 2.07 7.63
+*Buttock-knee length 206 582.9 1.83 26.24 520 685 0.45 0.93 4.50 ±3.59
+Buttock-popliteal length 206 475.5 1.5 21.5 421 542 0.4 0.47 4.52
+calf circumference 205 364.6 1.83 26.21 295 452 0.45 0.65 7.19
+cervical height 202 1400.3 3.57 50.70 1265 1532 −0.03 0.03 3.62
+chest circumference 204 892.2 5.1 72.87 733 1155 0.94 1.70 8.17
+chest depth 205 233.5 1.79 25.63 183 317 0.56 0.29 10.98
+Elbow rest height 204 230.7 1.54 22.03 164 295 −0.02 0.02 9.55
+*Eye height, sitting 206 751 2.05 29.13 678 815 −0.22 −0.29 3.88 ±4.02
+Foot breadth, horizontal 206 88.2 0.45 6.51 75 107 0.17 −0.59 7.38
+Foot length 205 247.1 0.83 11.97 218 278 0.18 −0.14 4.85
+Forearm circumference, flexed 205 248.8 1.18 16.85 204 312 0.74 1.32 6.77
+Forearm-hand length 205 435.8 1.33 19.05 392 492 0.11 −0.32 4.37
+Forearm-forearm breadth 203 432.2 2.96 42.18 340 615 0.99 2.51 9.76
+Functional leg length 200 1008 3.26 46.10 874 1149 −0.02 0.59 4.57
+Hand breadth 206 78.17 0.27 3.83 67 89 0 0.18 4.90
+Hand length 206 177.3 0.62 8.91 153 200 −0.12 −0.01 5.03
+Head circumference 206 549.4 1.01 14.55 511 590 0.11 −0.03 2.65
+Hip breadth, sitting 203 388.8 2.30 32.71 285 503 0.71 1.61 8.41
+*Knee height, sitting 206 513.7 1.45 20.78 455 568 0.13 −0.01 4.05 ±2.84
+overhead fingertip reach, sitting 200 1286.9 3.37 47.70 1186 1410 −0.09 −0.56 3.70
+Palm length 206 102.7 0.36 5.21 89 117 0.16 −0.16 5.07
+Popliteal height 205 384.0 1.39 19.86 280 429 −0.95 3.45 5.17
+*sitting height 206 865.8 2.19 31.07 787 949 −0.03 0 3.59 ±4.28
+shoulder-elbow length 205 331.1 1.13 16.17 291 377 0.43 0.08 4.88
+span 202 1649.1 4.76 67.6 1510 1865 0.39 0.03 4.10
+stature 205 1642.3 3.79 54.30 1505 1784 −0.01 −0.18 3.31 ±7.43
+Thigh circumference 206 594.6 3.82 54.81 453 776 0.67 0.55 9.22
+Thigh clearance 204 168.9 1.13 16.19 126 214 0.12 −0.32 9.59
+Thigh max circumference, sitting 205 592.8 3.65 52.31 481 758 0.66 0.23 8.82
+*Thumbtip reach 206 709.5 2.54 36.21 605 803 −0.1 −0.33 5.10 ±4.98
+Waist circumference (narrower) 201 722.3 4.81 68.2 585 1008 1.22 2.74 9.44
+Waist circumference (omphalion) 203 798 5.45 77.63 617 1116 1.18 2.72 9.73
+Weight (kg) 202 62.9 0.71 10.14 41 102 1.2 2.07 16.10
+Bmi (kg/m2) 202 23.3 0.24 3.33 17.6 37.5 1.46 3.01 14.30
+*cockpit critical dimensions. Weight in kg, Bmi in kg/m2 and, all other values in mm.
+
+==================================================
+PAGE 10
+==================================================
+ERGONOMICS 1453
+who could not be measured due to time conflicts and The rank structure of the FAB survey participants is pre-
+course assignments. Regarding geographical distribution sented in Table 5. Age distribution is influenced by rank
+of FAB survey participants compared to the FAB popula- distribution, and as such, we also expect to find distinct
+tion, it was found very similar with most participants from age distributions within the ranks. The most frequently
+Southeast Region (the most populous and developed in measured rank was Captain, closely followed by First
+Brazil). Lieutenant, for both males and females. An important
+Additionally, despite Brazil’s reputation as a country point to consider is that the highest rank achieved by the
+with extensive miscegenation, a substantial proportion of females who were measured was Major; consequently, the
+the sample declared themselves to be White (72%), while oldest female in this cohort was 38 years old.
+22% identified themselves as Brown, and 4.4% as Black Since it was not possible to measure the entire popu-
+(Table 3). Note that race/ethnic comparison between the lation as a census, the non-participants were examined
+sample and the FAB population is not possible because regarding the reason for their absence as well as their
+there are no baseline population data available. weight and stature. Understanding both the reason for the
+The sample included several types of aviation specialists non-participation as well as any variations in the anthropo-
+(Fighter, Transportation, Patrol, Helicopter and others) in dif- metric distribution of that cohort is also important. Tables
+ferent military fields and branches, as illustrated in Table 4. 6 and 7 present the aforementioned information about
+Interestingly, the cadet population provided an important the non-participants. Main reasons for non-participation
+component. Unlike those training as pilots, cadets have were administrative – flight mission and missions abroad,
+not yet undergone rigid selection on the basis of their course assignments; there are differences in the reasons
+body size and proportions; therefore, this population had between males and females. Furthermore, some military
+the potential to include more extreme body types. organisations/bases were not visited by the measurement
+Table 9. summary statistics of anthropometric measurements of male FAB.
+Dimensions n Mean SE mean SD Min Max Skewness Kurtosis CV CI
+Abdominal ext depth, sitting 2120 239.9 0.73 33.54 159 397 0.94 1.27 13.98
+*Acromial height, sitting 2122 598.4 0.65 29.78 509 699 0.10 −0.17 4.98 ±1.27
+Biacromial breadth 2122 394.8 0.47 21.60 313 465 −0.22 0.46 5.47
+Biceps circumference, flexed 2131 345.3 0.66 30.41 251 465 0.22 −0.02 8.81
+Bideltoid breadth 2121 483.6 0.61 28.20 365 596 0.13 0.66 5.83
+Buttock circumference 2116 989.4 1.45 66.48 770 1330 0.61 0.83 6.72
+*Buttock-knee length 2122 605.7 0.59 27.53 513 718 0.27 0.40 4.54 ±1.17
+Buttock-popliteal length 2121 490.1 0.55 25.41 400 602 0.20 0.50 5.18
+calf circumference 2129 383.2 0.55 25.50 299 499 0.46 0.66 6.65
+cervical height 2104 1504.4 1.28 58.50 1311 1697 0.04 0.06 3.89
+chest depth 2121 249.1 0.49 22.95 175 335 0.26 0.41 9.21
+chest circumference 2127 1014.7 1.55 71.70 806 1340 0.47 0.55 7.06
+Elbow rest height 2120 234.6 0.58 26.61 147 327 0.12 −0.13 11.34
+*Eye height, sitting 2122 802.1 0.68 31.15 688 917 0 0.07 3.88 ±1.33
+Foot breadth, horizontal 2123 96.9 0.14 6.65 77 120 0.10 −0.23 6.86
+Foot length 2122 270.8 0.29 13.58 219 319 0.06 0 5.01
+Forearm circumference, flexed 2132 298.7 0.44 20.28 241 399 0.37 0.86 6.79
+Forearm-hand length 2121 472.9 0.471 21.77 361 544 −0.07 0.46 4.60
+Forearm-forearm breadth 2118 516.3 0.96 44.23 390 646 0.02 −0.17 8.57
+Functional leg length 2074 1066.3 1.17 53.20 905 1242 0.13 0.02 4.99
+Hand breadth 2123 87.7 0.093 4.27 70 104 0.21 0.43 4.87
+Hand length 2123 190.4 0.23 10.35 157 237 0.10 0.09 5.44
+Head circumference 2132 568.7 0.34 15.57 509 644 0.18 0.72 2.74
+Hip breadth, sitting 2103 363.1 0.60 27.60 281 524 0.64 1.48 7.60
+*Knee height, sitting 2122 551.9 0.54 25.01 466 635 0.09 0.12 4.53 ±1.06
+overhead fingertip reach, sitting 2074 1377.7 1.26 57.30 1210 1567 0.06 0.01 4.16
+Palm length 2123 112.1 0.14 6.38 88 134 0.07 0.17 5.69
+Popliteal height 2119 418.7 0.49 22.72 290 507 −0.01 0.77 5.43
+*sitting height 2122 919.3 0.70 32.38 803 1024 −0.06 −0.09 3.52 ±1.38
+shoulder-elbow length 2123 359.8 0.41 18.62 279 424 −0.11 0.32 5.17
+span 2107 1791.4 1.63 74.90 1555 2050 0.09 −0.05 4.18
+stature 2127 1755.2 1.34 62 1580 1953 0.03 −0.02 3.53 ±2.64
+Thigh circumference 2131 597.3 1.03 47.68 463 824 0.45 0.44 7.98
+Thigh clearance 2122 185.2 0.33 15.12 136 242 0.07 0.13 8.17
+Thigh max circumference, sitting 2131 596.3 0.99 45.93 453 790 0.51 0.51 7.70
+*Thumbtip reach 2122 779.6 0.88 40.38 650 922 0.07 0.10 5.18 ±1.72
+Waist circumference (narrower) 2127 852.1 1.82 84.09 674 1203 0.82 0.61 9.87
+Waist circumference (omphalion) 2126 889.3 2.05 94.39 678 1259 0.75 0.49 10.61
+Weight (kg) 2116 79.2 0.25 11.67 47.6 133.9 0.78 1.14 14.74
+Bmi (kg/m2) 2111 25.6 0.07 3.25 15.5 41.6 0.82 1.58 12.65
+*cockpit critical dimensions. Weight in kg, Bmi in kg/m2 and, all other values in mm.
+
+==================================================
+PAGE 11
+==================================================
+1454 G. V. DA SILVA ET AL.
+teams due to the restricted timeframe and the huge size 4. Discussion
+of Brazil.
+It is noteworthy to clarify why this study still used man-
+Data in Table 6 were gathered during data collection
+ually measured body-size variables obtained by using
+in each location, in coordination with the Personnel
+traditional instruments. Firstly, because these methods,
+Management Sector. The non-participants’ height and
+when properly employed and controlled, still are a highly
+weight were collected from the FAB Annual Fitness
+accurate means of documenting the body sizes of individ-
+Records. As can be seen, the weight and stature features
+uals and of whole populations. Recent large-scale surveys
+between participants and non-participants are similar (see
+of military populations, such as the 2010 Anthropometric
+Table 7).
+Survey of US Marine Corps Personnel (Gordon et al.
+The summary anthropometric statistics of all 39 tradi-
+2013) and the 2012 Anthropometric Survey of US Army
+tional measurements are shown in Tables 8–11 for males
+Personnel (Gordon et al. 2014), still include traditional
+and females, separately. Tables 8 and 9 show the number
+anthropometric measurements in order to facilitate pop-
+of valid measurements (n), mean, standard error of the
+ulation comparisons over time and between user groups.
+mean (SE Mean), standard deviation (SD), minimum and
+In addition, methods for using 3D imaging systems are not
+maximum measurements acquired, skewness, kurtosis and
+standardised and scan-extracted circumference measure-
+correlation variance (CV). The confidence intervals (CI) for
+ments are much more difficult to obtain reliably.
+a confidence level of 95% for the six cockpit design critical
+In accordance with previous research (Gordon
+dimensions plus stature were also included in Tables 8 and 9.
+et al. 2013; ISO 2012) the sample can be considered truly
+Tables 10 and 11 present the percentile distributions. Body
+representative of the overall FAB pilot population as well
+Mass Index (BMI) is also presented in the aforementioned
+as large enough to accurately reflect the variability in this
+tables.
+Table 10. Anthropometric percentile summary statistics, female.
+Dimensions 1% 2% 5% 10% 25% 50% 75% 90% 95% 98% 99%
+Abdominal ext depth, sitting 161 163 173 179 191 205 222 243 270 301 326
+*Acromial height, sitting 508 509 520 530 551 566 584 595 610 624 631
+Biacromial breadth 305 307 319 330 339 351 365 375 382 393 404
+Biceps circumference, flexed 231 234 245 252 261 276 292 317 335 362 380
+Bideltoid breadth 357 372 390 39 407 422 437 461 482 497 522
+Buttock circumference 844 852 891 914 945 981 1028 1101 1137 1205 1272
+*Buttock-knee length 520 526 544 551 566 581 598 618 630 643 658
+Buttock-popliteal length 423 435 442 449 461 474 488 504 514 530 540
+calf circumference 304 312 326 334 347 362 382 401 409 424 449
+cervical height 1276 1290 1314 1334 1368 1400 1430 1462 1484 1511 1529
+chest circumference 741 771 792 809 841 886 932 975 1041 1118 1146
+chest depth 186 190 195 203 214 232 250 264 283 300 305
+Elbow rest height 176 186 194 201 217 231 246 259 268 276 280
+*Eye height, sitting 678 683 698 713 732 754 773 787 799 811 814
+Foot breadth, horizontal 75 76 78 80 83 88 94 97 99 102 103
+Foot length 220 223 229 232 239 247 255 262 269 274 278
+Forearm circumference, flexed 206 222 226 231 237 247 258 270 282 292 307
+Forearm-hand length 394 396 406 411 422 435 450 462 467 475 480
+Forearm-forearm breadth 351 355 372 382 405 427 454 484 505 551 601
+Functional leg length 876 900 931 953 981 1011 1034 1065 1087 1103 1128
+Hand breadth 69 70 72 73 76 78 81 83 84 87 88
+Hand length 154 156 161 166 171 177 184 189 192 195 198
+Head circumference 516 520 525 530 540 548 559 569 575 582 588
+Hip breadth, sitting 315 325 346 353 367 387 405 430 450 487 490
+*Knee height, sitting 467 472 478 488 499 513 528 540 551 563 567
+overhead fingertip reach, sit. 1187 1192 1207 1218 1253 1290 1320 1347 1365 1378 1387
+Palm length 90 92 94 96 99 102 106 110 112 113 116
+Popliteal height 314 344 349 358 373 386 396 408 415 420 423
+*sitting height 787 799 813 822 846 869 886 906 917 936 940
+shoulder-elbow length 300 302 305 312 319 330 341 353 358 373 378
+span 1511 1530 1544 1560 1603 1645 1700 1738 1768 1804 1839
+stature 1516 1533 1547 1569 1605 1644 1679 1708 1729 1760 1778
+Thigh circumference 493 509 521 532 554 588 624 671 694 732 763
+Thigh clearance 130 135 144 150 156 168 180 193 195 202 205
+Thigh max circumference, sitting 490 507 521 532 557 586 620 674 696 720 738
+*Thumbtip reach 630 631 650 660 685 710 737 754 770 785 787
+Waist circumference (narrower) 595 613 626 653 679 712 755 809 859 906 998
+Waist circumference (omphalion) 659 662 696 716 746 787 835 892 941 1024 1108
+Weight (kg) 45.1 47.1 50.4 52.7 55.9 61.3 67.6 77.5 83.9 94.2 102.1
+Bmi (kg/m2) 18.1 18.8 19.4 19.8 21.0 22.6 24.7 28.1 30.0 34.9 37.4
+*cockpit critical dimensions. Weight in kg, Bmi in kg/m2 and, all other values in mm.
+
+==================================================
+PAGE 12
+==================================================
+ERGONOMICS 1455
+population. Power analysis using equations 1 and 2 from Colonel and Colonel), measuring a total of 341 subjects
+ISO 15535 (2012) showed that male sample size was well (14.6%) above 40 years old.
+above the minimum required and the female sample size One explanation for this may have been due to the fact
+was above for the cockpit critical dimensions. The pres- that the FAB Survey was an official event, established by an
+entation of representative female pilot data is relevant for Ordinance that described the importance of the Survey,
+cockpit design and several military equipment and uni- and encouraging all pilots to participate.
+forms, since most previous studies have been presented The sample was also geographically representative.
+only anthropometric data from male subjects. Only 2 out of 26 states (Acre and Tocantins) had no repre-
+The sample demographic characteristics were very similar sentatives in the sample population. The most common
+to the entire Brazilian Air Force population. In the same way, birthplace for both male and female participants was Rio
+the comparison between participants and non-participants de Janeiro.
+revealed that weight and stature of both groups were similar. The age distribution of FAB survey participants was very
+This study captured a broad age range. A common sam- similar to the whole FAB population distribution. Since
+ple bias in many military research studies occurs with the there have been no studies to date describing the race/
+age distribution, as younger service members are more ethnicity distribution in the FAB, nor is it registered in the
+likely to be available to participate in studies than senior databases, it was not possible to determine whether the
+individuals. This has the potential to create problems, since race/ethnicity distribution in the sample is representative
+younger military personnel tend to be more fit and thinner, of the actual ethnic distribution. This survey creates a start-
+thus skewing the sample data. In our study we captured ing point from which the FAB may choose to initiate further
+a large proportion of higher ranking officials (Lieutenant investigations.
+Table 11. Anthropometric percentile summary statistics, male.
+Dimensions 1% 2% 5% 10% 25% 50% 75% 90% 95% 98% 99%
+Abdominal ext depth, sitting 178 186 196 203 217 234 259 284 305 328 343
+*Acromial height, sitting 533 540 550 560 578 598 619 637 649 660 669
+Biacromial breadth 337 345 368 381 395 410 421 429 437 446
+Biceps circumference, flexed 280 285 297 307 323 344 366 385 395 411 422
+Bideltoid breadth 415 427 441 450 465 482 502 520 530 544 555
+Buttock circumference 859 874 893 911 943 984 1030 1077 1106 1154 1171
+*Buttock-knee length 546 552 563 572 587 605 623 640 653 668 680
+Buttock-popliteal length 432 439 450 459 473 490 506 522 532 547 556
+calf circumference 330 36 345 353 366 381 398 416 428 442 450
+cervical height 1371 1383 1404 1428 1466 1505 1542 1578 1601 1627 1650
+chest circumference 868 881 908 930 964 1011 1059 1104 1140 1187 1214
+chest depth 196 202 214 221 234 249 262 279 288 301 311
+Elbow rest height 178 182 191 202 215 234 252 270 281 291 297
+*Eye height, sitting 730 739 750 762 781 802 823 841 853 864 878
+Foot breadth, horizontal 82 84 86 88 92 97 101 106 108 110 112
+Foot length 240 243 250 254 261 270 280 288 294 299 303
+Forearm circumference, flexed 254 259 267 275 285 298 312 324 332 343 350
+Forearm-hand length 422 429 437 446 459 473 487 500 510 520 525
+Forearm-forearm breadth 413 428 443 459 486 516 547 573 590 609 622
+Functional leg length 943 963 979 998 1029 1066 1100 1136 1159 1182 1194
+Hand breadth 79 80 81 82 85 87 90 93 95 97 98
+Hand length 168 170 173 177 183 190 197 204 208 212 215
+Head circumference 533 537 545 550 559 569 578 589 595 603 608
+Hip breadth, sitting 305 313 322 330 345 361 379 398 413 426 440
+*Knee height, sitting 495 502 511 519 535 552 568 584 594 607 614
+overhead fingertip reach, sit. 1250 1263 1282 1303 1338 1379 1415 1451 1474 1501 1516
+Palm length 97 100 102 104 108 112 116 120 123 125 128
+Popliteal height 364 373 383 390 404 419 433 447 456 469 476
+*sitting height 843 853 865 877 898 920 942 961 972 984 993
+shoulder-elbow length 313 320 329 335 349 360 372 383 390 397 405
+span 1628 1640 1668 1693 1740 1790 1841 1889 1915 1950 1971
+stature 1613 1626 1651 1674 1713 1755 1797 1833 1857 1886 1908
+Thigh circumference 503 510 525 540 564 594 628 660 685 701 719
+Thigh clearance 149 153 161 166 175 185 195 205 210 216 221
+Thigh max circumference, sitting 505 514 528 540 564 593 624 656 680 703 720
+*Thumbtip reach 690 700 715 730 751 780 806 830 848 868 878
+Waist circumference (narrower) 707 724 740 757 790 840 899 970 1018 1066 1097
+Waist circumference (omphalion) 729 741 761 781 819 879 944 101 1070 1128 1154
+Weight (kg) 58.6 60.2 62.7 65.7 71.1 77.9 85.8 94.8 100.2 107.8 113.1
+Bmi (kg/m2) 19.6 20.1 21.0 21.9 23.4 25.3 27.4 29.8 31.5 33.8 35.6
+*cockpit critical dimensions. Weight in kg, Bmi in kg/m2 and, all other values in mm.
+
+==================================================
+PAGE 13
+==================================================
+1456 G. V. DA SILVA ET AL.
+When controlling non-participants regarding stature Being the first large-scale anthropometric survey in the
+and weight there was no significant difference between Brazilian Armed Forces, the data obtained in this study pro-
+these groups. vide more accurate anthropometric information about the
+Another important contribution of this study is the data FAB pilots.
+provided beyond the 5th/95th percentile anthropomet- Therefore, this study contributes to general human
+ric values, since just a few studies presents this relevant engineering design criteria for military systems, equip-
+information (Parkinson and Garneau 2016), as well as the ment and facilities, thus ensuring optimum accommo-
+Skewness, Kurtosis and CV values necessary for data esti- dation of the FAB personnel. Including these data in the
+mation and comparison (Roebuck 1995). anthropometric criteria for a new FAB aircraft would lead
+The newly created FAB database will allow engineers to a more inclusive air force, minimising gender bias.
+and designers to develop more precise protective equip-
+ment, workplaces and uniforms. The database also serves
+Acknowledgements
+as a comprehensive and reliable resource for anthropo-
+metric research, since most available resources that engi- The authors express their gratitude to all Brazilian Air Force
+Pilots and Administrative Officers who participated in the
+neers, designers and practioners have been exposed to
+anthropometric survey for their cooperation.
+them, only shows inaccurate, outdated and/or incomplete
+data, as mentioned by Parkinson and Garneau (2016).
+The results of this study have numerous implications for Disclosure statement
+the FAB, in particular concerning the development and/
+No potential conflict of interest was reported by the authors.
+or acquisition of new aircraft, upgrading existing aircraft,
+and the design and sizing of uniforms and protective
+equipment worn by aircrew. This study provides critical Funding
+data to address cockpit design, space arrangement issues
+This study was supported by the Brazilian Air Force.
+and adjustments. The data will be also useful for protective
+gear and equipment design, as well as for digital human
+References
+modelling often used in early cockpit design processes.
+Another important implication is that the present study Brazil Ministry of Science and Technology – INT. 1988.
+can be considered as a starting point for the improvement Biomechanics and Anthropometric Study of Industrial Workers
+of the accommodation of females in cockpit design in from Rio de Janeiro. [Portuguese].
+Brazil Ministry of Defense, Brazilian Air Force Staff. 2013.
+Brazil, reducing gender bias and the impact in women’s
+Creation of a Work Group to perform the Brazilian Air Force
+career as pilots.
+Pilots Anthropometric Survey. EMAER Ordinance nº 17/3SC,
+May 28, 2013, issued on Air Force Command Bulletin (BCA) nº
+105, June 5, 2013. Brasilia, DF. [Portuguese].
+5. Conclusion
+Chuan, T. K., M. Hartono, and N. Kumar. 2010. “Anthropometry of
+the Singaporean and Indonesian Populations.” International
+This research provided the first reported anthropometric
+Journal of Industrial Ergonomics 40: 757–766.
+information for Brazilian Air Force pilots. The study investi-
+da Silva, G. V. 2013. Operational Anthropometric Assessment
+gated 39 anthropometric body dimensions that are of rel-
+Methodology for T-27 Tucano Aircraft. Technical Report – TR –
+evance to aircraft cockpit design for ensuring ergonomic 2/3SC4/2013. Brasília, DF: Brazilian Air Force Staff, Operational
+safety and comprehensive pilot accommodation, effective Division, Operational Projects Section. [Portuguese].
+protective gear and uniform design, as well as more accu- Dainoff, M., C. Gordon, K. Robinette, and M. Straus. 2004.
+Guidelines for using Anthropometric Data in Product Design.
+rate digital human modelling.
+HFES 300 Committee. Santa Monica, CA: Human Factors and
+The survey recruited a total of 2339 participants, a large
+Ergonomic Society.
+sample that included 70% of the entire FAB pilot popula- Gordon, C. C., C. L. Blackwell, B. Bradtmiller, J. L. Parham,
+tion, which was representative for the point of size, geo- P. Barrientos, S. P. Paquette, B. D. Corner, J. M. Carson, J. C.
+graphic and age distribution, as well as has not presented Venezia, B. M. Rockwell, M. Mucher, and S. Kristensen. 2014.
+2010–2012 Anthropometric Survey of U.S. Army Personnel:
+differences from the non-participants.
+Methods and Summary Statistics. Technical Report Natick/TR-
+Finally, the results of this study have numerous implica-
+15/007. Natick, MA: U.S. Army Natick Research, Development
+tions for the FAB, especially implications for human-equip-
+and Engineering Center.
+ment fit. The up-to-date pilots’ anthropometric data and Gordon, C. C., C. L. Blackwell, B. Bradtmiller, J. L. Parham,
+multivariate anthropometric models will benefit the J. Hotzman, S. P. Paquette, B. D. Corner, and B. M. Hodge. 2013.
+design of future aircraft cockpits which, in turn, will help 2010 Anthropometric Survey of U.S. Marine Corps Personnel:
+Methods and Summary Statistics. Technical Report Natick/TR-
+promote the safety, comfort and performance of all pilots,
+13/018. Natick, MA: U.S. Army Natick Research, Development
+facilitating the accomplishment of their mission.
+and Engineering Center.
+
+==================================================
+PAGE 14
+==================================================
+ERGONOMICS 1457
+Gross, R., F. D. Lima, C. J. Freitas, and U. Gross. 1990. “The Melmoth, D. R., and S. Grant. 2012. “Getting a Grip: Different
+Relationships Between Selected Anthropometric and Socio- Actions and Visual Guidance of the Thumb and Finger in
+economic Data in School Children from Different Social Strata Precision Grasping.” Experimental Brain Research 222: 265–
+in Rio de Janeiro, Brazil.” Revista de Saúde Pública 24: 11–19. 276.
+Hotzman, J., C. C. Gordon, B. Bradtmiller, B. D. Corner, M. Mucher, Parkinson, M. B., and C. J. Garneau. 2016. “A Survey of
+S. Kristensen, S. Paquette, and C. L. Blackwell. 2011. Measurer’s Anthropometry and Physical Accommodation in Ergonomics
+Handbook: US Army and Marine Corps Anthropometric Surveys, Curricula.” Ergonomics 59 (1): 143–154.
+2010–2011. Technical Report NATICK/TR-11/017. Natick, MA: Pheasant, S., and C. Haslegrave. 2006. Bodyspace: Anthropometry,
+U.S. Army Natick Research, Development and Engineering Ergonomics and the Design of Work. 3rd ed. Boca Raton, FL:
+Center. CRC Taylor and Francis.
+Hsiao, H. 2013. “Anthropometric Procedures for Protective Roebuck, J. 1995. Anthropometric Methods: Designing to Fit
+Equipment Sizing and Design.” Human Factors 55: 6–35. the Human Body. Santa Monica, CA: Human Factors and
+Hsiao, H., D. Long, and K. Snyder. 2002. “Anthropometric Ergonomics Society.
+Differences Among Occupational Groups.” Ergonomics 45: Silva, S. C., and W. D. Monteiro. 2009. “Anthropometric Profile
+136–152. Survey of the Brazilian Population User of Domestic Air
+Hudson, J. A., G. F. Zehner, and R. S. Meindl. 1998. “The USAF Transportation (Ordinary Passengers) – Projeto Conhecer.”
+Multivariate Accommodation Method.” Proceedings of National Civil Aviation Agency (ANAC), Rio de Janeiro –
+Human Factors and Ergonomics Society 42th Annual Brazil. [Portuguese]. http://www2.anac.gov.br/arquivos/pdf/
+Meeting, Santa Monica, CA, 722–726. Relatorio_Final_Projeto_Conhecer.pdf
+ISO (International Organization for Standardization). 2008. Singh, J., C. M. Peng, M. K. Lim, and C. N. Ong. 1995. “An
+ISO 7250-1:2008 Basic Human Body Measurements for Anthropometric Study of Singapore Candidate Aviators.”
+Technological Design-Part 1-Body Measurement Definitions Ergonomics 38: 651–658.
+and Landmarks. Geneva: International Organization for United States Air Force, Department of Defense. 2008. Aircrew
+Standardization. Accommodation requirements/Verification. Crew System
+ISO (International Organization for Standardization). 2010. Bulletin. ENFC-csb-08-01. Wright-Patterson AFB, OH: Crew
+ISO 7250-2:2010 Basic Human Body Measurements for Systems Engineering.
+Technological Design-Part 2-Statistical Summaries of Body United States of America Department of Defense. 1991. Military
+Measurements. Geneva: International Organization for Handbook of Anthropometry of US Military Personnel (DoD –
+Standardization. HDBK – 743A).
+ISO (International Organization for Standardization). 2012. Zehner, G. F. 1996. “Cockpit Anthropometric Accommodation
+ISO 15535:2012. General Requirements for Establishing an and the JPATS Program.” SAFE Journal 26: 3.
+Anthropometric Database. Geneva: International Organization Zehner, G. F. 2002. Body Size Accommodation in USAF Aircraft.
+for Standardization. AFRL-HE-WP-TR-2002-0118. Wright-Patterson AFB, OH: Air
+Kennedy, K. W. 1982. “International Anthropometric Variability Force Research Laboratory, Human Effectiveness Directorate,
+and its Effect on Aircraft Cockpit Design.” In Ethnic Variables Crew System Interface Division.
+in Human Factors Engineering, edited by A. Chaparis, 42–66. Zehner, G. F., R. M. Meindl, and J. A. Hudson. 1993. A Multivariate
+Baltimore, MD: Johns Hopkins Press. Anthropometric Method For Crewstation Design. Technical
+Kennedy, K. W., and G. F. Zehner. 1995. “Assessment of Report AL-TR-1992-0164. Wright-Patterson AFB, OH:
+Anthropometric Accommodation in Aircraft Cockpits.” SAFE Crew Systems Directorate, Human Engineering Division,
+Journal 25 (1): 51–57. Armstrong Laboratory.
+Lars, H., S. Lena, G. Gunvor, I. Staffan, and O. V. Cindy. 2009. Zhuang, Z., and B. Bradtmiller. 2005. “Head-and-Face
+“Swedish Anthropometrics for Product and Workplace Anthropometric Survey of U.S. Respirator Users.” Journal of
+Design.” Applied Ergonomics 40: 797–806. Occupational and Environmental Hygiene 2: 567–576.
+Lee, W., K. Jung, J. Jeong, J. Park, J. Cho, H. Kim, S. Park, and Zhuang, Z., B. Bradtmiller, and R. E. Shaffer. 2007. “New Respirator
+H. You. 2013. “An Anthropometric Analysis of Korean Male Fit Test Panels Representing the Current U.S. Civilian
+Helicopter Pilots for Helicopter Cockpit Design.” Ergonomics Workforce.” Journal of Occupational and Environmental
+56 (5): 879–887. Hygiene 4: 647–659.
+Lovesey, T. 2006. “Anthropometrics for Flight Deck Design.” In
+Human Factors for civil flight deck design, edited by Don Harris,
+199–210. Burlington, VT: Ashgate Publishing Company.
