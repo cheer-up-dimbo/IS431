@@ -1,572 +1,590 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: 5.3 Robot Intelligence</title>
-  <link rel="icon" href="../favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
-  <link rel="stylesheet" href="../index.css">
-  <script type="module" src="../components/image/image-component.js"></script>
-  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
-  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
-  <style>
-    .section-nav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin: 24px 0;
-    }
-    .section-nav-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 24px 16px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      text-decoration: none;
-      color: inherit;
-      transition: box-shadow 0.2s, border-color 0.2s;
-    }
-    .section-nav-card:hover {
-      border-color: #4CAF50;
-      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
-    }
-    .section-nav-card h3 {
-      margin: 12px 0 6px;
-      font-size: 1.05rem;
-    }
-    .section-nav-card p {
-      margin: 0;
-      font-size: 0.88rem;
-      color: #666;
-    }
-    .section-nav-full {
-      display: block;
-      margin-top: 16px;
-    }
-    .section-nav-full .section-nav-card {
-      flex-direction: row;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 28px;
-      text-align: left;
-    }
-    .section-nav-full .section-nav-card sl-icon { flex-shrink: 0; }
-    .section-nav-full .section-nav-card h3 { margin: 0 0 4px 0; }
-    .section-nav-full .section-nav-card p { margin: 0; }
-    .node-tag {
-      display: inline-block;
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>IS-431: 5.3 Robot Intelligence</title>
+ <link rel="icon" href="../favicon.ico" type="image/x-icon">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+ <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+ <link rel="stylesheet" href="../index.css">
+ <script type="module" src="../components/image/image-component.js"></script>
+ <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+ <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+ <style>
+    /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
+    code {
       background: #f0f4f8;
       border: 1px solid #d0d7de;
       border-radius: 4px;
       padding: 1px 6px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 0.88em;
       color: #1a7f37;
-      font-weight: 500;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
-    /* Subtle separation between H3 sub-topics under each H2 numbered section */
-    .content h3 {
-      margin-top: 36px;
-      padding-top: 18px;
-      border-top: 1px solid #ececec;
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
     }
-    .content h2 + h3,
-    .content > div > h3:first-of-type,
-    .section-nav-card h3 {
-      margin-top: 16px;
-      padding-top: 0;
-      border-top: none;
-    }
-    /* Strong visual break between MAIN sections */
-    .content sl-divider {
-      --width: 3px;
-      --color: #2e7d32;
-      margin: 56px 0 36px !important;
-      border-radius: 2px;
-    }
-    /* Bigger, bolder H2 main-section headings */
-    .content > h2,
-    .content > div > h2 {
-      font-size: 1.7rem !important;
-      color: #1b5e20 !important;
-      letter-spacing: -0.3px;
-    }
-    .content > div:has(> h2) {
-      padding-top: 4px;
-    }
-  </style>
-  <script src="../components/report-nav/report-nav.js" defer></script>
-  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
+
+ .section-nav-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+ gap: 16px;
+ margin: 24px 0;
+ }
+ .section-nav-card {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ padding: 24px 16px;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ text-decoration: none;
+ color: inherit;
+ transition: box-shadow 0.2s, border-color 0.2s;
+ }
+ .section-nav-card:hover {
+ border-color: #4CAF50;
+ box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+ }
+ .section-nav-card h3 {
+ margin: 12px 0 6px;
+ font-size: 1.05rem;
+ }
+ .section-nav-card p {
+ margin: 0;
+ font-size: 0.88rem;
+ color: #666;
+ }
+ .section-nav-full {
+ display: block;
+ margin-top: 16px;
+ }
+ .section-nav-full .section-nav-card {
+ flex-direction: row;
+ align-items: center;
+ gap: 16px;
+ padding: 18px 28px;
+ text-align: left;
+ }
+ .section-nav-full .section-nav-card sl-icon { flex-shrink: 0; }
+ .section-nav-full .section-nav-card h3 { margin: 0 0 4px 0; }
+ .section-nav-full .section-nav-card p { margin: 0; }
+ .node-tag {
+ display: inline-block;
+ background: #f0f4f8;
+ border: 1px solid #d0d7de;
+ border-radius: 4px;
+ padding: 1px 6px;
+ font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+ font-size: 0.88em;
+ color: #1a7f37;
+ font-weight: 500;
+ }
+ /* Subtle separation between H3 sub-topics under each H2 numbered section */
+ .content h3 {
+ margin-top: 36px;
+ padding-top: 18px;
+ border-top: 1px solid #ececec;
+ }
+ .content h2 + h3,
+ .content > div > h3:first-of-type,
+ .section-nav-card h3 {
+ margin-top: 16px;
+ padding-top: 0;
+ border-top: none;
+ }
+ /* Strong visual break between MAIN sections */
+ .content sl-divider {
+ --width: 3px;
+ --color: #2e7d32;
+ margin: 56px 0 36px !important;
+ border-radius: 2px;
+ }
+ /* Bigger, bolder H2 main-section headings */
+ .content > h2,
+ .content > div > h2 {
+ font-size: 1.7rem !important;
+ color: #1b5e20 !important;
+ letter-spacing: -0.3px;
+ }
+ .content > div:has(> h2) {
+ padding-top: 4px;
+ }
+ </style>
+ <script src="../components/report-nav/report-nav.js" defer></script>
+ <script src="../components/svg-zoom/svg-zoom.js" defer></script>
 </head>
 <body>
-  <div class="content">
-    <a href="../index.html#conceptual-design" class="back-btn">
-      <sl-button variant="default" size="medium">
-        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-        Back to Main Report
-      </sl-button>
-    </a>
-    <br>
+ <div class="content">
+ <a href="../index.html#conceptual-design" class="back-btn">
+ <sl-button variant="default" size="medium">
+ <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+ Back to Main Report
+ </sl-button>
+ </a>
+ <br>
 
-    <!-- OVERVIEW -->
-    <div id="robot-intelligence">
-      <h2>5.3 Robot Intelligence (Yogeeswaran)</h2>
-      <p>
-        Robot Intelligence is the <strong>AI brain</strong> that turns BoxBunny from a static
-        striking target into an <strong>adaptive sparring partner</strong>. It sees what the
-        boxer is doing in real time, decides how the robot should respond, drives the LLM
-        coach that gives feedback, and surfaces every session as analytics on a phone
-        dashboard.
-      </p>
-      <p>
-        At its core is a computer vision pipeline that classifies <strong>8 punch types</strong>
-        using depth-based 3D voxel motion fused with 2D pose estimation. A
-        <strong>ROS 2 workspace</strong> on an NVIDIA Jetson Orin NX orchestrates that
-        perception output alongside IMU sensing, an adaptive sparring engine, and a local
-        Qwen2.5-3B LLM coach &mdash; with everything running on-device, no cloud, no internet
-        required.
-      </p>
+ <!-- OVERVIEW -->
+ <div id="robot-intelligence">
+ <h2>5.3 Robot Intelligence (Yogeeswaran)</h2>
+ <p>
+ Robot Intelligence is the <strong>AI brain</strong> that turns BoxBunny from a static
+ striking target into an <strong>adaptive sparring partner</strong>. It sees what the
+ boxer is doing in real time, decides how the robot should respond, drives the LLM
+ coach that gives feedback, and surfaces every session as analytics on a phone
+ dashboard.
+ </p>
+ <p>
+ At its core is a computer vision pipeline that classifies <strong>8 punch types</strong>
+ using depth-based 3D voxel motion fused with 2D pose estimation. A
+ <strong>ROS 2 workspace</strong> on an NVIDIA Jetson Orin NX orchestrates that
+ perception output alongside IMU sensing, an adaptive sparring engine, and a local
+ Qwen2.5-3B LLM coach, with everything running on-device, no cloud, no internet
+ required.
+ </p>
 
-      <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
-        <strong>Section structure</strong>
-        <ul style="margin:6px 0 0; padding-left:20px; line-height:1.6;">
-          <li><strong>This page</strong> &mdash; subsystem boundaries, requirements, hardware, ROS 2 system architecture</li>
-          <li><strong>5.3.1</strong> &mdash; Computer Vision &amp; action prediction model</li>
-          <li><strong>5.3.2</strong> &mdash; Sensor fusion, sparring AI, LLM coach</li>
-          <li><strong>5.3.3</strong> &mdash; Dashboard backend &amp; analytics</li>
-          <li><strong>5.3.4</strong> &mdash; Testing &amp; verification of all 7 requirements</li>
-        </ul>
-      </div>
+ <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+ <strong>Section structure</strong>
+ <ul style="margin:6px 0 0; padding-left:20px; line-height:1.6;">
+ <li><strong>This page</strong>, subsystem boundaries, requirements, hardware, ROS 2 system architecture</li>
+ <li><strong>5.3.1</strong>, Computer Vision &amp; action prediction model</li>
+ <li><strong>5.3.2</strong>, Sensor fusion, sparring AI, LLM coach</li>
+ <li><strong>5.3.3</strong>, Dashboard backend &amp; analytics</li>
+ <li><strong>5.3.4</strong>, Testing &amp; verification of all 7 requirements</li>
+ </ul>
+ </div>
 
-      <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:10px; padding:18px 22px; margin:22px 0; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-        <h3 style="margin:0 0 6px; padding:0; border:none;">Where this subsystem sits in BoxBunny</h3>
+ <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:10px; padding:18px 22px; margin:22px 0; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+ <h3 style="margin:0 0 6px; padding:0; border:none;">Where this subsystem sits in BoxBunny</h3>
 
-        <p style="margin:0 0 12px;">
-          BoxBunny has three sibling subsystems wired through ROS&nbsp;2. Robot Intelligence
-          sits in the middle, deciding what the robot does next.
-        </p>
+ <p style="margin:0 0 12px;">
+ BoxBunny has three sibling subsystems wired through ROS&nbsp;2. Robot Intelligence
+ sits in the middle, deciding what the robot does next.
+ </p>
 
-        <div style="display:grid; grid-template-columns:1fr 28px 1fr 28px 1fr; gap:0; align-items:stretch; margin:14px 0;">
+ <div style="display:grid; grid-template-columns:1fr 28px 1fr 28px 1fr; gap:0; align-items:stretch; margin:14px 0;">
 
-          <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #1565c0; border-radius:6px; padding:14px 16px;">
-            <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">5.1 GUI</div>
-            <div style="font-size:0.92rem; font-weight:600; color:#0d47a1; margin-top:6px;">User input &amp; live feedback</div>
-            <div style="font-size:0.85rem; color:#555; margin-top:6px;">Touchscreen on the robot. User inputs in, live session state out.</div>
-          </div>
+ <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #1565c0; border-radius:6px; padding:14px 16px;">
+ <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">5.1 GUI</div>
+ <div style="font-size:0.92rem; font-weight:600; color:#0d47a1; margin-top:6px;">User input &amp; live feedback</div>
+ <div style="font-size:0.85rem; color:#555; margin-top:6px;">Touchscreen on the robot. User inputs in, live session state out.</div>
+ </div>
 
-          <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
+ <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
 
-          <div style="background:#f0f9f0; border:1px solid #c8e6c9; border-top:4px solid #2e7d32; border-radius:6px; padding:14px 16px; box-shadow:0 2px 6px rgba(46,125,50,0.12);">
-            <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">5.3 Robot Intelligence &middot; this section</div>
-            <div style="font-size:0.92rem; font-weight:600; color:#1b5e20; margin-top:6px;">The decision-making brain</div>
-            <div style="font-size:0.85rem; color:#555; margin-top:6px;">CV, sensor fusion, sparring AI, LLM coach &mdash; sensor data to commands.</div>
-          </div>
+ <div style="background:#f0f9f0; border:1px solid #c8e6c9; border-top:4px solid #2e7d32; border-radius:6px; padding:14px 16px; box-shadow:0 2px 6px rgba(46,125,50,0.12);">
+ <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">5.3 Robot Intelligence &middot; this section</div>
+ <div style="font-size:0.92rem; font-weight:600; color:#1b5e20; margin-top:6px;">The decision-making brain</div>
+ <div style="font-size:0.85rem; color:#555; margin-top:6px;">CV, sensor fusion, sparring AI, LLM coach, sensor data to commands.</div>
+ </div>
 
-          <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
+ <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
 
-          <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:14px 16px;">
-            <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">5.2 Robot Mechanism</div>
-            <div style="font-size:0.92rem; font-weight:600; color:#bf360c; margin-top:6px;">Physical actuation &amp; sensing</div>
-            <div style="font-size:0.85rem; color:#555; margin-top:6px;">Punch commands in, pad &amp; arm impact events out.</div>
-          </div>
+ <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:14px 16px;">
+ <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">5.2 Robot Mechanism</div>
+ <div style="font-size:0.92rem; font-weight:600; color:#bf360c; margin-top:6px;">Physical actuation &amp; sensing</div>
+ <div style="font-size:0.85rem; color:#555; margin-top:6px;">Punch commands in, pad &amp; arm impact events out.</div>
+ </div>
 
-        </div>
+ </div>
 
-        <p style="font-size:0.92rem; color:#444; margin:0;">
-          Together, the three fulfil the product needs from the
-          <a href="../sections/problem-clarification.html">user research</a>:
-          <strong>Realistic Training Partner</strong> (5.3.1 + 5.3.2),
-          <strong>Adaptive Fight Intelligence</strong> (5.3.2), and
-          <strong>Performance Analytics</strong> (5.3.3).
-        </p>
-      </div>
+ <p style="font-size:0.92rem; color:#444; margin:0;">
+ Together, the three fulfil the product needs from the
+ <a href="../sections/problem-clarification.html">user research</a>:
+ <strong>Realistic Training Partner</strong> (5.3.1 + 5.3.2),
+ <strong>Adaptive Fight Intelligence</strong> (5.3.2), and
+ <strong>Performance Analytics</strong> (5.3.3).
+ </p>
+ </div>
 
-      <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
-        <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
-        <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
-          <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="github"></sl-icon>
-            Action Recognition
-          </sl-button>
-        </a>
-        <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none;">
-          <sl-button variant="default" size="small">
-            <sl-icon slot="prefix" name="github"></sl-icon>
-            Robot Workspace
-          </sl-button>
-        </a>
-      </div>
+ <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
+ <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
+ <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
+ <sl-button variant="default" size="small">
+ <sl-icon slot="prefix" name="github"></sl-icon>
+ Action Recognition
+ </sl-button>
+ </a>
+ <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none;">
+ <sl-button variant="default" size="small">
+ <sl-icon slot="prefix" name="github"></sl-icon>
+ Robot Workspace
+ </sl-button>
+ </a>
+ </div>
 
-      <h3>Key Achievements</h3>
+ <h3>Key Achievements</h3>
 
-      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:14px 0;">
+ <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:14px 0;">
 
-        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #2e7d32; border-radius:6px; padding:16px 18px;">
-          <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">Action Prediction Model</div>
-          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
-            <span style="font-size:2.1rem; font-weight:700; color:#1b5e20; line-height:1;">96.8%</span>
-            <span style="font-size:0.85rem; color:#555;">validation accuracy on an unseen person</span>
-          </div>
-          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
-            Classifies <strong>8 punch types</strong> at <strong>30&nbsp;fps</strong> on an
-            NVIDIA Jetson. Built over <strong>9 iterations</strong> as a dual-branch
-            (voxel + pose) Transformer &mdash; full story in
-            <a href="robot-intelligence-cv.html">5.3.1</a>.
-          </div>
-        </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #2e7d32; border-radius:6px; padding:16px 18px;">
+ <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">Action Prediction Model</div>
+ <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+ <span style="font-size:2.1rem; font-weight:700; color:#1b5e20; line-height:1;">96.8%</span>
+ <span style="font-size:0.85rem; color:#555;">validation accuracy on an unseen person</span>
+ </div>
+ <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+ Classifies <strong>8 punch types</strong> at <strong>30&nbsp;fps</strong> on an
+ NVIDIA Jetson. Built over <strong>9 iterations</strong> as a dual-branch
+ (voxel + pose) Transformer, full story in
+ <a href="robot-intelligence-cv.html">5.3.1</a>.
+ </div>
+ </div>
 
-        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #1565c0; border-radius:6px; padding:16px 18px;">
-          <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">ROS 2 System</div>
-          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
-            <span style="font-size:2.1rem; font-weight:700; color:#0d47a1; line-height:1;">10</span>
-            <span style="font-size:0.85rem; color:#555;">ROS 2 nodes &middot; 21 messages &middot; 6 services</span>
-          </div>
-          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
-            Orchestrates CV inference, IMU sensor fusion, <strong>5 adaptive AI sparring
-            styles</strong> with weakness tracking, and a local <strong>Qwen2.5-3B LLM
-            coach</strong> running entirely on-device.
-          </div>
-        </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #1565c0; border-radius:6px; padding:16px 18px;">
+ <div style="font-size:0.74rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.6px;">ROS 2 System</div>
+ <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+ <span style="font-size:2.1rem; font-weight:700; color:#0d47a1; line-height:1;">10</span>
+ <span style="font-size:0.85rem; color:#555;">ROS 2 nodes &middot; 21 messages &middot; 6 services</span>
+ </div>
+ <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+ Orchestrates CV inference, IMU sensor fusion, <strong>5 adaptive AI sparring
+ styles</strong> with weakness tracking, and a local <strong>Qwen2.5-3B LLM
+ coach</strong> running entirely on-device.
+ </div>
+ </div>
 
-        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:16px 18px;">
-          <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">Dashboard &amp; Analytics</div>
-          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
-            <span style="font-size:1.4rem; font-weight:700; color:#bf360c; line-height:1;">Vue&nbsp;3 + FastAPI</span>
-          </div>
-          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
-            Phone dashboard for remote training control, performance trends, AI coach chat,
-            and <strong>population benchmarking</strong>. <strong>Public-URL tunnel</strong>
-            lets any phone connect from any network &mdash; no shared WiFi required.
-          </div>
-        </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:16px 18px;">
+ <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">Dashboard &amp; Analytics</div>
+ <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+ <span style="font-size:1.4rem; font-weight:700; color:#bf360c; line-height:1;">Vue&nbsp;3 + FastAPI</span>
+ </div>
+ <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+ Phone dashboard for remote training control, performance trends, AI coach chat,
+ and <strong>population benchmarking</strong>. <strong>Public-URL tunnel</strong>
+ lets any phone connect from any network, no shared WiFi required.
+ </div>
+ </div>
 
-        <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #6a1b9a; border-radius:6px; padding:16px 18px;">
-          <div style="font-size:0.74rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.6px;">Testing &amp; Validation</div>
-          <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
-            <span style="font-size:2.1rem; font-weight:700; color:#4a148c; line-height:1;">146</span>
-            <span style="font-size:0.85rem; color:#555;">unit + 28 integration tests</span>
-          </div>
-          <div style="font-size:0.88rem; color:#555; margin-top:8px;">
-            <strong>CDE AI Fair</strong> real-world deployment with public users, full model
-            interpretability analysis, and <strong>all 7 requirements verified</strong>
-            in <a href="robot-intelligence-testing.html">5.3.4</a>.
-          </div>
-        </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:4px solid #6a1b9a; border-radius:6px; padding:16px 18px;">
+ <div style="font-size:0.74rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.6px;">Testing &amp; Validation</div>
+ <div style="display:flex; align-items:baseline; gap:8px; margin-top:8px;">
+ <span style="font-size:2.1rem; font-weight:700; color:#4a148c; line-height:1;">146</span>
+ <span style="font-size:0.85rem; color:#555;">unit + 28 integration tests</span>
+ </div>
+ <div style="font-size:0.88rem; color:#555; margin-top:8px;">
+ <strong>CDE AI Fair</strong> real-world deployment with public users, full model
+ interpretability analysis, and <strong>all 7 requirements verified</strong>
+ in <a href="robot-intelligence-testing.html">5.3.4</a>.
+ </div>
+ </div>
 
-      </div>
+ </div>
 
-      <h3>Hardware &amp; Tech Stack</h3>
+ <h3>Hardware &amp; Tech Stack</h3>
 
-      <p>
-        Everything below runs on a single <strong>NVIDIA Jetson Orin NX</strong> &mdash; one
-        board carrying perception, fusion, decision logic, the LLM coach, the dashboard
-        backend, and the touchscreen GUI all at once. No external server, no cloud, no
-        internet required.
-      </p>
+ <p>
+ Everything below runs on a single <strong>NVIDIA Jetson Orin NX</strong>, one
+ board carrying perception, fusion, decision logic, the LLM coach, the dashboard
+ backend, and the touchscreen GUI all at once. No external server, no cloud, no
+ internet required.
+ </p>
 
-      <style>
-        .ts-row { display:grid; grid-template-columns:130px 1fr; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid #e5e7eb; }
-        .ts-row:last-child { border-bottom:none; padding-bottom:4px; }
-        .ts-row:first-child { padding-top:4px; }
-        .ts-label { font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#475569; text-align:right; }
-        .ts-pills { display:flex; flex-wrap:wrap; gap:6px; }
-        .ts-pill {
-          display:inline-block;
-          font-size:0.78rem;
-          font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
-          padding:3px 9px;
-          border-radius:11px;
-          background:#f0f4f8;
-          border:1px solid #d0d7de;
-          color:#1f2937;
-          white-space:nowrap;
-        }
-        .ts-pill.hw { background:#e3f2fd; border-color:#bbdefb; color:#0d47a1; }
-        .ts-pill.model { background:#e8f5e9; border-color:#c8e6c9; color:#1b5e20; }
-        .ts-pill.ros { background:#f3e5f5; border-color:#e1bee7; color:#4a148c; }
-        .ts-pill.backend { background:#fff3e0; border-color:#ffe0b2; color:#bf360c; }
-        .ts-pill.frontend { background:#fce4ec; border-color:#f8bbd0; color:#880e4f; }
-        @media (max-width:700px) {
-          .ts-row { grid-template-columns:1fr; gap:6px; }
-          .ts-label { text-align:left; }
-        }
-      </style>
+ <style>
+ .ts-row { display:grid; grid-template-columns:130px 1fr; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid #e5e7eb; }
+ .ts-row:last-child { border-bottom:none; padding-bottom:4px; }
+ .ts-row:first-child { padding-top:4px; }
+ .ts-label { font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#475569; text-align:right; }
+ .ts-pills { display:flex; flex-wrap:wrap; gap:6px; }
+ .ts-pill {
+ display:inline-block;
+ font-size:0.78rem;
+ font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+ padding:3px 9px;
+ border-radius:11px;
+ background:#f0f4f8;
+ border:1px solid #d0d7de;
+ color:#1f2937;
+ white-space:nowrap;
+ }
+ .ts-pill.hw { background:#e3f2fd; border-color:#bbdefb; color:#0d47a1; }
+ .ts-pill.model { background:#e8f5e9; border-color:#c8e6c9; color:#1b5e20; }
+ .ts-pill.ros { background:#f3e5f5; border-color:#e1bee7; color:#4a148c; }
+ .ts-pill.backend { background:#fff3e0; border-color:#ffe0b2; color:#bf360c; }
+ .ts-pill.frontend { background:#fce4ec; border-color:#f8bbd0; color:#880e4f; }
+ @media (max-width:700px) {
+ .ts-row { grid-template-columns:1fr; gap:6px; }
+ .ts-label { text-align:left; }
+ }
+ </style>
 
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:14px 18px; margin:12px 0;">
-        <div class="ts-row">
-          <div class="ts-label">Hardware</div>
-          <div class="ts-pills">
-            <span class="ts-pill hw">Jetson Orin NX 16GB</span>
-            <span class="ts-pill hw">Ubuntu 22.04</span>
-            <span class="ts-pill hw">CUDA 12.6</span>
-            <span class="ts-pill hw">RealSense D435i</span>
-            <span class="ts-pill hw">Teensy 4.1</span>
-            <span class="ts-pill hw">6&times; MPU6050</span>
-          </div>
-        </div>
-        <div class="ts-row">
-          <div class="ts-label">Models</div>
-          <div class="ts-pills">
-            <span class="ts-pill model">Voxel-Pose Transformer 1.75M</span>
-            <span class="ts-pill model">YOLO Pose nano</span>
-            <span class="ts-pill model">Qwen2.5-3B GGUF Q4_K_M</span>
-            <span class="ts-pill model">PyTorch &rarr; TensorRT FP16</span>
-            <span class="ts-pill model">llama-cpp-python</span>
-          </div>
-        </div>
-        <div class="ts-row">
-          <div class="ts-label">Robotics</div>
-          <div class="ts-pills">
-            <span class="ts-pill ros">ROS 2 Humble</span>
-            <span class="ts-pill ros">10 nodes</span>
-            <span class="ts-pill ros">21 messages</span>
-            <span class="ts-pill ros">6 services</span>
-          </div>
-        </div>
-        <div class="ts-row">
-          <div class="ts-label">Backend</div>
-          <div class="ts-pills">
-            <span class="ts-pill backend">FastAPI + Uvicorn</span>
-            <span class="ts-pill backend">SQLite (two-tier)</span>
-            <span class="ts-pill backend">WebSocket</span>
-            <span class="ts-pill backend">localhost.run tunnel</span>
-          </div>
-        </div>
-        <div class="ts-row">
-          <div class="ts-label">Frontends</div>
-          <div class="ts-pills">
-            <span class="ts-pill frontend">PySide6 / Qt &mdash; 10.1&Prime; touchscreen</span>
-            <span class="ts-pill frontend">Vue 3 + Tailwind &mdash; phone dashboard</span>
-          </div>
-        </div>
-      </div>
-    </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:14px 18px; margin:12px 0;">
+ <div class="ts-row">
+ <div class="ts-label">Hardware</div>
+ <div class="ts-pills">
+ <span class="ts-pill hw">Jetson Orin NX 16GB</span>
+ <span class="ts-pill hw">Ubuntu 22.04</span>
+ <span class="ts-pill hw">CUDA 12.6</span>
+ <span class="ts-pill hw">RealSense D435i</span>
+ <span class="ts-pill hw">Teensy 4.1</span>
+ <span class="ts-pill hw">6&times; MPU6050</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Models</div>
+ <div class="ts-pills">
+ <span class="ts-pill model">Voxel-Pose Transformer 1.75M</span>
+ <span class="ts-pill model">YOLO Pose nano</span>
+ <span class="ts-pill model">Qwen2.5-3B GGUF Q4_K_M</span>
+ <span class="ts-pill model">PyTorch &rarr; TensorRT FP16</span>
+ <span class="ts-pill model">llama-cpp-python</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Robotics</div>
+ <div class="ts-pills">
+ <span class="ts-pill ros">ROS 2 Humble</span>
+ <span class="ts-pill ros">10 nodes</span>
+ <span class="ts-pill ros">21 messages</span>
+ <span class="ts-pill ros">6 services</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Backend</div>
+ <div class="ts-pills">
+ <span class="ts-pill backend">FastAPI + Uvicorn</span>
+ <span class="ts-pill backend">SQLite (two-tier)</span>
+ <span class="ts-pill backend">WebSocket</span>
+ <span class="ts-pill backend">localhost.run tunnel</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Frontends</div>
+ <div class="ts-pills">
+ <span class="ts-pill frontend">PySide6 / Qt, 10.1&Prime; touchscreen</span>
+ <span class="ts-pill frontend">Vue 3 + Tailwind, phone dashboard</span>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- REQUIREMENTS AND DESIGN CONSIDERATIONS -->
-    <div id="requirements">
-      <h3>Requirements and Design Considerations</h3>
-      <p>
-        These requirements were derived from the Function Analysis, user journey,
-        and the physical constraints of deploying real-time computer vision on an
-        embedded platform during live boxing training.
-      </p>
+ <!-- REQUIREMENTS AND DESIGN CONSIDERATIONS -->
+ <div id="requirements">
+ <h3>Requirements and Design Considerations</h3>
+ <p>
+ These requirements were derived from the Function Analysis, user journey,
+ and the physical constraints of deploying real-time computer vision on an
+ embedded platform during live boxing training.
+ </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">ID</th>
-            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirement</th>
-            <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Rationale</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-1</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classify 8 boxing actions in real-time at &gt;=30 FPS</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Match human defensive reaction speed; voxel temporal features depend on consistent 30fps frame intervals</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-2</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">End-to-end latency (camera to motor command) &lt;=150ms</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Matches average intermediate boxer defensive reaction time</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-3</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &gt;=90% on unseen person validation set</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Reduce false triggers and incorrect counter-punches during live sparring</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-4</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">CV + IMU sensor fusion for confirmed punch events</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Single-source detection unreliable; fusion eliminates false positives from camera noise and accidental pad contacts</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-5</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin NX 16&nbsp;GB), no cloud</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-6</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Multiple adaptive AI sparring styles with weakness tracking</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Prevent user habituation; support varied training objectives</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-7</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time coaching feedback via local LLM</td>
-            <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Personalized technique guidance without cloud dependency</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">
-        Table: Robot Intelligence Requirements and Design Considerations
-      </p>
-    </div>
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">ID</th>
+ <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirement</th>
+ <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Rationale</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-1</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classify 8 boxing actions in real-time at &gt;=30 FPS</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Match human defensive reaction speed; voxel temporal features depend on consistent 30fps frame intervals</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-2</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">End-to-end latency (camera to motor command) &lt;=150ms</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Matches average intermediate boxer defensive reaction time</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-3</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &gt;=90% on unseen person validation set</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Reduce false triggers and incorrect counter-punches during live sparring</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-4</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">CV + IMU sensor fusion for confirmed punch events</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Single-source detection unreliable; fusion eliminates false positives from camera noise and accidental pad contacts</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-5</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin NX 16&nbsp;GB), no cloud</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-6</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Multiple adaptive AI sparring styles with weakness tracking</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Prevent user habituation; support varied training objectives</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-7</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time coaching feedback via local LLM</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Personalized technique guidance without cloud dependency</td>
+ </tr>
+ </tbody>
+ </table>
+ <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">
+ Table: Robot Intelligence Requirements and Design Considerations
+ </p>
+ </div>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- 5.3.2 SYSTEM ARCHITECTURE -->
-    <div id="system-architecture">
-      <h3>System Architecture</h3>
+ <!-- 5.3.2 SYSTEM ARCHITECTURE -->
+ <div id="system-architecture">
+ <h3>System Architecture</h3>
 
-      <p style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
-        This subsystem follows the same <strong>V&#8209;Model</strong> framework documented in
-        <a href="robot-mechanism.html">Section&nbsp;5.2's System Design Narrative</a>: requirements
-        RI&#8209;1 to RI&#8209;7 decompose into the subsystems in 5.3.1&ndash;5.3.3 and close back
-        into verification in <a href="robot-intelligence-testing.html">5.3.4</a>.
-      </p>
+ <p style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+ This subsystem follows the same <strong>V&#8209;Model</strong> framework documented in
+ <a href="robot-mechanism.html">Section&nbsp;5.2's System Design Narrative</a>: requirements
+ RI&#8209;1 to RI&#8209;7 decompose into the subsystems in 5.3.1&ndash;5.3.3 and close back
+ into verification in <a href="robot-intelligence-testing.html">5.3.4</a>.
+ </p>
 
-      <p>
-        The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
-        (Robot Operating System 2) &mdash; an industry-standard framework for building robotics
-        software as a network of independent, communicating processes called nodes. ROS 2 was
-        chosen because it provides reliable real-time messaging between components, allows each
-        subsystem (CV, fusion, sparring, LLM) to be developed and tested independently, and is
-        the standard for robotics projects requiring sensor integration and motor control.
-      </p>
-      <p>
-        The system consists of 10 ROS 2 nodes communicating via 21 custom message types and
-        6 services. Every confirmed punch flows through four stages from camera to robot
-        behaviour:
-      </p>
+ <p>
+ The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
+ (Robot Operating System 2), an industry-standard framework for building robotics
+ software as a network of independent, communicating processes called nodes. ROS 2 was
+ chosen because it provides reliable real-time messaging between components, allows each
+ subsystem (CV, fusion, sparring, LLM) to be developed and tested independently, and is
+ the standard for robotics projects requiring sensor integration and motor control.
+ </p>
+ <p>
+ The system consists of 10 ROS 2 nodes communicating via 21 custom message types and
+ 6 services. Every confirmed punch flows through four stages from camera to robot
+ behaviour:
+ </p>
 
-      <svg class="zoomable" viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
-        <defs>
-          <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
-          </marker>
-        </defs>
+ <svg class="zoomable" viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+ <defs>
+ <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+ <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+ </marker>
+ </defs>
 
-        <!-- Stage 1: Capture -->
-        <rect x="20" y="50" width="200" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.8"/>
-        <text x="120" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#0d47a1" letter-spacing="0.6">CAPTURE</text>
-        <text x="120" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#0d47a1">RealSense D435i</text>
-        <text x="120" y="100" text-anchor="middle" font-size="10" fill="#0d47a1">RGB + depth</text>
-        <text x="120" y="116" text-anchor="middle" font-size="10" fill="#0d47a1">848&times;480 @ 30 fps</text>
-        <text x="120" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#1565c0">camera_node</text>
+ <!-- Stage 1: Capture -->
+ <rect x="20" y="50" width="200" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.8"/>
+ <text x="120" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#0d47a1" letter-spacing="0.6">CAPTURE</text>
+ <text x="120" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#0d47a1">RealSense D435i</text>
+ <text x="120" y="100" text-anchor="middle" font-size="10" fill="#0d47a1">RGB + depth</text>
+ <text x="120" y="116" text-anchor="middle" font-size="10" fill="#0d47a1">848&times;480 @ 30 fps</text>
+ <text x="120" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#1565c0">camera_node</text>
 
-        <line x1="225" y1="100" x2="248" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+ <line x1="225" y1="100" x2="248" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
 
-        <!-- Stage 2: Perception -->
-        <rect x="252" y="50" width="220" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.8"/>
-        <text x="362" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1b5e20" letter-spacing="0.6">PERCEPTION</text>
-        <text x="362" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">YOLO pose</text>
-        <text x="362" y="91" text-anchor="middle" font-size="10" fill="#1b5e20">+ 3D voxel motion</text>
-        <text x="362" y="111" text-anchor="middle" font-size="10" fill="#1b5e20">&rarr; 8-class action</text>
-        <text x="362" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#2e7d32">cv_node</text>
+ <!-- Stage 2: Perception -->
+ <rect x="252" y="50" width="220" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.8"/>
+ <text x="362" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1b5e20" letter-spacing="0.6">PERCEPTION</text>
+ <text x="362" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">YOLO pose</text>
+ <text x="362" y="91" text-anchor="middle" font-size="10" fill="#1b5e20">+ 3D voxel motion</text>
+ <text x="362" y="111" text-anchor="middle" font-size="10" fill="#1b5e20">&rarr; 8-class action</text>
+ <text x="362" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#2e7d32"><code>cv_node</code></text>
 
-        <line x1="477" y1="100" x2="500" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+ <line x1="477" y1="100" x2="500" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
 
-        <!-- Stage 3: Fusion -->
-        <rect x="504" y="50" width="220" height="100" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.8"/>
-        <text x="614" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#bf360c" letter-spacing="0.6">FUSION</text>
-        <text x="614" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#bf360c">CV &harr; IMU match</text>
-        <text x="614" y="91" text-anchor="middle" font-size="10" fill="#bf360c">&plusmn;500 ms window</text>
-        <text x="614" y="111" text-anchor="middle" font-size="10" fill="#bf360c">+ pad constraints</text>
-        <text x="614" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#e65100">punch_processor</text>
+ <!-- Stage 3: Fusion -->
+ <rect x="504" y="50" width="220" height="100" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.8"/>
+ <text x="614" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#bf360c" letter-spacing="0.6">FUSION</text>
+ <text x="614" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#bf360c">CV &harr; IMU match</text>
+ <text x="614" y="91" text-anchor="middle" font-size="10" fill="#bf360c">&plusmn;500 ms window</text>
+ <text x="614" y="111" text-anchor="middle" font-size="10" fill="#bf360c">+ pad constraints</text>
+ <text x="614" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#e65100"><code>punch_processor</code></text>
 
-        <line x1="729" y1="100" x2="752" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+ <line x1="729" y1="100" x2="752" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
 
-        <!-- Stage 4: Downstream -->
-        <rect x="756" y="50" width="210" height="100" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.8"/>
-        <text x="861" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#4a148c" letter-spacing="0.6">DOWNSTREAM</text>
-        <text x="861" y="71" text-anchor="middle" font-size="10" fill="#4a148c">Session &middot; Drills</text>
-        <text x="861" y="86" text-anchor="middle" font-size="10" fill="#4a148c">Sparring AI</text>
-        <text x="861" y="101" text-anchor="middle" font-size="10" fill="#4a148c">Analytics &middot; LLM</text>
-        <text x="861" y="116" text-anchor="middle" font-size="10" fill="#4a148c">Robot motors</text>
-        <text x="861" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#6a1b9a">5 nodes</text>
+ <!-- Stage 4: Downstream -->
+ <rect x="756" y="50" width="210" height="100" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.8"/>
+ <text x="861" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#4a148c" letter-spacing="0.6">DOWNSTREAM</text>
+ <text x="861" y="71" text-anchor="middle" font-size="10" fill="#4a148c">Session &middot; Drills</text>
+ <text x="861" y="86" text-anchor="middle" font-size="10" fill="#4a148c">Sparring AI</text>
+ <text x="861" y="101" text-anchor="middle" font-size="10" fill="#4a148c">Analytics &middot; LLM</text>
+ <text x="861" y="116" text-anchor="middle" font-size="10" fill="#4a148c">Robot motors</text>
+ <text x="861" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#6a1b9a">5 nodes</text>
 
-        <!-- IMU side input -->
-        <rect x="356" y="180" width="220" height="40" rx="8" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3"/>
-        <text x="466" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#555">Teensy + 6&times; MPU6050 IMUs</text>
-        <text x="466" y="210" text-anchor="middle" font-size="9" font-style="italic" fill="#777">imu_node &mdash; pad &amp; arm impacts</text>
+ <!-- IMU side input -->
+ <rect x="356" y="180" width="220" height="40" rx="8" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3"/>
+ <text x="466" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#555">Teensy + 6&times; MPU6050 IMUs</text>
+ <text x="466" y="210" text-anchor="middle" font-size="9" font-style="italic" fill="#777"><code>imu_node</code>, pad &amp; arm impacts</text>
 
-        <line x1="466" y1="180" x2="540" y2="155" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dataArr)"/>
-      </svg>
+ <line x1="466" y1="180" x2="540" y2="155" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dataArr)"/>
+ </svg>
 
-      <p>
-        Zooming out, the full ROS 2 node graph below shows every node, every custom topic,
-        and every service in the system &mdash; including the side branches (analytics,
-        drill manager, gesture node, robot control) that the 4-stage flow above abstracts
-        away.
-      </p>
+ <p>
+ Zooming out, the full ROS 2 node graph below shows every node, every custom topic,
+ and every service in the system, including the side branches (analytics,
+ drill manager, gesture node, robot control) that the 4-stage flow above abstracts
+ away.
+ </p>
 
-      <image-component
-          tag="image"
-          source="../assets/robot_intelligence/ros/node_graph.svg"
-          subtitle="Figure: BoxBunny ROS 2 System Node Graph — 10 nodes, 40+ topics, 6 services">
-      </image-component>
+ <image-component
+ tag="image"
+ source="../assets/robot_intelligence/ros/node_graph.svg"
+ subtitle="Figure: BoxBunny ROS 2 System Node Graph, 10 nodes, 40+ topics, 6 services">
+ </image-component>
 
-      <h4 style="margin-top:28px;">Session State Machine</h4>
+ <h4 style="margin-top:28px;">Session State Machine</h4>
 
-      <p>
-        The session lifecycle is managed by a 5-state machine. Each state transition triggers
-        coordinated side effects across all nodes &mdash; for example, the CV frame rate scales
-        from ~6 fps (idle) to 30 fps (active), and data collection only runs during active
-        rounds. The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
-        (techniques, sparring, free, performance tests) sharing the same state machine shown
-        below.
-      </p>
+ <p>
+ The session lifecycle is managed by a 5-state machine. Each state transition triggers
+ coordinated side effects across all nodes, for example, the CV frame rate scales
+ from ~6 fps (idle) to 30 fps (active), and data collection only runs during active
+ rounds. The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
+ (techniques, sparring, free, performance tests) sharing the same state machine shown
+ below.
+ </p>
 
-      <image-component
-          tag="image"
-          source="../assets/robot_intelligence/ros/session_state_machine.svg"
-          subtitle="Figure: BoxBunny Session State Machine — 5 states coordinating all node behaviour">
-      </image-component>
-    </div>
+ <image-component
+ tag="image"
+ source="../assets/robot_intelligence/ros/session_state_machine.svg"
+ subtitle="Figure: BoxBunny Session State Machine, 5 states coordinating all node behaviour">
+ </image-component>
+ </div>
 
-    <sl-divider></sl-divider>
+ <sl-divider></sl-divider>
 
-    <!-- NAVIGATION CARDS -->
-    <div id="subsections">
-      <h3>Subsections</h3>
-      <div class="section-nav-grid">
-        <a class="section-nav-card" href="robot-intelligence-cv.html">
-          <sl-icon name="camera-video" style="font-size:1.6rem;"></sl-icon>
-          <h3>CV & Action Prediction</h3>
-          <p>96.8% fusion model, 9-iteration journey</p>
-        </a>
-        <a class="section-nav-card" href="robot-intelligence-integration.html">
-          <sl-icon name="cpu" style="font-size:1.6rem;"></sl-icon>
-          <h3>Intelligent Behaviour &amp; Control</h3>
-          <p>Sensor fusion, sparring AI, LLM coaching</p>
-        </a>
-        <a class="section-nav-card" href="robot-intelligence-software.html">
-          <sl-icon name="bar-chart-line" style="font-size:1.6rem;"></sl-icon>
-          <h3>Dashboard &amp; Analytics</h3>
-          <p>Phone dashboard, performance insights</p>
-        </a>
-      </div>
-      <div class="section-nav-full">
-        <a class="section-nav-card" href="robot-intelligence-testing.html">
-          <sl-icon name="clipboard-check" style="font-size:1.6rem;"></sl-icon>
-          <div>
-            <h3>Testing &amp; Validation</h3>
-            <p>CDE Fair deployment, 146 automated tests, model interpretability analysis</p>
-          </div>
-        </a>
-      </div>
+ <!-- NAVIGATION CARDS -->
+ <div id="subsections">
+ <h3>Subsections</h3>
+ <div class="section-nav-grid">
+ <a class="section-nav-card" href="robot-intelligence-cv.html">
+ <sl-icon name="camera-video" style="font-size:1.6rem;"></sl-icon>
+ <h3>CV & Action Prediction</h3>
+ <p>96.8% fusion model, 9-iteration journey</p>
+ </a>
+ <a class="section-nav-card" href="robot-intelligence-integration.html">
+ <sl-icon name="cpu" style="font-size:1.6rem;"></sl-icon>
+ <h3>Intelligent Behaviour &amp; Control</h3>
+ <p>Sensor fusion, sparring AI, LLM coaching</p>
+ </a>
+ <a class="section-nav-card" href="robot-intelligence-software.html">
+ <sl-icon name="bar-chart-line" style="font-size:1.6rem;"></sl-icon>
+ <h3>Dashboard &amp; Analytics</h3>
+ <p>Phone dashboard, performance insights</p>
+ </a>
+ </div>
+ <div class="section-nav-full">
+ <a class="section-nav-card" href="robot-intelligence-testing.html">
+ <sl-icon name="clipboard-check" style="font-size:1.6rem;"></sl-icon>
+ <div>
+ <h3>Testing &amp; Validation</h3>
+ <p>CDE Fair deployment, 146 automated tests, model interpretability analysis</p>
+ </div>
+ </a>
+ </div>
 
-      <div style="margin-top:20px; text-align:center;">
-        <a href="appendix-robot-intelligence.html" style="text-decoration:none;">
-          <sl-button variant="default" size="medium">
-            <sl-icon slot="prefix" name="journal-text"></sl-icon>
-            Appendix 7: Robot Intelligence
-          </sl-button>
-        </a>
-      </div>
-    </div>
+ <div style="margin-top:20px; text-align:center;">
+ <a href="appendix-robot-intelligence.html" style="text-decoration:none;">
+ <sl-button variant="default" size="medium">
+ <sl-icon slot="prefix" name="journal-text"></sl-icon>
+ Appendix 7: Robot Intelligence
+ </sl-button>
+ </a>
+ </div>
+ </div>
 
-  </div>
+ </div>
 
-  <!-- SCROLL TO TOP -->
-  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
-    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
-  </sl-button>
+ <!-- SCROLL TO TOP -->
+ <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+ <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+ </sl-button>
 </body>
 </html>
