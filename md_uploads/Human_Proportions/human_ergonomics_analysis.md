@@ -122,6 +122,8 @@ All landmarks expressed as a fraction of total stature **H**, measured from the 
 | Landmark | Male | Female | Source | Basis |
 |---|---|---|---|---|
 | **Head pad centre** | 0.935H | 0.935H | Drillis & Contini (1966) | Mid-ear; midpoint between crown and chin |
+| **Shoulder (acromion)** | 0.818H | 0.818H | Drillis & Contini (1966) | Bony surface tip of shoulder — used as skeletal anchor only |
+| **Glenohumeral (GH) joint centre** | 0.818H − 3.0 cm | 0.818H − 3.0 cm | D&C acromion + clinical biomechanics offset | Arm pivot point; ~3 cm inferior-medial to acromion (cadaveric / imaging studies) |
 | **Solar plexus pad centre** | 0.590H | 0.582H | D&C (1966) + ANSUR II sex correction | ~3 cm below xiphoid; epigastric centre |
 | **Xiphoid process** | 0.618H | 0.618H | Drillis & Contini (1966) | Skeletal surface landmark; costal arch apex |
 | **Liver pad centre** | 0.618H − 3 + 6.1 cm | 0.618H − 3 + 5.85 cm | D&C anchor + Malaysian liver span | Right costal margin + half liver span (SEA data) |
@@ -131,14 +133,14 @@ All landmarks expressed as a fraction of total stature **H**, measured from the 
 
 ## 5. Population Profiles — Erect Posture
 
-Absolute centre-point heights (cm). Liver via two-stage anchor method (Section 2.4).
+Absolute centre-point heights (cm). Liver via two-stage anchor method (Section 2.4). GH joint = acromion (0.818H) − 3.0 cm.
 
-| Profile | Stature H (cm) | Head Centre (cm) | Solar Plexus Centre (cm) | Liver Centre (cm) |
-|---|---|---|---|---|
-| **150 F** | 150 | 140.2 | 87.3 | 95.5 |
-| **150 M** | 150 | 140.2 | 88.5 | 95.8 |
-| **190 F** | 190 | 177.7 | 110.6 | 120.3 |
-| **190 M** | 190 | 177.7 | 112.1 | 120.5 |
+| Profile | Stature H (cm) | Head Centre (cm) | GH Joint Centre (cm) | Solar Plexus Centre (cm) | Liver Centre (cm) |
+|---|---|---|---|---|---|
+| **150 F** | 150 | 140.2 | 119.7 | 87.3 | 95.5 |
+| **150 M** | 150 | 140.2 | 119.7 | 88.5 | 95.8 |
+| **190 F** | 190 | 177.7 | 152.4 | 110.6 | 120.3 |
+| **190 M** | 190 | 177.7 | 152.4 | 112.1 | 120.5 |
 
 ---
 
@@ -154,12 +156,14 @@ In an active boxing stance, two distinct mechanisms lower anatomical landmarks. 
 
 Applying a flat −15 cm to all landmarks would under-count the solar plexus and liver heights. The chin tuck exclusively closes the gap between head and torso, not the torso-to-floor distance.
 
-| Profile | Head Centre — Stance (cm) | Solar Plexus Centre — Stance (cm) | Liver Centre — Stance (cm) |
-|---|---|---|---|
-| **150 F** | 125.2 | 79.3 | 87.5 |
-| **150 M** | 125.2 | 80.5 | 87.8 |
-| **190 F** | 162.7 | 102.6 | 112.3 |
-| **190 M** | 162.7 | 104.1 | 112.5 |
+| Profile | Head Centre — Stance (cm) | GH Joint Centre — Stance (cm) | Solar Plexus Centre — Stance (cm) | Liver Centre — Stance (cm) |
+|---|---|---|---|---|
+| **150 F** | 125.2 | 111.7 | 79.3 | 87.5 |
+| **150 M** | 125.2 | 111.7 | 80.5 | 87.8 |
+| **190 F** | 162.7 | 144.4 | 102.6 | 112.3 |
+| **190 M** | 162.7 | 144.4 | 104.1 | 112.5 |
+
+> **GH joint stance note:** The glenohumeral joint drops only with the body crouch (−8 cm). It is not affected by chin tuck (cervical flexion). It lies ~3 cm below the acromion surface landmark in all postures.
 
 ---
 
@@ -181,6 +185,36 @@ A consistent ratio would allow a single fixed robot design to suit all users; va
 
 ---
 
+### Ratio C — Head Centre to Glenohumeral (GH) Joint Centre
+
+The head-to-GH-joint gap reflects the neck + head height above the arm pivot in boxing stance. It is larger than the head-to-acromion gap because the GH joint sits ~3 cm below the shoulder surface.
+
+| Profile | Head Centre (cm) | GH Joint Centre (cm) | Gap C — Head to GH (cm) |
+|---|---|---|---|
+| **150 F** | 125.2 | 111.7 | **13.5** |
+| **150 M** | 125.2 | 111.7 | **13.5** |
+| **190 F** | 162.7 | 144.4 | **18.3** |
+| **190 M** | 162.7 | 144.4 | **18.3** |
+
+**Observation:** Gap C = `0.117H − 4 cm` (stance chin tuck minus the 3 cm GH offset). Ranges from **13.5 cm** (150 cm users) to **18.3 cm** (190 cm users). Mean = **15.9 cm**.
+
+---
+
+### Ratio D — Glenohumeral Joint Centre to Solar Plexus Centre
+
+This gap represents the full vertical distance from the arm pivot point to the solar plexus — key for understanding uppercut reach geometry and arm extension angle.
+
+| Profile | GH Joint Centre (cm) | Solar Plexus Centre (cm) | Gap D — GH to SP (cm) |
+|---|---|---|---|
+| **150 F** | 111.7 | 79.3 | **32.4** |
+| **150 M** | 111.7 | 80.5 | **31.2** |
+| **190 F** | 144.4 | 102.6 | **41.8** |
+| **190 M** | 144.4 | 104.1 | **40.3** |
+
+**Observation:** Gap D ranges from **31.2–32.4 cm** (150 cm users) to **40.3–41.8 cm** (190 cm users). Mean = **36.4 cm**. This is the vertical component of the arm reach envelope from pivot to solar plexus.
+
+---
+
 ### Ratio B — Solar Plexus Centre to Liver Centre
 
 This ratio validates the relative vertical offset between the two body pads.
@@ -198,20 +232,21 @@ This ratio validates the relative vertical offset between the two body pads.
 
 ## 8. Averaged Ergonomic Scale
 
-Taking the mean across all four profiles:
+Taking the mean stance-corrected centre-to-centre distances across all four profiles:
 
 | Metric | 150F | 150M | 190F | 190M | **Mean** |
 |---|---|---|---|---|---|
-| Ratio A (Head ÷ Solar Plexus) | 1.579 | 1.556 | 1.586 | 1.562 | **1.571** |
-| Gap A — Head to SP (cm) | 45.9 | 44.7 | 60.1 | 58.6 | **52.3 cm** |
-| Ratio B (Solar Plexus ÷ Liver) | 0.906 | 0.917 | 0.914 | 0.925 | **0.916** |
-| Gap B — SP to Liver (cm) | 8.2 | 7.3 | 9.7 | 8.4 | **8.4 cm** |
+| Gap A — Head to Solar Plexus (cm) | 45.9 | 44.7 | 60.1 | 58.6 | **52.3** |
+| Gap C — Head to GH joint (cm) | 13.5 | 13.5 | 18.3 | 18.3 | **15.9** |
+| Gap D — GH joint to Solar Plexus (cm) | 32.4 | 31.2 | 41.8 | 40.3 | **36.4** |
+| Gap B — Solar Plexus to Liver (cm) | 8.2 | 7.3 | 9.7 | 8.4 | **8.4** |
 
-> **Ergonomic scale targets for robot design:**
-> - The head pad centre should sit at **~1.57× the solar plexus pad centre height**
-> - The solar plexus pad centre should sit at **~0.92× the liver pad centre height**
-> - Average head–to–solar-plexus **gap = 52.3 cm** (centre-to-centre)
-> - Average solar-plexus–to–liver **gap = 8.4 cm** (centre-to-centre)
+> **Ergonomic design targets (all centre-to-centre):**
+> - Head pad centre → Solar Plexus pad centre: **52.3 cm** above
+> - Head centre → GH joint: **15.9 cm** above (stance)
+> - GH joint → Solar Plexus pad centre: **36.4 cm** above (stance)
+> - Solar Plexus pad centre → Liver pad centre: **8.4 cm** below
+> - Mean GH joint height from robot base: **128.1 cm** (anatomical reference — not a pad)
 
 ---
 
@@ -327,18 +362,21 @@ The robot pad layout targets the averaged stance-corrected height across the ful
 
 ## 12. Summary
 
-| Design Parameter | Value |
-|---|---|
-| Solar plexus pad centre from base | **91.6 cm** |
-| Liver pad centre from base (both sides) | **100.0 cm** |
-| Head pad centre from base | **143.9 cm** |
-| Head–to–solar-plexus gap (centre-to-centre) | **52.3 cm** |
-| Liver–to–solar-plexus gap (centre-to-centre) | **8.4 cm** |
-| Average forward punch reach | **54.7 cm** |
-| Ergonomic head-to-SP ratio (Ratio A) | **1.571** |
-| Ergonomic SP-to-liver ratio (Ratio B) | **0.916** |
+All values are centre-to-centre distances or heights from the robot base, in centimetres.
 
-> **Note on ratio consistency:** Ratio A varies ±0.015 across the target population — the chin tuck correction is isolated from body crouch, narrowing spread compared to a uniform correction model. Ratio B (0.906–0.925) reflects real-world SEA population liver span variability. The mean Gap B of **8.4 cm** is adopted as the design target.
+| Design Parameter | Value (cm) |
+|---|---|
+| Head pad centre from base | **143.9** |
+| Solar Plexus pad centre from base | **91.6** |
+| Liver pad centre from base (both sides) | **100.0** |
+| GH joint height from base (anatomical ref) | **128.1** |
+| Gap A — Head to Solar Plexus | **52.3** |
+| Gap B — Solar Plexus to Liver | **8.4** |
+| Gap C — Head to GH joint (stance) | **15.9** |
+| Gap D — GH joint to Solar Plexus (stance) | **36.4** |
+| Average forward punch reach | **54.7** |
+
+> **Population range note:** All gaps are mean values across the 150–190 cm target population. Gap A varies 44.7–60.1 cm; Gap C varies 13.5–18.3 cm; Gap D varies 31.2–41.8 cm; Gap B varies 7.3–9.7 cm. The ±2–3 cm positional uncertainty on the liver pad (from mixed-ethnicity methodology) is within the 9 cm pad half-height tolerance.
 
 ---
 
