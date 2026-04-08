@@ -1,986 +1,1067 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IS-431: 5.3.2 Intelligent Behaviour & Control</title>
-  <link rel="icon" href="../favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
-  <link rel="stylesheet" href="../index.css">
-  <script type="module" src="../components/image/image-component.js"></script>
-  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
-  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
-  <script src="../components/report-nav/report-nav.js" defer></script>
-  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
-  <style>
-    .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>IS-431: 5.3.2 Intelligent Behaviour & Control</title>
+ <link rel="icon" href="../favicon.ico" type="image/x-icon">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+ <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+ <link rel="stylesheet" href="../index.css">
+ <script type="module" src="../components/image/image-component.js"></script>
+ <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+ <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+ <script src="../components/report-nav/report-nav.js" defer></script>
+ <script src="../components/svg-zoom/svg-zoom.js" defer></script>
+ <style>
+    /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
+    code {
+      background: #f0f4f8;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.88em;
+      color: #1a7f37;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
 
-    /* Subtle separation between H3 sub-topics under each H2 numbered section */
-    .content h3 {
-      margin-top: 36px;
-      padding-top: 18px;
-      border-top: 1px solid #ececec;
-    }
-    .content h2 + h3,
-    .content > div > h3:first-of-type {
-      margin-top: 16px;
-      padding-top: 0;
-      border-top: none;
-    }
+ .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
 
-    /* Strong visual break between MAIN sections (5.3.2.1, 5.3.2.2, ...) */
-    .content sl-divider {
-      --width: 3px;
-      --color: #2e7d32;
-      margin: 56px 0 36px !important;
-      border-radius: 2px;
-    }
-    /* Bigger, bolder H2 main-section headings */
-    .content > h2,
-    .content > div > h2 {
-      font-size: 1.7rem !important;
-      color: #1b5e20 !important;
-      letter-spacing: -0.3px;
-    }
-    /* Tag the H2 wrapper divs (the ones containing an H2 + badge) with extra top padding */
-    .content > div:has(> h2) {
-      padding-top: 4px;
-    }
-  </style>
+ /* Subtle separation between H3 sub-topics under each H2 numbered section */
+ .content h3 {
+ margin-top: 36px;
+ padding-top: 18px;
+ border-top: 1px solid #ececec;
+ }
+ .content h2 + h3,
+ .content > div > h3:first-of-type {
+ margin-top: 16px;
+ padding-top: 0;
+ border-top: none;
+ }
+
+ /* Strong visual break between MAIN sections (5.3.2.1, 5.3.2.2, ...) */
+ .content sl-divider {
+ --width: 3px;
+ --color: #2e7d32;
+ margin: 56px 0 36px !important;
+ border-radius: 2px;
+ }
+ /* Bigger, bolder H2 main-section headings */
+ .content > h2,
+ .content > div > h2 {
+ font-size: 1.7rem !important;
+ color: #1b5e20 !important;
+ letter-spacing: -0.3px;
+ }
+ /* Tag the H2 wrapper divs (the ones containing an H2 + badge) with extra top padding */
+ .content > div:has(> h2) {
+ padding-top: 4px;
+ }
+ </style>
 </head>
 <body>
-  <div class="content">
-    <a href="robot-intelligence.html" class="back-btn">
-      <sl-button variant="default" size="medium">
-        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-        Back to Robot Intelligence
-      </sl-button>
-    </a>
-    <br>
-
-    <!-- 5.3.4 INTRO -->
-    <h2>5.3.2 Intelligent Behaviour & Control</h2>
-
-    <p>
-      All intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on the Jetson,
-      communicating via custom message types and services. Each subsection below corresponds to
-      one or more ROS nodes that handle a specific aspect of the system &mdash; from fusing sensor
-      data to generating AI coaching tips. Together they form the decision-making layer between
-      the CV perception pipeline (<a href="robot-intelligence-cv.html">Section 5.3.1</a>) and the
-      dashboard and analytics layer (<a href="robot-intelligence-software.html">Section 5.3.3</a>).
-    </p>
-
-    <sl-divider></sl-divider>
-
-    <!-- 5.3.2.1 CV + IMU SENSOR FUSION -->
-    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <h2 style="margin:0;">5.3.2.1 CV + IMU Sensor Fusion</h2>
-      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-4</sl-badge>
-    </div>
-
-    <p>
-      The CV model on its own says <em>"the user just threw a left hook"</em>. The IMU pad on its
-      own says <em>"something hit me hard"</em>. Neither is enough &mdash; CV can hallucinate
-      punches into thin air, and the IMU can't tell a hook from a cross. The
-      <strong>punch_processor</strong> node fuses the two into <em>confirmed</em> punch events
-      using three layers of logic: temporal matching, biomechanical filtering, and graceful
-      fallback when one sensor fails.
-    </p>
-
-    <h3>1. Temporal matching &mdash; lining up CV and IMU in time</h3>
-    <p>
-      When an IMU pad impact exceeds 5.0&nbsp;m/s&sup2; (after gravity calibration), the node
-      queries the CV prediction ring buffer within a <strong>&plusmn;500&nbsp;ms</strong>
-      window centred on the impact timestamp. Frame-count voting selects the dominant
-      prediction type within that window, and the result is emitted as a confirmed punch
-      carrying both the CV confidence and the IMU force.
-    </p>
-
-    <h3>2. Pad-constraint filtering &mdash; rejecting biomechanically impossible matches</h3>
-    <p>
-      Even with a clean temporal match, some CV predictions are physically impossible &mdash;
-      a left hook cannot land on the right pad. Each pad therefore only accepts the punch
-      types that could biomechanically reach it:
-    </p>
-    <ul>
-      <li><strong>Centre pad</strong> &mdash; jab and cross only</li>
-      <li><strong>Left pad</strong> &mdash; left hook and left uppercut only</li>
-      <li><strong>Right pad</strong> &mdash; right hook and right uppercut only</li>
-      <li><strong>Head pad</strong> &mdash; any punch type</li>
-    </ul>
-    <p>
-      If the primary CV prediction violates this constraint, secondary predictions are checked
-      against the same rules with a minimum confidence threshold of 0.25 &mdash; this is what
-      catches the model's retraction-phase wobble that
-      <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a> refers to.
-    </p>
-
-    <h3>3. Fallbacks &mdash; graceful degradation when one sensor fails</h3>
-    <p>
-      Both layers above assume CV and IMU are both producing usable data. When one of them
-      fails &mdash; the camera obscured, a pad disconnected &mdash; the node still emits a
-      best-effort punch event so downstream nodes never starve:
-    </p>
-    <ul>
-      <li><strong>CV-only mode:</strong> &ge;3 consecutive frames at &ge;0.6 confidence, emitted with a 0.3 penalty</li>
-      <li><strong>IMU-only mode:</strong> default 0.3 confidence, punch type inferred from pad location</li>
-    </ul>
-
-    <p>
-      The pipeline diagram below ties everything together &mdash; CV predictions and IMU pad
-      impacts both flow into the <code>punch_processor</code>'s ring buffer, get matched
-      within the &plusmn;500&nbsp;ms window, pass through the pad-constraint filter, and finally
-      emerge as a confirmed punch event published to the rest of the system.
-    </p>
-
-    <image-component tag="image" source="../assets/robot_intelligence/ros/fusion_pipeline.svg" subtitle="Figure: CV + IMU Sensor Fusion Pipeline"></image-component>
-
-    <sl-divider></sl-divider>
-
-    <!-- 5.3.2.2 REAL-TIME INFERENCE PIPELINE -->
-    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <h2 style="margin:0;">5.3.2.2 Real-Time Inference Pipeline</h2>
-      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-5</sl-badge>
-    </div>
-
-    <p>
-      Getting the action model from <em>"works on a recorded clip"</em> to <em>"works live
-      on the robot"</em> required four things in sequence: a frame rate the model could
-      trust, enough per-frame compute to actually hit it, output that didn't flicker between
-      classes, and a resource budget that left room for the LLM coach to run on the same GPU.
-      Each subsection below tackles one of those four problems, in order.
-    </p>
-
-    <h3>1. Frame rate &mdash; why 30fps matters</h3>
-    <p>
-      The action prediction model was trained on features extracted at a consistent 30fps. Its voxel
-      temporal deltas use 2-frame (67ms) and 8-frame (267ms) lookbacks &mdash; if the actual frame rate
-      drops below 30fps, these deltas span different real-world time intervals than what the model
-      learned, causing the model to misclassify punches. In other words, <strong>the action model's
-      accuracy is directly tied to maintaining 30fps</strong> &mdash; even a small drop degrades
-      predictions significantly.
-    </p>
-
-    <h3>2. Per-frame compute &mdash; the YOLO bottleneck</h3>
-    <p>
-      Knowing 30fps was non-negotiable, the next question was whether the pipeline could
-      actually hit it on the Jetson. The answer at first was no &mdash; and the bottleneck
-      was a single component:
-    </p>
-
-    <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
-      <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">YOLO bottleneck on the Jetson</div>
-      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
-        <span style="font-weight:600; color:#bf360c;">Problem:</span>
-        the single biggest deployment challenge was YOLO Pose. In its default PyTorch
-        (<code>.pt</code>) format, YOLO alone consumed most of the 33&nbsp;ms per-frame
-        budget, dragging the whole pipeline below 30&nbsp;fps. Since YOLO provides the pose
-        features the action model depends on, this meant the action model was being fed
-        features at inconsistent, lower frame rates &mdash; accurate offline, broken live.
-      </p>
-      <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
-        <span style="font-weight:600; color:#1b5e20;">Fix:</span>
-        convert YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format,
-        FP16 precision &mdash; half-precision 16-bit floats, which run roughly twice as
-        fast on GPU as the default 32-bit format with negligible accuracy loss). TensorRT
-        optimises the computation graph for the Jetson's GPU, fusing operations and
-        eliminating overhead. This brought YOLO inference down from
-        ~33&nbsp;ms to <strong>~16&nbsp;ms</strong>, comfortably under the frame budget.
-      </p>
-      <p style="margin:0;">
-        <span style="font-weight:600; color:#555;">Result:</span>
-        the action model became accurate and reliable in live deployment immediately
-        &mdash; confirming the accuracy issue was never the model, only the frame rate
-        feeding it.
-      </p>
-    </div>
-
-    <div style="border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin:22px 0; background:#fff;">
-    <h4 style="margin-top:0;">Why does this speedup matter?</h4>
-    <p>
-      Both models run <strong>in series every frame</strong> &mdash; YOLO extracts the pose
-      features the action model immediately consumes, and together they have to fit inside
-      the <strong>33&nbsp;ms frame budget</strong> to hold 30&nbsp;fps. Because the action
-      model is small (~1.75M parameters) and was already running at ~8&nbsp;ms, the entire
-      budget effectively came down to <strong>how fast YOLO could run</strong>. That makes
-      the TensorRT speedup the deciding factor between a pipeline that holds 30&nbsp;fps and
-      one that doesn't.
-    </p>
-
-    <svg class="zoomable" viewBox="0 0 1180 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1180px; margin:18px auto; display:block; font-family:system-ui,sans-serif;">
-      <defs>
-        <marker id="trtArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
-        </marker>
-      </defs>
-
-      <text x="20" y="32" font-size="15" font-weight="700" fill="#1565c0" letter-spacing="0.5">YOLO POSE CONVERSION</text>
-      <text x="20" y="54" font-size="13" fill="#666">Ultralytics ships native TensorRT export &mdash; one-shot conversion, no intermediate file needed</text>
-
-      <!-- Box 1: .pt -->
-      <rect x="20" y="80" width="240" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
-      <text x="140" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#0d47a1">yolo26n-pose.pt</text>
-      <text x="140" y="148" text-anchor="middle" font-size="13" fill="#0d47a1">Ultralytics weights</text>
-
-      <!-- Long arrow with command well above -->
-      <text x="484" y="118" text-anchor="middle" font-size="13" font-family="ui-monospace,monospace" fill="#475569">model.export(format="engine", half=True)</text>
-      <line x1="266" y1="138" x2="702" y2="138" stroke="#555" stroke-width="2.5" marker-end="url(#trtArr)"/>
-
-      <!-- Box 2: .engine -->
-      <rect x="708" y="80" width="240" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
-      <text x="828" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#1b5e20">yolo26n-pose.engine</text>
-      <text x="828" y="148" text-anchor="middle" font-size="13" fill="#1b5e20">TensorRT FP16 engine</text>
-
-      <!-- Latency comparison for YOLO -->
-      <rect x="965" y="80" width="200" height="100" rx="10" fill="#fafafa" stroke="#d0d7de" stroke-width="1.5"/>
-      <text x="1065" y="103" text-anchor="middle" font-size="10" font-weight="700" fill="#94a3b8" letter-spacing="0.7">INFERENCE LATENCY</text>
-      <text x="1065" y="138" text-anchor="middle" font-size="18" font-weight="700">
-        <tspan fill="#94a3b8">~33 ms</tspan><tspan fill="#475569" dx="6" dy="0">&rarr;</tspan><tspan fill="#16a34a" dx="6">~16 ms</tspan>
-      </text>
-      <text x="1065" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#16a34a">2&times; faster</text>
-    </svg>
-
-    <p style="font-size:0.92rem; color:#444;">
-      The chart below shows how that single conversion turns a frame that <em>missed</em> the
-      33&nbsp;ms budget into one that <em>fits</em> with headroom to spare:
-    </p>
-
-    <svg class="zoomable" viewBox="0 0 1000 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
-      <!-- Title -->
-      <text x="60" y="32" font-size="13" font-weight="700" fill="#0f172a">Per-frame inference budget &mdash; 33&nbsp;ms ceiling for 30&nbsp;fps</text>
-
-      <!-- Budget ceiling line -->
-      <line x1="654" y1="50" x2="654" y2="230" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4"/>
-      <rect x="610" y="48" width="88" height="20" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.2"/>
-      <text x="654" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="#b91c1c">33 ms ceiling</text>
-
-      <!-- ===== BEFORE row ===== -->
-      <text x="50" y="105" text-anchor="end" font-size="12" font-weight="700" fill="#475569">BEFORE</text>
-      <text x="50" y="120" text-anchor="end" font-size="10" fill="#94a3b8">PyTorch</text>
-
-      <!-- YOLO segment -->
-      <rect x="60" y="92" width="594" height="38" rx="4" fill="#fca5a5" stroke="#dc2626" stroke-width="1.5"/>
-      <text x="357" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">YOLO ~33 ms</text>
-
-      <!-- Action segment -->
-      <rect x="654" y="92" width="144" height="38" rx="4" fill="#fecaca" stroke="#dc2626" stroke-width="1.5"/>
-      <text x="726" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#7f1d1d">Action ~8 ms</text>
-
-      <text x="820" y="116" font-size="13" font-weight="700" fill="#dc2626">~41 ms &nbsp;&#x2715; misses 30&nbsp;fps</text>
-
-      <!-- ===== AFTER row ===== -->
-      <text x="50" y="180" text-anchor="end" font-size="12" font-weight="700" fill="#475569">AFTER</text>
-      <text x="50" y="195" text-anchor="end" font-size="10" fill="#94a3b8">TensorRT FP16</text>
-
-      <!-- YOLO segment -->
-      <rect x="60" y="167" width="288" height="38" rx="4" fill="#86efac" stroke="#16a34a" stroke-width="1.5"/>
-      <text x="204" y="191" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d">YOLO ~16 ms</text>
-
-      <!-- Action segment -->
-      <rect x="348" y="167" width="144" height="38" rx="4" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.5"/>
-      <text x="420" y="191" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">Action ~8 ms</text>
-
-      <!-- Headroom region -->
-      <rect x="492" y="167" width="162" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3,3"/>
-      <text x="573" y="191" text-anchor="middle" font-size="10" font-style="italic" fill="#94a3b8">~9 ms headroom</text>
-
-      <text x="820" y="191" font-size="13" font-weight="700" fill="#16a34a">~24 ms &nbsp;&#x2713; fits 30&nbsp;fps</text>
-
-      <!-- Footnote -->
-      <text x="60" y="248" font-size="11" fill="#666">Action model is in series with YOLO &mdash; it consumes YOLO's pose output every frame, so any time YOLO spends</text>
-      <text x="60" y="263" font-size="11" fill="#666">over budget directly drags the action model below 30&nbsp;fps. The TensorRT speedup is what makes the whole pipeline real-time.</text>
-    </svg>
-    </div>
-
-    <div style="border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin:22px 0; background:#fff;">
-    <h4 style="margin-top:0;">What does TensorRT actually do?</h4>
-    <p>
-      Conversion is more than a file rename. When TensorRT compiles a model for a specific
-      Jetson, it does four things:
-    </p>
-
-    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Layer fusion</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">Adjacent operations (e.g. conv&nbsp;+&nbsp;bias&nbsp;+&nbsp;ReLU) are fused into a single GPU kernel, eliminating intermediate memory writes.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Kernel autotuning</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">For each fused operation, TensorRT benchmarks several CUDA implementations on the actual hardware and picks the fastest one.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">FP16 quantisation</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">Every weight is converted from 32-bit to 16-bit floating point &mdash; halving the memory bandwidth with negligible accuracy loss.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Engine serialisation</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">The optimised plan is serialised to a single binary file that loads in milliseconds &mdash; no recompilation on subsequent runs.</div>
-      </div>
-    </div>
-
-    <p style="font-size:0.92rem; color:#444;">
-      The result is the <em>same model mathematically</em> running with roughly half the
-      memory bandwidth and a fraction of the kernel launch overhead &mdash; exactly what the
-      inference pipeline needed to sustain 30&nbsp;fps.
-    </p>
-    </div>
-
-    <h4 style="margin-top:24px;">Three more compute-side issues</h4>
-    <p style="font-size:0.94rem; color:#444;">
-      The TensorRT speedup got the per-frame budget under control, but three secondary
-      issues stood between offline accuracy and live performance:
-    </p>
-
-    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;">
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">Sequential processing</div>
-        <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> voxel extraction and YOLO ran one after the other, doubling per-frame time.</div>
-        <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> parallelised into separate worker threads, running concurrently.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">Buffer discontinuities</div>
-        <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> dropped frames created gaps in the temporal window the model relied on.</div>
-        <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> rolling FIFO feature buffer with strict frame ordering.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">FPS mismatch</div>
-        <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> trained at a steady 30 fps but the live pipeline ran at variable rates.</div>
-        <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> TensorRT optimisation of both models gave consistent throughput.</div>
-      </div>
-    </div>
-
-    <h4 style="margin-top:24px;">Final per-frame budget</h4>
-    <p style="font-size:0.94rem; color:#444;">
-      With the TensorRT speedup and the three compute fixes in place, here is what a single
-      frame actually costs end-to-end:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Component</th>
-          <th style="padding:8px; border:1px solid #ddd;">Latency</th>
-          <th style="padding:8px; border:1px solid #ddd;">Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
-          <td style="padding:8px; border:1px solid #ddd;">~16ms</td>
-          <td style="padding:8px; border:1px solid #ddd;">On GPU, single frame</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Depth &rarr; voxel extraction</td>
-          <td style="padding:8px; border:1px solid #ddd;">~10ms</td>
-          <td style="padding:8px; border:1px solid #ddd;">Background subtraction + voxelisation</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">YOLO + voxel in parallel</td>
-          <td style="padding:8px; border:1px solid #ddd;">~16ms</td>
-          <td style="padding:8px; border:1px solid #ddd;">Separate threads, limited by slower</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Model forward pass</td>
-          <td style="padding:8px; border:1px solid #ddd;">~8ms</td>
-          <td style="padding:8px; border:1px solid #ddd;">~1.75M params, d=192</td>
-        </tr>
-        <tr style="font-weight:bold;">
-          <td style="padding:8px; border:1px solid #ddd;">Total per frame</td>
-          <td style="padding:8px; border:1px solid #ddd;">~24ms</td>
-          <td style="padding:8px; border:1px solid #ddd;">42fps theoretical, 30fps practical</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p style="font-size:0.92rem; color:#444;">
-      The 24ms-per-frame inference budget is the CV pipeline only. The full <strong>end-to-end latency
-      from camera capture to motor command is ~120ms</strong> &mdash; the remaining ~96ms covers
-      RealSense capture buffering, ROS 2 message passing through <code>punch_processor</code>,
-      the &plusmn;500ms fusion window's earliest-match logic, and the motor command queue.
-      This is verified against requirement RI&#8209;2 (&le;150ms) in
-      <a href="robot-intelligence-testing.html">5.3.4.7</a>.
-    </p>
-
-    <h3>3. Output stability &mdash; cleaning up noisy predictions</h3>
-    <p>
-      A stable 30fps gets the model the inputs it expects, but the <em>outputs</em> still
-      need work. Even on perfectly clean frames, the model's per-frame top class can
-      flicker between two similar punches for a few frames at a time. Publishing every
-      raw prediction would generate spurious events, so three filtering stages stand
-      between the model and the rest of the system:
-    </p>
-    <dl style="margin:12px 0; line-height:1.55;">
-      <dt style="font-weight:600; color:#1565c0;">EMA smoothing &mdash; <span style="font-weight:400; color:#555;">&alpha; = 0.35</span></dt>
-      <dd style="margin:2px 0 10px 18px;">An exponential moving average over per-class confidences damps out frame-to-frame jitter so a single noisy frame can't flip the prediction.</dd>
-
-      <dt style="font-weight:600; color:#1565c0;">Hysteresis gate &mdash; <span style="font-weight:400; color:#555;">12% confidence margin</span></dt>
-      <dd style="margin:2px 0 10px 18px;">The new top class must beat the current top class by 12% confidence before the prediction is allowed to switch &mdash; this prevents two close classes from oscillating.</dd>
-
-      <dt style="font-weight:600; color:#1565c0;">State machine &mdash; <span style="font-weight:400; color:#555;">2 frames to enter, 3 to hold, &ge;0.78 sustain (block: 4)</span></dt>
-      <dd style="margin:2px 0 0 18px;">A class must hold for at least 2 frames at &ge;0.78 confidence before it is committed, and 3 more frames to stay committed. Block requires 4 consecutive frames because of its biomechanical similarity to uppercut onset.</dd>
-    </dl>
-
-    <h3>4. Resource sharing &mdash; coexisting with the LLM</h3>
-    <p>
-      Frame rate, compute, and output stability all assume the CV pipeline owns the GPU.
-      In practice it shares the Jetson with the LLM coach, the touchscreen GUI, and the
-      ROS messaging layer. Two mechanisms keep them out of each other's way:
-    </p>
-
-    <p>
-      <strong>Adaptive frame rate.</strong> The <code>cv_node</code> runs at the full
-      30&nbsp;fps only during <em>active</em> training sessions. Outside of active rounds
-      &mdash; idle, countdown, rest periods &mdash; it drops to ~6&nbsp;fps, freeing the
-      GPU for LLM inference exactly when the user is reading a coaching tip rather than
-      throwing punches.
-    </p>
-
-    <p>
-      <strong>Static memory budget.</strong> Every model that runs on the Jetson has a
-      known memory footprint. The combined budget below has been measured under live load:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Component</th>
-          <th style="padding:8px; border:1px solid #ddd;">Memory</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Action model (TensorRT)</td>
-          <td style="padding:8px; border:1px solid #ddd;">~200MB</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
-          <td style="padding:8px; border:1px solid #ddd;">~150MB</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Qwen2.5-3B LLM</td>
-          <td style="padding:8px; border:1px solid #ddd;">~2GB</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Frame buffers</td>
-          <td style="padding:8px; border:1px solid #ddd;">~100MB</td>
-        </tr>
-        <tr style="font-weight:bold;">
-          <td style="padding:8px; border:1px solid #ddd;">Total</td>
-          <td style="padding:8px; border:1px solid #ddd;">~2.5GB / 16GB</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p style="font-size:0.92rem; color:#444;">
-      The combined footprint sits comfortably below the Jetson's 16&nbsp;GB ceiling, leaving
-      headroom for upgrades like a larger LLM (see
-      <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>). With frame rate,
-      compute, output stability, and resource sharing all handled, the action model now
-      runs reliably in real time &mdash; the foundation that the rest of this section builds
-      on top of.
-    </p>
-
-    <sl-divider></sl-divider>
-
-    <!-- 5.3.2.3 AI SPARRING ENGINE -->
-    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <h2 style="margin:0;">5.3.2.3 AI Sparring Engine</h2>
-      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-6</sl-badge>
-    </div>
-
-    <p>
-      The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
-      their first-order Markov chain combo generation &mdash; including the transition matrix
-      worked example and the weakness-blending alpha &mdash; are introduced in
-      <a href="gui.html">Section 5.1 GUI</a>. This section covers the
-      <em>ROS-side execution</em> that turns those style definitions into live robot behaviour.
-      The <strong>sparring_engine</strong> node has to do five things in a loop, every round,
-      for every opponent style: <strong>pace attacks</strong> at the right intensity,
-      <strong>adapt</strong> to the user's weak areas, <strong>stay safe</strong> when something
-      else in the system goes wrong, <strong>read the user's response</strong> to each strike,
-      and provide a simpler <strong>reactive mode</strong> for unstructured practice. Each
-      subsection below covers one of those five jobs.
-    </p>
-
-    <h3>1. Pacing attacks &mdash; difficulty scaling</h3>
-
-    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
-          <th style="padding:8px; border:1px solid #ddd;">Easy</th>
-          <th style="padding:8px; border:1px solid #ddd;">Medium</th>
-          <th style="padding:8px; border:1px solid #ddd;">Hard</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Attack interval</td>
-          <td style="padding:8px; border:1px solid #ddd;">2.0s</td>
-          <td style="padding:8px; border:1px solid #ddd;">1.2s</td>
-          <td style="padding:8px; border:1px solid #ddd;">0.7s</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Counter-punch probability</td>
-          <td style="padding:8px; border:1px solid #ddd;">30%</td>
-          <td style="padding:8px; border:1px solid #ddd;">50%</td>
-          <td style="padding:8px; border:1px solid #ddd;">80%</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Arm speed</td>
-          <td style="padding:8px; border:1px solid #ddd;">8 rad/s</td>
-          <td style="padding:8px; border:1px solid #ddd;">15 rad/s</td>
-          <td style="padding:8px; border:1px solid #ddd;">25 rad/s</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>2. Adapting to the user &mdash; weakness tracking</h3>
-    <p>
-      Difficulty levels alone make sparring harder; they don't make it <em>smarter</em>.
-      The <strong>sparring_weakness_profile</strong> table persistently tracks the user's
-      per-punch-type defence success rate across sessions, and the engine biases attacks
-      toward whichever punches the user has been worst at defending against. Over time the
-      robot stops feeding the user openings they already handle well and concentrates on
-      the gaps &mdash; forcing continuous improvement instead of comfortable repetition.
-    </p>
-
-    <h3>3. Staying safe &mdash; engine safeguards</h3>
-    <p>
-      A relentless attack engine that doesn't know when to stop is dangerous &mdash; both
-      to the user and to the motors. Four runtime safeguards keep the engine safe and
-      well-behaved when something elsewhere in the system goes wrong:
-    </p>
-
-    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
-      <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px;">
-        <div style="font-weight:600; color:#5d4037;">Single strike at a time</div>
-        <div style="font-size:0.92rem; margin-top:4px; color:#555;">A <code>robot_busy</code> flag blocks any new <code>RobotCommand</code> while the previous strike is still executing &mdash; no motor command pile-ups.</div>
-      </div>
-      <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 14px;">
-        <div style="font-weight:600; color:#0d47a1;">Session watchdog</div>
-        <div style="font-size:0.92rem; margin-top:4px; color:#555;">Listens for the <code>SessionState</code> heartbeat (2&nbsp;Hz) and deactivates itself if none arrives for 5 seconds &mdash; a crashed <code>session_manager</code> never leaves the robot free-swinging.</div>
-      </div>
-      <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px;">
-        <div style="font-weight:600; color:#1b5e20;">Block reaction</div>
-        <div style="font-size:0.92rem; margin-top:4px; color:#555;">If the user successfully blocked the last strike, the engine forces a different punch type for the next attack &mdash; the AI never feeds the same opening twice in a row.</div>
-      </div>
-      <div style="background:#f3e5f5; border-left:3px solid #6a1b9a; padding:10px 14px;">
-        <div style="font-weight:600; color:#4a148c;">Idle surprise</div>
-        <div style="font-size:0.92rem; margin-top:4px; color:#555;">If the user goes idle for more than 3 seconds, the engine fires the next attack at 60% of the normal interval &mdash; breaking up rest periods that creep into a round.</div>
-      </div>
-    </div>
-
-    <h3>4. Reading the user's response &mdash; defence detection</h3>
-    <p>
-      The weakness profile from #2 only works if the engine actually knows whether the user
-      <em>defended</em> a strike or got hit by it. Every time the robot throws a punch, a
-      500&nbsp;ms detection window opens and the <strong>punch_processor</strong> classifies
-      the user's response using a priority-based system &mdash; physical contact wins over
-      visual cues, but visual cues catch the cases where the user dodged cleanly:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Priority</th>
-          <th style="padding:8px; border:1px solid #ddd;">Response</th>
-          <th style="padding:8px; border:1px solid #ddd;">Detection Method</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">1</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Hit</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Arm IMU detects physical contact &mdash; the robot's punch landed</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Block</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">CV model detects block pose (confidence &ge; 0.3)</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Slip</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Large displacement &mdash; user's bounding box moved &ge;40px laterally or &ge;0.15m in depth</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Dodge</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Moderate displacement &mdash; &ge;20px laterally or &ge;0.08m in depth</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Unknown</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">No detectable response within the 500ms window</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>
-      Defence results feed into the sparring analytics (defence rate, breakdown by type)
-      and the weakness tracking system, which uses them to target the user's weakest areas
-      in future sessions.
-    </p>
-
-    <h3>5. Reactive mode &mdash; free training</h3>
-    <p>
-      Sparring mode is structured: the robot drives, the user defends. <strong>Free training</strong>
-      flips the loop &mdash; the user drives, the robot reacts. Whenever the user hits a pad,
-      the robot fires back a contextually appropriate counter-punch instead of following
-      a scripted sequence. This is the simplest engine in the section because there's no
-      Markov chain, no weakness profile, and no difficulty scaling &mdash; just a pad-to-counter
-      mapping:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">User Hits</th>
-          <th style="padding:8px; border:1px solid #ddd;">Robot Responds With</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Centre pad</td>
-          <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Left pad</td>
-          <td style="padding:8px; border:1px solid #ddd;">Left Hook or Left Uppercut</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Right pad</td>
-          <td style="padding:8px; border:1px solid #ddd;">Right Hook or Right Uppercut</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Head pad</td>
-          <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>
-      A 300ms cooldown prevents rapid-fire counters, and the robot returns to guard position
-      after 5 seconds of inactivity.
-    </p>
-
-    <sl-divider></sl-divider>
-
-    <!-- 5.3.2.4 LLM COACH -->
-    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <h2 style="margin:0;">5.3.2.4 LLM Coach</h2>
-      <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge>
-    </div>
-
-    <p>
-      A local AI coach runs entirely on the Jetson &mdash; no cloud, no internet. Building one
-      that's actually useful inside a real-time boxing system means answering four questions
-      in order: <strong>why local at all</strong>, <strong>which model fits</strong>,
-      <strong>how to make it sound like a coach</strong>, and <strong>what happens when it
-      fails</strong>. The four subsections below tackle each in turn.
-    </p>
-
-    <h3>1. Why local? &mdash; the constraint that shapes everything else</h3>
-    <p>
-      Cloud-based AI coaching would add network latency and require stable internet, neither
-      of which is guaranteed in a gym environment. Running the LLM on-device addresses three
-      problems at once:
-    </p>
-
-    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0;">
-      <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 12px;">
-        <div style="font-size:0.78rem; font-weight:600; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Latency</div>
-        <div style="font-size:0.92rem; margin-top:4px;">Tips return in ~0.5&ndash;2&nbsp;s with no network round-trip.</div>
-      </div>
-      <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 12px;">
-        <div style="font-size:0.78rem; font-weight:600; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Reliability</div>
-        <div style="font-size:0.92rem; margin-top:4px;">Coaching keeps working when the gym WiFi doesn't.</div>
-      </div>
-      <div style="background:#fff3e0; border-left:3px solid #e65100; padding:10px 12px;">
-        <div style="font-size:0.78rem; font-weight:600; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Privacy</div>
-        <div style="font-size:0.92rem; margin-top:4px;">Training data never leaves the robot.</div>
-      </div>
-    </div>
-
-    <p>
-      Committing to local raises the obvious follow-up: which model is small enough to fit
-      alongside the CV pipeline on the Jetson but capable enough to actually coach?
-    </p>
-
-    <h3>2. Which model fits? &mdash; selection &amp; deployment</h3>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <tbody>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:180px;">Model</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">Qwen2.5-3B-Instruct &mdash; chosen for instruction-following ability at small size</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Quantisation</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">GGUF Q4_K_M (~2GB) &mdash; fits alongside CV models in shared GPU memory</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Runtime</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">llama-cpp-python with full GPU offload</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Response time</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">0.5&ndash;2 seconds per response</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Context window</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">2,048 tokens</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Generation limit</td>
-          <td style="padding:8px 12px; border:1px solid #ddd;">128 tokens (prevents cut-off mid-sentence)</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h4 style="margin-top:24px;">When does the coach actually speak?</h4>
-    <p style="font-size:0.94rem; color:#444;">
-      Picking Qwen2.5-3B answers the &ldquo;what runs&rdquo; question, but a model loaded in
-      memory is just an idle model. The engine wakes the LLM in three different situations,
-      each with its own context payload and output style:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Mode</th>
-          <th style="padding:8px; border:1px solid #ddd;">When</th>
-          <th style="padding:8px; border:1px solid #ddd;">What It Does</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Real-time tips</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Every ~18 seconds during active rounds</td>
-          <td style="padding:8px; border:1px solid #ddd;">1&ndash;2 sentence coaching tips based on recent punches, combo progress, and session stats. Displayed on the GUI's CoachTipBar widget.</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Post-session analysis</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">After session completes</td>
-          <td style="padding:8px; border:1px solid #ddd;">2&ndash;3 paragraph detailed analysis referencing specific metrics (punch count, power trends, weak areas). Can suggest specific drills via structured tags.</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;"><strong>Interactive chat</strong></td>
-          <td style="padding:8px; border:1px solid #ddd;">Anytime via phone dashboard</td>
-          <td style="padding:8px; border:1px solid #ddd;">Full conversation with the AI coach. Users can ask technique questions, request training plans, or get explanations of their stats. Word-by-word streaming display.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>
-      The system also includes personality modes to keep interactions engaging &mdash; an
-      <strong>advice mode</strong> for motivational pep talks and encouragement, and a
-      <strong>Singlish mode</strong> that responds in Singaporean colloquial English, adding
-      local flavour to the coaching experience. These modes are selectable via the chat
-      interface and demonstrate the flexibility of the system prompt approach.
-    </p>
-
-    <h3>3. Sounding like a coach &mdash; prompt, parameters, and knowledge base</h3>
-    <p>
-      A general-purpose 3B model doesn't know boxing out of the box and doesn't sound like
-      a coach unless you tell it to. Three pieces of configuration shape its voice and its
-      domain expertise: a system prompt that defines its persona, a tuned parameter set
-      that balances quality against the real-time loop, and a curated knowledge base that
-      grounds its advice in real boxing technique.
-    </p>
-
-    <h4 style="margin-top:18px;">System prompt</h4>
-    <p>
-      A 24-line embedded system prompt instructs the model to act as &ldquo;BoxBunny AI Coach&rdquo;
-      with knowledge of all 6 punch types and their codes, 5 boxing styles (European, Russian,
-      American, Cuban, hybrid), and AIBA methodology (AIBA, 2015). The prompt enforces plain
-      text output (no markdown formatting) and adjusts advice depth to the user's skill
-      level (beginner / intermediate / advanced). Different system prompt keys are used for
-      each of the three coaching modes above.
-    </p>
-
-    <h4 style="margin-top:18px;">Inference parameters</h4>
-    <p>
-      Each parameter below was tuned during development to balance response quality, speed,
-      and the real-time constraint that the LLM cannot block the rest of the system:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
-          <th style="padding:8px; border:1px solid #ddd;">Value</th>
-          <th style="padding:8px; border:1px solid #ddd;">Why This Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Temperature</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">0.7</td>
-          <td style="padding:8px; border:1px solid #ddd;">Balances variety with coherence &mdash; lower values produced repetitive tips, higher values caused off-topic responses</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Max tokens</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">128</td>
-          <td style="padding:8px; border:1px solid #ddd;">Keeps real-time tips to 1&ndash;2 sentences &mdash; prevents mid-sentence cut-offs within the generation budget</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Context window</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2,048</td>
-          <td style="padding:8px; border:1px solid #ddd;">Large enough to fit system prompt + session stats + knowledge base context without exceeding memory</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">GPU layers</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">All (-1)</td>
-          <td style="padding:8px; border:1px solid #ddd;">Full GPU offload for fastest inference &mdash; CPU fallback too slow for real-time tips</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Inference timeout</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">20s</td>
-          <td style="padding:8px; border:1px solid #ddd;">If inference hangs (GPU contention, model issue), the system serves a fallback tip instead of waiting indefinitely</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>
-      A standalone PySide6 chat GUI (<code>llm_chat_gui.py</code>) was built for iterative
-      prompt tuning. It supports streaming token display, model selection, configurable
-      system prompts, and sentence completion detection &mdash; used extensively to refine
-      coaching quality before deployment. The interface is shown below.
-    </p>
-
-    <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>
-
-    <h4 style="margin-top:18px;">Boxing knowledge base</h4>
-    <p>
-      The system prompt and parameters tell the model <em>how</em> to talk; the knowledge
-      base tells it <em>what</em> to talk about. 17 documents are injected into the context
-      during coaching analysis so the LLM's advice is grounded in real boxing expertise
-      rather than general-purpose hallucination:
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
-      <thead>
-        <tr style="background:#f0f0f0;">
-          <th style="padding:8px; border:1px solid #ddd;">Category</th>
-          <th style="padding:8px; border:1px solid #ddd; text-align:center;">Docs</th>
-          <th style="padding:8px; border:1px solid #ddd;">Content</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Techniques</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
-          <td style="padding:8px; border:1px solid #ddd;">Jab, cross, hooks, uppercuts, stance &amp; guard</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Defence</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
-          <td style="padding:8px; border:1px solid #ddd;">Blocking, slipping, footwork</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Combinations</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
-          <td style="padding:8px; border:1px solid #ddd;">Beginner to advanced progressions</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Training plans</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
-          <td style="padding:8px; border:1px solid #ddd;">8-week beginner &amp; intermediate programmes</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Other</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
-          <td style="padding:8px; border:1px solid #ddd;">Conditioning, common mistakes, coaching, FAQ</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">Official references</td>
-          <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
-          <td style="padding:8px; border:1px solid #ddd;">AIBA Coaches Manual (AIBA, 2015), APB Manual (AIBA, 2017)</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>4. What if it fails? &mdash; reliability and fallback</h3>
-    <p>
-      Everything above describes the coach when it works. The harder problem is what happens
-      when it <em>doesn't</em> &mdash; the LLM hangs under GPU contention, the model file is
-      missing, generation runs out of memory mid-response. Four layers of defence ensure the
-      user always sees something useful instead of an error or a dead UI:
-    </p>
-
-    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Response quality</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">128-token cap prevents mid-sentence cut-offs, an explicit "keep tips SHORT" instruction is in the system prompt, and markdown is stripped from outputs to remove formatting artefacts.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Timeout protection</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">A 20-second hard timeout runs on a background thread &mdash; if inference hangs, the coach fails over to a fallback tip instead of blocking the rest of the system.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Fallback tips</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">65 pre-written tips across 4 categories (technique, encouragement, correction, suggestion) are served when the LLM is unavailable, the model file is missing, or GPU memory runs out.</div>
-      </div>
-      <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Auto-recovery</div>
-        <div style="font-size:0.9rem; margin-top:6px; color:#555;">The system tracks consecutive failures and attempts a model reload after 3 failures in a row &mdash; transient GPU contention recovers itself without intervention.</div>
-      </div>
-    </div>
-
-    <p style="font-size:0.92rem; color:#444;">
-      Together the four steps above &mdash; constraint, model selection, voice, and fallback
-      &mdash; turn a generic 3B LLM into a domain-specific coach that streams useful tips to
-      the user during real training sessions, on a single Jetson, with no internet, and
-      degrades gracefully when anything goes wrong.
-    </p>
-
-    <sl-divider></sl-divider>
-
-    <!-- 5.3.2.5 SESSION MANAGEMENT -->
-    <h2>5.3.2.5 Session Management</h2>
-
-    <p>
-      Every other node on this page &mdash; fusion, inference, sparring, LLM &mdash; needs to know
-      whether a training session is active, resting, or idle. The <strong>session_manager</strong>
-      node is the single source of truth for this, coordinating all nodes through a 5-state machine:
-    </p>
-
-    <image-component tag="image" source="../assets/robot_intelligence/ros/session_state_machine.svg" subtitle="Figure: Session State Machine — 5 states coordinating all system nodes"></image-component>
-
-    <p>
-      The default cycle runs 3 rounds of 180s work + 60s rest, but rounds, durations, and rest
-      periods are all configurable per session. When a session completes, a comprehensive summary
-      is saved to the user's database &mdash; capturing everything from punch counts and force
-      levels to movement patterns and defence rates. This data powers the trend analysis and
-      AI coach insights on the <a href="robot-intelligence-software.html">Dashboard</a>.
-    </p>
-
-    <sl-divider></sl-divider>
-
-    <!-- BOTTOM NAVIGATION -->
-    <div class="page-nav-row">
-      <a href="robot-intelligence-cv.html">
-        <sl-button variant="default" size="medium">
-          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
-          Back: CV & Action Prediction
-        </sl-button>
-      </a>
-      <a href="robot-intelligence-software.html">
-        <sl-button variant="default" size="medium">
-          Next: Dashboard & Analytics
-          <sl-icon slot="suffix" name="arrow-right"></sl-icon>
-        </sl-button>
-      </a>
-    </div>
-
-    <!-- SCROLL TO TOP -->
-    <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
-      <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
-    </sl-button>
-
-  </div>
+ <div class="content">
+ <a href="robot-intelligence.html" class="back-btn">
+ <sl-button variant="default" size="medium">
+ <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+ Back to Robot Intelligence
+ </sl-button>
+ </a>
+ <br>
+
+ <!-- 5.3.4 INTRO -->
+ <h2>5.3.2 Intelligent Behaviour & Control</h2>
+
+ <p>
+ All intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on the Jetson,
+ communicating via custom message types and services. Each subsection below corresponds to
+ one or more ROS nodes that handle a specific aspect of the system, from fusing sensor
+ data to generating AI coaching tips. Together they form the decision-making layer between
+ the CV perception pipeline (<a href="robot-intelligence-cv.html">Section 5.3.1</a>) and the
+ dashboard and analytics layer (<a href="robot-intelligence-software.html">Section 5.3.3</a>).
+ </p>
+
+ <sl-divider></sl-divider>
+
+ <!-- 5.3.2.1 CV + IMU SENSOR FUSION -->
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.2.1 CV + IMU Sensor Fusion</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-4</sl-badge>
+ </div>
+
+ <p>
+ The CV model on its own says <em>"the user just threw a left hook"</em>. The IMU pad on its
+ own says <em>"something hit me hard"</em>. Neither is enough, CV can hallucinate
+ punches into thin air, and the IMU can't tell a hook from a cross. The
+ <code>punch_processor</code> node fuses the two into <em>confirmed</em> punch events
+ using three layers of logic: temporal matching, biomechanical filtering, and graceful
+ fallback when one sensor fails.
+ </p>
+
+ <h3>1. Temporal matching, lining up CV and IMU in time</h3>
+ <p>
+ When an IMU pad impact exceeds 5.0&nbsp;m/s&sup2; (after gravity calibration), the node
+ queries the CV prediction ring buffer within a <strong>&plusmn;500&nbsp;ms</strong>
+ window centred on the impact timestamp. Frame-count voting selects the dominant
+ prediction type within that window, and the result is emitted as a confirmed punch
+ carrying both the CV confidence and the IMU force.
+ </p>
+
+ <h3>2. Pad-constraint filtering, rejecting biomechanically impossible matches</h3>
+ <p>
+ Even with a clean temporal match, some CV predictions are physically impossible,
+ a left hook cannot land on the right pad. Each pad therefore only accepts the punch
+ types that could biomechanically reach it:
+ </p>
+ <ul>
+ <li><strong>Centre pad</strong>, jab and cross only</li>
+ <li><strong>Left pad</strong>, left hook and left uppercut only</li>
+ <li><strong>Right pad</strong>, right hook and right uppercut only</li>
+ <li><strong>Head pad</strong>, any punch type</li>
+ </ul>
+ <p>
+ If the primary CV prediction violates this constraint, secondary predictions are checked
+ against the same rules with a minimum confidence threshold of 0.25, this is what
+ catches the model's retraction-phase wobble that
+ <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a> refers to.
+ </p>
+
+ <h3>3. Fallbacks, graceful degradation when one sensor fails</h3>
+ <p>
+ Both layers above assume CV and IMU are both producing usable data. When one of them
+ fails, the camera obscured, a pad disconnected, the node still emits a
+ best-effort punch event so downstream nodes never starve:
+ </p>
+ <ul>
+ <li><strong>CV-only mode:</strong> &ge;3 consecutive frames at &ge;0.6 confidence, emitted with a 0.3 penalty</li>
+ <li><strong>IMU-only mode:</strong> default 0.3 confidence, punch type inferred from pad location</li>
+ </ul>
+
+ <p>
+ The pipeline diagram below ties everything together, CV predictions and IMU pad
+ impacts both flow into the <code>punch_processor</code>'s ring buffer, get matched
+ within the &plusmn;500&nbsp;ms window, pass through the pad-constraint filter, and finally
+ emerge as a confirmed punch event published to the rest of the system.
+ </p>
+
+ <image-component tag="image" source="../assets/robot_intelligence/ros/fusion_pipeline.svg" subtitle="Figure: CV + IMU Sensor Fusion Pipeline"></image-component>
+
+ <sl-divider></sl-divider>
+
+ <!-- 5.3.2.2 REAL-TIME INFERENCE PIPELINE -->
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.2.2 Real-Time Inference Pipeline</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-5</sl-badge>
+ </div>
+
+ <p>
+ Getting the action model from <em>"works on a recorded clip"</em> to <em>"works live
+ on the robot"</em> required four things in sequence: a frame rate the model could
+ trust, enough per-frame compute to actually hit it, output that didn't flicker between
+ classes, and a resource budget that left room for the LLM coach to run on the same GPU.
+ Each subsection below tackles one of those four problems, in order.
+ </p>
+
+ <h3>1. Frame rate, why 30fps matters</h3>
+ <p>
+ The action prediction model was trained on features extracted at a consistent 30fps. Its voxel
+ temporal deltas use 2-frame (67ms) and 8-frame (267ms) lookbacks, if the actual frame rate
+ drops below 30fps, these deltas span different real-world time intervals than what the model
+ learned, causing the model to misclassify punches. In other words, <strong>the action model's
+ accuracy is directly tied to maintaining 30fps</strong>, even a small drop degrades
+ predictions significantly.
+ </p>
+
+ <h3>2. Per-frame compute, the YOLO bottleneck</h3>
+ <p>
+ Knowing 30fps was non-negotiable, the next question was whether the pipeline could
+ actually hit it on the Jetson. The answer at first was no, and the bottleneck
+ was a single component:
+ </p>
+
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
+ <div style="font-weight:600; color:#5d4037; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0e4c0;">YOLO bottleneck on the Jetson</div>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
+ <span style="font-weight:600; color:#bf360c;">Problem:</span>
+ the single biggest deployment challenge was YOLO Pose. In its default PyTorch
+ (<code>.pt</code>) format, YOLO alone consumed most of the 33&nbsp;ms per-frame
+ budget, dragging the whole pipeline below 30&nbsp;fps. Since YOLO provides the pose
+ features the action model depends on, this meant the action model was being fed
+ features at inconsistent, lower frame rates, accurate offline, broken live.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f0e4c0;">
+ <span style="font-weight:600; color:#1b5e20;">Fix:</span>
+ convert YOLO to a <strong>TensorRT engine</strong> (<code>.engine</code> format,
+ FP16 precision, half-precision 16-bit floats, which run roughly twice as
+ fast on GPU as the default 32-bit format with negligible accuracy loss). TensorRT
+ optimises the computation graph for the Jetson's GPU, fusing operations and
+ eliminating overhead. This brought YOLO inference down from
+ ~33&nbsp;ms to <strong>~16&nbsp;ms</strong>, comfortably under the frame budget.
+ </p>
+ <p style="margin:0;">
+ <span style="font-weight:600; color:#555;">Result:</span>
+ the action model became accurate and reliable in live deployment immediately
+ , confirming the accuracy issue was never the model, only the frame rate
+ feeding it.
+ </p>
+ </div>
+
+ <div style="border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin:22px 0; background:#fff;">
+ <h4 style="margin-top:0;">Why does this speedup matter?</h4>
+ <p>
+ Both models run <strong>in series every frame</strong>, YOLO extracts the pose
+ features the action model immediately consumes, and together they have to fit inside
+ the <strong>33&nbsp;ms frame budget</strong> to hold 30&nbsp;fps. Because the action
+ model is small (~1.75M parameters) and was already running at ~8&nbsp;ms, the entire
+ budget effectively came down to <strong>how fast YOLO could run</strong>. That makes
+ the TensorRT speedup the deciding factor between a pipeline that holds 30&nbsp;fps and
+ one that doesn't.
+ </p>
+
+ <svg class="zoomable" viewBox="0 0 1180 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1180px; margin:18px auto; display:block; font-family:system-ui,sans-serif;">
+ <defs>
+ <marker id="trtArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+ <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+ </marker>
+ </defs>
+
+ <text x="20" y="32" font-size="15" font-weight="700" fill="#1565c0" letter-spacing="0.5">YOLO POSE CONVERSION</text>
+ <text x="20" y="54" font-size="13" fill="#666">Ultralytics ships native TensorRT export, one-shot conversion, no intermediate file needed</text>
+
+ <!-- Box 1: .pt -->
+ <rect x="20" y="80" width="240" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+ <text x="140" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#0d47a1">yolo26n-pose.pt</text>
+ <text x="140" y="148" text-anchor="middle" font-size="13" fill="#0d47a1">Ultralytics weights</text>
+
+ <!-- Long arrow with command well above -->
+ <text x="484" y="118" text-anchor="middle" font-size="13" font-family="ui-monospace,monospace" fill="#475569">model.export(format="engine", half=True)</text>
+ <line x1="266" y1="138" x2="702" y2="138" stroke="#555" stroke-width="2.5" marker-end="url(#trtArr)"/>
+
+ <!-- Box 2: .engine -->
+ <rect x="708" y="80" width="240" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+ <text x="828" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#1b5e20">yolo26n-pose.engine</text>
+ <text x="828" y="148" text-anchor="middle" font-size="13" fill="#1b5e20">TensorRT FP16 engine</text>
+
+ <!-- Latency comparison for YOLO -->
+ <rect x="965" y="80" width="200" height="100" rx="10" fill="#fafafa" stroke="#d0d7de" stroke-width="1.5"/>
+ <text x="1065" y="103" text-anchor="middle" font-size="10" font-weight="700" fill="#94a3b8" letter-spacing="0.7">INFERENCE LATENCY</text>
+ <text x="1065" y="138" text-anchor="middle" font-size="18" font-weight="700">
+ <tspan fill="#94a3b8">~33 ms</tspan><tspan fill="#475569" dx="6" dy="0">&rarr;</tspan><tspan fill="#16a34a" dx="6">~16 ms</tspan>
+ </text>
+ <text x="1065" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#16a34a">2&times; faster</text>
+ </svg>
+
+ <p style="font-size:0.92rem; color:#444;">
+ The chart below shows how that single conversion turns a frame that <em>missed</em> the
+ 33&nbsp;ms budget into one that <em>fits</em> with headroom to spare:
+ </p>
+
+ <svg class="zoomable" viewBox="0 0 1000 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+ <!-- Title -->
+ <text x="60" y="32" font-size="13" font-weight="700" fill="#0f172a">Per-frame inference budget, 33&nbsp;ms ceiling for 30&nbsp;fps</text>
+
+ <!-- Budget ceiling line -->
+ <line x1="654" y1="50" x2="654" y2="230" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4"/>
+ <rect x="610" y="48" width="88" height="20" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.2"/>
+ <text x="654" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="#b91c1c">33 ms ceiling</text>
+
+ <!-- ===== BEFORE row ===== -->
+ <text x="50" y="105" text-anchor="end" font-size="12" font-weight="700" fill="#475569">BEFORE</text>
+ <text x="50" y="120" text-anchor="end" font-size="10" fill="#94a3b8">PyTorch</text>
+
+ <!-- YOLO segment -->
+ <rect x="60" y="92" width="594" height="38" rx="4" fill="#fca5a5" stroke="#dc2626" stroke-width="1.5"/>
+ <text x="357" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">YOLO ~33 ms</text>
+
+ <!-- Action segment -->
+ <rect x="654" y="92" width="144" height="38" rx="4" fill="#fecaca" stroke="#dc2626" stroke-width="1.5"/>
+ <text x="726" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#7f1d1d">Action ~8 ms</text>
+
+ <text x="820" y="116" font-size="13" font-weight="700" fill="#dc2626">~41 ms &nbsp;&#x2715; misses 30&nbsp;fps</text>
+
+ <!-- ===== AFTER row ===== -->
+ <text x="50" y="180" text-anchor="end" font-size="12" font-weight="700" fill="#475569">AFTER</text>
+ <text x="50" y="195" text-anchor="end" font-size="10" fill="#94a3b8">TensorRT FP16</text>
+
+ <!-- YOLO segment -->
+ <rect x="60" y="167" width="288" height="38" rx="4" fill="#86efac" stroke="#16a34a" stroke-width="1.5"/>
+ <text x="204" y="191" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d">YOLO ~16 ms</text>
+
+ <!-- Action segment -->
+ <rect x="348" y="167" width="144" height="38" rx="4" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.5"/>
+ <text x="420" y="191" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">Action ~8 ms</text>
+
+ <!-- Headroom region -->
+ <rect x="492" y="167" width="162" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3,3"/>
+ <text x="573" y="191" text-anchor="middle" font-size="10" font-style="italic" fill="#94a3b8">~9 ms headroom</text>
+
+ <text x="820" y="191" font-size="13" font-weight="700" fill="#16a34a">~24 ms &nbsp;&#x2713; fits 30&nbsp;fps</text>
+
+ <!-- Footnote -->
+ <text x="60" y="248" font-size="11" fill="#666">Action model is in series with YOLO, it consumes YOLO's pose output every frame, so any time YOLO spends</text>
+ <text x="60" y="263" font-size="11" fill="#666">over budget directly drags the action model below 30&nbsp;fps. The TensorRT speedup is what makes the whole pipeline real-time.</text>
+ </svg>
+ </div>
+
+ <div style="border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin:22px 0; background:#fff;">
+ <h4 style="margin-top:0;">What does TensorRT actually do?</h4>
+ <p>
+ Conversion is more than a file rename. When TensorRT compiles a model for a specific
+ Jetson, it does four things:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Layer fusion</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">Adjacent operations (e.g. conv&nbsp;+&nbsp;bias&nbsp;+&nbsp;ReLU) are fused into a single GPU kernel, eliminating intermediate memory writes.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Kernel autotuning</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">For each fused operation, TensorRT benchmarks several CUDA implementations on the actual hardware and picks the fastest one.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">FP16 quantisation</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">Every weight is converted from 32-bit to 16-bit floating point, halving the memory bandwidth with negligible accuracy loss.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Engine serialisation</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">The optimised plan is serialised to a single binary file that loads in milliseconds, no recompilation on subsequent runs.</div>
+ </div>
+ </div>
+
+ <p style="font-size:0.92rem; color:#444;">
+ The result is the <em>same model mathematically</em> running with roughly half the
+ memory bandwidth and a fraction of the kernel launch overhead, exactly what the
+ inference pipeline needed to sustain 30&nbsp;fps.
+ </p>
+ </div>
+
+ <h4 style="margin-top:24px;">Three more compute-side issues</h4>
+ <p style="font-size:0.94rem; color:#444;">
+ The TensorRT speedup got the per-frame budget under control, but three secondary
+ issues stood between offline accuracy and live performance:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;">
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">Sequential processing</div>
+ <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> voxel extraction and YOLO ran one after the other, doubling per-frame time.</div>
+ <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> parallelised into separate worker threads, running concurrently.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">Buffer discontinuities</div>
+ <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> dropped frames created gaps in the temporal window the model relied on.</div>
+ <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> rolling FIFO feature buffer with strict frame ordering.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px; padding-bottom:6px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;">FPS mismatch</div>
+ <div style="font-size:0.9rem; color:#555; padding-bottom:8px; border-bottom:1px solid #e6e6e6; margin-bottom:8px;"><strong style="color:#bf360c;">Issue:</strong> trained at a steady 30 fps but the live pipeline ran at variable rates.</div>
+ <div style="font-size:0.9rem; color:#555;"><strong style="color:#1b5e20;">Fix:</strong> TensorRT optimisation of both models gave consistent throughput.</div>
+ </div>
+ </div>
+
+ <h4 style="margin-top:24px;">Final per-frame budget</h4>
+ <p style="font-size:0.94rem; color:#444;">
+ With the TensorRT speedup and the three compute fixes in place, here is what a single
+ frame actually costs end-to-end:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Component</th>
+ <th style="padding:8px; border:1px solid #ddd;">Latency</th>
+ <th style="padding:8px; border:1px solid #ddd;">Notes</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
+ <td style="padding:8px; border:1px solid #ddd;">~16ms</td>
+ <td style="padding:8px; border:1px solid #ddd;">On GPU, single frame</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Depth &rarr; voxel extraction</td>
+ <td style="padding:8px; border:1px solid #ddd;">~10ms</td>
+ <td style="padding:8px; border:1px solid #ddd;">Background subtraction + voxelisation</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">YOLO + voxel in parallel</td>
+ <td style="padding:8px; border:1px solid #ddd;">~16ms</td>
+ <td style="padding:8px; border:1px solid #ddd;">Separate threads, limited by slower</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Model forward pass</td>
+ <td style="padding:8px; border:1px solid #ddd;">~8ms</td>
+ <td style="padding:8px; border:1px solid #ddd;">~1.75M params, d=192</td>
+ </tr>
+ <tr style="font-weight:bold;">
+ <td style="padding:8px; border:1px solid #ddd;">Total per frame</td>
+ <td style="padding:8px; border:1px solid #ddd;">~24ms</td>
+ <td style="padding:8px; border:1px solid #ddd;">42fps theoretical, 30fps practical</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <p style="font-size:0.92rem; color:#444;">
+ The 24ms-per-frame inference budget is the CV pipeline only. The full <strong>end-to-end latency
+ from camera capture to motor command is ~120ms</strong>, the remaining ~96ms covers
+ RealSense capture buffering, ROS 2 message passing through <code>punch_processor</code>,
+ the &plusmn;500ms fusion window's earliest-match logic, and the motor command queue.
+ This is verified against requirement RI&#8209;2 (&le;150ms) in
+ <a href="robot-intelligence-testing.html">5.3.4.7</a>.
+ </p>
+
+ <h3>3. Output stability, cleaning up noisy predictions</h3>
+ <p>
+ A stable 30fps gets the model the inputs it expects, but the <em>outputs</em> still
+ need work. Even on perfectly clean frames, the model's per-frame top class can
+ flicker between two similar punches for a few frames at a time. Publishing every
+ raw prediction would generate spurious events, so three filtering stages stand
+ between the model and the rest of the system:
+ </p>
+ <dl style="margin:12px 0; line-height:1.55;">
+ <dt style="font-weight:600; color:#1565c0;">EMA smoothing, <span style="font-weight:400; color:#555;">&alpha; = 0.35</span></dt>
+ <dd style="margin:2px 0 10px 18px;">An exponential moving average over per-class confidences damps out frame-to-frame jitter so a single noisy frame can't flip the prediction.</dd>
+
+ <dt style="font-weight:600; color:#1565c0;">Hysteresis gate, <span style="font-weight:400; color:#555;">12% confidence margin</span></dt>
+ <dd style="margin:2px 0 10px 18px;">The new top class must beat the current top class by 12% confidence before the prediction is allowed to switch, this prevents two close classes from oscillating.</dd>
+
+ <dt style="font-weight:600; color:#1565c0;">State machine, <span style="font-weight:400; color:#555;">2 frames to enter, 3 to hold, &ge;0.78 sustain (block: 4)</span></dt>
+ <dd style="margin:2px 0 0 18px;">A class must hold for at least 2 frames at &ge;0.78 confidence before it is committed, and 3 more frames to stay committed. Block requires 4 consecutive frames because of its biomechanical similarity to uppercut onset.</dd>
+ </dl>
+
+ <h3>4. Resource sharing, coexisting with the LLM</h3>
+ <p>
+ Frame rate, compute, and output stability all assume the CV pipeline owns the GPU.
+ In practice it shares the Jetson with the LLM coach, the touchscreen GUI, and the
+ ROS messaging layer. Two mechanisms keep them out of each other's way:
+ </p>
+
+ <p>
+ <strong>Adaptive frame rate.</strong> The <code>cv_node</code> runs at the full
+ 30&nbsp;fps only during <em>active</em> training sessions. Outside of active rounds
+ , idle, countdown, rest periods, it drops to ~6&nbsp;fps, freeing the
+ GPU for LLM inference exactly when the user is reading a coaching tip rather than
+ throwing punches.
+ </p>
+
+ <p>
+ <strong>Shared-memory footprint.</strong> The Jetson Orin NX has 16&nbsp;GB of
+ <em>unified</em> memory shared between CPU and GPU, so every model on the Jetson is
+ drawing from the same pool. Knowing the exact footprint of each component matters
+ because anything that exceeds the pool starts paging to disk and the real-time loop
+ collapses. The footprint below has been measured under live load:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Component</th>
+ <th style="padding:8px; border:1px solid #ddd;">Memory</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Action model (TensorRT)</td>
+ <td style="padding:8px; border:1px solid #ddd;">~200MB</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
+ <td style="padding:8px; border:1px solid #ddd;">~150MB</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Qwen2.5-3B LLM</td>
+ <td style="padding:8px; border:1px solid #ddd;">~2GB</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Frame buffers</td>
+ <td style="padding:8px; border:1px solid #ddd;">~100MB</td>
+ </tr>
+ <tr style="font-weight:bold;">
+ <td style="padding:8px; border:1px solid #ddd;">Total</td>
+ <td style="padding:8px; border:1px solid #ddd;">~2.5GB / 16GB</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.93rem; color:#5d4037;">
+ <strong>Memory capacity is not the bottleneck for LLM speed.</strong> The combined
+ footprint sits well below the 16&nbsp;GB ceiling, but free memory does <em>not</em>
+ translate to free LLM throughput. LLM inference on the Jetson is bound by GPU compute
+ (~100 sparse&nbsp;TFLOPS on the Orin NX) and memory <em>bandwidth</em> (~102&nbsp;GB/s
+ of LPDDR5), not by capacity. A larger model would <em>fit</em> in the spare RAM, but
+ it would be too slow to be useful in the real-time loop. The 3B&nbsp;model + 128-token
+ cap is the largest the current hardware can sustain, this is the documented LLM
+ compute ceiling in <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>,
+ and the upgrade path is a more powerful Jetson, a discrete GPU, or a USB AI accelerator,
+ not a higher-capacity model on the same chip.
+ </div>
+
+ <p style="font-size:0.92rem; color:#444;">
+ With frame rate, compute, output stability, and resource sharing all handled, the
+ action model now runs reliably in real time, the foundation that the rest of this
+ section builds on top of.
+ </p>
+
+ <sl-divider></sl-divider>
+
+ <!-- 5.3.2.3 AI SPARRING ENGINE -->
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.2.3 AI Sparring Engine</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-6</sl-badge>
+ </div>
+
+ <p>
+ The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
+ their first-order Markov chain combo generation, including the transition matrix
+ worked example and the weakness-blending alpha, are introduced in
+ <a href="gui.html">Section 5.1 GUI</a>. This section covers the
+ <em>ROS-side execution</em> that turns those style definitions into live robot behaviour.
+ The <code>sparring_engine</code> node has to do five things in a loop, every round,
+ for every opponent style: <strong>pace attacks</strong> at the right intensity,
+ <strong>adapt</strong> to the user's weak areas, <strong>stay safe</strong> when something
+ else in the system goes wrong, <strong>read the user's response</strong> to each strike,
+ and provide a simpler <strong>reactive mode</strong> for unstructured practice. Each
+ subsection below covers one of those five jobs.
+ </p>
+
+ <h3>1. Pacing attacks, difficulty scaling</h3>
+
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+ <th style="padding:8px; border:1px solid #ddd;">Easy</th>
+ <th style="padding:8px; border:1px solid #ddd;">Medium</th>
+ <th style="padding:8px; border:1px solid #ddd;">Hard</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Attack interval</td>
+ <td style="padding:8px; border:1px solid #ddd;">2.0s</td>
+ <td style="padding:8px; border:1px solid #ddd;">1.2s</td>
+ <td style="padding:8px; border:1px solid #ddd;">0.7s</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Counter-punch probability</td>
+ <td style="padding:8px; border:1px solid #ddd;">30%</td>
+ <td style="padding:8px; border:1px solid #ddd;">50%</td>
+ <td style="padding:8px; border:1px solid #ddd;">80%</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Arm speed</td>
+ <td style="padding:8px; border:1px solid #ddd;">8 rad/s</td>
+ <td style="padding:8px; border:1px solid #ddd;">15 rad/s</td>
+ <td style="padding:8px; border:1px solid #ddd;">25 rad/s</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <h3>2. Adapting to the user, weakness tracking</h3>
+ <p>
+ Difficulty levels alone make sparring harder; they don't make it <em>smarter</em>.
+ The <code>sparring_weakness_profile</code> table persistently tracks the user's
+ per-punch-type defence success rate across sessions, and the engine biases attacks
+ toward whichever punches the user has been worst at defending against. Over time the
+ robot stops feeding the user openings they already handle well and concentrates on
+ the gaps, forcing continuous improvement instead of comfortable repetition.
+ </p>
+
+ <h3>3. Staying safe, engine safeguards</h3>
+ <p>
+ A relentless attack engine that doesn't know when to stop is dangerous, both
+ to the user and to the motors. Four runtime safeguards keep the engine safe and
+ well-behaved when something elsewhere in the system goes wrong:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px;">
+ <div style="font-weight:600; color:#5d4037;">Single strike at a time</div>
+ <div style="font-size:0.92rem; margin-top:4px; color:#555;">A <code>robot_busy</code> flag blocks any new <code>RobotCommand</code> while the previous strike is still executing, no motor command pile-ups.</div>
+ </div>
+ <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 14px;">
+ <div style="font-weight:600; color:#0d47a1;">Session watchdog</div>
+ <div style="font-size:0.92rem; margin-top:4px; color:#555;">Listens for the <code>SessionState</code> heartbeat (2&nbsp;Hz) and deactivates itself if none arrives for 5 seconds, a crashed <code>session_manager</code> never leaves the robot free-swinging.</div>
+ </div>
+ <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px;">
+ <div style="font-weight:600; color:#1b5e20;">Block reaction</div>
+ <div style="font-size:0.92rem; margin-top:4px; color:#555;">If the user successfully blocked the last strike, the engine forces a different punch type for the next attack, the AI never feeds the same opening twice in a row.</div>
+ </div>
+ <div style="background:#f3e5f5; border-left:3px solid #6a1b9a; padding:10px 14px;">
+ <div style="font-weight:600; color:#4a148c;">Idle surprise</div>
+ <div style="font-size:0.92rem; margin-top:4px; color:#555;">If the user goes idle for more than 3 seconds, the engine fires the next attack at 60% of the normal interval, breaking up rest periods that creep into a round.</div>
+ </div>
+ </div>
+
+ <h3>4. Reading the user's response, defence detection</h3>
+ <p>
+ The weakness profile from #2 only works if the engine actually knows whether the user
+ <em>defended</em> a strike or got hit by it. Every time the robot throws a punch, a
+ 500&nbsp;ms detection window opens and the <code>punch_processor</code> classifies
+ the user's response using a priority-based system, physical contact wins over
+ visual cues, but visual cues catch the cases where the user dodged cleanly:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Priority</th>
+ <th style="padding:8px; border:1px solid #ddd;">Response</th>
+ <th style="padding:8px; border:1px solid #ddd;">Detection Method</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">1</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Hit</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Arm IMU detects physical contact, the robot's punch landed</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Block</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">CV model detects block pose (confidence &ge; 0.3)</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Slip</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Large displacement, user's bounding box moved &ge;40px laterally or &ge;0.15m in depth</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Dodge</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Moderate displacement, &ge;20px laterally or &ge;0.08m in depth</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Unknown</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">No detectable response within the 500ms window</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <p>
+ Defence results feed into the sparring analytics (defence rate, breakdown by type)
+ and the weakness tracking system, which uses them to target the user's weakest areas
+ in future sessions.
+ </p>
+
+ <h3>5. Reactive mode, free training</h3>
+ <p>
+ Sparring mode is structured: the robot drives, the user defends. <strong>Free training</strong>
+ flips the loop, the user drives, the robot reacts. Whenever the user hits a pad,
+ the robot fires back a contextually appropriate counter-punch instead of following
+ a scripted sequence. This is the simplest engine in the section because there's no
+ Markov chain, no weakness profile, and no difficulty scaling, just a pad-to-counter
+ mapping:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">User Hits</th>
+ <th style="padding:8px; border:1px solid #ddd;">Robot Responds With</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Centre pad</td>
+ <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Left pad</td>
+ <td style="padding:8px; border:1px solid #ddd;">Left Hook or Left Uppercut</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Right pad</td>
+ <td style="padding:8px; border:1px solid #ddd;">Right Hook or Right Uppercut</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Head pad</td>
+ <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <p>
+ A 300ms cooldown prevents rapid-fire counters, and the robot returns to guard position
+ after 5 seconds of inactivity.
+ </p>
+
+ <sl-divider></sl-divider>
+
+ <!-- 5.3.2.4 LLM COACH -->
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.2.4 LLM Coach</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge>
+ </div>
+
+ <p>
+ A local AI coach runs entirely on the Jetson, no cloud, no internet. Building one
+ that's actually useful inside a real-time boxing system means answering four questions
+ in order: <strong>why local at all</strong>, <strong>which model fits</strong>,
+ <strong>how to make it sound like a coach</strong>, and <strong>what happens when it
+ fails</strong>. The four subsections below tackle each in turn.
+ </p>
+
+ <h3>1. Why local?, the constraint that shapes everything else</h3>
+ <p>
+ Cloud-based AI coaching would add network latency and require stable internet, neither
+ of which is guaranteed in a gym environment. Running the LLM on-device addresses three
+ problems at once:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0;">
+ <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 12px;">
+ <div style="font-size:0.78rem; font-weight:600; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Latency</div>
+ <div style="font-size:0.92rem; margin-top:4px;">Tips return in ~0.5&ndash;2&nbsp;s with no network round-trip.</div>
+ </div>
+ <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 12px;">
+ <div style="font-size:0.78rem; font-weight:600; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Reliability</div>
+ <div style="font-size:0.92rem; margin-top:4px;">Coaching keeps working when the gym WiFi doesn't.</div>
+ </div>
+ <div style="background:#fff3e0; border-left:3px solid #e65100; padding:10px 12px;">
+ <div style="font-size:0.78rem; font-weight:600; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Privacy</div>
+ <div style="font-size:0.92rem; margin-top:4px;">Training data never leaves the robot.</div>
+ </div>
+ </div>
+
+ <p>
+ Committing to local raises the obvious follow-up: which model is small enough to fit
+ alongside the CV pipeline on the Jetson but capable enough to actually coach?
+ </p>
+
+ <h3>2. Which model fits?, selection &amp; deployment</h3>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+ <tbody>
+ <tr>
+ <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:180px;">Model</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">Qwen2.5-3B-Instruct, chosen for instruction-following ability at small size</td>
+ </tr>
+ <tr>
+ <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Quantisation</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">GGUF Q4_K_M (~2GB), fits alongside CV models in shared GPU memory</td>
+ </tr>
+ <tr>
+ <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Runtime</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">llama-cpp-python with full GPU offload</td>
+ </tr>
+ <tr>
+ <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Response time</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">0.5&ndash;2 seconds per response</td>
+ </tr>
+ <tr>
+ <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Context window</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">2,048 tokens</td>
+ </tr>
+ <tr>
+ <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Generation limit</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">128 tokens (prevents cut-off mid-sentence)</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <h4 style="margin-top:24px;">When does the coach actually speak?</h4>
+ <p style="font-size:0.94rem; color:#444;">
+ Picking Qwen2.5-3B answers the &ldquo;what runs&rdquo; question, but a model loaded in
+ memory is just an idle model. The engine wakes the LLM in three different situations,
+ each with its own context payload and output style:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Mode</th>
+ <th style="padding:8px; border:1px solid #ddd;">When</th>
+ <th style="padding:8px; border:1px solid #ddd;">What It Does</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Real-time tips</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Every ~18 seconds during active rounds</td>
+ <td style="padding:8px; border:1px solid #ddd;">1&ndash;2 sentence coaching tips based on recent punches, combo progress, and session stats. Displayed on the GUI's CoachTipBar widget.</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Post-session analysis</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">After session completes</td>
+ <td style="padding:8px; border:1px solid #ddd;">2&ndash;3 paragraph detailed analysis referencing specific metrics (punch count, power trends, weak areas). Can suggest specific drills via structured tags.</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Interactive chat</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">Anytime via phone dashboard</td>
+ <td style="padding:8px; border:1px solid #ddd;">Full conversation with the AI coach. Users can ask technique questions, request training plans, or get explanations of their stats. Word-by-word streaming display.</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <p>
+ The system also includes personality modes to keep interactions engaging, an
+ <strong>advice mode</strong> for motivational pep talks and encouragement, and a
+ <strong>Singlish mode</strong> that responds in Singaporean colloquial English, adding
+ local flavour to the coaching experience. These modes are selectable via the chat
+ interface and demonstrate the flexibility of the system prompt approach.
+ </p>
+
+ <h3>3. Sounding like a coach, prompt, parameters, and knowledge base</h3>
+ <p>
+ A general-purpose 3B model doesn't know boxing out of the box and doesn't sound like
+ a coach unless you tell it to. Three pieces of configuration shape its voice and its
+ domain expertise: a system prompt that defines its persona, a tuned parameter set
+ that balances quality against the real-time loop, and a curated knowledge base that
+ grounds its advice in real boxing technique.
+ </p>
+
+ <h4 style="margin-top:18px;">System prompt</h4>
+ <p>
+ A 24-line embedded system prompt instructs the model to act as &ldquo;BoxBunny AI Coach&rdquo;
+ with knowledge of all 6 punch types and their codes, 5 boxing styles (European, Russian,
+ American, Cuban, hybrid), and AIBA methodology (AIBA, 2015). The prompt enforces plain
+ text output (no markdown formatting) and adjusts advice depth to the user's skill
+ level (beginner / intermediate / advanced). Different system prompt keys are used for
+ each of the three coaching modes above.
+ </p>
+
+ <h4 style="margin-top:18px;">Inference parameters</h4>
+ <p>
+ Each parameter below was tuned during development to balance response quality, speed,
+ and the real-time constraint that the LLM cannot block the rest of the system:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+ <th style="padding:8px; border:1px solid #ddd;">Value</th>
+ <th style="padding:8px; border:1px solid #ddd;">Why This Value</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Temperature</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">0.7</td>
+ <td style="padding:8px; border:1px solid #ddd;">Balances variety with coherence, lower values produced repetitive tips, higher values caused off-topic responses</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Max tokens</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">128</td>
+ <td style="padding:8px; border:1px solid #ddd;">Keeps real-time tips to 1&ndash;2 sentences, prevents mid-sentence cut-offs within the generation budget</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Context window</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">2,048</td>
+ <td style="padding:8px; border:1px solid #ddd;">Large enough to fit system prompt + session stats + knowledge base context without exceeding memory</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">GPU layers</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">All (-1)</td>
+ <td style="padding:8px; border:1px solid #ddd;">Full GPU offload for fastest inference, CPU fallback too slow for real-time tips</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Inference timeout</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">20s</td>
+ <td style="padding:8px; border:1px solid #ddd;">If inference hangs (GPU contention, model issue), the system serves a fallback tip instead of waiting indefinitely</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <p>
+ A standalone PySide6 chat GUI (<code>llm_chat_gui.py</code>) was built for iterative
+ prompt tuning. It supports streaming token display, model selection, configurable
+ system prompts, and sentence completion detection, used extensively to refine
+ coaching quality before deployment. The interface is shown below.
+ </p>
+
+ <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>
+
+ <h4 style="margin-top:18px;">Boxing knowledge base</h4>
+ <p>
+ The system prompt and parameters tell the model <em>how</em> to talk; the knowledge
+ base tells it <em>what</em> to talk about. 17 documents are injected into the context
+ during coaching analysis so the LLM's advice is grounded in real boxing expertise
+ rather than general-purpose hallucination:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Category</th>
+ <th style="padding:8px; border:1px solid #ddd; text-align:center;">Docs</th>
+ <th style="padding:8px; border:1px solid #ddd;">Content</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Techniques</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">5</td>
+ <td style="padding:8px; border:1px solid #ddd;">Jab, cross, hooks, uppercuts, stance &amp; guard</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Defence</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
+ <td style="padding:8px; border:1px solid #ddd;">Blocking, slipping, footwork</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Combinations</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">3</td>
+ <td style="padding:8px; border:1px solid #ddd;">Beginner to advanced progressions</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Training plans</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+ <td style="padding:8px; border:1px solid #ddd;">8-week beginner &amp; intermediate programmes</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Other</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
+ <td style="padding:8px; border:1px solid #ddd;">Conditioning, common mistakes, coaching, FAQ</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Official references</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
+ <td style="padding:8px; border:1px solid #ddd;">AIBA Coaches Manual (AIBA, 2015), APB Manual (AIBA, 2017)</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <h3>4. What if it fails?, reliability and fallback</h3>
+ <p>
+ Everything above describes the coach when it works. The harder problem is what happens
+ when it <em>doesn't</em>, the LLM hangs under GPU contention, the model file is
+ missing, generation runs out of memory mid-response. Four layers of defence ensure the
+ user always sees something useful instead of an error or a dead UI:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">Response quality</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">128-token cap prevents mid-sentence cut-offs, an explicit "keep tips SHORT" instruction is in the system prompt, and markdown is stripped from outputs to remove formatting artefacts.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">Timeout protection</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">A 20-second hard timeout runs on a background thread, if inference hangs, the coach fails over to a fallback tip instead of blocking the rest of the system.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Fallback tips</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">65 pre-written tips across 4 categories (technique, encouragement, correction, suggestion) are served when the LLM is unavailable, the model file is missing, or GPU memory runs out.</div>
+ </div>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px;">
+ <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">Auto-recovery</div>
+ <div style="font-size:0.9rem; margin-top:6px; color:#555;">The system tracks consecutive failures and attempts a model reload after 3 failures in a row, transient GPU contention recovers itself without intervention.</div>
+ </div>
+ </div>
+
+ <p style="font-size:0.92rem; color:#444;">
+ Together the four steps above, constraint, model selection, voice, and fallback
+ , turn a generic 3B LLM into a domain-specific coach that streams useful tips to
+ the user during real training sessions, on a single Jetson, with no internet, and
+ degrades gracefully when anything goes wrong.
+ </p>
+
+ <sl-divider></sl-divider>
+
+ <!-- 5.3.2.5 SESSION MANAGEMENT -->
+ <h2>5.3.2.5 Session Management</h2>
+
+ <p>
+ Every other node on this page, fusion, inference, sparring, LLM, needs to know
+ whether a training session is currently active, resting, or idle. Without a single
+ authority for that, each node would have to guess from its own data, drift out of
+ sync with the others, and either keep running compute it doesn't need (wasting GPU)
+ or miss data it should be capturing. The <code>session_manager</code> node is the
+ single source of truth: it owns the lifecycle, broadcasts the current state at 2&nbsp;Hz
+ as a heartbeat, and every other node treats that heartbeat as the truth.
+ </p>
+
+ <h3>The 5 states and what each one triggers</h3>
+ <p>
+ Every training session, regardless of mode (techniques, sparring, free, performance
+ tests), flows through the same 5 states. Each transition isn't just a label change,
+ it triggers coordinated side effects across the rest of the system:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #757575; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">1. Idle</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Default state between sessions. CV frame rate drops to ~6&nbsp;fps to free GPU headroom for the LLM. <code>imu_node</code> switches to navigation mode (pad hits become menu navigation, not punch events). No data is recorded.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">2. Countdown</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">3-second pre-round window. The robot auto-adjusts its height to the user's shoulder line using the CV bounding box, the audio cue plays, and the sparring engine and drill manager arm themselves but don't fire yet.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">3. Active</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">CV ramps to full 30&nbsp;fps, <code>imu_node</code> switches to training mode, <code>punch_processor</code> starts emitting confirmed punches, the sparring engine starts attacking, and the LLM coach begins emitting tips every ~18&nbsp;s. All session statistics accumulate.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">4. Rest</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Between rounds. CV drops back to ~6&nbsp;fps, the sparring engine pauses, the LLM coach gets the recent round summary as context for its next batch of tips. Round counter advances and the cycle returns to active for the next round.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px; grid-column: 1 / -1;">
+     <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">5. Complete</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Final round finished. The full session summary is written to the per-user SQLite database (see Section 5.3.3), the LLM coach is asked for its post-session analysis, and the GUI transitions to the results page. After a brief moment the state machine returns to <strong>idle</strong>.</div>
+   </div>
+ </div>
+
+ <image-component tag="image" source="../assets/robot_intelligence/ros/session_state_machine.svg" subtitle="Figure: Session State Machine, 5 states coordinating all system nodes"></image-component>
+
+ <h3>Configurable cycle &amp; session summary</h3>
+ <p>
+ The default cycle runs <strong>3 rounds of 180&nbsp;s work + 60&nbsp;s rest</strong>, but
+ the round count, work duration, and rest duration are all configurable per session via
+ the <code>SessionConfig</code> message. The same 5-state machine drives every training
+ mode, so the GUI, the dashboard, and every ROS node only ever have to handle one
+ lifecycle.
+ </p>
+ <p>
+ When the session reaches the <strong>complete</strong> state, the
+ <code>session_manager</code> writes a comprehensive summary to the user's database that
+ powers every analytics view on the <a href="robot-intelligence-software.html">Dashboard</a>:
+ </p>
+ <ul style="line-height:1.7;">
+   <li><strong>Punch metrics</strong>, total count, distribution by punch type, peak and average force, punches per minute</li>
+   <li><strong>Defence metrics</strong>, defence rate, breakdown by defence type (block / slip / dodge / hit), reaction times</li>
+   <li><strong>Movement metrics</strong>, max lateral and depth displacement, movement timeline, person direction changes</li>
+   <li><strong>Coaching context</strong>, the round-by-round LLM tips emitted during the session and the post-session analysis text</li>
+ </ul>
+ <p>
+ This summary is what makes the per-user database useful. Without it, every analytics
+ view, trend chart, and personal record on the dashboard would have nothing to read from.
+ </p>
+
+ <sl-divider></sl-divider>
+
+ <!-- BOTTOM NAVIGATION -->
+ <div class="page-nav-row">
+ <a href="robot-intelligence-cv.html">
+ <sl-button variant="default" size="medium">
+ <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+ Back: CV & Action Prediction
+ </sl-button>
+ </a>
+ <a href="robot-intelligence-software.html">
+ <sl-button variant="default" size="medium">
+ Next: Dashboard & Analytics
+ <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+ </sl-button>
+ </a>
+ </div>
+
+ <!-- SCROLL TO TOP -->
+ <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+ <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+ </sl-button>
+
+ </div>
 </body>
 </html>

@@ -83,11 +83,11 @@
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Pose estimator not trained for boxing</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO where hands are bare, so it has no concept of gloved hands or this camera angle. The wrist keypoints become unreliable exactly when they matter most (at punch extension), and the model is forced to lean on the voxel branch instead of getting two strong signals &mdash; capping how much further the fused architecture can be pushed</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO where hands are bare, so it has no concept of gloved hands or this camera angle. The wrist keypoints become unreliable exactly when they matter most (at punch extension), and the model is forced to lean on the voxel branch instead of getting two strong signals, capping how much further the fused architecture can be pushed</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">LLM compute ceiling on the Jetson</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">The Jetson has 16&nbsp;GB of memory but its GPU isn't built to run a heavy LLM in parallel with the CV pipeline. A 3B model with a 128-token output cap is the largest the current hardware can sustain without hurting the real-time loop &mdash; which limits how deep the post-session coaching analysis can go and how specific the drill suggestions can be</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The Jetson has 16&nbsp;GB of memory but its GPU isn't built to run a heavy LLM in parallel with the CV pipeline. A 3B model with a 128-token output cap is the largest the current hardware can sustain without hurting the real-time loop, which limits how deep the post-session coaching analysis can go and how specific the drill suggestions can be</td>
           </tr>
         </tbody>
       </table>
@@ -127,7 +127,7 @@
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="3"><strong>Robot Intelligence</strong></td>
             <td style="padding:10px 14px; border:1px solid #ccc;">Expand the CV model's training scope</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> so the CV model is correct end-to-end and the IMU filter no longer has to absorb the retraction wobble. Then expand the action set with <strong>slips, head/body targets, and defensive footwork</strong> &mdash; richer labels feed every other part of the system (sparring AI, analytics, LLM coach) and unlock more dynamic feedback</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> so the CV model is correct end-to-end and the IMU filter no longer has to absorb the retraction wobble. Then expand the action set with <strong>slips, head/body targets, and defensive footwork</strong>, since richer labels feed every other part of the system (sparring AI, analytics, LLM coach) and unlock more dynamic feedback</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Fine-tune a custom pose estimator on boxing footage</td>
