@@ -63,35 +63,35 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-3</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
             <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
             <td style="padding:8px; border:1px solid #ddd;">Monotonic: light &lt; medium &lt; heavy</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm comparison (3 users)</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-11</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-11</td>
             <td style="padding:8px; border:1px solid #ddd;">False positive rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≤ 2 FP per 60 s of arm-only motion</td>
             <td style="padding:8px; border:1px solid #ddd;">Combat Orbit arm motion without user punches</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-12</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-12</td>
             <td style="padding:8px; border:1px solid #ddd;">Spatial discrimination accuracy</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 80% correct zone ID</td>
             <td style="padding:8px; border:1px solid #ddd;">40-punch zoned test (10 per IMU zone)</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-13</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-13</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike-to-response latency</td>
             <td style="padding:8px; border:1px solid #ddd;">≤ 200 ms mean</td>
             <td style="padding:8px; border:1px solid #ddd;">Timestamped /strike_events → motor command pair</td>
@@ -102,7 +102,7 @@
 
       <sl-alert variant="neutral" open>
         <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        <strong>Cross-reference:</strong> PC-3 and PC-5 also appear on the
+        <strong>Cross-reference:</strong> PAD-PC-3 and PAD-PC-5 also appear on the
         <a href="../arm-actuation/testing-evaluation.html">Arm Actuation
         Testing &amp; Evaluation</a> page, since they validate the
         integration between the padding IMU pipeline and the arm's FSM
@@ -118,7 +118,7 @@
     <div>
       <h3>Test Procedures</h3>
 
-      <h4>PC-3: Strike Detection Rate Test</h4>
+      <h4>PAD-PC-3: Strike Detection Rate Test</h4>
       <p>
         <strong>Equipment:</strong> BoxBunny robot (arm stationary at nominal
         height), padding assembly with 4× MPU6050 IMUs active, GUI V3 with
@@ -136,7 +136,7 @@
         test session.
       </p>
 
-      <h4>PC-5: Force Differentiation Test</h4>
+      <h4>PAD-PC-5: Force Differentiation Test</h4>
       <p>
         <strong>Equipment:</strong> Three users of different skill levels,
         GUI V3 with L2 norm logging.<br>
@@ -152,7 +152,7 @@
         ANOVA summary table.
       </p>
 
-      <h4>PC-11: False Positive Rate Test</h4>
+      <h4>PAD-PC-11: False Positive Rate Test</h4>
       <p>
         <strong>Equipment:</strong> Robot arm in Combat Orbit mode (moving
         without user interaction).<br>
@@ -166,7 +166,7 @@
         confirming no true peaks above threshold.
       </p>
 
-      <h4>PC-12: Spatial Discrimination Test</h4>
+      <h4>PAD-PC-12: Spatial Discrimination Test</h4>
       <p>
         <strong>Equipment:</strong> Boxing gloves, 4-zone padding assembly.<br>
         <strong>Procedure:</strong> Deliver 10 punches to each of the 4 IMU
@@ -178,7 +178,7 @@
         per-zone accuracy table.
       </p>
 
-      <h4>PC-13: Strike-to-Response Latency Test</h4>
+      <h4>PAD-PC-13: Strike-to-Response Latency Test</h4>
       <p>
         <strong>Equipment:</strong> Robot arm in reactive sparring mode,
         ROS 2 timestamp logging.<br>
@@ -227,7 +227,7 @@
           <li>GUI screenshots from the IMU Diagnostics Tab</li>
           <li>L2 norm distribution plots and confusion matrices</li>
           <li>Video evidence of sparring test sessions</li>
-          <li>Latency histogram from PC-13</li>
+          <li>Latency histogram from PAD-PC-13</li>
         </ul>
       </sl-alert>
     </div>

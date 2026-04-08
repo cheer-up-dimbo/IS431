@@ -57,31 +57,31 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90&deg; rotation)</td>
             <td style="padding:8px; border:1px solid #ddd;">&le; 0.70 s</td>
             <td style="padding:8px; border:1px solid #ddd;">Firmware timestamp delta (N=43 speed tests)</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Sparring endurance</td>
             <td style="padding:8px; border:1px solid #ddd;">5 min continuous, &lt;60&deg;C motors</td>
             <td style="padding:8px; border:1px solid #ddd;">Continuous sparring + Damiao temperature telemetry</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Regenerative braking safety</td>
             <td style="padding:8px; border:1px solid #ddd;">No PSU trip over 5 emergency stops</td>
             <td style="padding:8px; border:1px solid #ddd;">Visual confirmation + voltmeter</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Multi-strike chain</td>
             <td style="padding:8px; border:1px solid #ddd;">3-strike chain &le; 5 s total</td>
             <td style="padding:8px; border:1px solid #ddd;">Video timestamp + GUI console log</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Peak current within safety limit</td>
             <td style="padding:8px; border:1px solid #ddd;">&lt; 2.0 A per motor across all strikes</td>
             <td style="padding:8px; border:1px solid #ddd;">CAN current telemetry (N=43 speed tests)</td>
@@ -97,7 +97,7 @@
       <h3>5.2.5.5.2 Test Results</h3>
       <p>
         Results from the speed test validation (N=43 tests, all 6 standard
-        strikes) are presented below. PC-2, PC-3, and PC-4 require dedicated
+        strikes) are presented below. ARM-PC-2, ARM-PC-3, and ARM-PC-4 require dedicated
         test sessions and are documented as pending.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
@@ -112,7 +112,7 @@
         </thead>
         <tbody>
           <tr style="background:#e8f5e9;">
-            <td style="padding:8px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90&deg;)</td>
             <td style="padding:8px; border:1px solid #ddd;">&le; 0.70 s</td>
             <td style="padding:8px; border:1px solid #ddd;"><strong>0.64 s</strong> (best, 30 rad/s Jab)</td>
@@ -126,28 +126,28 @@
             </td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Sparring endurance</td>
             <td style="padding:8px; border:1px solid #ddd;">5 min, &lt;60&deg;C</td>
             <td style="padding:8px; border:1px solid #ddd;">&mdash;</td>
             <td style="padding:8px; border:1px solid #ddd; color:#666;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Regen braking safety</td>
             <td style="padding:8px; border:1px solid #ddd;">No PSU trip / 5 E-stops</td>
             <td style="padding:8px; border:1px solid #ddd;">&mdash;</td>
             <td style="padding:8px; border:1px solid #ddd; color:#666;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Multi-strike chain</td>
             <td style="padding:8px; border:1px solid #ddd;">3-strike &le; 5 s</td>
             <td style="padding:8px; border:1px solid #ddd;">&mdash;</td>
             <td style="padding:8px; border:1px solid #ddd; color:#666;">Pending</td>
           </tr>
           <tr style="background:#e8f5e9;">
-            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Peak current safety</td>
             <td style="padding:8px; border:1px solid #ddd;">&lt; 2.0 A per motor</td>
             <td style="padding:8px; border:1px solid #ddd;"><strong>0.69 A max</strong> (Right Hook M4)</td>
@@ -474,21 +474,7 @@
           of irreducible overhead. The revised target of &le; 0.70 s was met
           (0.64 s best). Feed-forward control could further reduce this.
         </li>
-        <li>
-          <strong>Regenerative braking:</strong> Software PWM ramp-down
-          mitigates OVP trips but a hardware TVS clamp remains required for
-          full protection under extreme loads.
-        </li>
-        <li>
-          <strong>3D-printed durability:</strong> Key load-bearing gears are
-          polymer FDM prints. Long-term fatigue under repeated high-velocity
-          impacts has not been characterised.
-        </li>
-        <li>
-          <strong>IMU MEMS drift:</strong> Velocity integration was abandoned
-          due to thermal random-walk drift; the system relies on peak-vector
-          magnitude tracking only.
-        </li>
+
       </ul>
     </div>
 

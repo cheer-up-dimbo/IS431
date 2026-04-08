@@ -119,14 +119,14 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-3</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% TP</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
             <td style="padding:8px; border:1px solid #ddd;">Monotonic (L &lt; M &lt; H)</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
@@ -144,12 +144,13 @@
 
       <h4>5.2.5 Arm Actuation</h4>
       <p>
-        The arm actuation subsystem has the most complete verification
-        record across 10 performance criteria. See
+        The arm actuation subsystem is evaluated against five performance
+        criteria (ARM-PC-1 to ARM-PC-5). Speed testing (ARM-PC-1, ARM-PC-5)
+        has been completed across N=43 tests. See
         <a href="arm-actuation/testing-evaluation.html">Testing
-        &amp; Evaluation</a> for detailed test procedures and
+        &amp; Evaluation</a> for full procedures and benchmark data, and
         <a href="arm-actuation/troubleshooting.html">Troubleshooting</a>
-        for the 9 cross-layer defect resolutions (8 resolved, 1 mitigated).
+        for cross-layer defect resolutions (8 resolved, 1 mitigated).
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
@@ -162,14 +163,41 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-1</td><td style="padding:8px; border:1px solid #ddd;">Strike speed</td><td style="padding:8px; border:1px solid #ddd;">≤ 0.25 s</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-2</td><td style="padding:8px; border:1px solid #ddd;">Repeatability</td><td style="padding:8px; border:1px solid #ddd;">≤ 10 mm</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-4</td><td style="padding:8px; border:1px solid #ddd;">Endurance</td><td style="padding:8px; border:1px solid #ddd;">10 min, &lt;60°C</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-6</td><td style="padding:8px; border:1px solid #ddd;">FSM chain</td><td style="padding:8px; border:1px solid #ddd;">3 strikes ≤ 5 s</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-7</td><td style="padding:8px; border:1px solid #ddd;">Regen safety</td><td style="padding:8px; border:1px solid #ddd;">No OVP trip</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-8</td><td style="padding:8px; border:1px solid #ddd;">Agent recovery</td><td style="padding:8px; border:1px solid #ddd;">≤ 3 s</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-9</td><td style="padding:8px; border:1px solid #ddd;">Current cutoff</td><td style="padding:8px; border:1px solid #ddd;">≤ 100 ms</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">PC-10</td><td style="padding:8px; border:1px solid #ddd;">ROS command</td><td style="padding:8px; border:1px solid #ddd;">Correct strike</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td><td style="padding:8px; border:1px solid #ddd; color:#999;">—</td></tr>
+          <tr style="background:#fff8e1;">
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike speed (90° rotation)</td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 0.25 s <em style="color:#888;">(original RM-5)</em></td>
+            <td style="padding:8px; border:1px solid #ddd;">0.64 s best (Left Jab, 30 rad/s)</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c0832a; font-weight:bold;">Partial</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Sparring endurance</td>
+            <td style="padding:8px; border:1px solid #ddd;">5 min continuous, &lt;60°C motors</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Regenerative braking safety</td>
+            <td style="padding:8px; border:1px solid #ddd;">No PSU trip over 5 E-stops</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Multi-strike chain execution</td>
+            <td style="padding:8px; border:1px solid #ddd;">3-strike chain ≤ 5 s total</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Peak motor current within safety limit</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt; 2.0 A per motor</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.69 A max (Right Hook M4)</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
+          </tr>
         </tbody>
       </table>
       <p>
