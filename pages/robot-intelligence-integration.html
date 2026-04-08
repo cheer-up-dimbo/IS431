@@ -455,8 +455,11 @@
  </p>
 
  <p>
- <strong>Static memory budget.</strong> Every model that runs on the Jetson has a
- known memory footprint. The combined budget below has been measured under live load:
+ <strong>Shared-memory footprint.</strong> The Jetson Orin NX has 16&nbsp;GB of
+ <em>unified</em> memory shared between CPU and GPU, so every model on the Jetson is
+ drawing from the same pool. Knowing the exact footprint of each component matters
+ because anything that exceeds the pool starts paging to disk and the real-time loop
+ collapses. The footprint below has been measured under live load:
  </p>
 
  <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
@@ -490,13 +493,23 @@
  </tbody>
  </table>
 
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.93rem; color:#5d4037;">
+ <strong>Memory capacity is not the bottleneck for LLM speed.</strong> The combined
+ footprint sits well below the 16&nbsp;GB ceiling, but free memory does <em>not</em>
+ translate to free LLM throughput. LLM inference on the Jetson is bound by GPU compute
+ (~100 sparse&nbsp;TFLOPS on the Orin NX) and memory <em>bandwidth</em> (~102&nbsp;GB/s
+ of LPDDR5), not by capacity. A larger model would <em>fit</em> in the spare RAM, but
+ it would be too slow to be useful in the real-time loop. The 3B&nbsp;model + 128-token
+ cap is the largest the current hardware can sustain, this is the documented LLM
+ compute ceiling in <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>,
+ and the upgrade path is a more powerful Jetson, a discrete GPU, or a USB AI accelerator,
+ not a higher-capacity model on the same chip.
+ </div>
+
  <p style="font-size:0.92rem; color:#444;">
- The combined footprint sits comfortably below the Jetson's 16&nbsp;GB ceiling, leaving
- headroom for upgrades like a larger LLM (see
- <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>). With frame rate,
- compute, output stability, and resource sharing all handled, the action model now
- runs reliably in real time, the foundation that the rest of this section builds
- on top of.
+ With frame rate, compute, output stability, and resource sharing all handled, the
+ action model now runs reliably in real time, the foundation that the rest of this
+ section builds on top of.
  </p>
 
  <sl-divider></sl-divider>
@@ -962,18 +975,68 @@
 
  <p>
  Every other node on this page, fusion, inference, sparring, LLM, needs to know
- whether a training session is active, resting, or idle. The <code>session_manager</code>
- node is the single source of truth for this, coordinating all nodes through a 5-state machine:
+ whether a training session is currently active, resting, or idle. Without a single
+ authority for that, each node would have to guess from its own data, drift out of
+ sync with the others, and either keep running compute it doesn't need (wasting GPU)
+ or miss data it should be capturing. The <code>session_manager</code> node is the
+ single source of truth: it owns the lifecycle, broadcasts the current state at 2&nbsp;Hz
+ as a heartbeat, and every other node treats that heartbeat as the truth.
  </p>
+
+ <h3>The 5 states and what each one triggers</h3>
+ <p>
+ Every training session, regardless of mode (techniques, sparring, free, performance
+ tests), flows through the same 5 states. Each transition isn't just a label change,
+ it triggers coordinated side effects across the rest of the system:
+ </p>
+
+ <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #757575; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">1. Idle</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Default state between sessions. CV frame rate drops to ~6&nbsp;fps to free GPU headroom for the LLM. <code>imu_node</code> switches to navigation mode (pad hits become menu navigation, not punch events). No data is recorded.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">2. Countdown</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">3-second pre-round window. The robot auto-adjusts its height to the user's shoulder line using the CV bounding box, the audio cue plays, and the sparring engine and drill manager arm themselves but don't fire yet.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">3. Active</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">CV ramps to full 30&nbsp;fps, <code>imu_node</code> switches to training mode, <code>punch_processor</code> starts emitting confirmed punches, the sparring engine starts attacking, and the LLM coach begins emitting tips every ~18&nbsp;s. All session statistics accumulate.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #e65100; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.5px;">4. Rest</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Between rounds. CV drops back to ~6&nbsp;fps, the sparring engine pauses, the LLM coach gets the recent round summary as context for its next batch of tips. Round counter advances and the cycle returns to active for the next round.</div>
+   </div>
+   <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #6a1b9a; padding:12px 14px; border-radius:4px; grid-column: 1 / -1;">
+     <div style="font-size:0.78rem; font-weight:700; color:#6a1b9a; text-transform:uppercase; letter-spacing:0.5px;">5. Complete</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Final round finished. The full session summary is written to the per-user SQLite database (see Section 5.3.3), the LLM coach is asked for its post-session analysis, and the GUI transitions to the results page. After a brief moment the state machine returns to <strong>idle</strong>.</div>
+   </div>
+ </div>
 
  <image-component tag="image" source="../assets/robot_intelligence/ros/session_state_machine.svg" subtitle="Figure: Session State Machine, 5 states coordinating all system nodes"></image-component>
 
+ <h3>Configurable cycle &amp; session summary</h3>
  <p>
- The default cycle runs 3 rounds of 180s work + 60s rest, but rounds, durations, and rest
- periods are all configurable per session. When a session completes, a comprehensive summary
- is saved to the user's database, capturing everything from punch counts and force
- levels to movement patterns and defence rates. This data powers the trend analysis and
- AI coach insights on the <a href="robot-intelligence-software.html">Dashboard</a>.
+ The default cycle runs <strong>3 rounds of 180&nbsp;s work + 60&nbsp;s rest</strong>, but
+ the round count, work duration, and rest duration are all configurable per session via
+ the <code>SessionConfig</code> message. The same 5-state machine drives every training
+ mode, so the GUI, the dashboard, and every ROS node only ever have to handle one
+ lifecycle.
+ </p>
+ <p>
+ When the session reaches the <strong>complete</strong> state, the
+ <code>session_manager</code> writes a comprehensive summary to the user's database that
+ powers every analytics view on the <a href="robot-intelligence-software.html">Dashboard</a>:
+ </p>
+ <ul style="line-height:1.7;">
+   <li><strong>Punch metrics</strong>, total count, distribution by punch type, peak and average force, punches per minute</li>
+   <li><strong>Defence metrics</strong>, defence rate, breakdown by defence type (block / slip / dodge / hit), reaction times</li>
+   <li><strong>Movement metrics</strong>, max lateral and depth displacement, movement timeline, person direction changes</li>
+   <li><strong>Coaching context</strong>, the round-by-round LLM tips emitted during the session and the post-session analysis text</li>
+ </ul>
+ <p>
+ This summary is what makes the per-user database useful. Without it, every analytics
+ view, trend chart, and personal record on the dashboard would have nothing to read from.
  </p>
 
  <sl-divider></sl-divider>

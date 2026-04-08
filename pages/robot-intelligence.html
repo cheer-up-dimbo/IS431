@@ -428,16 +428,194 @@
 
  <sl-divider></sl-divider>
 
+ <!-- SYSTEM DESIGN NARRATIVE (V-MODEL APPLICATION) -->
+ <div>
+   <h3>System Design Narrative</h3>
+   <p>
+     Following the Systems Engineering V-Model in <a href="../index.html#v-model">Section 3.2</a>, RI-1 to RI-7 were
+     fixed before any model architecture, ROS node, or LLM prompt was written (INCOSE, 2023).
+     These requirements trace back to the product needs mapped in
+     <a href="appendix-robot-intelligence.html">Appendix 6</a>. The diagram below applies the same
+     V-Model structure used in Robot Mechanism (5.2) and GUI (5.1), but tailored to the engineering
+     decisions specific to a real-time AI subsystem: model design, sensor fusion, on-device LLM
+     deployment, and live verification.
+   </p>
+   <p>
+     In product terms, the Robot Intelligence layer had to feel like a sparring partner that
+     <em>understood</em> what the user was doing, not just a script that swung an arm on a timer.
+     That meant the perception model had to be accurate enough to trust, fast enough to react in
+     real time, robust enough to deploy at a public demo, and the surrounding ROS layer had to
+     stay safe when individual components failed.
+   </p>
+
+   <!-- RI V-Model SVG Diagram -->
+   <div style="margin: 28px 0; text-align: center; overflow-x: auto;">
+     <svg viewBox="0 0 1260 530" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1260px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; box-shadow:0 2px 12px rgba(0,0,0,0.06);" font-family="Inter, system-ui, sans-serif">
+       <rect width="1260" height="530" rx="12" fill="#f8fafc"/>
+
+       <text x="630" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a" letter-spacing="0.5">BoxBunny Robot Intelligence, Systems Engineering V-Model</text>
+       <text x="310" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#2563eb" letter-spacing="1.5">DESIGN DECOMPOSITION</text>
+       <text x="950" y="56" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a" letter-spacing="1.5">VERIFICATION AND VALIDATION</text>
+
+       <line x1="100" y1="110" x2="1160" y2="110" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+       <line x1="200" y1="230" x2="1060" y2="230" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+       <line x1="310" y1="350" x2="950" y2="350" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="7,5"/>
+
+       <polyline points="246,110 356,230 470,350 630,430" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+       <polyline points="1014,110 904,230 790,350 630,430" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+       <!-- 01 Problem Framing -->
+       <rect x="151" y="72" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+       <text x="246" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">01</text>
+       <text x="246" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">RI Problem Framing</text>
+       <text x="246" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">RI-1 to RI-7 fixed</text>
+
+       <!-- 02 System Architecture -->
+       <rect x="261" y="192" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+       <text x="356" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">02</text>
+       <text x="356" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">System Architecture</text>
+       <text x="356" y="245" text-anchor="middle" font-size="9" fill="#3b82f6">10 ROS 2 nodes, dual-branch CV, LLM</text>
+
+       <!-- 03 Component Design -->
+       <rect x="375" y="312" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+       <text x="470" y="333" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">03</text>
+       <text x="470" y="348" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Component Design</text>
+       <text x="470" y="361" text-anchor="middle" font-size="9" fill="#3b82f6">CV model, sensor fusion,</text>
+       <text x="470" y="373" text-anchor="middle" font-size="9" fill="#3b82f6">sparring AI, LLM prompt</text>
+
+       <!-- Centre: Integration Build -->
+       <ellipse cx="630" cy="430" rx="110" ry="42" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+       <text x="630" y="420" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">RI Integration Build</text>
+       <text x="630" y="434" text-anchor="middle" font-size="9" fill="#b45309">All 10 nodes wired,</text>
+       <text x="630" y="447" text-anchor="middle" font-size="9" fill="#b45309">dashboard live, model deployed</text>
+
+       <!-- 04 Component Verification -->
+       <rect x="695" y="312" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+       <text x="790" y="333" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">04</text>
+       <text x="790" y="348" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Component Verification</text>
+       <text x="790" y="361" text-anchor="middle" font-size="9" fill="#16a34a">146 unit tests, model</text>
+       <text x="790" y="373" text-anchor="middle" font-size="9" fill="#16a34a">interpretability, ablation study</text>
+
+       <!-- 05 Integration Testing -->
+       <rect x="809" y="192" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+       <text x="904" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">05</text>
+       <text x="904" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Integration Testing</text>
+       <text x="904" y="245" text-anchor="middle" font-size="9" fill="#16a34a">28 cross-module tests, live CV+IMU fusion</text>
+
+       <!-- 06 System Validation -->
+       <rect x="919" y="72" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+       <text x="1014" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">06</text>
+       <text x="1014" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Validation</text>
+       <text x="1014" y="125" text-anchor="middle" font-size="9" fill="#16a34a">CDE AI Fair, all 7 RI verified</text>
+
+       <line x1="30" y1="498" x2="1230" y2="498" stroke="#e2e8f0" stroke-width="1"/>
+       <rect x="38" y="506" width="12" height="12" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+       <text x="56" y="516" font-size="10" fill="#64748b">Design decomposition</text>
+       <rect x="220" y="506" width="12" height="12" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+       <text x="238" y="516" font-size="10" fill="#64748b">Verification and validation</text>
+       <ellipse cx="426" cy="512" rx="8" ry="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+       <text x="440" y="516" font-size="10" fill="#64748b">Integration build stage</text>
+       <line x1="590" y1="512" x2="617" y2="512" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+       <text x="625" y="516" font-size="10" fill="#64748b">Requirement to verification correspondence</text>
+     </svg>
+
+     <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
+       Figure: Robot Intelligence Systems Engineering V-Model showing requirement decomposition (left), integration build (centre), and verification closure (right) for RI-1 to RI-7.
+     </sub>
+   </div>
+
+   <h4>Left Side of the V: Design Decomposition</h4>
+   <p>
+     Decomposition was performed by capability, not by codebase. RI-1 and RI-2 drove the
+     real-time inference budget that shaped the dual-branch (voxel + pose) Transformer
+     and the ~24&nbsp;ms per-frame compute target. RI-3 drove the model architecture and the
+     leave-one-person-out validation strategy. RI-4 drove the <code>punch_processor</code> sensor
+     fusion logic and the pad-constraint filter. RI-5 drove every on-device deployment decision,
+     from TensorRT FP16 conversion to the 16&nbsp;GB shared-memory budget. RI-6 drove the
+     <code>sparring_engine</code>, the Markov chain styles, and the persistent weakness profile.
+     RI-7 drove the local Qwen2.5-3B LLM coach and its fallback tip system.
+   </p>
+
+   <h4>Base of the V: Integration Build</h4>
+   <p>
+     At the integration stage, all 10 ROS 2 nodes were wired together over 21 custom message
+     types and 6 services, the trained CV model was packaged and deployed as a TensorRT engine
+     on the Jetson, the Vue 3 + FastAPI dashboard was built and connected to the per-user SQLite
+     database, and the LLM coach was loaded into shared GPU memory alongside the CV pipeline.
+     The <code>session_manager</code> 5-state machine became the single source of truth that
+     coordinated every other node, so all training modes (techniques, sparring, free, performance
+     tests) flowed through the same lifecycle.
+   </p>
+
+   <h4>Right Side of the V: Verification Closure</h4>
+   <p>
+     Verification was planned from the same RI-1 to RI-7 requirements used during decomposition.
+     The base of the testing pyramid is 146 pytest unit tests covering sensor fusion, gamification,
+     and database operations. The middle layer is 28 cross-module integration tests that exercise
+     ROS message contracts, fusion end-to-end, and motor protocol. The top is 12 system-level
+     notebook sections plus the CDE AI Fair real-world deployment. Together these close the
+     requirement-to-verification loop for all 7 RI requirements
+     (see <a href="robot-intelligence-testing.html">5.3.4 Testing &amp; Validation</a>).
+   </p>
+
+   <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+     <thead>
+       <tr style="background:#f0f0f0;">
+         <th style="padding:8px; border:1px solid #ddd; text-align:left;">V-Model Stage</th>
+         <th style="padding:8px; border:1px solid #ddd; text-align:left;">Robot Intelligence Focus</th>
+         <th style="padding:8px; border:1px solid #ddd; text-align:left;">Applied to BoxBunny RI</th>
+         <th style="padding:8px; border:1px solid #ddd; text-align:left;">Verification Evidence</th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr>
+         <td style="padding:8px; border:1px solid #ddd;">Concept and Requirements</td>
+         <td style="padding:8px; border:1px solid #ddd;">Define real-time perception, fusion, and coaching behaviour</td>
+         <td style="padding:8px; border:1px solid #ddd;">RI-1 to RI-7 derived from product needs and on-device deployment constraints</td>
+         <td style="padding:8px; border:1px solid #ddd;">Requirement table with rationale</td>
+       </tr>
+       <tr>
+         <td style="padding:8px; border:1px solid #ddd;">High-Level Design</td>
+         <td style="padding:8px; border:1px solid #ddd;">Partition the AI stack into independent ROS 2 nodes</td>
+         <td style="padding:8px; border:1px solid #ddd;">
+           <div style="margin-bottom:6px;">10-node architecture:</div>
+           <div style="display:flex; flex-wrap:wrap; gap:6px;">
+             <code>cv_node</code>
+             <code>imu_node</code>
+             <code>punch_processor</code>
+             <code>session_manager</code>
+             <code>drill_manager</code>
+             <code>sparring_engine</code>
+             <code>llm_node</code>
+             <code>analytics_node</code>
+             <code>free_training_engine</code>
+             <code>robot_node</code>
+           </div>
+         </td>
+         <td style="padding:8px; border:1px solid #ddd;">Node graph and 5-state session machine</td>
+       </tr>
+       <tr>
+         <td style="padding:8px; border:1px solid #ddd;">Detailed Design and Build</td>
+         <td style="padding:8px; border:1px solid #ddd;">Train and deploy each AI component</td>
+         <td style="padding:8px; border:1px solid #ddd;">9-iteration CV model, CV+IMU fusion, Markov sparring, Qwen2.5-3B LLM with knowledge base, TensorRT FP16 deployment</td>
+         <td style="padding:8px; border:1px solid #ddd;">Per-component design narratives in 5.3.1, 5.3.2, 5.3.3</td>
+       </tr>
+       <tr>
+         <td style="padding:8px; border:1px solid #ddd;">Verification and Validation</td>
+         <td style="padding:8px; border:1px solid #ddd;">Confirm performance against RI-1 to RI-7</td>
+         <td style="padding:8px; border:1px solid #ddd;">146 unit tests, 28 integration tests, 12 system notebook sections, model interpretability analysis, CDE AI Fair real-world deployment</td>
+         <td style="padding:8px; border:1px solid #ddd;">5.3.4.7 verification summary, all 7 RI requirements pass</td>
+       </tr>
+     </tbody>
+   </table>
+   <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: Robot Intelligence application of the V-Model from decomposition to verification</p>
+ </div>
+
+ <sl-divider></sl-divider>
+
  <!-- 5.3.2 SYSTEM ARCHITECTURE -->
  <div id="system-architecture">
  <h3>System Architecture</h3>
-
- <p style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
- This subsystem follows the same <strong>V&#8209;Model</strong> framework documented in
- <a href="robot-mechanism.html">Section&nbsp;5.2's System Design Narrative</a>: requirements
- RI&#8209;1 to RI&#8209;7 decompose into the subsystems in 5.3.1&ndash;5.3.3 and close back
- into verification in <a href="robot-intelligence-testing.html">5.3.4</a>.
- </p>
 
  <p>
  The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
@@ -476,7 +654,7 @@
  <text x="362" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">YOLO pose</text>
  <text x="362" y="91" text-anchor="middle" font-size="10" fill="#1b5e20">+ 3D voxel motion</text>
  <text x="362" y="111" text-anchor="middle" font-size="10" fill="#1b5e20">&rarr; 8-class action</text>
- <text x="362" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#2e7d32"><code>cv_node</code></text>
+ <text x="362" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#2e7d32">cv_node</text>
 
  <line x1="477" y1="100" x2="500" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
 
@@ -486,7 +664,7 @@
  <text x="614" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#bf360c">CV &harr; IMU match</text>
  <text x="614" y="91" text-anchor="middle" font-size="10" fill="#bf360c">&plusmn;500 ms window</text>
  <text x="614" y="111" text-anchor="middle" font-size="10" fill="#bf360c">+ pad constraints</text>
- <text x="614" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#e65100"><code>punch_processor</code></text>
+ <text x="614" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#e65100">punch_processor</text>
 
  <line x1="729" y1="100" x2="752" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
 
@@ -502,7 +680,7 @@
  <!-- IMU side input -->
  <rect x="356" y="180" width="220" height="40" rx="8" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3"/>
  <text x="466" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#555">Teensy + 6&times; MPU6050 IMUs</text>
- <text x="466" y="210" text-anchor="middle" font-size="9" font-style="italic" fill="#777"><code>imu_node</code>, pad &amp; arm impacts</text>
+ <text x="466" y="210" text-anchor="middle" font-size="9" font-style="italic" fill="#777">imu_node, pad &amp; arm impacts</text>
 
  <line x1="466" y1="180" x2="540" y2="155" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dataArr)"/>
  </svg>
@@ -520,22 +698,11 @@
  subtitle="Figure: BoxBunny ROS 2 System Node Graph, 10 nodes, 40+ topics, 6 services">
  </image-component>
 
- <h4 style="margin-top:28px;">Session State Machine</h4>
-
- <p>
- The session lifecycle is managed by a 5-state machine. Each state transition triggers
- coordinated side effects across all nodes, for example, the CV frame rate scales
- from ~6 fps (idle) to 30 fps (active), and data collection only runs during active
- rounds. The default cycle is 3 rounds of 180s work + 60s rest, with all training modes
- (techniques, sparring, free, performance tests) sharing the same state machine shown
- below.
+ <p style="font-size:0.92rem; color:#444; margin-top:14px;">
+ Coordinating all 10 nodes during a live session is the job of the
+ <code>session_manager</code> node and its 5-state machine, covered in detail in
+ <a href="robot-intelligence-integration.html">5.3.2.5 Session Management</a>.
  </p>
-
- <image-component
- tag="image"
- source="../assets/robot_intelligence/ros/session_state_machine.svg"
- subtitle="Figure: BoxBunny Session State Machine, 5 states coordinating all node behaviour">
- </image-component>
  </div>
 
  <sl-divider></sl-divider>
