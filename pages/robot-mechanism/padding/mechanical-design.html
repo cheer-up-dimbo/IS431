@@ -104,170 +104,144 @@
 
       <h4>Anatomical Basis</h4>
       <p>
-        BoxBunny's striking targets correspond to two anatomical landmarks
-        commonly targeted in boxing: the head (chin level) and the torso
-        (solar plexus/liver region). The robot uses a single-DOF screw-jack
-        height adjustment, so both targets translate together with a fixed
-        vertical separation. This means the placement must be derived from
-        body-proportion data that scales predictably across the intended user
-        range of 150 to 190 cm.
+        The final design uses the Human Proportions analysis to define strike
+        zones from anatomical landmarks rather than a single torso height.
+        Instead of treating the torso as one target, three separate anatomical
+        targets were modelled: solar plexus centre, right liver centre, and
+        mirrored left-side body target (spleen-side training target). All
+        values are referenced to the pad centre height from the ground.
       </p>
       <p>
-        Published anthropometric data (Pheasant and Haslegrave, 2006) places
-        the chin at approximately 87 to 92% of standing stature and the
-        xiphoid process (solar plexus) at approximately 70 to 75% of standing
-        stature. The xiphoid process marks the lower boundary of the sternum
-        and sits directly above the solar plexus and liver, making it a
-        reliable skeletal reference for the torso strike zone. These ratios
-        are consistent across adult populations when expressed as proportions
-        of stature, allowing the robot to scale its targets using two
-        dimensionless ratios:
+        The method combines skeletal landmark ratios and stance correction.
+        Head and solar plexus placement use anthropometric proportions, while
+        liver placement uses a two-stage derivation: (1) estimate right costal
+        margin from xiphoid landmark, then (2) offset upward by half liver span
+        from Malaysian ultrasound data. This was selected because liver-centre
+        floor height is not directly tabulated in standard datasets.
       </p>
       <ul>
-        <li><strong>r<sub>head</sub> = 0.875</strong> (chin height / stature, midpoint of the 0.87 to 0.88 range)</li>
-        <li><strong>r<sub>torso</sub> = 0.70</strong> (xiphoid height / stature, midpoint of the 0.68 to 0.72 range)</li>
+        <li><strong>Head centre:</strong> 0.935H, with stance correction of -15 cm (body crouch + chin tuck).</li>
+        <li><strong>Solar plexus centre:</strong> 0.590H (male) and 0.582H (female), with body crouch correction of -8 cm.</li>
+        <li><strong>Liver centre:</strong> xiphoid anchor (0.618H), right costal margin offset (-3 cm), then + half liver span (male 12.2 cm, female 11.7 cm), with body crouch correction of -8 cm.</li>
       </ul>
+
+      <h4>Why Liver/Spleen Pads Are Above Solar Plexus</h4>
+      <p>
+        The liver does not share the same vertical level as the solar plexus.
+        In the stance-corrected model across 150F, 150M, 190F, and 190M user
+        profiles, the mean solar plexus centre is 91.6 cm while the mean liver
+        centre is 100.0 cm from ground, giving a mean centre-to-centre offset
+        of 8.4 cm. Therefore, the side pads are intentionally mounted above the
+        solar plexus pad centre, not level with it.
+      </p>
+      <p>
+        The opposite-side pad is mirrored to the same height as the liver pad.
+        This side represents spleen-side body-shot training and keeps left-right
+        hook practice symmetric. In short: centre pad (solar plexus) is lower,
+        bilateral side pads (liver/spleen-side target) are higher by the same
+        mean offset.
+      </p>
 
       <h4>Design Envelope</h4>
       <p>
-        Applying these ratios across the 150 to 190 cm operating range defines
-        the vertical envelope that the screw jack must cover:
+        The selected design targets are the mean stance-corrected values used
+        in the final iteration build:
       </p>
 
       <table class="spec-table" style="max-width:550px;">
         <thead>
           <tr>
-            <th>Target</th>
-            <th>@ 150 cm user</th>
-            <th>@ 190 cm user</th>
+            <th>Pad Target</th>
+            <th>Centre Height from Ground</th>
+            <th>Basis</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>Head strike height</strong></td>
-            <td>131 cm</td>
-            <td>166 cm</td>
+            <td><strong>Head pad centre</strong></td>
+            <td>143.9 cm</td>
+            <td>Mean stance-corrected head centre</td>
           </tr>
           <tr>
-            <td><strong>Torso strike height</strong></td>
-            <td>105 cm</td>
-            <td>133 cm</td>
+            <td><strong>Solar plexus pad centre</strong></td>
+            <td>91.6 cm</td>
+            <td>Mean stance-corrected solar plexus centre</td>
           </tr>
           <tr>
-            <td><strong>Head-torso separation</strong></td>
-            <td>26 cm</td>
-            <td>33 cm</td>
+            <td><strong>Liver/spleen-side pad centre</strong></td>
+            <td>100.0 cm</td>
+            <td>Mean stance-corrected liver centre (mirrored to opposite side)</td>
+          </tr>
+          <tr>
+            <td><strong>Head pad bottom to solar plexus pad top gap</strong></td>
+            <td>31.8 cm</td>
+            <td>Practical fixed pad spacing used in the build</td>
+          </tr>
+          <tr>
+            <td><strong>Liver/spleen-side to solar plexus gap</strong></td>
+            <td>8.4 cm</td>
+            <td>Centre-to-centre mean gap (Gap B)</td>
           </tr>
         </tbody>
       </table>
 
       <p>
-        The head-torso separation varies from approximately 26 cm (shorter
-        users) to 33 cm (taller users), with a mean of approximately 30 cm.
-        Because the screw jack moves both pads as a unit, the robot adopts a
-        fixed vertical separation of 30 cm between the head and torso pad
-        centres. The total vertical travel required is 166 cm minus 131 cm =
-        35 cm for the head target, which falls within the screw jack's 400 mm
-        stroke.
+        This Strike-Zone Placement logic was applied in the new final iteration
+        so that pad positions reflect documented anatomy, not equal-height
+        assumptions. The side pads are intentionally raised above the solar
+        plexus pad by the averaged 8.4 cm value. The fixed head-pad bottom to
+        solar-plexus-pad top spacing is 31.8 cm, which sits close to the
+        30 cm boxing-stance gap observed in practical measurement (Drillis and
+        Contini, 1966; ANSUR II, 2012; Pheasant and Haslegrave, 2006).
       </p>
 
-      <!-- Annotated human silhouette SVG -->
-      <div style="width:100%; overflow-x:auto; margin:24px 0;">
-        <svg viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:520px; height:auto; font-family:system-ui, sans-serif; display:block; margin:0 auto;">
+      <table class="spec-table" style="max-width:640px;">
+        <thead>
+          <tr>
+            <th>Profile</th>
+            <th>Head Centre (stance)</th>
+            <th>Solar Plexus Centre (stance)</th>
+            <th>Liver Centre (stance)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>150F</td>
+            <td>125.2 cm</td>
+            <td>79.3 cm</td>
+            <td>87.5 cm</td>
+          </tr>
+          <tr>
+            <td>150M</td>
+            <td>125.2 cm</td>
+            <td>80.5 cm</td>
+            <td>87.8 cm</td>
+          </tr>
+          <tr>
+            <td>190F</td>
+            <td>162.7 cm</td>
+            <td>102.6 cm</td>
+            <td>112.3 cm</td>
+          </tr>
+          <tr>
+            <td>190M</td>
+            <td>162.7 cm</td>
+            <td>104.1 cm</td>
+            <td>112.5 cm</td>
+          </tr>
+        </tbody>
+      </table>
 
-          <!-- 150 cm user (left) -->
-          <!-- Body outline -->
-          <ellipse cx="120" cy="60" rx="16" ry="19" fill="none" stroke="#1565c0" stroke-width="2"/>
-          <line x1="120" y1="79" x2="120" y2="180" stroke="#1565c0" stroke-width="2"/>
-          <line x1="120" y1="100" x2="90" y2="150" stroke="#1565c0" stroke-width="2"/>
-          <line x1="120" y1="100" x2="150" y2="150" stroke="#1565c0" stroke-width="2"/>
-          <line x1="120" y1="180" x2="100" y2="290" stroke="#1565c0" stroke-width="2"/>
-          <line x1="120" y1="180" x2="140" y2="290" stroke="#1565c0" stroke-width="2"/>
-
-          <!-- Head strike zone (chin) -->
-          <line x1="60" y1="75" x2="170" y2="75" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <rect x="155" y="66" width="60" height="18" rx="3" fill="#e53935"/>
-          <text x="185" y="79" text-anchor="middle" fill="white" font-size="10" font-weight="bold">131 cm</text>
-
-          <!-- Torso strike zone (xiphoid) -->
-          <line x1="60" y1="133" x2="170" y2="133" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <rect x="155" y="124" width="60" height="18" rx="3" fill="#2e7d32"/>
-          <text x="185" y="137" text-anchor="middle" fill="white" font-size="10" font-weight="bold">105 cm</text>
-
-          <!-- Separation annotation -->
-          <line x1="55" y1="75" x2="55" y2="133" stroke="#555" stroke-width="1"/>
-          <line x1="50" y1="75" x2="60" y2="75" stroke="#555" stroke-width="1"/>
-          <line x1="50" y1="133" x2="60" y2="133" stroke="#555" stroke-width="1"/>
-          <text x="48" y="108" text-anchor="end" fill="#555" font-size="9">26 cm</text>
-
-          <!-- Ground line and height label -->
-          <line x1="80" y1="290" x2="160" y2="290" stroke="#999" stroke-width="1"/>
-          <text x="120" y="310" text-anchor="middle" fill="#1565c0" font-size="12" font-weight="bold">150 cm user</text>
-
-          <!-- Ratio labels -->
-          <text x="120" y="340" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">head</tspan> = 0.92</text>
-          <text x="120" y="355" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">torso</tspan> = 0.72</text>
-
-          <!-- 190 cm user (right) -->
-          <!-- Body outline (taller) -->
-          <ellipse cx="380" cy="38" rx="18" ry="21" fill="none" stroke="#1565c0" stroke-width="2"/>
-          <line x1="380" y1="59" x2="380" y2="175" stroke="#1565c0" stroke-width="2"/>
-          <line x1="380" y1="82" x2="345" y2="140" stroke="#1565c0" stroke-width="2"/>
-          <line x1="380" y1="82" x2="415" y2="140" stroke="#1565c0" stroke-width="2"/>
-          <line x1="380" y1="175" x2="355" y2="290" stroke="#1565c0" stroke-width="2"/>
-          <line x1="380" y1="175" x2="405" y2="290" stroke="#1565c0" stroke-width="2"/>
-
-          <!-- Head strike zone (chin) -->
-          <line x1="310" y1="55" x2="435" y2="55" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <rect x="420" y="46" width="60" height="18" rx="3" fill="#e53935"/>
-          <text x="450" y="59" text-anchor="middle" fill="white" font-size="10" font-weight="bold">166 cm</text>
-
-          <!-- Torso strike zone (xiphoid) -->
-          <line x1="310" y1="120" x2="435" y2="120" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <rect x="420" y="111" width="60" height="18" rx="3" fill="#2e7d32"/>
-          <text x="450" y="124" text-anchor="middle" fill="white" font-size="10" font-weight="bold">133 cm</text>
-
-          <!-- Separation annotation -->
-          <line x1="305" y1="55" x2="305" y2="120" stroke="#555" stroke-width="1"/>
-          <line x1="300" y1="55" x2="310" y2="55" stroke="#555" stroke-width="1"/>
-          <line x1="300" y1="120" x2="310" y2="120" stroke="#555" stroke-width="1"/>
-          <text x="298" y="92" text-anchor="end" fill="#555" font-size="9">33 cm</text>
-
-          <!-- Ground line and height label -->
-          <line x1="335" y1="290" x2="425" y2="290" stroke="#999" stroke-width="1"/>
-          <text x="380" y="310" text-anchor="middle" fill="#1565c0" font-size="12" font-weight="bold">190 cm user</text>
-
-          <!-- Ratio labels -->
-          <text x="380" y="340" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">head</tspan> = 0.92</text>
-          <text x="380" y="355" text-anchor="middle" fill="#777" font-size="9">r<tspan baseline-shift="sub" font-size="7">torso</tspan> = 0.72</text>
-
-          <!-- Centre annotation: fixed 34 cm -->
-          <rect x="210" y="155" width="100" height="40" rx="6" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
-          <text x="260" y="173" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">Fixed: 30 cm</text>
-          <text x="260" y="187" text-anchor="middle" fill="#777" font-size="9">(design mean)</text>
-
-          <!-- Legend -->
-          <line x1="175" y1="390" x2="200" y2="390" stroke="#e53935" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="208" y="394" fill="#333" font-size="9">Head (chin) strike zone</text>
-          <line x1="330" y1="390" x2="355" y2="390" stroke="#2e7d32" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="363" y="394" fill="#333" font-size="9">Torso (xiphoid) strike zone</text>
-        </svg>
+      <div style="margin: 20px 0;">
       </div>
-      <sub style="display:block; text-align:center; margin-top:4px; font-style:italic; font-size:0.9rem;">
-        Figure: Strike-zone heights at the operating range extremes, derived from anthropometric ratios (Pheasant and Haslegrave, 2006).
-      </sub>
 
       <h4>Zone-Based Pad Sizing</h4>
       <p>
-        The fixed 30 cm separation is the mean of the anatomical range
-        (26 to 33 cm). For shorter users, the actual head-torso gap is
-        smaller than 30 cm, so the pads overlap slightly in coverage. For
-        taller users, the gap is larger, leaving a small uncovered region
-        between pads. To accommodate this variation without adding mechanical
-        complexity, the pads are designed as vertically extended zones rather
-        than point targets. Sizing each pad tall enough to span the
-        inter-user variation ensures that the head and torso remain hittable
-        across the full 150 to 190 cm range.
+        With fixed pad sizes (head 230 mm, body pads 180 mm), these centre
+        heights create overlap between likely target regions across the full
+        150 to 190 cm range while preserving anatomically correct order. This
+        avoids the earlier equal-height side-pad assumption that did not match
+        liver position.
       </p>
     </div>
 
@@ -277,7 +251,7 @@
     <div>
       <h3>Mount Design Evolution</h3>
       <p>
-        The padding mount went through four iterations, all 3D-printed in PLA
+        The padding mount went through five iterations, all 3D-printed in PLA
         and attached to the robot's 80x80 mm aluminium V-slot extrusion frame.
       </p>
 
@@ -343,7 +317,7 @@
 
       <!-- ITERATION 4 -->
       <div class="iteration-card pass">
-        <h4>Iteration 4: Spring-Loaded Box (Final Design)</h4>
+        <h4>Iteration 4: Spring-Loaded Box (Pre-Final Baseline)</h4>
         <p>
           Inspired by spring-loaded box mechanisms, the spring now sits inside a
           box-shaped housing that constrains lateral movement. The exact spring OD
@@ -358,7 +332,34 @@
         </p>
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_4_final.glb"
-          alt="Iteration 4 (Final): Full assembly â frame mount, spring, foam mount, and foam"
+          alt="Iteration 4 baseline: full assembly frame mount, spring, foam mount, and foam"
+          height="350" explode-scale="1.5">
+        </explode-viewer>
+      </div>
+
+      <!-- ITERATION 5 -->
+      <div class="iteration-card pass">
+        <h4>Iteration 5: Anatomy-Guided Anti-Rotation Mount (Final Design)</h4>
+        <p>
+          The new final iteration keeps the spring-loaded box architecture from
+          Iteration 4, then integrates the Human_Proportions strike-zone model
+          into the mounting geometry. The torso mounts were re-positioned so the
+          liver and mirrored spleen-side pads sit 8.4 cm above the solar plexus
+          centreline, while the fixed head-pad bottom to solar-plexus-pad top
+          spacing is 31.8 cm. This ties the CAD directly to the validated
+          anatomical targets and keeps the practical gap near 30 cm in boxing stance.
+        </p>
+        <p>
+          To solve pad rotation after repeated impacts, anti-rotation guides were
+          added to the moving pad carrier. The guides constrain twisting about the
+          mounting axis while preserving intended spring compression along the
+          punch direction. This improved impact repeatability and keeps IMU
+          orientation stable over long training sessions.
+        </p>
+        <explode-viewer
+          src="../../../assets/upper_mechanism/padding/Final_Assembly_for_Showcase.glb"
+          alt="Iteration 5 final: anatomy-guided pad layout with anti-rotation guides"
+          model-rotation="0,180,0"
           height="350" explode-scale="1.5">
         </explode-viewer>
       </div>
@@ -440,7 +441,7 @@
 
       <table class="spec-table">
         <thead>
-          <tr><th>Parameter</th><th>Iteration 3 (rejected)</th><th>Iteration 4 (final)</th></tr>
+          <tr><th>Parameter</th><th>Iteration 3 (rejected)</th><th>Iteration 4 baseline (retained in Iteration 5 final)</th></tr>
         </thead>
         <tbody>
           <tr class="old"><td>Free length</td><td>180 mm</td><td class="new">140 mm</td></tr>
@@ -542,6 +543,10 @@
         <li>
           Pheasant, S. and Haslegrave, C.M. (2006). <em>Bodyspace: Anthropometry,
           Ergonomics and the Design of Work</em>, 3rd ed. CRC Press.
+        </li>
+        <li>
+          Author's boxing-stance measurement (April 2026). Standing and defensive-stance
+          head-to-solar-plexus checks used to sanity-check the fixed 31.8 cm pad spacing.
         </li>
         <li>
           Pierce, J.D., Reinbold, K.A., Lyngard, B.C., Goldman, R.J. and Pastore, C.M. (2006). Direct Measurement of Punch Force During Six Professional Boxing Matches. Journal of Quantitative Analysis in Sports, 2(2).

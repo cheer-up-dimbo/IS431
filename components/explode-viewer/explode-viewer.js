@@ -37,6 +37,13 @@ class ExplodeViewer extends HTMLElement {
     const alt = this.getAttribute('alt') || '3D Model';
     const noControls = this.hasAttribute('no-controls');
 
+    // Optional model rotation in degrees: 'x,y,z'
+    const rotationAttr = (this.getAttribute('model-rotation') || '0,0,0').trim();
+    const rotationParts = rotationAttr.split(',').map((value) => Number(value.trim()));
+    const modelRotation = rotationParts.length === 3 && rotationParts.every((value) => Number.isFinite(value))
+      ? rotationParts.map((value) => THREE.MathUtils.degToRad(value))
+      : [0, 0, 0];
+
     // Parse explode axis: 'x', 'y', 'z', or custom 'x,y,z' vector
     const axisAttr = (this.getAttribute('explode-axis') || 'z').trim().toLowerCase();
     let explodeAxis;
@@ -212,10 +219,10 @@ class ExplodeViewer extends HTMLElement {
       <div class="caption">${alt}</div>
     `;
 
-    this._initScene(height, explodeScale, src, explodeAxis);
+    this._initScene(height, explodeScale, src, explodeAxis, modelRotation);
   }
 
-  _initScene(height, explodeScale, src, explodeAxis) {
+  _initScene(height, explodeScale, src, explodeAxis, modelRotation) {
     const canvas = this.shadowRoot.getElementById('canvas');
     const loaderEl = this.shadowRoot.getElementById('loader');
     const slider = this.shadowRoot.getElementById('exploder');
@@ -281,7 +288,7 @@ class ExplodeViewer extends HTMLElement {
           mesh.name = 'STL Mesh';
           const model = new THREE.Group();
           model.add(mesh);
-          this._onModelLoaded(model, explodeAxis, scene, camera, controls, loaderEl, partCountEl);
+          this._onModelLoaded(model, explodeAxis, scene, camera, controls, loaderEl, partCountEl, modelRotation);
         },
         (progress) => {
           if (progress.total > 0) {
@@ -303,7 +310,7 @@ class ExplodeViewer extends HTMLElement {
       gltfLoader.load(
         src,
         (gltf) => {
-          this._onModelLoaded(gltf.scene, explodeAxis, scene, camera, controls, loaderEl, partCountEl);
+          this._onModelLoaded(gltf.scene, explodeAxis, scene, camera, controls, loaderEl, partCountEl, modelRotation);
         },
         (progress) => {
           if (progress.total > 0) {
@@ -357,7 +364,9 @@ class ExplodeViewer extends HTMLElement {
     this._resizeObserver.observe(this);
   }
 
-  _onModelLoaded(model, explodeAxis, scene, camera, controls, loaderEl, partCountEl) {
+  _onModelLoaded(model, explodeAxis, scene, camera, controls, loaderEl, partCountEl, modelRotation) {
+    model.rotation.set(modelRotation[0], modelRotation[1], modelRotation[2]);
+
     // Centre and scale
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
