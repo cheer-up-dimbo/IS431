@@ -118,31 +118,30 @@
 
         <sl-tree-item>
           <a href="#problem-clarification">2. Problem Clarification</a>
-          <sl-tree-item><a href="#domain-overview">2.1. Domain Overview and Trends</a></sl-tree-item>
-          <sl-tree-item><a href="#background">2.2. Background</a></sl-tree-item>
-          <sl-tree-item><a href="#primary-research">2.3. Primary Research: User Interviews/Surveys</a></sl-tree-item>
-          <sl-tree-item><a href="#secondary-research">2.4. Secondary Research: Competitor Analysis</a></sl-tree-item>
-          <sl-tree-item>
-            <a href="#value-proposition">2.5. Value Proposition Canvas</a>
-            <sl-tree-item><a href="#problem-of-interest">2.5.1. Problem of Interest</a></sl-tree-item>
-            <sl-tree-item><a href="#value-proposition-statement">2.5.2. Value Proposition Statement</a></sl-tree-item>
-          </sl-tree-item>
+          <sl-tree-item><a href="#domain-overview">2.1 Domain Overview and Trends</a></sl-tree-item>
+          <sl-tree-item><a href="#background">2.2 Background</a></sl-tree-item>
+          <sl-tree-item><a href="#primary-research">2.3 Primary Research: User Interviews &amp; Surveys</a></sl-tree-item>
+          <sl-tree-item><a href="#value-proposition">2.4 Value Proposition Canvas</a></sl-tree-item>
+          <sl-tree-item><a href="#secondary-research">2.5 Secondary Research: Competitor Analysis</a></sl-tree-item>
+          <sl-tree-item><a href="#problem-of-interest">2.6 Problem of Interest</a></sl-tree-item>
+          <sl-tree-item><a href="#value-proposition-statement">2.7 Value Proposition Statement</a></sl-tree-item>
         </sl-tree-item>
 
         <sl-tree-item>
-          <a href="#design-methodology">3. Design Methodology</a>
-          <sl-tree-item><a href="#clarification-of-task">3.1. Clarification of Task</a></sl-tree-item>
-          <sl-tree-item><a href="#v-model">3.2. Systems Engineering V-Model</a></sl-tree-item>
+          <a href="#concept-development">3. Concept Development: Product Needs Formation</a>
+          <sl-tree-item><a href="#product-needs-mapping">3.1 Product Needs Mapping</a></sl-tree-item>
+          <sl-tree-item><a href="#design-methodology">3.2 Systems Engineering V-Model</a></sl-tree-item>
         </sl-tree-item>
 
         <sl-tree-item>
-          <a href="#final-design">4. Final Design</a>
-          <sl-tree-item><a href="#system-overview">4.1. System Overview</a></sl-tree-item>
-          <sl-tree-item><a href="#user-journey">4.2. User Journey</a></sl-tree-item>
+          <a href="#system-overview">4. System Overview</a>
+          <sl-tree-item><a href="#concept-development-detail">4.1 Concept Development</a></sl-tree-item>
+          <sl-tree-item><a href="#final-conceptual-design">4.2 Final Conceptual Design</a></sl-tree-item>
+          <sl-tree-item><a href="#user-journey">4.3 User Journey</a></sl-tree-item>
         </sl-tree-item>
 
         <sl-tree-item expanded>
-          <a href="#conceptual-design">5. Conceptual Design</a>
+          <a href="#conceptual-design">5. Final Boxbunny Design</a>
           <sl-tree-item>
             <a href="pages/gui.html">5.1. User Interface (GUI)</a>
             <sl-tree-item><a href="pages/gui/design-ideation.html">5.1.1. Design and Ideation</a></sl-tree-item>
@@ -214,19 +213,32 @@
     <div id="section-problem-clarification"></div>
     <sl-divider></sl-divider>
 
-    <!-- 3. Design Methodology -->
+    <!-- 3. Concept Development: Product Needs Formation -->
     <div id="section-design-methodology"></div>
     <sl-divider></sl-divider>
 
-    <!-- 4. Final Design -->
+    <!-- 4. System Overview -->
     <div id="section-final-design"></div>
     <sl-divider></sl-divider>
 
-    <!-- 5. Conceptual Design - Navigation Buttons -->
+    <!-- 5. Final Boxbunny Design -->
     <div id="conceptual-design">
-      <h2>5. Conceptual Design</h2>
+      <h2>5. Final BoxBunny Design</h2>
+
       <p>
-        The interactive 3D model below shows the full BoxBunny assembly. Click and drag to rotate, scroll to zoom, and right-click to pan.
+        Chapter 5 presents the realised implementation of the BoxBunny system, advancing from the
+        conceptual architecture established in Chapter 4 to the engineered, integrated, and verified
+        prototype. The system is structured across three primary subsystem domains: the User Interface
+        (Section 5.1), which translates user intent into training session control and presents
+        real-time performance feedback to the practitioner; the Robot Mechanism (Section 5.2), which
+        encompasses the physical actuation hardware, structural frame, and embedded electronics; and
+        the Robot Intelligence layer (Section 5.3), which provides computer vision-based punch
+        classification, adaptive sparring control, and on-device language model coaching. Each
+        subsystem domain was developed in accordance with the V-Model engineering framework
+        introduced in Section 3.2, with measurable requirements established prior to design,
+        subsystem design conducted before integration, and formal verification executed against
+        pre-defined acceptance criteria. The interactive three-dimensional model below presents
+        the physical integration of all five mechanism subsystems into the finalized assembly.
       </p>
 
       <div class="model-viewer-container">
@@ -241,28 +253,69 @@
           style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
         ></model-viewer>
         <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
-          Interactive 3D Model: BoxBunny Full Assembly
+          Figure 6: Interactive 3D Model — BoxBunny Full Assembly
         </sub>
       </div>
 
+      <h3 style="margin-top: 2rem;">System Integration</h3>
+
+      <div style="margin: 16px 0; text-align: center;">
+        <img
+          src="assets/robot_mechanism/Overall_System_Diagrm.jpg"
+          alt="BoxBunny Overall System Diagram"
+          id="fig7-img"
+          onclick="openFig7()"
+          style="max-width: 100%; border-radius: 10px; border: 1px solid #e0e0e0; cursor: zoom-in;"
+        />
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Figure 7: BoxBunny Overall System Diagram
+        </sub>
+      </div>
+
+      <!-- Figure 7 lightbox -->
+      <div id="fig7-modal" onclick="closeFig7()" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:24px;">
+        <img src="assets/robot_mechanism/Overall_System_Diagrm.jpg" style="max-width:95vw; max-height:90vh; border-radius:12px; box-shadow:0 24px 80px rgba(0,0,0,0.5); cursor:zoom-out;" alt="BoxBunny Overall System Diagram expanded" />
+      </div>
+      <script>
+        function openFig7()  { var m=document.getElementById('fig7-modal'); m.style.display='flex'; document.body.style.overflow='hidden'; }
+        function closeFig7() { var m=document.getElementById('fig7-modal'); m.style.display='none'; document.body.style.overflow=''; }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeFig7(); });
+      </script>
+
       <p>
-        Click on each subsystem below to view its detailed conceptual design.
+        The three subsystem domains are unified through a ROS&nbsp;2 communication framework
+        executing on an NVIDIA Jetson Orin NX compute module. User inputs entered through the
+        touchscreen interface are relayed as session commands to the Robot Intelligence layer,
+        which coordinates computer vision inference, inertial measurement unit sensor fusion,
+        and the adaptive sparring finite-state machine. Actuation commands are issued from the
+        Robot Intelligence layer to the Robot Mechanism over a shared CAN bus, with a Teensy&nbsp;4.0
+        microcontroller executing a deterministic 200&nbsp;Hz firmware loop that manages motor
+        command dispatch and sensor polling. A dual-rail power architecture electrically isolates
+        the 24&nbsp;V motor bus from the 12&nbsp;V logic rail, preventing regenerative braking
+        transients from disrupting the control subsystem. The base rotation axis communicates
+        over a dedicated WiFi UDP link, eliminating cable fatigue through the rotating base joint.
+        Linear footwork movement was descoped from the current prototype; the remaining five
+        mechanism subsystems, comprising the base, rotation, height adjustment, padding, and
+        arm actuation, were each developed to a verified standard within the available project
+        timeframe.
       </p>
+
+      <h3 style="margin-top: 2rem;">Subsystem Documentation</h3>
       <div class="section-nav-grid">
         <a href="pages/gui.html" class="section-nav-card">
           <sl-icon name="display" style="font-size: 2rem;"></sl-icon>
           <h3>5.1 User Interface (GUI)</h3>
-          <p>Zakir</p>
+          <p>Touchscreen interface, training modes, session management, phone dashboard</p>
         </a>
         <a href="pages/robot-mechanism.html" class="section-nav-card">
           <sl-icon name="gear-wide-connected" style="font-size: 2rem;"></sl-icon>
           <h3>5.2 Robot Mechanism</h3>
-          <p>Elgin &amp; Jeanette</p>
+          <p>Mechanical structure, actuators, electrical integration, embedded firmware</p>
         </a>
         <a href="pages/robot-intelligence.html" class="section-nav-card">
           <sl-icon name="cpu" style="font-size: 2rem;"></sl-icon>
           <h3>5.3 Robot Intelligence</h3>
-          <p>Yogeeswaran</p>
+          <p>Computer vision, sensor fusion, adaptive sparring engine, LLM coach</p>
         </a>
       </div>
     </div>

@@ -30,31 +30,32 @@
       children: [
         { label: '2.1 Domain Overview and Trends', href: '/index.html#domain-overview' },
         { label: '2.2 Background', href: '/index.html#background' },
-        { label: '2.3 Primary Research: User Interviews/Surveys', href: '/index.html#primary-research' },
-        { label: '2.4 Secondary Research: Competitor Analysis', href: '/index.html#secondary-research' },
-        { label: '2.5 Value Proposition Canvas', href: '/index.html#value-proposition' },
-        { label: '2.5.1 Problem of Interest', href: '/index.html#problem-of-interest' },
-        { label: '2.5.2 Value Proposition Statement', href: '/index.html#value-proposition-statement' },
+        { label: '2.3 Primary Research: User Interviews & Surveys', href: '/index.html#primary-research' },
+        { label: '2.4 Value Proposition Canvas', href: '/index.html#value-proposition' },
+        { label: '2.5 Secondary Research: Competitor Analysis', href: '/index.html#secondary-research' },
+        { label: '2.6 Problem of Interest', href: '/index.html#problem-of-interest' },
+        { label: '2.7 Value Proposition Statement', href: '/index.html#value-proposition-statement' },
       ]
     },
     {
-      label: '3. Design Methodology',
-      href: '/index.html#design-methodology',
+      label: '3. Concept Development: Product Needs Formation',
+      href: '/index.html#concept-development',
       children: [
-        { label: '3.1 Clarification of Task', href: '/index.html#clarification-of-task' },
-        { label: '3.2 V-Model', href: '/index.html#v-model' },
+        { label: '3.1 Product Needs Mapping', href: '/index.html#product-needs-mapping' },
+        { label: '3.2 Systems Engineering V-Model', href: '/index.html#design-methodology' },
       ]
     },
     {
-      label: '4. Final Design',
-      href: '/index.html#final-design',
+      label: '4. System Overview',
+      href: '/index.html#system-overview',
       children: [
-        { label: '4.1 System Overview', href: '/index.html#system-overview' },
-        { label: '4.2 User Journey', href: '/index.html#user-journey' },
+        { label: '4.1 Concept Development', href: '/index.html#concept-development-detail' },
+        { label: '4.2 Final Conceptual Design', href: '/index.html#final-conceptual-design' },
+        { label: '4.3 User Journey', href: '/index.html#user-journey' },
       ]
     },
     {
-      label: '5. Conceptual Design',
+      label: '5. Final Boxbunny Design',
       href: '/index.html#conceptual-design',
       children: [
         {
@@ -293,7 +294,7 @@
 
         // Auto-open: Ch 5 (Conceptual Design) always starts open,
         // other sections only open if user is on a page within them
-        const isConceptualDesign = section.label.includes('Conceptual Design');
+        const isConceptualDesign = section.label.includes('Final Boxbunny Design');
         if (isConceptualDesign || sectionActive) {
           sectionEl.classList.add('open');
           linksList.classList.add('open');

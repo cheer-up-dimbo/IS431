@@ -230,3 +230,118 @@ p {
   display: inline-block;
   margin-bottom: 10px;
 }
+
+/* ── Section-fragment styles (exact copy from pages/introduction.html) ── */
+
+/* Inline quote highlight */
+.block-quote {
+  border-left: 4px solid #1565c0;
+  padding: 12px 20px;
+  margin: 1.5rem 0;
+  background: #f0f4ff;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: #1e3a5f;
+}
+
+/* Callout box */
+.callout {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 1.5rem 0;
+}
+
+.callout strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #0d47a1;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Shared report table */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 8px;
+}
+
+.report-table caption {
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 0.92rem;
+}
+
+.report-table thead tr {
+  background: #f8f9fa;
+}
+
+.report-table th,
+.report-table td {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 0.95rem;
+  vertical-align: top;
+}
+
+.report-table th { font-weight: 600; }
+
+.report-table td.center { text-align: center; }
+
+.check { color: #2e7d32; font-weight: bold; }
+.cross  { color: #c62828; }
+
+/* Sub-figure caption */
+sub.fig-caption {
+  display: block;
+  text-align: center;
+  margin-top: 8px;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Journey swim-lane wrapper */
+.swim-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+}
+
+/* Pie chart centring + size cap */
+.chart-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 0;
+}
+
+.chart-wrap canvas {
+  max-width: 380px;
+  max-height: 380px;
+}
+
+/* Design consideration row colours */
+.dc-row-1 td { background: #cfe2ff; }
+.dc-row-2 td { background: #d1e7dd; }
+.dc-row-3 td { background: #f8d7da; }
+.dc-row-4 td { background: #e2e3e5; }
+.dc-row-5 td { background: #e2d9f3; }
+
+/* h3/h4 colours for injected sections */
+#section-introduction h3,
+#section-problem-clarification h3,
+#section-design-methodology h3,
+#section-final-design h3 { color: #1565c0; margin-top: 2rem; }
+
+#section-introduction h4,
+#section-problem-clarification h4,
+#section-design-methodology h4,
+#section-final-design h4 { color: #37474f; margin-top: 1.5rem; }
+
+
