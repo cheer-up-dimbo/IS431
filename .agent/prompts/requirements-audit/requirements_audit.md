@@ -1,5 +1,6 @@
-# IS431 BoxBunny — Requirements Audit Report (Pass 3)
+# IS431 BoxBunny — Requirements Audit Report (Pass 4)
 > Full re-audit: 2026-04-09 | All source files checked against live HTML
+> Pass 4 adds 3 new pages discovered since Pass 3
 
 ---
 
@@ -50,18 +51,18 @@
 
 ---
 
-## 2. Gap Analysis — All Gaps Resolved ✅
+## 2. Gap Analysis
+
+### Pass 4 Net-New Gaps
 
 | Gap | Severity | Description | Status |
 |-----|----------|-------------|--------|
-| GAP-A | Medium | `padding/testing-evaluation.html` used old PAD-PC-3/5 instead of PAD-PC-1/2 | ✅ **Resolved** — renamed throughout |
-| GAP-B | Medium | PAD-PC-11/12/13 orphaned criteria in sub-page | ✅ **Resolved** — completely removed |
-| GAP-C | Low | `appendix-arm.html` prose used bare `PC-2, PC-3, PC-4` | ✅ **Resolved** — updated to ARM-PC-2/3/4 |
-| GAP-D | Low | V-Model alert in `padding/testing-evaluation.html` referenced bare `PC-3` and `PC-5` | ✅ **Resolved** — updated to PAD-PC-1 and PAD-PC-2 |
+| GAP-P4-A | **Low** | 3 new pages discovered not listed in Pass 3 V-Model coverage table: `arm-actuation/firmware-software.html`, `rotation/load-analysis.html`, `rotation/timing-belt-selection.html` | ✅ **Classified** — all confirmed N/A (no RM-x references; pure design/calculation content) |
+| GAP-P4-B | **Low** | `robot-mechanism.html` hub uses RM-x IDs only in SVG text elements and inline prose — not in machine-parseable `id` attributes, making automated RM-x grep return no matches on that file alone | ℹ️ **Informational** — IDs are present and correct in rendered HTML; no fix required for traceability |
 
----
+> **Net-new actionable gaps: 0** — All Pass 4 findings are informational/classification updates only.
 
-## 3. Confirmed Resolved (all passes)
+### All Prior Gaps (Pass 1–3) — All Resolved ✅
 
 | Gap | Resolution |
 |---|---|
@@ -81,48 +82,51 @@
 
 ---
 
-## 4. V-Model Traceability Alert Coverage (Pass 3)
+## 3. V-Model Traceability Alert Coverage (Pass 4)
 
-> **Standard:** Every `testing-evaluation.html` and all subsection pages with explicit RM-x references must open with a `<sl-alert variant="primary">` V-Model Traceability badge immediately below the `<h2>` heading.
+> **Standard:** Every subsection page with explicit RM-x references must open with a `<sl-alert variant="primary">` V-Model Traceability badge immediately below the `<h2>` heading.
 
-### 4A. Testing & Evaluation Pages
+### 3A. Testing & Evaluation Pages
 
-| File | Requirements Tagged | Added This Pass |
-|------|--------------------|----|
-| `base/testing-evaluation.html` | RM-1, RM-2, RM-7, BASE-1 | ✅ Pass 3 |
-| `rotation/testing-evaluation.html` | RM-4, ROT-1, ROT-2 | ✅ Pass 3 |
-| `height-adjustment/testing-evaluation.html` | RM-3 | ✅ Pass 3 |
-| `padding/testing-evaluation.html` | RM-6, PAD-PC-1, PAD-PC-2 | ✅ Pass 3 (GAP-D fix) |
-| `arm-actuation/testing-evaluation.html` | RM-5, ARM-PC-1 to ARM-PC-5 | ✅ Pass 3 |
+| File | Requirements Tagged | Alert Status |
+|------|--------------------|---|
+| `base/testing-evaluation.html` | RM-1, RM-2, RM-7, BASE-1 | ✅ Has alert |
+| `rotation/testing-evaluation.html` | RM-4, ROT-1, ROT-2 | ✅ Has alert |
+| `height-adjustment/testing-evaluation.html` | RM-3 | ✅ Has alert |
+| `padding/testing-evaluation.html` | RM-6, PAD-PC-1, PAD-PC-2 | ✅ Has alert |
+| `arm-actuation/testing-evaluation.html` | RM-5, ARM-PC-1 to ARM-PC-5 | ✅ Has alert |
 
-### 4B. Other Subsection Pages (applicable)
+### 3B. Other Subsection Pages (applicable)
 
-| File | Requirements Tagged | Added This Pass |
-|------|--------------------|----|
-| `base/design-ideation.html` | RM-1, RM-2 | ✅ Pass 3 |
-| `base/mechanical-design.html` | RM-7, RM-1 | ✅ Pass 3 |
-| `base/load-stability-analysis.html` | RM-1, RM-7 | ✅ Pass 3 |
-| `height-adjustment/load-analysis.html` | RM-3 | ✅ Pass 3 |
-| `padding/mechanical-design.html` | RM-6 | pre-existing ✅ |
-| `padding/electrical-integration.html` | RM-6 | ✅ Pass 3 |
-| `rotation/electrical-control.html` | RM-4, RM-1 | pre-existing ✅ |
-| `height-adjustment/electrical-control.html` | RM-3, RM-1 | pre-existing ✅ |
+| File | Requirements Tagged | Alert Status |
+|------|--------------------|---|
+| `base/design-ideation.html` | RM-1, RM-2 | ✅ Has alert |
+| `base/mechanical-design.html` | RM-7, RM-1 | ✅ Has alert |
+| `base/load-stability-analysis.html` | RM-1, RM-7 | ✅ Has alert |
+| `height-adjustment/load-analysis.html` | RM-3 | ✅ Has alert |
+| `padding/mechanical-design.html` | RM-6 | ✅ Has alert |
+| `padding/electrical-integration.html` | RM-6 | ✅ Has alert |
+| `rotation/electrical-control.html` | RM-4, RM-1 | ✅ Has alert |
+| `height-adjustment/electrical-control.html` | RM-3, RM-1 | ✅ Has alert |
 
-### 4C. Not-Applicable Pages (no RM-x references, pure design/calculation content)
+### 3C. Not-Applicable Pages (no RM-x references — alert not required)
 
 | File | Reason |
 |------|--------|
 | `rotation/design-ideation.html` | No system-level RM-x references |
 | `rotation/mechanical-design.html` | No system-level RM-x references |
+| `rotation/load-analysis.html` | **[NEW Pass 4]** Pure structural calculation; no RM-x refs |
+| `rotation/timing-belt-selection.html` | **[NEW Pass 4]** Pure belt-drive selection; no RM-x refs |
 | `height-adjustment/design-ideation.html` | No system-level RM-x references |
 | `height-adjustment/mechanical-design.html` | No system-level RM-x references |
 | `arm-actuation/design-ideation.html` | No system-level RM-x references |
 | `arm-actuation/mechanical-design.html` | No system-level RM-x references |
 | `arm-actuation/electrical-integration.html` | No system-level RM-x references |
+| `arm-actuation/firmware-software.html` | **[NEW Pass 4]** Two-tier firmware architecture doc; no RM-x refs |
 
 ---
 
-## 5. Summary
+## 4. Summary
 
 ### Active Gaps: **0** — All requirements documentation is consistent ✅
 
@@ -157,5 +161,11 @@
 | Status | Count |
 |--------|-------|
 | Pages with alert (applicable) | 13 |
-| Pages not applicable (no RM-x refs) | 7 |
+| Pages not applicable (no RM-x refs) | 10 (+3 new pages since Pass 3) |
 | Pages missing alert | **0** ✅ |
+
+### Top 3 Gaps Requiring Attention
+
+> **None — all requirement documentation gaps are resolved.**
+>
+> The 3 outstanding **Pending** requirements (RM-3, RM-4, RM-6) are awaiting **physical testing**, not documentation work. These are not documentation gaps; they are known engineering work items pending lab time.
