@@ -526,36 +526,36 @@
 
    <h4>Left Side of the V: Design Decomposition</h4>
    <p>
-     Decomposition was performed by capability, not by codebase. RI-1 and RI-2 drove the
-     real-time inference budget that shaped the dual-branch (voxel + pose) Transformer
-     and the ~24&nbsp;ms per-frame compute target. RI-3 drove the model architecture and the
-     leave-one-person-out validation strategy. RI-4 drove the <code>punch_processor</code> sensor
-     fusion logic and the pad-constraint filter. RI-5 drove every on-device deployment decision,
-     from TensorRT FP16 conversion to the 16&nbsp;GB shared-memory budget. RI-6 drove the
-     <code>sparring_engine</code>, the Markov chain styles, and the persistent weakness profile.
-     RI-7 drove the local Qwen2.5-3B LLM coach and its fallback tip system.
+     Each requirement drove a specific design choice:
+     <strong>RI-1 / RI-2</strong> set the ~24&nbsp;ms per-frame budget that shaped the
+     dual-branch (voxel + pose) Transformer;
+     <strong>RI-3</strong> drove the model architecture and the leave-one-person-out
+     validation strategy;
+     <strong>RI-4</strong> drove the <code>punch_processor</code> fusion logic and
+     pad-constraint filter;
+     <strong>RI-5</strong> drove every on-device decision, from TensorRT FP16 to the
+     16&nbsp;GB shared-memory budget;
+     <strong>RI-6</strong> drove the <code>sparring_engine</code> and weakness profile;
+     <strong>RI-7</strong> drove the local Qwen2.5-3B LLM coach and its fallback system.
    </p>
 
    <h4>Base of the V: Integration Build</h4>
    <p>
-     At the integration stage, all 10 ROS 2 nodes were wired together over 21 custom message
-     types and 6 services, the trained CV model was packaged and deployed as a TensorRT engine
-     on the Jetson, the Vue 3 + FastAPI dashboard was built and connected to the per-user SQLite
-     database, and the LLM coach was loaded into shared GPU memory alongside the CV pipeline.
-     The <code>session_manager</code> 5-state machine became the single source of truth that
-     coordinated every other node, so all training modes (techniques, sparring, free, performance
-     tests) flowed through the same lifecycle.
+     All 10 ROS 2 nodes were wired together over 21 custom messages and 6 services, the CV
+     model was packaged as a TensorRT engine, the Vue 3 + FastAPI dashboard was connected
+     to the per-user SQLite database, and the LLM coach was loaded into shared GPU memory
+     alongside the CV pipeline. The <code>session_manager</code> 5-state machine became the
+     single source of truth, so every training mode flowed through the same lifecycle.
    </p>
 
    <h4>Right Side of the V: Verification Closure</h4>
    <p>
-     Verification was planned from the same RI-1 to RI-7 requirements used during decomposition.
-     The base of the testing pyramid is 146 pytest unit tests covering sensor fusion, gamification,
-     and database operations. The middle layer is 28 cross-module integration tests that exercise
-     ROS message contracts, fusion end-to-end, and motor protocol. The top is 12 system-level
-     notebook sections plus the CDE AI Fair real-world deployment. Together these close the
-     requirement-to-verification loop for all 7 RI requirements
-     (see <a href="robot-intelligence-testing.html">5.3.4 Testing &amp; Validation</a>).
+     Verification followed a three-tier testing pyramid: <strong>146 pytest unit tests</strong>
+     at the base (sensor fusion, gamification, database), <strong>28 integration tests</strong>
+     in the middle (ROS message contracts, fusion end-to-end, motor protocol), and
+     <strong>12 system-level notebook sections + the CDE AI Fair real-world deployment</strong>
+     at the top. Together they close the loop for all 7 RI requirements (see
+     <a href="robot-intelligence-testing.html">5.3.4 Testing &amp; Validation</a>).
    </p>
 
    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">

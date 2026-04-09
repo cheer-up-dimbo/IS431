@@ -152,7 +152,7 @@
  <td style="padding:8px; border:1px solid #ddd; text-align:center;">6</td>
  <td style="padding:8px; border:1px solid #ddd;"><strong>Voxel + Colour Tracking</strong></td>
  <td style="padding:8px; border:1px solid #ddd;">1,749 dims/frame: 12&sup3; voxel delta + optical flow + glove colour tracking (18 dims). VoxelFlowModel (~1.2M): Conv3D + MLP branches, concatenation fusion.</td>
- <td style="padding:8px; border:1px solid #ddd;">~96%. <span style="color:#c62828;">Required coloured gloves. HSV unreliable in variable lighting.</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
+ <td style="padding:8px; border:1px solid #ddd;">~96%. <span style="color:#c62828;">Required coloured gloves. HSV tracking broke when similar colours appeared in the frame (background props, clothing).</span> <span style="color:#e65100;">Insight: voxels need hand info.</span></td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; text-align:center;">7</td>
