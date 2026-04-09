@@ -152,7 +152,7 @@
  only the frames seen so far (causal inference). It also needs to handle the natural variation
  in punch speed: a fast jab and a slow hook look very different at any given point in their
  trajectory, so the model must be temporally flexible rather than relying on a fixed-length window.
- This is why a <strong>causal Transformer</strong> architecture (Vaswani et al., 2017) was chosen, its attention
+ This is why a <strong>causal Transformer</strong> architecture (Vaswani et al., 2017) was chosen because its attention
  mechanism can dynamically weigh recent and earlier frames to capture both fast and slow motions.
  </p>
 
@@ -295,7 +295,7 @@
  </tr>
  <tr style="background:#f8f9fa; font-weight:700;">
  <td style="padding:8px; border:1px solid #ddd; text-align:center;">Total</td>
- <td style="padding:8px; border:1px solid #ddd; text-align:center;">,</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">&ndash;</td>
  <td style="padding:8px; border:1px solid #ddd; text-align:center; white-space:nowrap; color:#1b5e20;">1,747,224</td>
  <td style="padding:8px; border:1px solid #ddd; font-weight:400; color:#555;">Small enough to run at ~8&nbsp;ms per frame on the Jetson</td>
  </tr>
@@ -424,7 +424,7 @@
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">1</td>
  <td style="padding:8px; border:1px solid #ddd;">2D Pose + LSTM</td>
- <td style="padding:8px; border:1px solid #ddd; text-align:center;">,</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">&ndash;</td>
  <td style="padding:8px; border:1px solid #ddd;">Validated pipeline. Training data angles did not match robot-mounted camera.</td>
  </tr>
  <tr>
@@ -442,13 +442,13 @@
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">4</td>
  <td style="padding:8px; border:1px solid #ddd;">RGBD + Segmentation + Causal Transformer</td>
- <td style="padding:8px; border:1px solid #ddd; text-align:center;">,</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">&ndash;</td>
  <td style="padding:8px; border:1px solid #ddd;">Still pixel-based, still required Colab for training.</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">5</td>
  <td style="padding:8px; border:1px solid #ddd;">Depth Feature Engineering (Z-Mask grid)</td>
- <td style="padding:8px; border:1px solid #ddd; text-align:center;">,</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">&ndash;</td>
  <td style="padding:8px; border:1px solid #ddd;">2D depth grid lost 3D spatial info. Hooks vs uppercuts indistinguishable.</td>
  </tr>
  <tr>
