@@ -29,12 +29,14 @@
     <br>
 
     <h2>5.2.4 Padding — Electrical Integration</h2>
-    <p>
-      This section documents the electrical design of the embedded IMU
-      sensing system, covering sensor selection, I2C topology, wiring
-      considerations, and the strike detection signal pipeline from
-      hardware to software.
-    </p>
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page addresses
+      <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
+      provide impact detection</em>) at the electrical layer — covering IMU
+      sensor selection, I²C topology, wiring design, and the strike detection
+      signal pipeline.
+    </sl-alert>
 
     <sl-divider></sl-divider>
 
@@ -196,7 +198,7 @@
       <p>
         Full root-cause analysis and signal-integrity timing diagrams are
         documented in
-        <a href="troubleshooting.html">Troubleshooting, Section 7: I2C Bus
+        <a href="../../../appendix-system-troubleshooting.html#defect-7">System Troubleshooting Appendix, Defect 7: I²C Bus Hang</a>
         Hang on Long-Wire IMU Routing</a>.
       </p>
     </div>

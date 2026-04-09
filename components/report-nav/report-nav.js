@@ -114,8 +114,8 @@
         { label: 'Appendix 3 - GUI Interface', href: '/pages/appendix-gui.html' },
         { label: 'Appendix 4 - User Interview Questions', href: '/pages/appendix-interview-questions.html' },
         { label: 'Appendix 5 - Product Needs Mapping', href: '/pages/appendix-product-mapping.html' },
-        { label: 'Appendix 6 - Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
-        { label: 'Appendix 7 - Arm Actuation Troubleshooting', href: '/pages/robot-mechanism/arm-actuation/troubleshooting.html' },
+        { label: 'Appendix 7 - Robot Intelligence', href: '/pages/appendix-robot-intelligence.html' },
+        { label: 'Appendix 8 - System Troubleshooting', href: '/pages/appendix-system-troubleshooting.html' },
       ]
     },
     {
@@ -156,7 +156,6 @@
       { label: 'Mechanical Design', href: '/pages/robot-mechanism/padding/mechanical-design.html' },
       { label: 'Electrical Integration', href: '/pages/robot-mechanism/padding/electrical-integration.html' },
       { label: 'Testing & Evaluation', href: '/pages/robot-mechanism/padding/testing-evaluation.html' },
-      { label: 'Troubleshooting', href: '/pages/robot-mechanism/padding/troubleshooting.html' },
     ],
     '/pages/robot-mechanism/arm-actuation.html': [
       { label: 'Design & Ideation', href: '/pages/robot-mechanism/arm-actuation/design-ideation.html' },

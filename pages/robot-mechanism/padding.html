@@ -160,38 +160,7 @@
         <code>/strike_events</code> ROS 2 topic.
       </p>
 
-      <h4>Noise Rejection &amp; Threshold Configuration</h4>
-      <p>
-        Two dedicated noise-rejection mechanisms ensure that only genuine
-        user punches trigger a strike event:
-      </p>
-      <ol>
-        <li>
-          <strong>Hard STOP I²C Protocol:</strong> Long (30–40 cm)
-          unshielded jumper wires to the padding zones introduce parasitic
-          capacitance. At 400 kHz, the "Repeated Start" condition can lock
-          the MPU6050's internal state machine, causing it to hold SDA
-          permanently low. The firmware uses a physical
-          <strong>Hard STOP</strong>
-          (<code>endTransmission(true)</code>) after every register write,
-          resetting the sensor state machine before each read. This adds
-          ~20 µs latency per read but eliminates the bus-hang failure mode.
-          See <a href="padding/troubleshooting.html">Troubleshooting
-          §7</a> for the full root-cause analysis.
-        </li>
-        <li>
-          <strong>Scan-Window Peak Detection:</strong> The GUI refreshes
-          at 20 Hz (50 ms), but punch impulses last ~30 ms. A naïve
-          "check the latest sample" approach creates a Nyquist blind-spot
-          where strikes occurring between GUI frames are missed. The
-          detection logic was refactored to
-          <code>np.max(mag_arr[-n_scan:])</code>, scanning all accumulated
-          samples since the last GUI tick (n_scan ≈ 10 samples at 200 Hz
-          firmware rate / 20 Hz GUI rate). See
-          <a href="padding/troubleshooting.html">Troubleshooting
-          §8</a> for details.
-        </li>
-      </ol>
+
 
       <!-- ─── Technical Callout: Timing Budget ─── -->
       <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
@@ -287,13 +256,13 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
             <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
             <td style="padding:8px; border:1px solid #ddd;">Monotonic increase: light &lt; medium &lt; heavy</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm (3 users)</td>
@@ -304,49 +273,10 @@
       <ul>
         <li><strong>Mechanical:</strong> Padding survives repeated high-velocity strikes without delamination.</li>
         <li><strong>Electrical:</strong> IMU I²C communication reliable during active sparring (Hard STOP protocol eliminates bus hang).</li>
-        <li><strong>Vibration isolation:</strong> Anti-vibration mounts reduce transmitted forces to drivetrain.</li>
       </ul>
     </div>
 
-    <sl-divider></sl-divider>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 6. RELATED TROUBLESHOOTING                             -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Related Troubleshooting</h3>
-      <p>
-        Two of the nine cross-layer defects documented in the
-        <a href="arm-actuation/troubleshooting.html">Troubleshooting
-        &amp; Iteration</a> page directly affect the padding subsystem:
-      </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd;">#</th>
-            <th style="padding:8px; border:1px solid #ddd;">Defect</th>
-            <th style="padding:8px; border:1px solid #ddd;">Layer</th>
-            <th style="padding:8px; border:1px solid #ddd;">Impact on Padding</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">7</td>
-            <td style="padding:8px; border:1px solid #ddd;">I²C Bus Hang</td>
-            <td style="padding:8px; border:1px solid #ddd;">Firmware</td>
-            <td style="padding:8px; border:1px solid #ddd;">Long wires to padding zones caused MPU6050 state machine lockup — resolved with Hard STOP protocol</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">8</td>
-            <td style="padding:8px; border:1px solid #ddd;">Nyquist Blind-Spot</td>
-            <td style="padding:8px; border:1px solid #ddd;">Application</td>
-            <td style="padding:8px; border:1px solid #ddd;">GUI sampled only 1 of ~10 accumulated samples per frame, missing inter-frame strikes — resolved with scan-window peak detection</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 7. DETAILED DOCUMENTATION NAV CARDS                    -->
@@ -368,13 +298,9 @@
         <a href="padding/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
           <h3>Testing &amp; Evaluation</h3>
-          <p>PAD-PC-3 detection rate, PAD-PC-5 force differentiation, endurance testing</p>
+          <p>PAD-PC-1 detection rate, PAD-PC-2 force differentiation, endurance testing</p>
         </a>
-        <a href="padding/troubleshooting.html" class="section-nav-card">
-          <sl-icon name="bug" style="font-size: 2rem;"></sl-icon>
-          <h3>Troubleshooting</h3>
-          <p>Defect 7: I²C bus hang, Defect 8: Nyquist blind-spot</p>
-        </a>
+
       </div>
     </div>
 

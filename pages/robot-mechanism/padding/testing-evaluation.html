@@ -34,8 +34,8 @@
       <sl-icon slot="icon" name="check-circle"></sl-icon>
       <strong>V-Model Traceability:</strong> This page validates
       <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
-      provide impact detection</em>) through performance criteria PC-3 and
-      PC-5, plus additional subsystem-level tests designed to ensure
+      provide impact detection</em>) through performance criteria PAD-PC-1 and
+      PAD-PC-2, plus additional subsystem-level tests designed to ensure
       reliability under real sparring conditions.
     </sl-alert>
 
@@ -63,38 +63,17 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
             <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
             <td style="padding:8px; border:1px solid #ddd;">Monotonic: light &lt; medium &lt; heavy</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm comparison (3 users)</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-11</td>
-            <td style="padding:8px; border:1px solid #ddd;">False positive rate</td>
-            <td style="padding:8px; border:1px solid #ddd;">≤ 2 FP per 60 s of arm-only motion</td>
-            <td style="padding:8px; border:1px solid #ddd;">Combat Orbit arm motion without user punches</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-12</td>
-            <td style="padding:8px; border:1px solid #ddd;">Spatial discrimination accuracy</td>
-            <td style="padding:8px; border:1px solid #ddd;">≥ 80% correct zone ID</td>
-            <td style="padding:8px; border:1px solid #ddd;">40-punch zoned test (10 per IMU zone)</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-13</td>
-            <td style="padding:8px; border:1px solid #ddd;">Strike-to-response latency</td>
-            <td style="padding:8px; border:1px solid #ddd;">≤ 200 ms mean</td>
-            <td style="padding:8px; border:1px solid #ddd;">Timestamped /strike_events → motor command pair</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
         </tbody>
@@ -102,7 +81,7 @@
 
       <sl-alert variant="neutral" open>
         <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        <strong>Cross-reference:</strong> PAD-PC-3 and PAD-PC-5 also appear on the
+        <strong>Cross-reference:</strong> PAD-PC-1 and PAD-PC-2 also appear on the
         <a href="../arm-actuation/testing-evaluation.html">Arm Actuation
         Testing &amp; Evaluation</a> page, since they validate the
         integration between the padding IMU pipeline and the arm's FSM
@@ -118,7 +97,7 @@
     <div>
       <h3>Test Procedures</h3>
 
-      <h4>PAD-PC-3: Strike Detection Rate Test</h4>
+      <h4>PAD-PC-1: Strike Detection Rate Test</h4>
       <p>
         <strong>Equipment:</strong> BoxBunny robot (arm stationary at nominal
         height), padding assembly with 4× MPU6050 IMUs active, GUI V3 with
@@ -136,7 +115,7 @@
         test session.
       </p>
 
-      <h4>PAD-PC-5: Force Differentiation Test</h4>
+      <h4>PAD-PC-2: Force Differentiation Test</h4>
       <p>
         <strong>Equipment:</strong> Three users of different skill levels,
         GUI V3 with L2 norm logging.<br>
@@ -150,44 +129,6 @@
         Statistical significance confirmed via one-way ANOVA (p &lt; 0.05).<br>
         <strong>Evidence:</strong> Box plot of L2 norms by force category,
         ANOVA summary table.
-      </p>
-
-      <h4>PAD-PC-11: False Positive Rate Test</h4>
-      <p>
-        <strong>Equipment:</strong> Robot arm in Combat Orbit mode (moving
-        without user interaction).<br>
-        <strong>Setup:</strong> Enable <code>/strike_events</code> logging.
-        No punches delivered during test.<br>
-        <strong>Procedure:</strong> Run Combat Orbit FSM for 60&nbsp;seconds
-        (3 trials). Count any spurious <code>/strike_events</code>
-        publications triggered by arm vibration alone.<br>
-        <strong>Acceptance:</strong> ≤ 2 false positives per 60&nbsp;s trial.<br>
-        <strong>Evidence:</strong> Strike event log, L2 norm trace
-        confirming no true peaks above threshold.
-      </p>
-
-      <h4>PAD-PC-12: Spatial Discrimination Test</h4>
-      <p>
-        <strong>Equipment:</strong> Boxing gloves, 4-zone padding assembly.<br>
-        <strong>Procedure:</strong> Deliver 10 punches to each of the 4 IMU
-        zones (40 total). Compare the detected zone from
-        <code>/strike_events</code> (peak-IMU index) against the actual
-        impact zone.<br>
-        <strong>Acceptance:</strong> Overall accuracy ≥ 80%.<br>
-        <strong>Evidence:</strong> 4×4 confusion matrix heatmap,
-        per-zone accuracy table.
-      </p>
-
-      <h4>PAD-PC-13: Strike-to-Response Latency Test</h4>
-      <p>
-        <strong>Equipment:</strong> Robot arm in reactive sparring mode,
-        ROS 2 timestamp logging.<br>
-        <strong>Procedure:</strong> Deliver 20 punches. Log
-        <code>/strike_events</code> publication timestamp and first
-        subsequent <code>/motor_command</code> timestamp.<br>
-        <strong>Acceptance:</strong> Mean latency ≤ 200&nbsp;ms, max
-        ≤ 500&nbsp;ms.<br>
-        <strong>Evidence:</strong> Latency histogram, min/mean/max table.
       </p>
 
       <h4>Mechanical Endurance</h4>
@@ -227,7 +168,6 @@
           <li>GUI screenshots from the IMU Diagnostics Tab</li>
           <li>L2 norm distribution plots and confusion matrices</li>
           <li>Video evidence of sparring test sessions</li>
-          <li>Latency histogram from PAD-PC-13</li>
         </ul>
       </sl-alert>
     </div>
@@ -240,7 +180,7 @@
           Prev: Electrical Integration
         </sl-button>
       </a>
-      <a href="troubleshooting.html">
+      <a href="../../../appendix-system-troubleshooting.html">
         <sl-button variant="default" size="medium">
           Next: Troubleshooting
           <sl-icon slot="suffix" name="arrow-right"></sl-icon>

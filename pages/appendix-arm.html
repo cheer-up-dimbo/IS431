@@ -74,31 +74,31 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90&deg; rotation)</td>
             <td style="padding:8px; border:1px solid #ddd;">&le; 0.70 s</td>
             <td style="padding:8px; border:1px solid #ddd;">Firmware timestamp delta (N=43 speed tests)</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Sparring endurance</td>
             <td style="padding:8px; border:1px solid #ddd;">5 min continuous, &lt;60&deg;C motors</td>
             <td style="padding:8px; border:1px solid #ddd;">Continuous sparring + Damiao temperature telemetry</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Regenerative braking safety</td>
             <td style="padding:8px; border:1px solid #ddd;">No PSU trip over 5 emergency stops</td>
             <td style="padding:8px; border:1px solid #ddd;">Visual confirmation and voltmeter</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Multi-strike chain</td>
             <td style="padding:8px; border:1px solid #ddd;">3-strike chain &le; 5 s total</td>
             <td style="padding:8px; border:1px solid #ddd;">Video timestamp and GUI console log</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Peak current within safety limit</td>
             <td style="padding:8px; border:1px solid #ddd;">&lt; 2.0 A per motor across all strikes</td>
             <td style="padding:8px; border:1px solid #ddd;">CAN current telemetry (N=43 speed tests)</td>
@@ -110,7 +110,7 @@
       <h4>Test Results</h4>
       <p>
         Results from the speed test validation (N=43 tests, all 6 standard
-        strikes) are presented below. PC-2, PC-3, and PC-4 require dedicated
+        strikes) are presented below. ARM-PC-2, ARM-PC-3, and ARM-PC-4 require dedicated
         test sessions and are documented as pending.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
@@ -125,35 +125,35 @@
         </thead>
         <tbody>
           <tr style="background:#e8f5e9;">
-            <td style="padding:8px; border:1px solid #ddd;">PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90&deg;)</td>
             <td style="padding:8px; border:1px solid #ddd;">&le; 0.70 s</td>
             <td style="padding:8px; border:1px solid #ddd;">0.64 s (best, 30 rad/s Jab)</td>
             <td style="padding:8px; border:1px solid #ddd;" class="kpi-pass">Pass</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Sparring endurance</td>
             <td style="padding:8px; border:1px solid #ddd;">5 min, &lt;60&deg;C</td>
             <td style="padding:8px; border:1px solid #ddd;">&mdash;</td>
             <td style="padding:8px; border:1px solid #ddd;" class="kpi-pend">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Regen braking safety</td>
             <td style="padding:8px; border:1px solid #ddd;">No PSU trip / 5 E-stops</td>
             <td style="padding:8px; border:1px solid #ddd;">&mdash;</td>
             <td style="padding:8px; border:1px solid #ddd;" class="kpi-pend">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PC-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Multi-strike chain</td>
             <td style="padding:8px; border:1px solid #ddd;">3-strike &le; 5 s</td>
             <td style="padding:8px; border:1px solid #ddd;">&mdash;</td>
             <td style="padding:8px; border:1px solid #ddd;" class="kpi-pend">Pending</td>
           </tr>
           <tr style="background:#e8f5e9;">
-            <td style="padding:8px; border:1px solid #ddd;">PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">ARM-PC-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Peak current safety</td>
             <td style="padding:8px; border:1px solid #ddd;">&lt; 2.0 A per motor</td>
             <td style="padding:8px; border:1px solid #ddd;">0.69 A max (Right Hook M4)</td>
@@ -309,8 +309,8 @@
         <sl-icon slot="icon" name="info-circle"></sl-icon>
         This section is archived from the main report (formerly Section 5.2.5.6).
         Full detailed content, including code extraction and diagnostic videos,
-        is preserved in
-        <a href="robot-mechanism/arm-actuation/troubleshooting.html">troubleshooting.html</a>.
+        is preserved in the
+        <a href="appendix-system-troubleshooting.html">System Troubleshooting Appendix</a>.
         The defect index below provides a navigable summary.
       </sl-alert>
 
@@ -326,63 +326,63 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-1">Defect 1</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-1">Defect 1</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Firmware (CAN parsing)</td>
             <td style="padding:10px; border:1px solid #ddd;">Phantom 8&ndash;9 A idle current oscillations</td>
             <td style="padding:10px; border:1px solid #ddd;">Corrected 12-bit MIT Torque field extraction; stable 0.00 A idle confirmed</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-2">Defect 2</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-2">Defect 2</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Firmware (CAN addressing)</td>
             <td style="padding:10px; border:1px solid #ddd;">All four motors mirrored M1 motion; M2&ndash;M4 unresponsive</td>
             <td style="padding:10px; border:1px solid #ddd;">Corrected command frame IDs to 0x101&ndash;0x104</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-3">Defect 3</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-3">Defect 3</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Middleware (micro-ROS)</td>
             <td style="padding:10px; border:1px solid #ddd;">micro-ROS agent froze after 30&ndash;60 s of operation</td>
             <td style="padding:10px; border:1px solid #ddd;">Reduced feedback payload from 72 to 21 doubles; eliminated rmw buffer overflow</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-4">Defect 4</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-4">Defect 4</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Electrical (power)</td>
             <td style="padding:10px; border:1px solid #ddd;">PSU OVP trip during rapid stop commands</td>
             <td style="padding:10px; border:1px solid #ddd;">Software PWM ramp-down + RegenClamp V0.3 + dual-rail isolation</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-5">Defect 5</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-5">Defect 5</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Firmware (IMU)</td>
             <td style="padding:10px; border:1px solid #ddd;">I2C bus hang on long-wire IMU routing</td>
             <td style="padding:10px; border:1px solid #ddd;">Replaced Repeated Start with Hard STOP after every register write</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-6">Defect 6</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-6">Defect 6</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Electrical (back-EMF)</td>
             <td style="padding:10px; border:1px solid #ddd;">Height motor back-EMF caused OVP trip on shared 24 V bus</td>
             <td style="padding:10px; border:1px solid #ddd;">Isolated height motor to dedicated RegenClamp; PWM ramp-down on stop</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-7">Defect 7</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-7">Defect 7</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Application (GUI)</td>
             <td style="padding:10px; border:1px solid #ddd;">Strike detection false positives from vibration during arm motion</td>
             <td style="padding:10px; border:1px solid #ddd;">Added motion-active gate: detection suppressed while any motor is commanding</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-8">Defect 8</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-8">Defect 8</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Mechanical (encoder)</td>
             <td style="padding:10px; border:1px solid #ddd;">Position jumps at &plusmn;180&deg; encoder boundary during continuous motion</td>
             <td style="padding:10px; border:1px solid #ddd;">Multi-turn unwrap logic using 2EC encoder; position register bounded to 360&deg;</td>
             <td style="padding:10px; border:1px solid #ddd; color:#2e7d32;">Resolved</td>
           </tr>
           <tr>
-            <td style="padding:10px; border:1px solid #ddd;"><a href="robot-mechanism/arm-actuation/troubleshooting.html#defect-9">Defect 9</a></td>
+            <td style="padding:10px; border:1px solid #ddd;"><a href="appendix-system-troubleshooting.html#defect-9">Defect 9</a></td>
             <td style="padding:10px; border:1px solid #ddd;">Application (motion planning)</td>
             <td style="padding:10px; border:1px solid #ddd;">Jerky return-to-zero motion causing mechanical wear</td>
             <td style="padding:10px; border:1px solid #ddd;">State-aware proportional snap-back replaces stateless zero-return</td>

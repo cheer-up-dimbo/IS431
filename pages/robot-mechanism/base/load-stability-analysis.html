@@ -59,12 +59,15 @@
     <br>
 
     <h2>Load &amp; Stability Analysis</h2>
-    <p>
-      The load analysis for the base subsystem developed in two stages. The first stage occurred during the early Robotics Fair implementation, where the calculation was used to determine the most suitable <strong>position of the main robot body on the 1220 mm wooden board</strong>. The second stage developed into a more complete design-load philosophy for BoxBunny, distinguishing between repeated-service loads and conservative structural design loads.
-    </p>
-    <p>
-      This load-analysis framework later informed not only the base design, but also the rotation stage, lower mechanism, and height-adjustment subsystem.
-    </p>
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page analytically verifies
+      <strong>RM-1</strong> (<em>Structural stability — robot must remain
+      upright under worst-credible punching loads, FoS &ge; 1.5</em>). The
+      analysis also informs the <strong>RM-7</strong> (<em>Portability</em>)
+      trade-off: mass added for restoring moment must not make the robot
+      unmanageable to one person.
+    </sl-alert>
 
     <sl-divider></sl-divider>
 

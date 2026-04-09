@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IS-431: Appendix — System Troubleshooting &amp; Iteration</title>
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="../components/table-of-content/table-of-content.css">
+  <script type="module" src="../components/image/image-component.js"></script>
+  <script type="module" src="../components/video/video.js"></script>
+  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
+  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
+  <script src="../components/report-nav/report-nav.js" defer></script>
+  <style>
+    .page-nav-row {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <a href="../index.html#appendices" class="back-btn">
+      <sl-button variant="default" size="medium">
+        <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+        Back to Main Report
+      </sl-button>
+    </a>
+    <br>
+
+    <h2>Appendix: System Troubleshooting &amp; Iteration</h2>
+    <p>
+      This appendix consolidates all engineering defects identified during the BoxBunny
+      integration phase, covering the <strong>Arm Actuation</strong> and
+      <strong>Padding</strong> subsystems. Each defect entry documents the symptom,
+      root cause, and implemented resolution. All defects have been resolved (8) or
+      mitigated (1).
+    </p>
+
+    <sl-alert variant="neutral" open>
+      <sl-icon slot="icon" name="info-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> Defects 7 and 8 span the
+      Electrical → Firmware → Application boundary and directly affect
+      <strong>RM-6</strong> (impact detection reliability). Defects 1–6 and 9 affect
+      <strong>RM-5</strong> (arm actuation speed and safety).
+    </sl-alert>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 1 ─── -->
+    <div id="defect-1">
+      <h3>Defect 1: Phantom 8–9A Idle Current</h3>
+      <p><strong>Layer:</strong> Firmware (CAN parsing)</p>
+      <p>
+        <strong>Symptom:</strong> All motors reported ~8–9 A current draws at
+        idle, fluctuating between large positive and negative values.
+      </p>
+      <p>
+        <strong>Root Cause:</strong> The Damiao motor protocol encodes torque
+        as a <strong>12-bit integer</strong> in the CAN response frame. The
+        firmware incorrectly parsed this as a 16-bit float, consuming the
+        adjacent temperature byte. Temperature fluctuations caused the parsed
+        torque (and reported current) to oscillate wildly.
+      </p>
+      <p>
+        <strong>Resolution:</strong> Corrected the CAN unpacking logic to
+        cleanly extract the 12-bit MIT Torque field. Confirmed stable 0.00 A
+        idle readings.
+      </p>
+      <p><strong>Status:</strong> ✅ Resolved</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 2 ─── -->
+    <div id="defect-2">
+      <h3>Defect 2: Motor Jitter &amp; Boomerang Effect</h3>
+      <p><strong>Layer:</strong> Middleware (ROS 2)</p>
+      <p>
+        <strong>Symptom:</strong> The arm would reach the target, reverse to
+        origin, then proceed again — producing a "boomerang" oscillation.
+      </p>
+      <p>
+        <strong>Root Cause (A — Ghost Node):</strong> A stale GUI instance
+        published all-zero targets at 10 Hz, conflicting with the active GUI.
+      </p>
+      <p>
+        <strong>Root Cause (B — 50 Hz Reset):</strong> Publishing CAN commands
+        at the ROS 2 callback rate (50 Hz) continuously reset the Damiao
+        internal trajectory planner.
+      </p>
+      <p>
+        <strong>Resolution:</strong> (A) Pre-launch <code>killall -9 python3</code>.
+        (B) Sparse Edge-Trigger: CAN only on position change &gt;0.01 rad or
+        every 100 ms keep-alive.
+      </p>
+      <p><strong>Status:</strong> ✅ Resolved</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 3 ─── -->
+    <div id="defect-3">
+      <h3>Defect 3: Damiao 50 Hz Trajectory Reset</h3>
+      <p><strong>Layer:</strong> Firmware (CAN timing)</p>
+      <p>
+        <strong>Symptom:</strong> Motors exhibited choppy, non-smooth motion
+        when commands were published at the full ROS callback rate.
+      </p>
+      <p>
+        <strong>Root Cause:</strong> Each CAN position command restarts the
+        Damiao motor's internal trajectory planner. At 50 Hz, the planner
+        never completed a smooth ramp before being reset.
+      </p>
+      <p>
+        <strong>Resolution:</strong> Sparse Edge-Trigger strategy (described
+        above). The motor's internal planner now has time to execute smooth
+        trajectories between commands.
+      </p>
+      <p><strong>Status:</strong> ✅ Resolved</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 4 ─── -->
+    <div id="defect-4">
+      <h3>Defect 4: Jump-Back &amp; Failed Sensorless Homing</h3>
+      <p><strong>Layer:</strong> Application (GUI logic)</p>
+      <p>
+        <strong>Symptom:</strong> After a sequence ended, the arm jumped to
+        an arbitrary position instead of returning to start.
+      </p>
+      <p>
+        <strong>Root Cause:</strong> The GUI's <code>apply_dynamic_endstops()</code>
+        function was overwritten when using <code>set_target()</code> via
+        sequence executor (not the same function as <code>set_target_arm()</code>).
+        The endstop clamp was applied to stale slider values.
+      </p>
+      <p>
+        <strong>Resolution:</strong> Unified the target-setting pathway.
+        Additionally, the automated sensorless homing sequence was removed
+        after three failure modes (spurious current spikes, gear mesh slack
+        non-repeatability, Motor 2 torque resonance) and replaced with a
+        Manual Calibration Framework.
+      </p>
+      <p><strong>Status:</strong> ✅ Resolved</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 5 ─── -->
+    <div id="defect-5">
+      <h3>Defect 5: MDDS10 PWM/DIR Pin Transposition</h3>
+      <p><strong>Layer:</strong> Firmware + Documentation</p>
+      <p>
+        <strong>Symptom:</strong> Motor ran at constant full speed; speed
+        slider had no effect; STOP command was ignored.
+      </p>
+      <p>
+        <strong>Root Cause:</strong> The wiring document transposed the AN1
+        (speed) and DIG1 (direction) function labels. Pin 3 was wired to
+        AN1 but mapped as direction output (constant 5V = 100% speed). Pin 2
+        was wired to DIG1 but mapped as PWM (direction-pin ignores PWM).
+      </p>
+      <p>
+        <strong>Resolution:</strong> Firmware pin swap — no physical rewiring.
+        Documentation corrected.
+      </p>
+      <p><strong>Status:</strong> ✅ Resolved</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 6 ─── -->
+    <div id="defect-6">
+      <h3>Defect 6: Confirmed PSU OVP Trip</h3>
+      <p><strong>Layer:</strong> Electrical (Power)</p>
+      <p>
+        <strong>Symptom:</strong> Releasing the EXTEND button caused the PSU
+        to trip and all systems lost power.
+      </p>
+      <p>
+        <strong>Root Cause:</strong> Abrupt PWM cut from full speed → zero.
+        Rotor back-EMF injected onto 24V bus, exceeding the PSU's ~28V OVP
+        threshold.
+      </p>
+      <p>
+        <strong>Resolution:</strong> <code>_ramp_down()</code> — 6 decreasing
+        PWM steps over 300 ms. Hardware TVS clamp recommended for permanent
+        fix.
+      </p>
+      <p><strong>Status:</strong> ⚠️ Mitigated (hardware TVS clamp pending)</p>
+
+      <h4>Defect 6 Detail: Regenerative Braking &amp; Back-EMF Management</h4>
+      <p>
+        The DC height motor operates as a <strong>generator</strong>
+        during the deceleration phase of height adjustment. When the
+        motor decelerates rapidly (e.g., an abrupt STOP command at
+        speed), the collapsing magnetic flux produces a
+        <strong>back-EMF</strong> voltage spike that is injected onto the
+        shared 24V bus.
+      </p>
+
+      <sl-alert variant="danger" open>
+        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
+        <strong>Root Cause:</strong> This failure mode was discovered
+        during integration testing. The OVP trip was caused by the
+        <strong>DC height motor</strong> (via the Cytron MDDS10), not
+        the Damiao arm motors. The geared DC motor's higher rotor
+        inertia and the mechanical advantage of the screw jack produce
+        larger back-EMF transients than the smaller Damiao BLDC motors.
+      </sl-alert>
+
+      <h5>Software Mitigation — PWM Ramp-Down</h5>
+      <p>
+        A <code>_ramp_down()</code> method was implemented in the GUI
+        control layer (V3). Instead of issuing a single STOP command,
+        the method transmits <strong>six progressively decreasing
+        position commands</strong> over a 300 ms window, limiting the
+        rate of rotor deceleration and thereby capping the back-EMF
+        voltage below the OVP threshold.
+      </p>
+
+      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+        <h5 style="margin-top:0; color:#1e40af;">Back-EMF Physics</h5>
+        <p>
+          The induced voltage (<em>V<sub>emf</sub></em>) is proportional
+          to the rate of change of magnetic flux:
+        </p>
+        <p style="font-family: serif; font-size: 1.15rem; text-align: center; margin: 12px 0;">
+          V<sub>emf</sub> = &minus;N &middot;
+          d&Phi; / dt &nbsp;&asymp;&nbsp;
+          K<sub>e</sub> &middot; &omega;
+        </p>
+        <p>
+          Where K<sub>e</sub> is the motor's back-EMF constant and
+          &omega; is the angular velocity at the moment of deceleration.
+          By controlling d&omega;/dt through the ramp-down, the firmware
+          limits V<sub>emf</sub> to below the OVP threshold.
+        </p>
+      </div>
+
+      <h5>Residual Risk &amp; Recommended Future Work</h5>
+      <p>
+        The software ramp-down addresses the common case but does not
+        protect against edge cases such as a user physically stopping the
+        height column mid-travel. A hardware-level protection — either a
+        <strong>TVS clamp diode</strong> or an
+        <strong>Active Shunt Regulator</strong> on the 24V bus — is
+        recommended as a permanent solution.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 7 ─── -->
+    <div id="defect-7">
+      <h3>Defect 7: I²C Bus Hang on Long-Wire IMU Routing</h3>
+      <p><strong>Layer:</strong> Firmware (Electrical → Software boundary) — affects <strong>RM-6</strong> (Padding / Impact Detection)</p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold; width:140px;">Symptom</td>
+            <td style="padding:8px; border:1px solid #ddd;">MPU6050 holds SDA permanently low, freezing the entire I²C bus; IMU readings drop to <code>-1</code> (0xFFFF) without power cycle recovery</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Root Cause</td>
+            <td style="padding:8px; border:1px solid #ddd;">Long (30–40 cm) unshielded jumper wires introduce parasitic capacitance (~50–100 pF per wire). At 400 kHz Fast Mode, the I²C "Repeated Start" condition causes the MPU6050's state machine to misinterpret the condition as a data bit, latching SDA low indefinitely</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Resolution</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hard STOP protocol — <code>endTransmission(true)</code> after every register write, forcing a full STOP + START sequence. Adds ~20 µs latency per read but eliminates the bus-hang failure mode</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Status</td>
+            <td style="padding:8px; border:1px solid #ddd;">✅ Resolved</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Root-Cause Analysis</h4>
+      <p>
+        The MPU6050 implements I²C with an internal state machine that
+        tracks bus conditions. When the master issues a
+        <strong>Repeated Start</strong> (SR) — pulling SDA low while SCL is
+        high without an intervening STOP — the sensor must detect the
+        transition within a narrow timing window (t<sub>HD;STA</sub> ≥
+        0.6&nbsp;µs per the I²C spec). On short PCB traces (&lt;&nbsp;5&nbsp;cm),
+        this timing is comfortably met.
+      </p>
+      <p>
+        However, the BoxBunny padding assembly routes
+        <strong>30–40&nbsp;cm 4-conductor jumper wires</strong> from each
+        IMU breakout to the Teensy 4.1. At this length, parasitic
+        capacitance introduces RC rise-time delays on both SDA and SCL.
+        At 400&nbsp;kHz Fast Mode, these delays can cause the MPU6050's
+        state machine to <em>misinterpret</em> the Repeated Start as a data
+        bit, latching SDA low indefinitely.
+      </p>
+      <p>
+        The fix replaces all Repeated Start sequences with a
+        <strong>Hard STOP + full START</strong> sequence
+        (<code>endTransmission(true)</code>). The STOP condition
+        unambiguously resets the MPU6050's state machine regardless of
+        parasitic capacitance.
+      </p>
+
+      <sl-alert variant="neutral" open>
+        <sl-icon slot="icon" name="speedometer2"></sl-icon>
+        <strong>Performance penalty:</strong> The Hard STOP protocol adds
+        ~20&nbsp;µs per read cycle. At 200&nbsp;Hz scan rate across 4 IMUs,
+        this totals ~16&nbsp;ms additional overhead per second (&lt; 2% of
+        the 5&nbsp;ms loop budget) — an acceptable trade-off for guaranteed
+        bus stability.
+      </sl-alert>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 8 ─── -->
+    <div id="defect-8">
+      <h3>Defect 8: Nyquist Blind-Spot in Strike Detection</h3>
+      <p><strong>Layer:</strong> Application (GUI signal processing) — affects <strong>RM-6</strong> (Padding / Impact Detection)</p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold; width:140px;">Symptom</td>
+            <td style="padding:8px; border:1px solid #ddd;">Visible acceleration peaks in PyQtGraph plot exceed threshold but system fails to register strike events</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Root Cause</td>
+            <td style="padding:8px; border:1px solid #ddd;">GUI refreshes at 20 Hz (50 ms), but punch impulses last ~30 ms. Naïve "check latest sample" approach samples only 1 of ~10 accumulated data points per frame, missing inter-frame strikes — a Nyquist blind-spot</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Resolution</td>
+            <td style="padding:8px; border:1px solid #ddd;">Scan-window peak detection: <code>np.max(mag_arr[-n_scan:])</code> scans all accumulated samples since last GUI tick (n_scan ≈ 10 at 200 Hz firmware / 20 Hz GUI)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">Status</td>
+            <td style="padding:8px; border:1px solid #ddd;">✅ Resolved</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Root-Cause Analysis</h4>
+      <p>
+        The IMU firmware publishes accelerometer data at
+        <strong>200&nbsp;Hz</strong> (5&nbsp;ms sample period). The GUI
+        processes this data in its Qt event loop at <strong>20&nbsp;Hz</strong>
+        (50&nbsp;ms tick period). Between each GUI tick, approximately
+        10 IMU samples accumulate in the subscription buffer.
+      </p>
+      <p>The original detection logic checked only the <em>most recent sample</em> at each GUI tick:</p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">
+<span style="color:#999;"># BEFORE (broken): checks only 1 of ~10 samples</span>
+if mag_arr[-1] &gt; threshold:
+    publish_strike_event()</pre>
+      <p>
+        A punch impulse lasts approximately 20–30&nbsp;ms. If the peak
+        occurs between two GUI ticks, the latest sample may already be below
+        the threshold — the peak is <em>visible</em> in the real-time plot
+        but <em>invisible</em> to the point-in-time threshold check.
+      </p>
+      <p>The fix scans <em>all accumulated samples</em> since the last tick:</p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">
+<span style="color:#999;"># AFTER (fixed): scans all samples in the window</span>
+n_scan = max(1, int(firmware_hz / gui_hz))  <span style="color:#999;"># ≈ 10</span>
+peak = np.max(mag_arr[-n_scan:])
+if peak &gt; threshold:
+    publish_strike_event(zone=np.argmax(...))</pre>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect 9 ─── -->
+    <div id="defect-9">
+      <h3>Defect 9: Micro-ROS Agent Disconnect Hang</h3>
+      <p><strong>Layer:</strong> Firmware (micro-ROS transport)</p>
+      <p>
+        <strong>Symptom:</strong> Killing the <code>micro_ros_agent</code>
+        left the Teensy permanently hung in AGENT_CONNECTED state (WSL-specific).
+      </p>
+      <p>
+        <strong>Root Cause:</strong> WSL USB passthrough drivers fail to
+        signal DTR/RTS teardown to the Teensy when the host port closes.
+      </p>
+      <p>
+        <strong>Resolution:</strong> 1 Hz active ping
+        (<code>rmw_uros_ping_agent(10, 1)</code>). After 3 failed pings (1.5 s),
+        the firmware triggers a <strong>hardware silicon reset</strong>
+        (<code>SCB_AIRCR = 0x05FA0004</code>), guaranteeing a pristine state
+        and immediate re-handshake.
+      </p>
+      <p><strong>Status:</strong> ✅ Resolved</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Design Notes (Archived) ─── -->
+    <div>
+      <h3>Design Note: Tactical Walking — Exploiting the Differential Coupling</h3>
+      <p>
+        The bevel gear "walking" effect described in
+        <a href="robot-mechanism/arm-actuation/mechanical-design.html">Mechanical Design</a> is typically
+        characterised as a mechanical challenge requiring software
+        compensation. However, during motion planning development, this
+        same coupling was identified as an <strong>intentional
+        choreographic asset</strong> for specific strike patterns.
+      </p>
+
+      <h4>The Jab Windup — Intentional Rearing Motion</h4>
+      <p>
+        A realistic jab requires a preparatory "windup" phase where the
+        arm lifts before descending into the strike. With the coaxial
+        differential, this compound motion emerges naturally from the
+        gear coupling by commanding Motor 1 and Motor 2 to rotate in
+        <strong>opposition</strong>, producing a <strong>"rearing"
+        motion</strong> that lifts the training stick vertically before
+        the subsequent downward strike.
+      </p>
+      <p>
+        This reframing — from "compensating an error" to "exploiting a
+        mechanical property" — illustrates the design philosophy of the
+        Upper Mechanism: the differential coupling is a
+        <strong>4-quadrant actuation space</strong> where same-direction
+        rotation produces pure roll, opposite-direction produces amplified
+        pitch, and intermediate ratios blend both axes to create fluid,
+        compound strike trajectories.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── Defect Summary Table ─── -->
+    <div>
+      <h3>Defect Summary</h3>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">#</th>
+            <th style="padding:8px; border:1px solid #ddd;">Defect</th>
+            <th style="padding:8px; border:1px solid #ddd;">Layer</th>
+            <th style="padding:8px; border:1px solid #ddd;">Req</th>
+            <th style="padding:8px; border:1px solid #ddd;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;">1</td><td style="padding:8px; border:1px solid #ddd;">Phantom current</td><td style="padding:8px; border:1px solid #ddd;">Firmware</td><td style="padding:8px; border:1px solid #ddd;">RM-5</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">2</td><td style="padding:8px; border:1px solid #ddd;">Motor jitter</td><td style="padding:8px; border:1px solid #ddd;">Middleware</td><td style="padding:8px; border:1px solid #ddd;">RM-5</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">3</td><td style="padding:8px; border:1px solid #ddd;">Trajectory reset</td><td style="padding:8px; border:1px solid #ddd;">Firmware</td><td style="padding:8px; border:1px solid #ddd;">RM-5</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">4</td><td style="padding:8px; border:1px solid #ddd;">Jump-back + homing</td><td style="padding:8px; border:1px solid #ddd;">Application</td><td style="padding:8px; border:1px solid #ddd;">RM-5</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">5</td><td style="padding:8px; border:1px solid #ddd;">MDDS10 pin swap</td><td style="padding:8px; border:1px solid #ddd;">Firmware</td><td style="padding:8px; border:1px solid #ddd;">RM-3</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">6</td><td style="padding:8px; border:1px solid #ddd;">PSU OVP trip</td><td style="padding:8px; border:1px solid #ddd;">Electrical</td><td style="padding:8px; border:1px solid #ddd;">RM-5</td><td style="padding:8px; border:1px solid #ddd; color:orange;">⚠️ Mitigated (HW fix pending)</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">7</td><td style="padding:8px; border:1px solid #ddd;">I²C bus hang</td><td style="padding:8px; border:1px solid #ddd;">Firmware</td><td style="padding:8px; border:1px solid #ddd;">RM-6</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">8</td><td style="padding:8px; border:1px solid #ddd;">Nyquist blind-spot</td><td style="padding:8px; border:1px solid #ddd;">Application</td><td style="padding:8px; border:1px solid #ddd;">RM-6</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">9</td><td style="padding:8px; border:1px solid #ddd;">Micro-ROS hang</td><td style="padding:8px; border:1px solid #ddd;">Firmware</td><td style="padding:8px; border:1px solid #ddd;">RM-5</td><td style="padding:8px; border:1px solid #ddd; color:green;">✅ Resolved</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="page-nav-row">
+      <a href="appendix-arm.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Appendix — Arm Actuation Testing
+        </sl-button>
+      </a>
+      <div></div>
+    </div>
+  </div>
+
+  <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
+    <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
+  </sl-button>
+</body>
+</html>

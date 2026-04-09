@@ -119,28 +119,22 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% TP</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
             <td style="padding:8px; border:1px solid #ddd;">Monotonic (L &lt; M &lt; H)</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
         </tbody>
       </table>
-      <p>
-        <strong>Related defects resolved:</strong>
-        <a href="arm-actuation/troubleshooting.html">Defect 7</a>
-        (I²C bus hang) and
-        <a href="arm-actuation/troubleshooting.html">Defect 8</a>
-        (Nyquist blind-spot in strike detection).
-      </p>
+
 
       <h4>5.2.5 Arm Actuation</h4>
       <p>
@@ -148,8 +142,8 @@
         criteria (ARM-PC-1 to ARM-PC-5). Speed testing (ARM-PC-1, ARM-PC-5)
         has been completed across N=43 tests. See
         <a href="arm-actuation/testing-evaluation.html">Testing
-        &amp; Evaluation</a> for full procedures and benchmark data, and
-        <a href="arm-actuation/troubleshooting.html">Troubleshooting</a>
+        &amp; Evaluation</a> for full procedures and benchmark data, and the
+        <a href="../appendix-system-troubleshooting.html">System Troubleshooting Appendix</a>
         for cross-layer defect resolutions (8 resolved, 1 mitigated).
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
@@ -166,7 +160,7 @@
           <tr style="background:#fff8e1;">
             <td style="padding:8px; border:1px solid #ddd;">ARM-PC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90° rotation)</td>
-            <td style="padding:8px; border:1px solid #ddd;">≤ 0.25 s <em style="color:#888;">(original RM-5)</em></td>
+            <td style="padding:8px; border:1px solid #ddd;">≤ 0.25 s</td>
             <td style="padding:8px; border:1px solid #ddd;">0.64 s best (Left Jab, 30 rad/s)</td>
             <td style="padding:8px; border:1px solid #ddd; color:#c0832a; font-weight:bold;">Partial</td>
           </tr>
@@ -267,28 +261,28 @@
             <td style="padding:8px; border:1px solid #ddd;">Height adjustment stroke</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 400 mm, ≤ 32 s</td>
             <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Yaw angular velocity</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 150°/s</td>
             <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
-          <tr>
+          <tr style="background:#fff8e1;">
             <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed</td>
             <td style="padding:8px; border:1px solid #ddd;">90° ≤ 0.25 s</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.64 s best (Left Jab, 30 rad/s) — Damiao PID ramp overhead</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c0832a; font-weight:bold;">Partial</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-6</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact detection</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% TP</td>
             <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
