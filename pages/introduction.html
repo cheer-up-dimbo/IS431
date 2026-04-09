@@ -258,19 +258,21 @@
     <div id="domain-overview">
       <h3>2.1 Domain Overview and Trends</h3>
       <p>
-        Boxing is one of the most widely practised combat sports globally, with participation growing across
-        Southeast Asia, Europe, and North America. Within sports technology, data-driven training tools have
-        moved from elite institutions into mainstream gyms. Products such as FightCamp (FightCamp, 2017) and
-        Hykso (Hykso, 2018) demonstrate consumer appetite for punch tracking and performance feedback. This
-        shift has raised user expectations: practitioners now expect quantifiable feedback and interactive
-        training experiences that passive equipment such as heavy bags and focus pads cannot provide.
+        Boxing is one of the most widely practised combat sports globally, and within the sports technology
+        sector, data-driven training tools have moved into mainstream gyms, raising practitioner expectations
+        for quantifiable feedback beyond what passive equipment can provide (FightCamp, 2017; Hykso, 2018).
       </p>
+      <iframe src="../assets/charts/sports-tech-market-chart.html" width="100%" height="400" style="border:none;"></iframe>
       <p>
-        Several robotic boxing products have entered the market, including the Nexersys, the STRYK RXT-1
-        (STRYK, 2020), and the BotBoxer by SkyTechSport (BotBoxer, 2010). While these systems offer
-        interactive strike targets, they remain predominantly reactive, responding only to the boxer's inputs
-        rather than initiating attacks or adapting strategy based on real-time performance. This gap between
-        existing robotic capability and boxing-specific application defines the opportunity that BoxBunny
+        The global boxing equipment market was valued at approximately USD 4.1 billion in 2023 and is
+        projected to grow through the decade (Mordor Intelligence, 2023), accelerating demand for
+        interactive, data-driven training tools beyond traditional bag work and pad drills.
+      </p>
+      <iframe src="../assets/charts/boxing-market-chart.html" width="100%" height="400" style="border:none;"></iframe>
+      <p>
+        Robotic boxing products including the Nexersys, STRYK RXT-1 (STRYK, 2020), and BotBoxer
+        (BotBoxer, 2010) have entered this market, but remain predominantly reactive and do not
+        initiate attacks or adapt strategy in real time, defining the capability gap BoxBunny
         is designed to address.
       </p>
     </div>
@@ -289,8 +291,9 @@
         To better understand this problem, the project team engaged directly with the boxing community by
         joining boxing gym memberships and observing standard training flows first-hand. User interviews and
         surveys were subsequently conducted at six boxing gyms across Singapore, and three leading competitive
-        products were reviewed in depth. These findings informed two Value Proposition Canvases capturing
-        the distinct jobs, pains, and gains of boxers and training support stakeholders respectively.
+        products were reviewed in depth. These findings were synthesised through two Value Proposition Canvases
+        (Section&nbsp;2.4) and a competitor analysis (Section&nbsp;2.5), establishing a validated problem
+        statement and the design requirements addressed in Chapter 3.
       </p>
     </div>
 
@@ -370,14 +373,65 @@
     </div>
 
     <!-- §2.4 ─────────────────────────────────────────── -->
-    <div id="secondary-research">
-      <h3>2.4 Secondary Research: Competitor Analysis</h3>
+    <div id="value-proposition">
+      <h3>2.4 Value Proposition Canvas</h3>
       <p>
-        A competitor study evaluated three robotic or interactive training products — BotBoxer, FightCamp,
-        and STRYK — against the user requirements identified in Section 2.3 (Table 2). Each product was
-        selected for its market presence and relevance as an interactive training solution, and each had
-        been subject to a volume of user-generated reviews sufficient to identify recurring pain points
-        and gaps.
+        The findings from primary research were synthesised through a Value Proposition Canvas (VPC)
+        framework, producing two canvases — one for Boxing-Gym Boxers (Figure 3) and one for Training
+        Support Stakeholders (Figure 4). Each canvas maps customer jobs, pains, and gains against the
+        proposed pain relievers and gain creators offered by the product, identifying targeted product
+        opportunities for each stakeholder group.
+      </p>
+
+      <p>
+        Boxers demand flexibility, quantifiable progress, and the realism of sparring. Primary frustrations
+        centre on coaching scarcity and inadequate partner matching: 80% reported limited coaching attention,
+        76% struggle with training partner availability, and 72% feel constrained by slow progress in
+        mixed-ability settings.
+      </p>
+
+      <image-component
+        width="72%"
+        tag="image"
+        source="../assets/vpc/VPC Boxers in Boxing Gyms.png"
+        subtitle="Figure 3: Value Proposition Canvas — Boxing-Gym Boxers">
+      </image-component>
+
+      <p>
+        Training support stakeholders prioritise safety, structured skill development, and operational
+        scalability. Their primary challenge is delivering individualised attention: pad work and defensive
+        drills rank highest in teaching priority, yet current coach-to-boxer ratios prevent the one-on-one
+        engagement these methods require.
+      </p>
+
+      <image-component
+        width="72%"
+        tag="image"
+        source="../assets/vpc/VPC Training Support Stakeholders.png"
+        subtitle="Figure 4: Value Proposition Canvas — Training Support Stakeholders">
+      </image-component>
+
+      <p>
+        Together, the two canvases established a unified set of product attributes that balance boxer demands
+        for realism and measurable progress against stakeholder requirements for safety, structure, and
+        operational efficiency. These attributes directly informed the secondary research scope, guiding the
+        selection of competitor products evaluated in Section 2.5.
+      </p>
+    </div>
+
+    <!-- §2.5 ─────────────────────────────────────────── -->
+    <div id="secondary-research">
+      <h3>2.5 Secondary Research: Competitor Analysis</h3>
+      <p>
+        The secondary research evaluated three robotic or interactive training products: BotBoxer, FightCamp,
+        and STRYK, each selected for its market presence and the volume of user-generated reviews available
+        to identify recurring pain points and capability gaps.
+      </p>
+      <iframe src="../assets/charts/competitor-carousel.html" width="100%" height="450" style="border:none; margin: 16px 0;"></iframe>
+      <p>
+        User requirements derived from the Value Proposition Canvases (Section&nbsp;2.4) were applied to
+        evaluate each product above, with results tabulated in Table 2. Products were assessed against
+        twelve requirements identified as priorities by both stakeholder groups during primary research.
       </p>
 
       <table class="report-table">
@@ -457,12 +511,7 @@
             <td class="center"></td>
             <td class="center"><span class="check">&#10003;</span></td>
           </tr>
-          <tr>
-            <td>Validated through user research</td>
-            <td class="center"></td>
-            <td class="center"></td>
-            <td class="center"></td>
-          </tr>
+
         </tbody>
       </table>
 
@@ -470,113 +519,59 @@
         Competitor analysis confirmed that existing solutions each address only a subset of user requirements.
         Digital coaching and performance data are reasonably well served, but realistic striking engagement,
         adaptability across skill levels, proactive attack initiation, and space-efficient design remain
-        collectively unmet by any single product. These gaps directly informed the five design considerations
-        below, which define what BoxBunny must deliver to close the identified market gap.
+        collectively unmet by any single product. These gaps, combined with the Jobs-to-be-Done identified
+        in the VPCs (Section 2.4), directly informed the five design considerations below, which define
+        what BoxBunny must deliver to close the identified market gap.
       </p>
 
       <table class="report-table">
-        <caption>Table 3: Design Considerations for BoxBunny Derived from Competitor Gaps</caption>
+        <caption>Table 3: Design Considerations: Rationale, Competitor Gaps &amp; Proposed Improvements</caption>
         <thead>
           <tr>
-            <th style="width:28%">Design Consideration</th>
-            <th>What This Means for BoxBunny</th>
+            <th style="width:18%">Design Consideration</th>
+            <th style="width:24%">Rationale from Research</th>
+            <th style="width:30%">Existing Competitor Offerings &amp; User Feedback</th>
+            <th style="width:28%">Proposed Design Improvement for BoxBunny</th>
           </tr>
         </thead>
         <tbody>
           <tr class="dc-row-1">
             <td><strong>Performance Analytics</strong></td>
-            <td>
-              80% of boxers cited limited coaching attention; support stakeholders prioritise personalised
-              feedback. BoxBunny tracks punch power, stamina, reaction time, and defence metrics, enabling
-              coaches to deliver individualised guidance at scale and helping boxers quantify progress
-              objectively.
-            </td>
+            <td>80% of boxers cited limited coaching attention; support stakeholders prioritised personalised, quantifiable feedback.</td>
+            <td>Sensor analytics exist across Nexersys and BotBoxer, but metrics are siloed with no product integrating sensor data and visual tracking.</td>
+            <td>Unified system recording punch power, accuracy, and timing, with sensor-CV synchronisation and shared performance dashboards.</td>
           </tr>
           <tr class="dc-row-2">
-            <td><strong>Realistic Training Partner</strong></td>
-            <td>
-              Injury risk deters 36% of boxers from frequent live sparring; support stakeholders prioritise
-              pad work and defensive drills. BoxBunny delivers realistic punching interaction and defensive
-              feedback without the injury burden associated with human sparring partners.
-            </td>
+            <td><strong>Intelligent Sparring System</strong></td>
+            <td>Injury risk deters 36% of boxers from live sparring; support stakeholders ranked pad work and defensive drills as the highest teaching priority.</td>
+            <td>BotBoxer reviews cite no haptic feedback and a stationary base; a recurring finding is that existing systems cannot replicate a real sparring partner.</td>
+            <td>Active arm actuation, footwork body movement, and haptic feedback simulating real incoming strikes, triggered by computer vision.</td>
           </tr>
           <tr class="dc-row-3">
             <td><strong>Skill Progression Studio</strong></td>
-            <td>
-              72% of boxers reported slow progress due to mixed-ability classes forcing repetition of
-              fundamentals. BoxBunny delivers layered, AI-guided drills that scale with individual skill
-              level, supporting continuous development without holding back advanced practitioners.
-            </td>
+            <td>72% of boxers attributed slow progress to mixed-ability class settings that constrain advanced practitioners to repeated fundamental drills.</td>
+            <td>STRYK offers multiple training modes but provides no adaptive progression logic linking them.</td>
+            <td>AI-guided drills blending offensive, defensive, and reactive techniques, scaling in difficulty with individual performance.</td>
           </tr>
           <tr class="dc-row-4">
             <td><strong>Adaptive Fight Intelligence</strong></td>
-            <td>
-              76% of boxers struggle to find training partners at their skill level. BoxBunny responds
-              intelligently to user movements and adjusts difficulty in real time using computer vision,
-              providing a consistently matched opponent that cannot be replicated by conventional training
-              equipment.
-            </td>
+            <td>76% of boxers cited difficulty finding training partners at a comparable ability level.</td>
+            <td>BotBoxer dodges in real time and STRYK provides coaching cues, but neither initiates attacks nor adapts based on accumulated session performance.</td>
+            <td>A counterpunching system that reacts dynamically to user attack patterns, augmented by real-time auditory and visual coaching cues.</td>
           </tr>
           <tr class="dc-row-5">
             <td><strong>Modular Boxing Platform</strong></td>
-            <td>
-              Gym operators report space constraints and cost pressures; boxers vary in build and height.
-              BoxBunny employs a compact, height-adjustable frame that accommodates diverse user populations
-              and fits space-constrained training environments, while remaining scalable in cost.
-            </td>
+            <td>Gym operators reported space constraints and cost pressures; boxer respondents ranged in height from 150 cm to 190 cm.</td>
+            <td>STRYK offers height adjustment, but user reviews describe it as too bulky for typical gym use.</td>
+            <td>Height-adjustable, portable platform for gym and home deployment, simplified for broad adoption.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- §2.5 ─────────────────────────────────────────── -->
-    <div id="value-proposition">
-      <h3>2.5 Value Proposition Canvas</h3>
-      <p>
-        Two Value Proposition Canvases (VPCs) were constructed — one for Boxing-Gym Boxers (Figure 3) and one
-        for Training Support Stakeholders (Figure 4) — translating user interview findings and competitor gaps
-        into targeted product opportunities. The VPC framework maps customer jobs, pains, and gains against
-        the proposed pain relievers and gain creators offered by the product.
-      </p>
-
-      <p>
-        Boxers demand flexibility, quantifiable progress, and the realism of sparring. Primary frustrations
-        centre on coaching scarcity and inadequate partner matching: 80% reported limited coaching attention,
-        76% struggle with training partner availability, and 72% feel constrained by slow progress in
-        mixed-ability settings.
-      </p>
-
-      <image-component
-        width="72%"
-        tag="image"
-        source="../assets/vpc/VPC Boxers in Boxing Gyms.png"
-        subtitle="Figure 3: Value Proposition Canvas — Boxing-Gym Boxers">
-      </image-component>
-
-      <p>
-        Training support stakeholders prioritise safety, structured skill development, and operational
-        scalability. Their primary challenge is delivering individualised attention: pad work and defensive
-        drills rank highest in teaching priority, yet current coach-to-boxer ratios prevent the one-on-one
-        engagement these methods require.
-      </p>
-
-      <image-component
-        width="72%"
-        tag="image"
-        source="../assets/vpc/VPC Training Support Stakeholders.png"
-        subtitle="Figure 4: Value Proposition Canvas — Training Support Stakeholders">
-      </image-component>
-
-      <p>
-        Together, the two canvases established a unified set of product attributes that balance boxer demands
-        for realism and measurable progress against stakeholder requirements for safety, structure, and
-        operational efficiency.
-      </p>
-    </div>
-
-    <!-- §2.5.1 ───────────────────────────────────────── -->
+    <!-- §2.6 ─────────────────────────────────────────── -->
     <div id="problem-of-interest">
-      <h4>2.5.1 Problem of Interest</h4>
+      <h3>2.6 Problem of Interest</h3>
       <p>
         User interviews, competitor analysis, and the five design considerations collectively reveal a
         persistent gap: no existing training technology consolidates performance analytics, realistic
@@ -592,9 +587,9 @@
       </div>
     </div>
 
-    <!-- §2.5.2 ───────────────────────────────────────── -->
+    <!-- §2.7 ─────────────────────────────────────────── -->
     <div id="value-proposition-statement">
-      <h4>2.5.2 Value Proposition Statement</h4>
+      <h3>2.7 Value Proposition Statement</h3>
       <p>
         Based on insights from interviews, surveys, and the analysis of existing solutions, BoxBunny
         directly addresses the challenges faced by both boxers and coaching staff. The system provides
@@ -612,140 +607,36 @@
         <strong>Design Direction</strong>
         BoxBunny is conceived as a <em>human-assistive sparring ecosystem</em> — redefining how boxing
         skills are learnt, practised, and mastered by serving simultaneously as an adaptive training partner
-        for athletes and a scalable coaching extension for instructors.
+        for recreational and competitive athletes in gym settings, and as a scalable coaching extension for
+        instructors managing groups of mixed ability. The system is not intended to replace professional
+        sparring, but to function as an intelligent, safe adjunct that extends the quality and availability
+        of independent practice.
       </div>
     </div>
 
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════
-         §3. CONCEPT DEVELOPMENT — PRODUCT REQUIREMENTS
+         §3. CONCEPT DEVELOPMENT — PRODUCT NEEDS FORMATION
     ════════════════════════════════════════════════════ -->
     <div id="concept-development">
-      <h2>3. Concept Development: Product Requirements</h2>
+      <h2>3. Concept Development: Product Needs Formation</h2>
 
       <p>
-        With the problem space validated through primary and secondary research in Chapter 2, this chapter
-        establishes the design specifications required to address it. The concept development process
-        proceeded in two sequential stages: first, existing competitor features and their associated user
-        feedback were evaluated to identify concrete design improvements; second, each improvement was
-        translated into verifiable product needs that define what BoxBunny must deliver at the system level.
-        This two-stage process ensures that every product requirement is traceable directly to a validated
-        user pain point or market gap.
-      </p>
-
-      <h3>3.1 Design Gap Analysis: From Competitor Feedback to Design Improvements</h3>
-      <p>
-        The three selected competitors — Nexersys, STRYK RXT-1, and BotBoxer — were evaluated against the
-        five design considerations identified in Section 2.4. For each consideration, the features and
-        verified user complaints of existing products were reviewed, and a corresponding design improvement
-        was formulated to close the identified gap. This analysis is summarised in Table 4.
+        Each design improvement was subsequently translated into one or more verifiable product needs,
+        forming the system-level requirements that define the minimum acceptable behaviour of BoxBunny.
+        These then form the primary input to the subsystem-level conceptual design in Chapter 5.
       </p>
       <p>
-        Notably, user-generated reviews surfaced recurring complaints that are not captured by feature
-        checklists alone: the absence of haptic feedback and a stationary base were cited as barriers to
-        realism, and cost and bulk were identified as key adoption barriers. These qualitative signals
-        directly shaped the design improvements proposed for BoxBunny.
-      </p>
-
-      <table class="report-table">
-        <caption>Table 4: Design Gap Analysis — Competitor Offerings vs. Proposed Design Improvements</caption>
-        <thead>
-          <tr>
-            <th style="width:22%">Feature Area</th>
-            <th style="width:38%">Existing Competitor Offerings &amp; User Feedback</th>
-            <th style="width:40%">Proposed Design Improvement for BoxBunny</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="dc-row-1">
-            <td><strong>Performance Analytics</strong></td>
-            <td>
-              Strike pads with impact sensors, skill assessments, competitive leaderboards, and multi-user
-              modes are available across Nexersys and BotBoxer. However, these metrics operate in
-              isolation — no product integrates sensor data with visual tracking for composite analysis.
-            </td>
-            <td>
-              Refined into a unified performance quantification system recording punch power, accuracy,
-              and timing with visual analytics. Sensor data is synchronised with computer vision tracking,
-              and results are surfaced on shared dashboards to motivate progress and support coach-level
-              oversight at scale.
-            </td>
-          </tr>
-          <tr class="dc-row-2">
-            <td><strong>Intelligent Sparring System</strong></td>
-            <td>
-              Existing products use stationary or limited-motion bases. BotBoxer reviews cite <em>"no
-              haptic feedback"</em> and <em>"stationary base limits realism"</em>; a recurring negative
-              verdict is that these systems <em>"cannot replace a real partner."</em>
-            </td>
-            <td>
-              Addressed through active arm actuation, rotational body motion, and haptic feedback to
-              simulate real incoming strikes safely. Computer vision-based opponent behaviour and reactive
-              full-body movement are introduced to replicate the unpredictability of human sparring
-              responses.
-            </td>
-          </tr>
-          <tr class="dc-row-3">
-            <td><strong>Skill Progression Studio</strong></td>
-            <td>
-              STRYK offers on-screen 3D animated coaching and a variety of training modes (cardio, mitts,
-              sparring, core, combo). Modes exist as discrete programmes with no adaptive progression
-              logic linking them.
-            </td>
-            <td>
-              Translated into modular training programmes with guided sparring drills and real-time AI
-              assistance for structured learning. Expanded into progressive sequences that blend offensive,
-              defensive, and reactive exercises, scaling in difficulty as user performance improves.
-            </td>
-          </tr>
-          <tr class="dc-row-4">
-            <td><strong>Adaptive Fight Intelligence</strong></td>
-            <td>
-              BotBoxer provides an evading target that dodges punches in real time, and STRYK provides
-              voice coaching cues. Neither product initiates attacks or adapts its strategy based on the
-              user's accumulated performance history.
-            </td>
-            <td>
-              Enhanced into a responsive counterpunching system that reacts dynamically to user attack
-              patterns, mimicking the read-and-respond behaviour of a real sparring opponent. Coaching
-              cues are embedded as both auditory and visual feedback mechanisms that reinforce correct
-              form and rhythm.
-            </td>
-          </tr>
-          <tr class="dc-row-5">
-            <td><strong>Modular Boxing Platform</strong></td>
-            <td>
-              STRYK features a height-adjustable frame, multiple strike zones, and glide wheels for
-              portability. User reviews describe it as <em>"extremely expensive"</em> and <em>"too bulky
-              for gym use"</em>, limiting its addressable market to large, well-funded facilities.
-            </td>
-            <td>
-              Reimagined as an adjustable, safe, and durable platform accommodating the full range of user
-              heights and enabling real punching interaction during and after class. Designed for both gym
-              and home deployment without compromising durability, and simplified into a scalable,
-              cost-efficient structure to enable wider adoption.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>3.2 Product Needs Formation</h3>
-      <p>
-        Each design improvement identified in Section 3.1 was subsequently translated into one or more
-        discrete product needs — specific, system-level requirements that define the minimum acceptable
-        behaviour of BoxBunny with respect to each design consideration. This translation step, summarised
-        in Table 5, directly maps research-derived insights to engineering specifications and forms the
-        primary input to the subsystem-level conceptual design in Chapter 5.
-      </p>
-      <p>
-        Together, the product needs in Table 5 define a platform that none of the evaluated competitors
+        Together, the product needs in Table 4 define a platform that none of the evaluated competitors
         individually satisfies: a single integrated system capable of simultaneously supporting teaching,
         data tracking, and realistic skill development through safe and intelligent sparring.
       </p>
 
+      <h3>3.1 Product Needs Mapping</h3>
+
       <table class="report-table">
-        <caption>Table 5: Design Improvements to Product Needs Mapping</caption>
+        <caption>Table 4: Design Improvements to Product Needs Mapping</caption>
         <thead>
           <tr>
             <th style="width:30%">Design Improvement</th>
@@ -772,12 +663,12 @@
             <td>
               <strong>Intelligent Sparring System</strong><br>
               <span style="font-size:0.88rem; color:#444;">
-                Active arm actuation, rotation, haptic feedback; CV-based reactive movements.
+                Active arm actuation, footwork, haptic feedback; CV-based reactive movements.
               </span>
             </td>
             <td>
               <ul style="margin:0; padding-left:18px; font-size:0.95rem;">
-                <li>The product shall incorporate active arm actuation, rotational motion, and haptic feedback to simulate realistic incoming strikes safely.</li>
+                <li>The product shall incorporate active arm actuation, footwork motion, and haptic feedback to simulate realistic incoming strikes safely.</li>
                 <li>The product shall employ computer vision to trigger reactive full-body movements that mimic the responses of a human sparring partner.</li>
               </ul>
             </td>
@@ -791,7 +682,7 @@
             </td>
             <td>
               <ul style="margin:0; padding-left:18px; font-size:0.95rem;">
-                <li>The product shall provide modular training programmes with AI-guided drills structured for systematic skill development.</li>
+                <li>The product shall provide training programmes with AI-guided drills structured for systematic skill development.</li>
                 <li>The product shall offer progressive training modules that integrate offensive, defensive, and reactive exercise sequences, scaling with individual performance.</li>
               </ul>
             </td>
@@ -841,41 +732,129 @@
          §4.1. SYSTEM OVERVIEW
     ════════════════════════════════════════════════════ -->
     <div id="system-overview">
-      <h2>4. Final Design</h2>
+      <h2>4. System Overview</h2>
       <p>
-        With the problem space and user requirements established in Chapter 2, this chapter consolidates
-        findings into a system architecture (4.1) and a user journey (4.2). These define the top-level
-        structure and interaction model that inform the subsystem-level conceptual design presented in
-        Chapter 5.
+        With the problem space and product needs established in Chapters 2 and 3, this chapter presents
+        a summary of the concept development process (Section 4.1), the resulting physical architecture
+        (Section 4.2), and the user journey through a structured training session (Section 4.3).
       </p>
 
-      <h3>4.1 System Overview</h3>
+      <h3>4.1 Concept Development</h3>
       <p>
-        The BoxBunny robot is organised into three primary subsystems, each addressing a distinct set of
-        functional requirements derived from the product needs mapping (Appendix 6):
+        Prior to finalising the architecture, concept alternatives were evaluated for two key subsystems:
+        the arm actuation joint and the lower mechanism base. For each subsystem, candidate concepts were
+        scored against weighted engineering criteria and the concept yielding the highest composite score
+        was selected. The full evaluations, including requirements tables, benefits/limitations analyses,
+        and decision matrices, are documented in
+        <a href="appendix-upper.html">Appendix 1: Upper Mechanisms</a> and
+        <a href="appendix-lower.html">Appendix 2: Lower Mechanisms</a>.
       </p>
-      <ul>
-        <li>
-          <strong>User Interface</strong> — a touchscreen-based control layer providing visual feedback,
-          session configuration, real-time coaching cues, and post-session performance dashboards.
-        </li>
-        <li>
-          <strong>Robot Mechanism</strong> — the integrated physical platform comprising five mechanical
-          subcomponents: Base (stability and portability), Rotation (yaw tracking), Height Adjustment
-          (user-adaptive positioning), Padding (impact sensing and contact surfaces), and Arm Actuation
-          (punch execution via a 2-DOF coaxial differential joint). Together these subsystems position
-          the robot and deliver safe, realistic striking interaction.
-        </li>
-        <li>
-          <strong>Robot Intelligence</strong> — the computer vision and AI layer enabling real-time user
-          tracking, punch classification, and adaptive drill control. This layer enables the robot to
-          respond to the boxer's movements and adjust training behaviour dynamically.
-        </li>
-      </ul>
+
+      <h4>Upper Assembly</h4>
       <p>
-        For a detailed mapping of how each derived product need relates to these subsystems, see
+        Three joint configurations were evaluated against five weighted criteria. The Multi-Actuator Rig
+        was eliminated due to physical bulk and obstruction of the target strike zones; the Windmill
+        Actuator was rejected for permanently obstructing the liver strike zone in the neutral position.
+        The 2-Degree-of-Freedom (2-DOF) Coaxial Differential Joint achieved the highest composite score
+        of 48 and was selected; its coordinated pitch and yaw axes replicate the trajectory of all
+        primary punches while retracting to a guard position that leaves target zones unobstructed.
+      </p>
+
+      <h4>Lower Mechanism Base</h4>
+      <p>
+        Two base architectures were evaluated: an omnidirectional wheel system and a decoupled-axis
+        design comprising a motorised linear rail for forward-backward travel and a slewing bearing
+        for yaw rotation. Omnidirectional wheels were penalised by low stiffness under punching impact
+        and performance degradation on the foam and rubber surfaces prevalent in Singapore gym facilities.
+        The decoupled-axis architecture was selected for its positional stiffness and repeatability under
+        repeated impulse loads, with a ball-screw drive and four-point contact slewing ring bearing
+        confirmed via separate decision matrices for the linear and yaw stages respectively.
+      </p>
+
+      <h3>4.2 Final Conceptual Design</h3>
+      <p>
+        The BoxBunny architecture is organised into three primary subsystems. Full requirement-to-subsystem
+        traceability is documented in
         <a href="appendix-product-mapping.html">Appendix 6: Product Needs to Subsystem Mapping</a>.
       </p>
+
+
+      <table class="report-table">
+        <caption>Table 5: BoxBunny System Architecture: Subsystems, Components, and Functions</caption>
+        <thead>
+          <tr>
+            <th style="width:22%">Subsystem</th>
+            <th style="width:28%">Component</th>
+            <th>Function / Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- User Interface -->
+          <tr>
+            <td rowspan="4" style="vertical-align:middle; font-weight:bold; background:#e3f2fd;">User Interface</td>
+            <td><strong>Touchscreen Control Panel</strong></td>
+            <td>Session configuration, training mode selection, and pattern-lock user login.</td>
+          </tr>
+          <tr>
+            <td><strong>Live Feedback Display</strong></td>
+            <td>Round timer, combo display, punch counter, and streak tracker during active training.</td>
+          </tr>
+          <tr>
+            <td><strong>Real-time Coaching Cues</strong></td>
+            <td>LLM-generated coaching tips delivered every 18 s throughout the training round.</td>
+          </tr>
+          <tr>
+            <td><strong>Performance Dashboard</strong></td>
+            <td>Post-session analytics: punch distribution, accuracy rate, defence rate, and XP earned.</td>
+          </tr>
+          <!-- Robot Mechanism — Lower -->
+          <tr>
+            <td rowspan="6" style="vertical-align:middle; font-weight:bold; background:#e8f5e9;">Robot Mechanism</td>
+            <td><strong>Base</strong></td>
+            <td>Structural foundation providing stability under punching impacts; designed for portability across gym and home environments.</td>
+          </tr>
+          <tr>
+            <td><strong>Linear Rail (Footwork)</strong></td>
+            <td>Ball-screw drive with closed-loop stepper motor; forward–backward stance adjustment ~300 mm stroke with high stiffness under repeated load.</td>
+          </tr>
+          <tr>
+            <td><strong>Yaw Rotation</strong></td>
+            <td>Four-point contact ball slewing ring bearing driven by a pinion motor; tracks user lateral position from CV output.</td>
+          </tr>
+          <tr>
+            <td><strong>Height Adjustment</strong></td>
+            <td>Motorised vertical column auto-aligns pad targets to the user's head position via CV bounding-box targeting at session start.</td>
+          </tr>
+          <tr>
+            <td><strong>Arm Actuation</strong></td>
+            <td>2-DOF coaxial differential joint (pitch + yaw); executes jabs, hooks, and uppercuts at up to 6.04 rad/s with a 90 cm foam training stick. Retracts to a guard position leaving all strike zones clear.</td>
+          </tr>
+          <tr>
+            <td><strong>Padding</strong></td>
+            <td>Impact-sensing surfaces across head, shoulder, and body zones; ergonomically positioned for the 150–190 cm user population.</td>
+          </tr>
+          <!-- Robot Intelligence -->
+          <tr>
+            <td rowspan="4" style="vertical-align:middle; font-weight:bold; background:#f3e5f5;">Robot Intelligence</td>
+            <td><strong>Computer Vision (CV)</strong></td>
+            <td>Person detection and punch-type classification at 30 Hz during active training; ramps from 6 Hz at session start.</td>
+          </tr>
+          <tr>
+            <td><strong>IMU Fusion</strong></td>
+            <td>Pad-mounted IMU confirms impact events; fused with CV output to produce validated punch classifications.</td>
+          </tr>
+          <tr>
+            <td><strong>Adaptive Drill Control</strong></td>
+            <td>Adjusts arm actuation mode and yaw tracking in real time based on detected user position and session performance.</td>
+          </tr>
+          <tr>
+            <td><strong>AI Coach (Post-session)</strong></td>
+            <td>LLM generates personalised session analysis, drill suggestions, and progress commentary.</td>
+          </tr>
+        </tbody>
+      </table>
+
+
       <div style="margin: 24px 0;">
         <model-viewer
           src="../assets/3d_models/FINAL_ASSEM.glb"
@@ -894,7 +873,7 @@
 
     <!-- §4.2 ─────────────────────────────────────────── -->
     <div id="user-journey">
-      <h3>4.2 User Journey</h3>
+      <h3>4.3 User Journey</h3>
       <p>
         Figure 6 presents a swim-lane diagram illustrating how the three subsystems collaborate across
         the five phases of a structured training session. During the Setup phase, only the User Interface
@@ -1063,65 +1042,78 @@
     <sl-icon name="arrow-up" label="Back to top"></sl-icon>
   </sl-button>
 
-  <!-- ── Pie chart scripts ──────────────────────────── -->
+  <!-- ── Pie chart scripts (match index.html components) ── -->
   <script>
-    // Figure 1: Boxer challenges
+    // Figure 1: Boxer challenges — mirrors components/data-chart/boxer-pie.js
     (function () {
       const ctx = document.getElementById('boxer-pie');
       if (!ctx) return;
+
+      const labels = [
+        'Limited Coaching Attention',
+        'Lack of Training Partners',
+        'Slow Progress',
+        'Time Commitment',
+        'Injury-Prone',
+        'Unmotivated',
+        'Tracking Progress'
+      ];
+      const values = [40, 38, 36, 22, 18, 14, 14];
+      const totalRespondents = 50;
+
       new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: [
-            'Limited coaching attention (80%)',
-            'Partner availability (76%)',
-            'Slow progress (72%)',
-            'Injury risk from sparring (36%)',
-            'Other concerns (28%)'
-          ],
-          datasets: [{
-            data: [80, 76, 72, 36, 28],
-            backgroundColor: ['#1565c0','#2e7d32','#f57c00','#c62828','#6d4c41'],
-            borderWidth: 2,
-            borderColor: '#fff'
-          }]
+          labels,
+          datasets: [{ data: values }]
         },
         options: {
-          responsive: true,
           plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 14 } },
-            tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.label; } } }
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const value = context.raw;
+                  const percent = ((value / totalRespondents) * 100).toFixed(1);
+                  return `${context.label}: ${percent}% (${value} of ${totalRespondents} boxers)`;
+                }
+              }
+            }
           }
         }
       });
     })();
 
-    // Figure 2: Support stakeholder drill priorities
+    // Figure 2: Support stakeholder drill priorities — mirrors components/data-chart/train-sp-pie.js
     (function () {
       const ctx = document.getElementById('train-sp-pie');
       if (!ctx) return;
+
+      const labels = [
+        'Pad Work',
+        'Defense Drills',
+        'Technique Drills',
+        'Sparring',
+        'Bag Work'
+      ];
+      const values = [10, 6, 6, 4, 2];
+      const totalRespondents = 12;
+
       new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: [
-            'Pad work / Mitt drills (highest)',
-            'Sparring technique',
-            'Defensive drills',
-            'Cardio conditioning',
-            'Bag work'
-          ],
-          datasets: [{
-            data: [38, 25, 18, 12, 7],
-            backgroundColor: ['#1565c0','#2e7d32','#7b1fa2','#f57c00','#455a64'],
-            borderWidth: 2,
-            borderColor: '#fff'
-          }]
+          labels,
+          datasets: [{ data: values }]
         },
         options: {
-          responsive: true,
           plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 14 } },
-            tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.label; } } }
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const value = context.raw;
+                  return `${context.label}: priority score ${value}/5`;
+                }
+              }
+            }
           }
         }
       });
