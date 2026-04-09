@@ -402,7 +402,7 @@
           Arm actuation power subsystem: Mean Well LRS-200-24 (200 W, 24 V, 8.8 A)
           supplying four Damiao DM-J4310-2EC motors in parallel via a distribution
           busbar, with RegenClamp V0.3 protection against back-EMF OVP spikes.
-          <span style="color:#3b82f6;">&mdash; Click to enlarge.</span>
+          <span style="color:#3b82f6;">Click to enlarge.</span>
         </div>
       </div>
     </div>
@@ -421,7 +421,7 @@
         Edge-Trigger strategy) and polls the four MPU6050 IMUs across two
         I2C buses. Motor feedback and IMU data are packed into a 21-double
         payload and published via micro-ROS to the Jetson Orin NX. The Jetson
-        hosts the GUI V4 application, which executes the combat decision logic
+        hosts the GUI application, which executes the combat decision logic
         and publishes motor commands on the
         <code>/motor_commands</code> topic at 100 Hz.
       </p>
@@ -434,8 +434,8 @@
         <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
           Arm actuation data and control architecture: CAN bus (1 Mbps, 4&times; Damiao
           DM-J4310-2EC), I2C dual-bus (400 kHz, 4&times; MPU6050 IMUs), micro-ROS USB
-          bridge to Jetson Orin NX, and ROS 2 GUI&nbsp;V4 command loop at 100 Hz.
-          <span style="color:#3b82f6;">&mdash; Click to enlarge.</span>
+          bridge to Jetson Orin NX, and ROS 2 GUI command loop at 100 Hz.
+          <span style="color:#3b82f6;">Click to enlarge.</span>
         </div>
       </div>
     </div>
@@ -568,7 +568,7 @@
         <a href="arm-actuation/firmware-software.html" class="section-nav-card">
           <sl-icon name="code-slash" style="font-size: 2rem;"></sl-icon>
           <h3>5.2.5.4 Firmware &amp; Software</h3>
-          <p>200 Hz unified loop, GUI V4, Strike Library, ROS 2 interface</p>
+          <p>200 Hz unified loop, GUI application, Strike Library, ROS 2 interface</p>
         </a>
         <a href="arm-actuation/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>

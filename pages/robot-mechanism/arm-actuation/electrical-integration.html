@@ -176,111 +176,9 @@
         DM-J4310-2EC's output torque (after the 30:1 total gear reduction) exceeds
         the application requirement. The complete derivations, numerical
         values, and final safety margin are presented in
-        <a href="../../appendix-upper.html">Appendix 1 &mdash; Torque
+        <a href="../../appendix-upper.html">Appendix 1: Torque
         Calculations</a>.
       </p>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. POWER DISTRIBUTION                                  -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>5.2.5.3.3 Dual-Rail Power Architecture</h3>
-      <p>
-        The electrical system employs a dual-rail power
-        architecture, separating the high-current motor bus from
-        the logic-level compute bus.
-      </p>
-
-
-      <h4>24V Motor Bus</h4>
-      <p>
-        The motor bus is powered by a Mean Well LRS-200-24
-        (200W, 24V / 8.8A) switched-mode PSU. Power is distributed through a
-        common terminal block to all four Damiao DM-J4310-2EC motors
-        (connected in parallel, each rated for 24V nominal operation) and
-        the Cytron MDDS10 height motor driver.
-      </p>
-      <p>
-        At peak demand, with four motors simultaneously executing a
-        snap-back command, the instantaneous current draw can approach
-        the PSU's rated capacity. The PSU's internal current-limiting
-        circuit provides a hardware-level ceiling, but the firmware's
-        dI/dt safety layer (see
-        <a href="../arm-actuation.html">Multi-Layered Safety
-        Architecture</a>) ensures that current spikes are detected and
-        mitigated before reaching this hardware limit.
-      </p>
-
-      <sl-alert variant="success" open>
-        <sl-icon slot="icon" name="check-circle"></sl-icon>
-        <strong>Measured Operating Power (N=43 speed tests):</strong>
-        The four arm motors draw <strong>~33 W peak / ~10 W average</strong>
-        per strike cycle at 24 V — well below the theoretical 384 W stall
-        maximum. Peak per-motor current never exceeds 0.69 A. Full
-        analysis in
-        <a href="testing-evaluation.html">Testing &amp; Evaluation §
-        Power Budget Validation</a>.
-      </sl-alert>
-
-      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
-        <img src="../../../assets/system_architecture/power_arms.png"
-             alt="Arm motor power subsystem"
-             data-zoom
-             title="Click to enlarge"
-             style="width:100%; min-width:400px; max-width:700px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
-        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
-          Arm motor power subsystem: four Damiao DM-J4310-2EC motors on the 24V bus.
-          Measured steady-state draw is ~8 W/motor average per strike cycle (N=43); peak 33W across
-          all four motors simultaneously at 24V.
-          <span style="color:#3b82f6;"> &mdash; Click to enlarge.</span>
-        </div>
-      </div>
-
-      <h4>Isolated 12V Logic Rail</h4>
-      <p>
-        The NVIDIA Jetson Orin NX compute module and the Teensy 4.0
-        microcontroller are powered from a dedicated 12V
-        supply, electrically isolated from the 24V motor bus.
-        This isolation addresses a specific failure mode: during
-        rapid height motor deceleration, the geared DC motor (driven by
-        the Cytron MDDS10) injects regenerative back-EMF onto the 24V
-        bus. When these transients exceed the PSU's overvoltage
-        protection (OVP) threshold (approximately 28V), the supply trips and
-        all devices on that rail lose power simultaneously.
-      </p>
-      <p>
-        On a single-rail architecture, this OVP trip would reboot the
-        Teensy (losing encoder references and active safety state) and
-        the Jetson (losing the ROS 2 graph and GUI session) during active
-        sparring, an unacceptable failure mode for a system with
-        exposed 3D-printed moving parts. The dual-rail isolation
-        guarantees that motor bus disturbances cannot propagate to the
-        compute and control subsystems. The full OVP failure analysis and
-        the software ramp-down mitigation are documented under
-        <a href="../height-adjustment.html">5.2.3 Height
-        Adjustment</a> and
-        <a href="../../../appendix-system-troubleshooting.html#defect-6">System Troubleshooting Appendix &sect;Defect 6: PSU OVP</a>
-        Trip</a>.
-      </p>
-
-
-      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
-        <img src="../../../assets/system_architecture/system_data_overview.png"
-             alt="System data architecture overview"
-             data-zoom
-             title="Click to enlarge"
-             style="width:100%; min-width:560px; max-width:1000px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
-        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
-          System data architecture: CAN bus (1 Mbps, 4x Damiao DM-J4310-2EC arm motors),
-          I2C dual-bus (400 kHz, 4&times; MPU6050 IMUs, Wire and Wire1), micro-ROS USB bridge to Jetson Orin NX,
-          and WiFi UDP link to Arduino Uno R4 WiFi base controller.
-        </div>
-      </div>
-
-
     </div>
 
     <sl-divider></sl-divider>
@@ -364,7 +262,7 @@
         during rapid multi-motor strike sequences.
       </p>
 
-      <h4>CAN Frame Structure — Position-Speed Command Mode</h4>
+      <h4>CAN Frame Structure: Position-Speed Command Mode</h4>
       <p>
         The Damiao DM-J4310-2EC motors operate in
         Position-Speed mode, where each
@@ -396,6 +294,108 @@
         source="../../../assets/upper_mechanism/damiao_motor_can_bus_wiring.jpg"
         subtitle="Four Damiao DM-J4310-2EC motors wired in parallel on the CAN bus (1 Mbps). A single 120 &Omega; termination resistor is fitted at the Teensy transceiver end; single-terminator operation was validated in system testing."
       ></image-component>
+
+
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. POWER DISTRIBUTION                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>5.2.5.3.3 Dual-Rail Power Architecture</h3>
+      <p>
+        The electrical system employs a dual-rail power
+        architecture, separating the high-current motor bus from
+        the logic-level compute bus.
+      </p>
+
+
+      <h4>24V Motor Bus</h4>
+      <p>
+        The motor bus is powered by a Mean Well LRS-200-24
+        (200W, 24V / 8.8A) switched-mode PSU. Power is distributed through a
+        common terminal block to all four Damiao DM-J4310-2EC motors
+        (connected in parallel, each rated for 24V nominal operation) and
+        the Cytron MDDS10 height motor driver.
+      </p>
+      <p>
+        At peak demand, with four motors simultaneously executing a
+        snap-back command, the instantaneous current draw can approach
+        the PSU's rated capacity. The PSU's internal current-limiting
+        circuit provides a hardware-level ceiling, but the firmware's
+        dI/dt safety layer (see
+        <a href="../arm-actuation.html">Multi-Layered Safety
+        Architecture</a>) ensures that current spikes are detected and
+        mitigated before reaching this hardware limit.
+      </p>
+
+      <sl-alert variant="success" open>
+        <sl-icon slot="icon" name="check-circle"></sl-icon>
+        <strong>Measured Operating Power (N=43 speed tests):</strong>
+        The four arm motors draw <strong>~33 W peak / ~10 W average</strong>
+        per strike cycle at 24 V — well below the theoretical 384 W stall
+        maximum. Peak per-motor current never exceeds 0.69 A. Full
+        analysis in
+        <a href="testing-evaluation.html">Testing &amp; Evaluation §
+        Power Budget Validation</a>.
+      </sl-alert>
+
+      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
+        <img src="../../../assets/system_architecture/power_arms.png"
+             alt="Arm motor power subsystem"
+             data-zoom
+             title="Click to enlarge"
+             style="width:100%; min-width:400px; max-width:700px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
+        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
+          Arm motor power subsystem: four Damiao DM-J4310-2EC motors on the 24V bus.
+          Measured steady-state draw is ~8 W/motor average per strike cycle (N=43); peak 33W across
+          all four motors simultaneously at 24V.
+          <span style="color:#3b82f6;">Click to enlarge.</span>
+        </div>
+      </div>
+
+      <h4>Isolated 12V Logic Rail</h4>
+      <p>
+        The NVIDIA Jetson Orin NX compute module and the Teensy 4.0
+        microcontroller are powered from a dedicated 12V
+        supply, electrically isolated from the 24V motor bus.
+        This isolation addresses a specific failure mode: during
+        rapid height motor deceleration, the geared DC motor (driven by
+        the Cytron MDDS10) injects regenerative back-EMF onto the 24V
+        bus. When these transients exceed the PSU's overvoltage
+        protection (OVP) threshold (approximately 28V), the supply trips and
+        all devices on that rail lose power simultaneously.
+      </p>
+      <p>
+        On a single-rail architecture, this OVP trip would reboot the
+        Teensy (losing encoder references and active safety state) and
+        the Jetson (losing the ROS 2 graph and GUI session) during active
+        sparring, an unacceptable failure mode for a system with
+        exposed 3D-printed moving parts. The dual-rail isolation
+        guarantees that motor bus disturbances cannot propagate to the
+        compute and control subsystems. The full OVP failure analysis and
+        the software ramp-down mitigation are documented under
+        <a href="../height-adjustment.html">5.2.3 Height
+        Adjustment</a> and
+        <a href="../../../appendix-system-troubleshooting.html#defect-6">System Troubleshooting Appendix &sect;Defect 6: PSU OVP</a>
+        Trip</a>.
+      </p>
+
+
+      <div style="overflow-x:auto; margin:20px 0; text-align:center;">
+        <img src="../../../assets/system_architecture/system_data_overview.png"
+             alt="System data architecture overview"
+             data-zoom
+             title="Click to enlarge"
+             style="width:100%; min-width:560px; max-width:1000px; border-radius:8px; border:1px solid #e5e7eb; cursor:zoom-in;">
+        <div style="font-size:0.82rem; color:#555; margin-top:8px; text-align:left;">
+          System data architecture: CAN bus (1 Mbps, 4x Damiao DM-J4310-2EC arm motors),
+          I2C dual-bus (400 kHz, 4&times; MPU6050 IMUs, Wire and Wire1), micro-ROS USB bridge to Jetson Orin NX,
+          and WiFi UDP link to Arduino Uno R4 WiFi base controller.
+        </div>
+      </div>
 
 
     </div>

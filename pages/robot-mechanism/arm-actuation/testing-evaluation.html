@@ -299,11 +299,11 @@
         </tbody>
       </table>
       <p>
-        Diminishing returns above 20 rad/s &mdash; execution time plateaus
+        Diminishing returns above 20 rad/s: execution time plateaus
         near 0.64 s as the PID acceleration/deceleration ramp time dominates.
       </p>
 
-      <h4>PID Overhead Analysis &mdash; Why the Original 0.25 s Target Was Not Achievable</h4>
+      <h4>PID Overhead Analysis: Why the Original 0.25 s Target Was Not Achievable</h4>
 
       <!-- ─── Technical Callout: PID Overhead ─── -->
       <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
@@ -347,8 +347,8 @@
           </tbody>
         </table>
         <p>
-          The velocity profile is a <strong>triangle</strong> (not trapezoid)
-          &mdash; the motor never reaches steady-state velocity before
+          The velocity profile is a <strong>triangle</strong> (not trapezoid):
+          the motor never reaches steady-state velocity before
           deceleration begins. This is the primary bottleneck for strike
           speed. Tuning the Damiao PID acceleration parameters or
           implementing feed-forward control could reduce this overhead.
@@ -358,22 +358,22 @@
       <h4>Key Findings</h4>
       <ul>
         <li>
-          <strong>Current draw is very low</strong> &mdash; Peak per-motor
+          Current draw is very low: peak per-motor
           current never exceeds 0.69 A (Right Hook M4). Well below the 2.0 A
           safety limit and 3.0 A firmware watchdog.
         </li>
         <li>
-          <strong>Total arm power ~33 W peak, ~10 W average</strong> &mdash;
-          4 motors combined. Cross-arm leakage is negligible (0.01&ndash;0.10 A).
+          Total arm power is approximately 33 W peak and 10 W average
+          across 4 motors combined. Cross-arm leakage is negligible (0.01&ndash;0.10 A).
         </li>
         <li>
-          <strong>Uppercuts are fastest</strong> &mdash; Shortest travel
-          distance &rarr; ~0.55 s WU&rarr;AP, vs ~0.66 s for Jab at the
+          Uppercuts are fastest: shortest travel
+          distance yields approximately 0.55 s warm-up to apex, versus approximately 0.66 s for the Jab at the
           same set speed.
         </li>
         <li>
-          <strong>No safety trips in 43 tests</strong> &mdash; Zero current
-          limit events, zero position timeouts.
+          No safety trips occurred in 43 tests: zero current
+          limit events and zero position timeouts.
         </li>
       </ul>
     </div>
@@ -401,7 +401,7 @@
         <li>
           <strong>PID acceleration/deceleration overhead:</strong> The
           approximately constant ~0.4&ndash;0.5 s ramp overhead means the
-          velocity profile is triangular &mdash; the motor never reaches
+          velocity profile is triangular: the motor never reaches
           steady-state before deceleration begins.
         </li>
         <li>
@@ -460,7 +460,7 @@
           <video controls preload="metadata" style="width:100%; border-radius:8px;">
             <source src="../../../assets/upper_mechanism/videos/Arm_Chain_Execution.mp4" type="video/mp4">
           </video>
-          <sub>Strike library chain execution — three sequential strikes (Jab, Left Hook, Uppercut) demonstrating vector alignment skip logic and proportional snap-back recovery. Recorded from GUI V4 during N=43 speed test session.</sub>
+          <sub>Strike library chain execution: three sequential strikes (Jab, Left Hook, Uppercut) demonstrating vector alignment skip logic and proportional snap-back recovery. Recorded during N=43 speed test session.</sub>
         </div>
       </div>
     </div>
