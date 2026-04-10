@@ -14,6 +14,7 @@
  <script src="../components/report-nav/report-nav.js" defer></script>
  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
  <style>
+    .stepper-link:hover { background:#6a1b9a !important; color:#fff !important; border-color:#6a1b9a !important; }
     /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
     code {
       background: #f0f4f8;
@@ -52,7 +53,7 @@
  /* Strong visual break between MAIN sections */
  .content sl-divider {
  --width: 3px;
- --color: #2e7d32;
+ --color: #7b1fa2;
  margin: 56px 0 36px !important;
  border-radius: 2px;
  }
@@ -60,7 +61,7 @@
  .content > h2,
  .content > div > h2 {
  font-size: 1.7rem !important;
- color: #1b5e20 !important;
+ color: #4a148c !important;
  letter-spacing: -0.3px;
  }
  .content > div:has(> h2) {
@@ -79,18 +80,19 @@
  <br>
 
  <!-- 5.3.4 INTRO -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
  <h2 style="margin:0;">5.3.4 Testing & Validation</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">Verifies RI-1 to RI-7</sl-badge>
  </div>
 
+ <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#test-validation" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Validation</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-fair" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">CDE Fair</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-infra" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Tests</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-verify" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">7/7 Pass</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-limits" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Limitations</a></div>
+
  <p>
  The Robot Intelligence subsystem was validated through model performance and interpretability,
  real-world deployment at the CDE AI Fair, and comprehensive automated testing.
- This section covers methodology, results, and limitations.
  </p>
 
- <p style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.93rem;">
+ <p style="background:#f8f9fa; border-left:3px solid #7b1fa2; padding:10px 14px; margin:14px 0; font-size:0.93rem;">
  <strong>V-Model alignment.</strong> Following the Systems Engineering V-Model introduced in
  <a href="../index.html#v-model">Section 3.2</a>, this page corresponds to the
  <strong>right side of the V</strong>, where each Robot Intelligence requirement (RI-1 through
@@ -104,7 +106,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.1 MODEL VALIDATION & INTERPRETABILITY -->
- <h2>5.3.4.1 Model Validation & Interpretability</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-validation" style="margin:0;">5.3.4.1 Model Validation &amp; Interpretability</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-3</sl-badge></div>
 
  <p>
  This section presents how well the final model performs and provides visual evidence
@@ -255,7 +257,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.2 CDE AI FAIR -->
- <h2>5.3.4.2 CDE AI Fair, Real-World Deployment</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-fair" style="margin:0;">5.3.4.2 CDE AI Fair, Real-World Deployment</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge></div>
 
  <p>
  As introduced in the <a href="gui/testing-evaluation.html">GUI testing section (5.1)</a>,
@@ -411,7 +413,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.3 TESTING INFRASTRUCTURE -->
- <h2>5.3.4.3 Testing Infrastructure</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-infra" style="margin:0;">5.3.4.3 Testing Infrastructure</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge></div>
 
  <p>
  Testing followed the classic bottom-up pyramid, many small, fast unit tests at
@@ -569,7 +571,7 @@
  <h3>Teensy Simulator</h3>
 
  <p>
- A GUI-based simulator emulating the Teensy 4.1 with 6 IMU sensors (4 pad + 2 arm),
+ A GUI-based simulator emulating the Teensy 4.0 with 4 IMU sensors (4 pads),
  enabling full system testing without physical hardware. Supports manual mode (click to inject
  pad impacts with configurable force) and auto mode (predefined punch sequences for reproducible testing).
  </p>
@@ -710,10 +712,10 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.7 VERIFICATION SUMMARY -->
- <h2>5.3.4.7 Verification Summary</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-verify" style="margin:0;">5.3.4.7 Verification Summary</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge></div>
 
  <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-left:4px solid #2e7d32; border-radius:6px; padding:14px 18px; margin:14px 0;">
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
  <div style="font-size:2.2rem; font-weight:700; color:#1b5e20; line-height:1;">7&nbsp;/&nbsp;7</div>
  <div>
  <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">Robot Intelligence requirements</div>
@@ -791,7 +793,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.8 LIMITATIONS -->
- <h2>5.3.4.8 Limitations</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-limits" style="margin:0;">5.3.4.8 Limitations</h2></div>
 
  <p>All requirements were met, but several limitations remain that scope out the natural
  next direction for the system. The rows highlighted below are the <strong>principal

@@ -167,8 +167,8 @@
   <!-- ════════════ CONVERGE TO FUSION ════════════ -->
 
   <!-- PunchDetection → Fusion (label ABOVE arrow, not on it) -->
-  <path d="M405 582 L405 614 Q405 620 411 620 L460 620" fill="none" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
-  <text x="310" y="600" font-size="10.5" font-weight="500" fill="#444">CV buffer (0.8 s)</text>
+  <path d="M405 582 L405 644 Q405 650 411 650 L460 650" fill="none" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="310" y="620" font-size="10.5" font-weight="500" fill="#444">CV buffer (0.8 s)</text>
 
   <!-- PunchEvent → Fusion -->
   <path d="M1065 492 L1065 660 Q1065 666 1059 666 L920 666" fill="none" stroke="#333" stroke-width="1.3" marker-end="url(#a)"/>

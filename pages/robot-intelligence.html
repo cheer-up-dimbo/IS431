@@ -12,6 +12,15 @@
  <link rel="stylesheet" href="../components/scroll-to-top/scroll-to-top.css">
  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
  <style>
+    /* Prevent double-line: the .content wrapper applies a bottom border on child divs,
+       which doubles up with sl-divider. Kill the border on any div immediately before a divider. */
+    sl-divider { margin: 24px 0; }
+    .content > div { border-bottom: none !important; }
+    .content > #requirements,
+    .content > #robot-intelligence,
+    .content > #system-architecture,
+    .content > #subsections { border-bottom: none !important; margin-bottom: 0; padding-bottom: 0; }
+
     /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
     code {
       background: #f0f4f8;
@@ -49,8 +58,8 @@
  transition: box-shadow 0.2s, border-color 0.2s;
  }
  .section-nav-card:hover {
- border-color: #4CAF50;
- box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+ border-color: #7b1fa2;
+ box-shadow: 0 2px 8px rgba(123, 31, 162, 0.2);
  }
  .section-nav-card h3 {
  margin: 12px 0 6px;
@@ -94,15 +103,24 @@
  }
  .content h2 + h3,
  .content > div > h3:first-of-type,
- .section-nav-card h3 {
+ .section-nav-card h3,
+ sl-divider + div > h3:first-child,
+ sl-divider + h3 {
  margin-top: 16px;
  padding-top: 0;
  border-top: none;
  }
+ /* Only h3 headings directly after a purple divider get purple text + match subsection page h2 style */
+ sl-divider + div > h3:first-child,
+ sl-divider + h3 {
+ color: #4a148c;
+ font-size: 1.7rem !important;
+ letter-spacing: -0.3px;
+ }
  /* Strong visual break between MAIN sections */
  .content sl-divider {
  --width: 3px;
- --color: #2e7d32;
+ --color: #7b1fa2;
  margin: 56px 0 36px !important;
  border-radius: 2px;
  }
@@ -110,7 +128,7 @@
  .content > h2,
  .content > div > h2 {
  font-size: 1.7rem !important;
- color: #1b5e20 !important;
+ color: #4a148c !important;
  letter-spacing: -0.3px;
  }
  .content > div:has(> h2) {
@@ -149,10 +167,11 @@
  required.
  </p>
 
- <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+ <!-- SECTION STRUCTURE (table of contents at the top) -->
+ <div style="background:#f8f9fa; border-left:3px solid #7b1fa2; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
  <strong>Section structure</strong>
  <ul style="margin:6px 0 0; padding-left:20px; line-height:1.6;">
- <li><strong>This page</strong>: subsystem boundaries, requirements, hardware, ROS 2 system architecture</li>
+ <li><strong>This page</strong>: requirements, hardware, ROS 2 system architecture</li>
  <li><strong>5.3.1</strong>: Computer Vision &amp; action prediction model</li>
  <li><strong>5.3.2</strong>: Sensor fusion, sparring AI, LLM coach</li>
  <li><strong>5.3.3</strong>: Dashboard backend &amp; analytics</li>
@@ -160,6 +179,9 @@
  </ul>
  </div>
 
+ <hr style="border:none; border-top:1px solid #e5e7eb; margin:24px 0;">
+
+ <!-- WHERE THIS SITS -->
  <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:10px; padding:18px 22px; margin:22px 0; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
  <h3 style="margin:0 0 6px; padding:0; border:none;">Where this subsystem sits in BoxBunny</h3>
 
@@ -178,9 +200,9 @@
 
  <div style="display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#94a3b8; font-weight:700;">&harr;</div>
 
- <div style="background:#f0f9f0; border:1px solid #c8e6c9; border-top:4px solid #2e7d32; border-radius:6px; padding:14px 16px; box-shadow:0 2px 6px rgba(46,125,50,0.12);">
- <div style="font-size:0.74rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.6px;">5.3 Robot Intelligence &middot; this section</div>
- <div style="font-size:0.92rem; font-weight:600; color:#1b5e20; margin-top:6px;">The decision-making brain</div>
+ <div style="background:#f3e5f5; border:1px solid #ce93d8; border-top:4px solid #7b1fa2; border-radius:6px; padding:14px 16px; box-shadow:0 2px 6px rgba(123,31,162,0.12);">
+ <div style="font-size:0.74rem; font-weight:700; color:#7b1fa2; text-transform:uppercase; letter-spacing:0.6px;">5.3 Robot Intelligence &middot; this section</div>
+ <div style="font-size:0.92rem; font-weight:600; color:#4a148c; margin-top:6px;">The decision-making brain</div>
  <div style="font-size:0.85rem; color:#555; margin-top:6px;">CV, sensor fusion, sparring AI, LLM coach, sensor data to commands.</div>
  </div>
 
@@ -189,7 +211,7 @@
  <div style="background:#fff; border:1px solid #e0e0e0; border-top:4px solid #e65100; border-radius:6px; padding:14px 16px;">
  <div style="font-size:0.74rem; font-weight:700; color:#e65100; text-transform:uppercase; letter-spacing:0.6px;">5.2 Robot Mechanism</div>
  <div style="font-size:0.92rem; font-weight:600; color:#bf360c; margin-top:6px;">Physical actuation &amp; sensing</div>
- <div style="font-size:0.85rem; color:#555; margin-top:6px;">Punch commands in, pad &amp; arm impact events out.</div>
+ <div style="font-size:0.85rem; color:#555; margin-top:6px;">Punch commands in, pad impact events out.</div>
  </div>
 
  </div>
@@ -203,21 +225,7 @@
  </p>
  </div>
 
- <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
- <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
- <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
- <sl-button variant="default" size="small">
- <sl-icon slot="prefix" name="github"></sl-icon>
- Action Recognition
- </sl-button>
- </a>
- <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none;">
- <sl-button variant="default" size="small">
- <sl-icon slot="prefix" name="github"></sl-icon>
- Robot Workspace
- </sl-button>
- </a>
- </div>
+ <hr style="border:none; border-top:1px solid #e5e7eb; margin:24px 0;">
 
  <h3>Key Achievements</h3>
 
@@ -277,91 +285,20 @@
 
  </div>
 
- <h3>Hardware &amp; Tech Stack</h3>
-
- <p>
- Everything below runs on a single <strong>NVIDIA Jetson Orin NX</strong>, one
- board carrying perception, fusion, decision logic, the LLM coach, the dashboard
- backend, and the touchscreen GUI all at once. No external server, no cloud, no
- internet required.
- </p>
-
- <style>
- .ts-row { display:grid; grid-template-columns:130px 1fr; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid #e5e7eb; }
- .ts-row:last-child { border-bottom:none; padding-bottom:4px; }
- .ts-row:first-child { padding-top:4px; }
- .ts-label { font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#475569; text-align:right; }
- .ts-pills { display:flex; flex-wrap:wrap; gap:6px; }
- .ts-pill {
- display:inline-block;
- font-size:0.78rem;
- font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
- padding:3px 9px;
- border-radius:11px;
- background:#f0f4f8;
- border:1px solid #d0d7de;
- color:#1f2937;
- white-space:nowrap;
- }
- .ts-pill.hw { background:#e3f2fd; border-color:#bbdefb; color:#0d47a1; }
- .ts-pill.model { background:#e8f5e9; border-color:#c8e6c9; color:#1b5e20; }
- .ts-pill.ros { background:#f3e5f5; border-color:#e1bee7; color:#4a148c; }
- .ts-pill.backend { background:#fff3e0; border-color:#ffe0b2; color:#bf360c; }
- .ts-pill.frontend { background:#fce4ec; border-color:#f8bbd0; color:#880e4f; }
- @media (max-width:700px) {
- .ts-row { grid-template-columns:1fr; gap:6px; }
- .ts-label { text-align:left; }
- }
- </style>
-
- <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:14px 18px; margin:12px 0;">
- <div class="ts-row">
- <div class="ts-label">Hardware</div>
- <div class="ts-pills">
- <span class="ts-pill hw">Jetson Orin NX 16GB</span>
- <span class="ts-pill hw">Ubuntu 22.04</span>
- <span class="ts-pill hw">CUDA 12.6</span>
- <span class="ts-pill hw">RealSense D435i</span>
- <span class="ts-pill hw">Teensy 4.1</span>
- <span class="ts-pill hw">6&times; MPU6050</span>
- </div>
- </div>
- <div class="ts-row">
- <div class="ts-label">Models</div>
- <div class="ts-pills">
- <span class="ts-pill model">Voxel-Pose Transformer 1.75M</span>
- <span class="ts-pill model">YOLO Pose nano</span>
- <span class="ts-pill model">Qwen2.5-3B GGUF Q4_K_M</span>
- <span class="ts-pill model">PyTorch &rarr; TensorRT FP16</span>
- <span class="ts-pill model">llama-cpp-python</span>
- </div>
- </div>
- <div class="ts-row">
- <div class="ts-label">Robotics</div>
- <div class="ts-pills">
- <span class="ts-pill ros">ROS 2 Humble</span>
- <span class="ts-pill ros">10 nodes</span>
- <span class="ts-pill ros">21 messages</span>
- <span class="ts-pill ros">6 services</span>
- </div>
- </div>
- <div class="ts-row">
- <div class="ts-label">Backend</div>
- <div class="ts-pills">
- <span class="ts-pill backend">FastAPI + Uvicorn</span>
- <span class="ts-pill backend">SQLite (two-tier)</span>
- <span class="ts-pill backend">WebSocket</span>
- <span class="ts-pill backend">localhost.run tunnel</span>
- </div>
- </div>
- <div class="ts-row">
- <div class="ts-label">Frontends</div>
- <div class="ts-pills">
- <span class="ts-pill frontend">PySide6 / Qt, 10.1&Prime; touchscreen</span>
- <span class="ts-pill frontend">Vue 3 + Tailwind, phone dashboard</span>
- </div>
- </div>
- </div>
+ <div style="display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; align-items:center;">
+ <span style="font-size:0.92rem; color:#555;">GitHub Repositories:</span>
+ <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
+ <sl-button variant="default" size="small">
+ <sl-icon slot="prefix" name="github"></sl-icon>
+ Action Recognition
+ </sl-button>
+ </a>
+ <a href="https://github.com/Yogee-s/boxing_robot_ws" target="_blank" style="text-decoration:none;">
+ <sl-button variant="default" size="small">
+ <sl-icon slot="prefix" name="github"></sl-icon>
+ Robot Workspace
+ </sl-button>
+ </a>
  </div>
 
  <sl-divider></sl-divider>
@@ -439,20 +376,11 @@
  <div>
    <h3>System Design Narrative</h3>
    <p>
-     Following the Systems Engineering V-Model in <a href="../index.html#v-model">Section 3.2</a>, RI-1 to RI-7 were
-     fixed before any model architecture, ROS node, or LLM prompt was written (INCOSE, 2023).
-     These requirements trace back to the product needs mapped in
-     <a href="appendix-robot-intelligence.html">Appendix 6</a>. The diagram below applies the same
-     V-Model structure used in Robot Mechanism (5.2) and GUI (5.1), but tailored to the engineering
-     decisions specific to a real-time AI subsystem: model design, sensor fusion, on-device LLM
-     deployment, and live verification.
-   </p>
-   <p>
-     In product terms, the Robot Intelligence layer had to feel like a sparring partner that
-     <em>understood</em> what the user was doing, not just a script that swung an arm on a timer.
-     That meant the perception model had to be accurate enough to trust, fast enough to react in
-     real time, robust enough to deploy at a public demo, and the surrounding ROS layer had to
-     stay safe when individual components failed.
+     Following the V-Model from <a href="../index.html#v-model">Section 3.2</a>,
+     RI-1 to RI-7 were fixed before any model architecture, ROS node, or LLM prompt
+     was written. The diagram below shows how each requirement decomposed into a design
+     decision (left arm), was built and integrated (base), and then verified (right arm).
+     The table underneath maps each V-Model stage to the specific BoxBunny RI work.
    </p>
 
    <!-- RI V-Model SVG Diagram -->
@@ -531,40 +459,6 @@
      </sub>
    </div>
 
-   <h4>Left Side of the V: Design Decomposition</h4>
-   <p>
-     Each requirement drove a specific design choice:
-     <strong>RI-1 / RI-2</strong> set the ~24&nbsp;ms per-frame budget that shaped the
-     dual-branch (voxel + pose) Transformer;
-     <strong>RI-3</strong> drove the model architecture and the leave-one-person-out
-     validation strategy;
-     <strong>RI-4</strong> drove the <code>punch_processor</code> fusion logic and
-     pad-constraint filter;
-     <strong>RI-5</strong> drove every on-device decision, from TensorRT FP16 to the
-     16&nbsp;GB shared-memory budget;
-     <strong>RI-6</strong> drove the <code>sparring_engine</code> and weakness profile;
-     <strong>RI-7</strong> drove the local Qwen2.5-3B LLM coach and its fallback system.
-   </p>
-
-   <h4>Base of the V: Integration Build</h4>
-   <p>
-     All 10 ROS 2 nodes were wired together over 21 custom messages and 6 services, the CV
-     model was packaged as a TensorRT engine, the Vue 3 + FastAPI dashboard was connected
-     to the per-user SQLite database, and the LLM coach was loaded into shared GPU memory
-     alongside the CV pipeline. The <code>session_manager</code> 5-state machine became the
-     single source of truth, so every training mode flowed through the same lifecycle.
-   </p>
-
-   <h4>Right Side of the V: Verification Closure</h4>
-   <p>
-     Verification followed a three-tier testing pyramid: <strong>146 pytest unit tests</strong>
-     at the base (sensor fusion, gamification, database), <strong>28 integration tests</strong>
-     in the middle (ROS message contracts, fusion end-to-end, motor protocol), and
-     <strong>12 system-level notebook sections + the CDE AI Fair real-world deployment</strong>
-     at the top. Together they close the loop for all 7 RI requirements (see
-     <a href="robot-intelligence-testing.html">5.3.4 Testing &amp; Validation</a>).
-   </p>
-
    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
      <thead>
        <tr style="background:#f0f0f0;">
@@ -576,16 +470,16 @@
      </thead>
      <tbody>
        <tr>
-         <td style="padding:8px; border:1px solid #ddd;">Concept and Requirements</td>
-         <td style="padding:8px; border:1px solid #ddd;">Define real-time perception, fusion, and coaching behaviour</td>
-         <td style="padding:8px; border:1px solid #ddd;">RI-1 to RI-7 derived from product needs and on-device deployment constraints</td>
-         <td style="padding:8px; border:1px solid #ddd;">Requirement table with rationale</td>
+         <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #2563eb; vertical-align:top; background:#f8faff;"><strong>Concept &amp; Requirements</strong></td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Fix measurable targets before any design work begins</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">RI-1 to RI-7 derived from product needs and on-device deployment constraints. Each requirement drove a specific design choice downstream (see next rows)</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirements table above with rationale per requirement</td>
        </tr>
        <tr>
-         <td style="padding:8px; border:1px solid #ddd;">High-Level Design</td>
-         <td style="padding:8px; border:1px solid #ddd;">Partition the AI stack into independent ROS 2 nodes</td>
-         <td style="padding:8px; border:1px solid #ddd;">
-           <div style="margin-bottom:6px;">10-node architecture:</div>
+         <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #2563eb; vertical-align:top; background:#f8faff;"><strong>High-Level Design</strong></td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Partition the AI stack into independent ROS 2 nodes coordinated by a central state machine</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">
+           <div style="margin-bottom:6px;">10-node architecture, 21 custom messages, 6 services:</div>
            <div style="display:flex; flex-wrap:wrap; gap:6px;">
              <code>cv_node</code>
              <code>imu_node</code>
@@ -598,31 +492,182 @@
              <code>free_training_engine</code>
              <code>robot_node</code>
            </div>
+           <div style="margin-top:6px; font-size:0.88rem; color:#555;"><code>session_manager</code> 5-state machine is the single source of truth: all training modes flow through the same lifecycle</div>
          </td>
-         <td style="padding:8px; border:1px solid #ddd;">Node graph and 5-state session machine</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Node graph + session state machine diagrams (below)</td>
        </tr>
        <tr>
-         <td style="padding:8px; border:1px solid #ddd;">Detailed Design and Build</td>
-         <td style="padding:8px; border:1px solid #ddd;">Train and deploy each AI component</td>
-         <td style="padding:8px; border:1px solid #ddd;">9-iteration CV model, CV+IMU fusion, Markov sparring, Qwen2.5-3B LLM with knowledge base, TensorRT FP16 deployment</td>
-         <td style="padding:8px; border:1px solid #ddd;">Per-component design narratives in 5.3.1, 5.3.2, 5.3.3</td>
+         <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #d97706; vertical-align:top; background:#fffdf5;"><strong>Detailed Design &amp; Build</strong></td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Design, train, and deploy each AI component, each driven by a specific RI requirement</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">
+           <strong>RI-1/2</strong>: ~24 ms per-frame budget shaped the dual-branch Transformer + TensorRT FP16 deployment<br>
+           <strong>RI-3</strong>: 9-iteration CV model with leave-one-person-out validation<br>
+           <strong>RI-4</strong>: <code>punch_processor</code> CV+IMU fusion with pad-constraint filtering<br>
+           <strong>RI-5</strong>: all inference on-device within the 16 GB shared-memory budget<br>
+           <strong>RI-6</strong>: <code>sparring_engine</code> with Markov chain styles + persistent weakness profile<br>
+           <strong>RI-7</strong>: local Qwen2.5-3B LLM coach with 17-document boxing knowledge base + fallback tips<br>
+           <span style="font-size:0.88rem; color:#555;">Vue 3 + FastAPI phone dashboard connected to per-user SQLite database</span>
+         </td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Per-component design narratives in <a href="robot-intelligence-cv.html">5.3.1</a>, <a href="robot-intelligence-integration.html">5.3.2</a>, <a href="robot-intelligence-software.html">5.3.3</a></td>
        </tr>
        <tr>
-         <td style="padding:8px; border:1px solid #ddd;">Verification and Validation</td>
-         <td style="padding:8px; border:1px solid #ddd;">Confirm performance against RI-1 to RI-7</td>
-         <td style="padding:8px; border:1px solid #ddd;">146 unit tests, 28 integration tests, 12 system notebook sections, model interpretability analysis, CDE AI Fair real-world deployment</td>
-         <td style="padding:8px; border:1px solid #ddd;">5.3.4.7 verification summary, all 7 RI requirements pass</td>
+         <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #16a34a; vertical-align:top; background:#f6fdf8;"><strong>Verification &amp; Validation</strong></td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Three-tier testing pyramid + real-world deployment to confirm RI-1 to RI-7</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">
+           <strong>Unit</strong>: 146 pytest tests (sensor fusion, gamification, database)<br>
+           <strong>Integration</strong>: 28 cross-module tests (ROS messages, fusion end-to-end, motor protocol)<br>
+           <strong>System</strong>: 12 notebook sections + CDE AI Fair real-world deployment + model interpretability analysis
+         </td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;"><a href="robot-intelligence-testing.html">5.3.4.7</a> verification summary: all 7 RI requirements pass</td>
        </tr>
      </tbody>
    </table>
    <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: Robot Intelligence application of the V-Model from decomposition to verification</p>
  </div>
 
+ <!-- HARDWARE & TECH STACK -->
+ <h3>Hardware &amp; Tech Stack</h3>
+
+ <p>
+ Everything below runs on a single <strong>NVIDIA Jetson Orin NX</strong>, one
+ board carrying perception, fusion, decision logic, the LLM coach, the dashboard
+ backend, and the touchscreen GUI all at once. No external server, no cloud, no
+ internet required.
+ </p>
+
+ <style>
+ .ts-row { display:grid; grid-template-columns:130px 1fr; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid #e5e7eb; }
+ .ts-row:last-child { border-bottom:none; padding-bottom:4px; }
+ .ts-row:first-child { padding-top:4px; }
+ .ts-label { font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#475569; text-align:right; }
+ .ts-pills { display:flex; flex-wrap:wrap; gap:6px; }
+ .ts-pill {
+ display:inline-block;
+ font-size:0.78rem;
+ font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+ padding:3px 9px;
+ border-radius:11px;
+ background:#f0f4f8;
+ border:1px solid #d0d7de;
+ color:#1f2937;
+ white-space:nowrap;
+ }
+ .ts-pill.hw { background:#e3f2fd; border-color:#bbdefb; color:#0d47a1; }
+ .ts-pill.model { background:#e8f5e9; border-color:#c8e6c9; color:#1b5e20; }
+ .ts-pill.ros { background:#f3e5f5; border-color:#e1bee7; color:#4a148c; }
+ .ts-pill.backend { background:#fff3e0; border-color:#ffe0b2; color:#bf360c; }
+ .ts-pill.frontend { background:#fce4ec; border-color:#f8bbd0; color:#880e4f; }
+ @media (max-width:700px) {
+ .ts-row { grid-template-columns:1fr; gap:6px; }
+ .ts-label { text-align:left; }
+ }
+ </style>
+
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:14px 18px; margin:12px 0;">
+ <div class="ts-row">
+ <div class="ts-label">Hardware</div>
+ <div class="ts-pills">
+ <span class="ts-pill hw">Jetson Orin NX 16GB</span>
+ <span class="ts-pill hw">Ubuntu 22.04</span>
+ <span class="ts-pill hw">CUDA 12.6</span>
+ <span class="ts-pill hw">RealSense D435i</span>
+ <span class="ts-pill hw">Teensy 4.0</span>
+ <span class="ts-pill hw">4&times; MPU6050</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Models</div>
+ <div class="ts-pills">
+ <span class="ts-pill model">Voxel-Pose Transformer 1.75M</span>
+ <span class="ts-pill model">YOLO Pose nano</span>
+ <span class="ts-pill model">Qwen2.5-3B GGUF Q4_K_M</span>
+ <span class="ts-pill model">PyTorch &rarr; TensorRT FP16</span>
+ <span class="ts-pill model">llama-cpp-python</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Robotics</div>
+ <div class="ts-pills">
+ <span class="ts-pill ros">ROS 2 Humble</span>
+ <span class="ts-pill ros">10 nodes</span>
+ <span class="ts-pill ros">21 messages</span>
+ <span class="ts-pill ros">6 services</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Backend</div>
+ <div class="ts-pills">
+ <span class="ts-pill backend">FastAPI + Uvicorn</span>
+ <span class="ts-pill backend">SQLite (two-tier)</span>
+ <span class="ts-pill backend">WebSocket</span>
+ <span class="ts-pill backend">localhost.run tunnel</span>
+ </div>
+ </div>
+ <div class="ts-row">
+ <div class="ts-label">Frontends</div>
+ <div class="ts-pills">
+ <span class="ts-pill frontend">PySide6 / Qt, 10.1&Prime; touchscreen</span>
+ <span class="ts-pill frontend">Vue 3 + Tailwind, phone dashboard</span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <h3>Open-Source Licensing</h3>
+
+ <p>
+ If BoxBunny were deployed as a commercial product, the open-source licences in the
+ stack would need to be addressed. Most of the stack is permissive (Apache 2.0, MIT,
+ BSD), but two components carry stricter terms:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.9rem;">
+   <thead>
+     <tr style="background:#f0f0f0;">
+       <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">Component</th>
+       <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">Licence</th>
+       <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">Commercial implication</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr>
+       <td style="padding:6px 10px; border:1px solid #ddd;">YOLO26 (Ultralytics)</td>
+       <td style="padding:6px 10px; border:1px solid #ddd;"><strong>AGPL-3.0</strong></td>
+       <td style="padding:6px 10px; border:1px solid #ddd;">Requires open-sourcing the full application if distributed, <strong>or</strong> purchasing an <a href="https://www.ultralytics.com/license" target="_blank">Ultralytics Enterprise licence</a> (~US$5,000/year per developer, quote-based (<a href="https://github.com/orgs/ultralytics/discussions/7440" target="_blank">Ultralytics, 2024</a>))</td>
+     </tr>
+     <tr>
+       <td style="padding:6px 10px; border:1px solid #ddd;">PySide6 (Qt)</td>
+       <td style="padding:6px 10px; border:1px solid #ddd;"><strong>LGPL</strong></td>
+       <td style="padding:6px 10px; border:1px solid #ddd;">OK if dynamically linked (the default), but must allow users to replace the Qt library</td>
+     </tr>
+     <tr>
+       <td style="padding:6px 10px; border:1px solid #ddd;">Everything else<br><span style="font-size:0.82rem; color:#888;">(Qwen2.5, llama-cpp, ROS 2, FastAPI, Vue 3)</span></td>
+       <td style="padding:6px 10px; border:1px solid #ddd;">Apache 2.0 / MIT / BSD</td>
+       <td style="padding:6px 10px; border:1px solid #ddd;">Permissive, no issues</td>
+     </tr>
+   </tbody>
+ </table>
+
+ <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:14px 18px; margin:14px 0; font-size:0.93rem;">
+ <strong style="color:#1b5e20; font-size:1rem;">Why YOLO despite AGPL?</strong>
+
+ <dl style="margin:10px 0 0; line-height:1.55;">
+   <dt style="font-weight:600; color:#1b5e20; margin-top:8px;">The constraint</dt>
+   <dd style="margin:2px 0 0 18px;">The system's 33 ms per-frame budget leaves no room for a slower pose estimator. <strong>YOLO26 Nano Pose</strong> (<code>yolo26n-pose</code>, Jocher et al., 2025) is the fastest open-source option available: its key breakthrough is <strong>NMS-free end-to-end inference</strong> (no post-processing step, final detections in a single forward pass), which combined with progressive loss balancing and edge-optimised architecture runs at <strong>~16 ms</strong> (TensorRT FP16) on the Jetson. No other open-source pose estimator fits the budget.</dd>
+
+   <dt style="font-weight:600; color:#1b5e20; margin-top:10px;">The commercial path</dt>
+   <dd style="margin:2px 0 0 18px;">For deployment, two options: purchase an <strong>Ultralytics Enterprise licence</strong>, or swap YOLO for an Apache/MIT-licensed pose estimator (e.g. MediaPipe Pose, MMPose) with pipeline re-tuning.</dd>
+
+   <dt style="font-weight:600; color:#1b5e20; margin-top:10px;">What's unaffected</dt>
+   <dd style="margin:2px 0 0 18px;">The rest of the action prediction model (voxel branch, transformer, fusion layer) is <strong>entirely custom code</strong> with no licence constraints. Only the pose estimator component carries the AGPL dependency.</dd>
+ </dl>
+ </div>
+
  <sl-divider></sl-divider>
 
  <!-- 5.3.2 SYSTEM ARCHITECTURE -->
  <div id="system-architecture">
- <h3>System Architecture</h3>
+ <h3>ROS 2 System Architecture</h3>
 
  <p>
  The entire system runs on an NVIDIA Jetson Orin NX using <strong>ROS 2 Humble</strong>
@@ -638,58 +683,113 @@
  behaviour:
  </p>
 
- <svg class="zoomable" viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:980px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
+ <svg class="zoomable" viewBox="0 0 900 440" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px; margin:14px auto; display:block; font-family:system-ui,sans-serif;">
  <defs>
- <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
- <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
- </marker>
+   <marker id="dataArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+     <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+   </marker>
+   <marker id="dataArrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+     <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65100"/>
+   </marker>
  </defs>
 
- <!-- Stage 1: Capture -->
- <rect x="20" y="50" width="200" height="100" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.8"/>
- <text x="120" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#0d47a1" letter-spacing="0.6">CAPTURE</text>
- <text x="120" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#0d47a1">RealSense D435i</text>
- <text x="120" y="100" text-anchor="middle" font-size="10" fill="#0d47a1">RGB + depth</text>
- <text x="120" y="116" text-anchor="middle" font-size="10" fill="#0d47a1">848&times;480 @ 30 fps</text>
- <text x="120" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#1565c0">camera_node</text>
+ <!-- Background -->
+ <rect width="900" height="440" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
 
- <line x1="225" y1="100" x2="248" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+ <!-- Title -->
+ <text x="450" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Data Flow: Camera to Robot Behaviour (4 stages)</text>
+
+ <!-- ==================== ROW 1: Main pipeline ==================== -->
+
+ <!-- Stage 1: Capture -->
+ <rect x="30" y="60" width="180" height="130" rx="12" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+ <rect x="30" y="60" width="180" height="30" rx="12" fill="#1565c0"/>
+ <rect x="30" y="75" width="180" height="15" fill="#1565c0"/>
+ <text x="120" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" letter-spacing="0.6">1. CAPTURE</text>
+ <text x="120" y="112" text-anchor="middle" font-size="14" font-weight="700" fill="#0d47a1">RealSense D435i</text>
+ <text x="120" y="132" text-anchor="middle" font-size="11" fill="#1565c0">RGB + depth</text>
+ <text x="120" y="148" text-anchor="middle" font-size="11" fill="#1565c0">848&times;480 @ 30 fps</text>
+ <text x="120" y="178" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">camera_node</text>
+
+ <!-- Arrow 1→2 -->
+ <line x1="215" y1="125" x2="248" y2="125" stroke="#555" stroke-width="2.5" marker-end="url(#dataArr)"/>
 
  <!-- Stage 2: Perception -->
- <rect x="252" y="50" width="220" height="100" rx="10" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.8"/>
- <text x="362" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#1b5e20" letter-spacing="0.6">PERCEPTION</text>
- <text x="362" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">YOLO pose</text>
- <text x="362" y="91" text-anchor="middle" font-size="10" fill="#1b5e20">+ 3D voxel motion</text>
- <text x="362" y="111" text-anchor="middle" font-size="10" fill="#1b5e20">&rarr; 8-class action</text>
- <text x="362" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#2e7d32">cv_node</text>
+ <rect x="252" y="60" width="180" height="130" rx="12" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+ <rect x="252" y="60" width="180" height="30" rx="12" fill="#2e7d32"/>
+ <rect x="252" y="75" width="180" height="15" fill="#2e7d32"/>
+ <text x="342" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" letter-spacing="0.6">2. PERCEPTION</text>
+ <text x="342" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#1b5e20">YOLO pose</text>
+ <text x="342" y="130" text-anchor="middle" font-size="11" fill="#2e7d32">+ 3D voxel motion</text>
+ <text x="342" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">&rarr; 8-class action</text>
+ <text x="342" y="178" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">cv_node</text>
 
- <line x1="477" y1="100" x2="500" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+ <!-- Arrow 2→3 -->
+ <line x1="437" y1="125" x2="470" y2="125" stroke="#555" stroke-width="2.5" marker-end="url(#dataArr)"/>
 
  <!-- Stage 3: Fusion -->
- <rect x="504" y="50" width="220" height="100" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.8"/>
- <text x="614" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#bf360c" letter-spacing="0.6">FUSION</text>
- <text x="614" y="74" text-anchor="middle" font-size="12" font-weight="600" fill="#bf360c">CV &harr; IMU match</text>
- <text x="614" y="91" text-anchor="middle" font-size="10" fill="#bf360c">&plusmn;500 ms window</text>
- <text x="614" y="111" text-anchor="middle" font-size="10" fill="#bf360c">+ pad constraints</text>
- <text x="614" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#e65100">punch_processor</text>
+ <rect x="474" y="60" width="180" height="130" rx="12" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+ <rect x="474" y="60" width="180" height="30" rx="12" fill="#e65100"/>
+ <rect x="474" y="75" width="180" height="15" fill="#e65100"/>
+ <text x="564" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" letter-spacing="0.6">3. FUSION</text>
+ <text x="564" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#bf360c">CV &harr; IMU match</text>
+ <text x="564" y="130" text-anchor="middle" font-size="11" fill="#e65100">&plusmn;500 ms window</text>
+ <text x="564" y="148" text-anchor="middle" font-size="11" fill="#e65100">+ pad constraints</text>
+ <text x="564" y="178" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">punch_processor</text>
 
- <line x1="729" y1="100" x2="752" y2="100" stroke="#555" stroke-width="2" marker-end="url(#dataArr)"/>
+ <!-- Arrow 3→4 -->
+ <line x1="659" y1="125" x2="692" y2="125" stroke="#555" stroke-width="2.5" marker-end="url(#dataArr)"/>
 
  <!-- Stage 4: Downstream -->
- <rect x="756" y="50" width="210" height="100" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.8"/>
- <text x="861" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#4a148c" letter-spacing="0.6">DOWNSTREAM</text>
- <text x="861" y="71" text-anchor="middle" font-size="10" fill="#4a148c">Session &middot; Drills</text>
- <text x="861" y="86" text-anchor="middle" font-size="10" fill="#4a148c">Sparring AI</text>
- <text x="861" y="101" text-anchor="middle" font-size="10" fill="#4a148c">Analytics &middot; LLM</text>
- <text x="861" y="116" text-anchor="middle" font-size="10" fill="#4a148c">Robot motors</text>
- <text x="861" y="140" text-anchor="middle" font-size="9" font-style="italic" fill="#6a1b9a">5 nodes</text>
+ <rect x="696" y="60" width="180" height="130" rx="12" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+ <rect x="696" y="60" width="180" height="30" rx="12" fill="#6a1b9a"/>
+ <rect x="696" y="75" width="180" height="15" fill="#6a1b9a"/>
+ <text x="786" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" letter-spacing="0.6">4. DOWNSTREAM</text>
+ <text x="786" y="110" text-anchor="middle" font-size="11" fill="#4a148c">Session &middot; Drills</text>
+ <text x="786" y="128" text-anchor="middle" font-size="12" font-weight="600" fill="#4a148c">Sparring AI</text>
+ <text x="786" y="146" text-anchor="middle" font-size="11" fill="#4a148c">Analytics &middot; LLM</text>
+ <text x="786" y="162" text-anchor="middle" font-size="11" fill="#4a148c">Robot motors</text>
+ <text x="786" y="178" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">5 nodes</text>
 
- <!-- IMU side input -->
- <rect x="356" y="180" width="220" height="40" rx="8" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3"/>
- <text x="466" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#555">Teensy + 6&times; MPU6050 IMUs</text>
- <text x="466" y="210" text-anchor="middle" font-size="9" font-style="italic" fill="#777">imu_node, pad &amp; arm impacts</text>
+ <!-- ==================== ROW 2: IMU side input ==================== -->
 
- <line x1="466" y1="180" x2="540" y2="155" stroke="#999" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#dataArr)"/>
+ <rect x="252" y="230" width="400" height="70" rx="12" fill="#fff8e1" stroke="#f9a825" stroke-width="2"/>
+ <rect x="252" y="230" width="400" height="28" rx="12" fill="#f9a825"/>
+ <rect x="252" y="245" width="400" height="13" fill="#f9a825"/>
+ <text x="452" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" letter-spacing="0.5">IMU SENSORS (Teensy 4.0)</text>
+ <text x="452" y="274" text-anchor="middle" font-size="12" font-weight="600" fill="#5d4037">4&times; MPU6050: 4 pad sensors (centre, left, right, head)</text>
+ <text x="452" y="290" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">imu_node: pad impact detection, force classification</text>
+
+ <!-- Arrow from IMU up to Fusion (straight vertical) -->
+ <line x1="564" y1="230" x2="564" y2="195" stroke="#e65100" stroke-width="2.5" marker-end="url(#dataArrO)"/>
+ <text x="590" y="216" font-size="10" font-weight="600" fill="#e65100">serial &rarr; ROS</text>
+
+ <!-- ==================== ROW 3: Legend ==================== -->
+
+ <line x1="30" y1="330" x2="870" y2="330" stroke="#d0d7de" stroke-width="1"/>
+ <text x="450" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#475569" letter-spacing="0.5">HARDWARE &amp; CONNECTION SUMMARY</text>
+
+ <!-- 3 muted summary cards -->
+ <!-- Jetson -->
+ <rect x="30" y="365" width="275" height="60" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+ <rect x="38" y="373" width="8" height="8" rx="2" fill="#1565c0"/>
+ <text x="52" y="381" font-size="9" font-weight="700" fill="#555">Jetson Orin NX (16 GB)</text>
+ <text x="46" y="396" font-size="8.5" fill="#888">Camera (USB 3.0) &middot; Display (HDMI)</text>
+ <text x="46" y="410" font-size="8.5" fill="#888">WiFi AP &middot; All ROS nodes &middot; GPU inference</text>
+
+ <!-- Teensy -->
+ <rect x="315" y="365" width="275" height="60" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+ <rect x="323" y="373" width="8" height="8" rx="2" fill="#f9a825"/>
+ <text x="337" y="381" font-size="9" font-weight="700" fill="#555">Teensy 4.0</text>
+ <text x="331" y="396" font-size="8.5" fill="#888">4&times; MPU6050 pads (I2C) &middot; Serial to Jetson</text>
+ <text x="331" y="410" font-size="8.5" fill="#888">Pad impact detection &middot; Force classification</text>
+
+ <!-- Phone -->
+ <rect x="600" y="365" width="275" height="60" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+ <rect x="608" y="373" width="8" height="8" rx="2" fill="#2e7d32"/>
+ <text x="622" y="381" font-size="9" font-weight="700" fill="#555">Phone Dashboard</text>
+ <text x="616" y="396" font-size="8.5" fill="#888">Jetson WiFi AP &rarr; FastAPI (HTTP/WS)</text>
+ <text x="616" y="410" font-size="8.5" fill="#888">&rarr; GUI via /tmp/ IPC files</text>
  </svg>
 
  <p>

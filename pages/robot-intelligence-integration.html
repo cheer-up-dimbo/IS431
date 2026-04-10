@@ -14,6 +14,7 @@
  <script src="../components/report-nav/report-nav.js" defer></script>
  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
  <style>
+    .stepper-link:hover { background:#6a1b9a !important; color:#fff !important; border-color:#6a1b9a !important; }
     /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
     code {
       background: #f0f4f8;
@@ -50,7 +51,7 @@
  /* Strong visual break between MAIN sections (5.3.2.1, 5.3.2.2, ...) */
  .content sl-divider {
  --width: 3px;
- --color: #2e7d32;
+ --color: #7b1fa2;
  margin: 56px 0 36px !important;
  border-radius: 2px;
  }
@@ -58,7 +59,7 @@
  .content > h2,
  .content > div > h2 {
  font-size: 1.7rem !important;
- color: #1b5e20 !important;
+ color: #4a148c !important;
  letter-spacing: -0.3px;
  }
  /* Tag the H2 wrapper divs (the ones containing an H2 + badge) with extra top padding */
@@ -78,22 +79,25 @@
  <br>
 
  <!-- 5.3.4 INTRO -->
- <h2>5.3.2 Intelligent Behaviour & Control</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.2 Intelligent Behaviour &amp; Control</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge>
+ </div>
+
+ <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#int-fusion" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Fusion</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-inference" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Inference</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sparring" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sparring</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-llm" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">LLM</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sessions" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sessions</a></div>
 
  <p>
  All intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on the Jetson,
- communicating via custom message types and services. Each subsection below corresponds to
- one or more ROS nodes that handle a specific aspect of the system, from fusing sensor
- data to generating AI coaching tips. Together they form the decision-making layer between
- the CV perception pipeline (<a href="robot-intelligence-cv.html">Section 5.3.1</a>) and the
- dashboard and analytics layer (<a href="robot-intelligence-software.html">Section 5.3.3</a>).
+ communicating via custom message types and services. Together they form the decision-making
+ layer between the CV perception pipeline (<a href="robot-intelligence-cv.html">5.3.1</a>)
+ and the dashboard (<a href="robot-intelligence-software.html">5.3.3</a>).
  </p>
 
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.1 CV + IMU SENSOR FUSION -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.1 CV + IMU Sensor Fusion</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-fusion">5.3.2.1 CV + IMU Sensor Fusion</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-4</sl-badge>
  </div>
 
@@ -157,8 +161,8 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.2 REAL-TIME INFERENCE PIPELINE -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.2 Real-Time Inference Pipeline</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-inference">5.3.2.2 Real-Time Inference Pipeline</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-5</sl-badge>
  </div>
 
@@ -493,46 +497,115 @@
  </tbody>
  </table>
 
- <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.93rem; color:#5d4037;">
- <strong>Memory capacity is not the bottleneck for LLM speed.</strong> The combined
- footprint sits well below the 16&nbsp;GB ceiling, but free memory does <em>not</em>
- translate to free LLM throughput. LLM inference on the Jetson is bound by GPU compute
- (~100 sparse&nbsp;TFLOPS on the Orin NX) and memory <em>bandwidth</em> (~102&nbsp;GB/s
- of LPDDR5), not by capacity. A larger model would <em>fit</em> in the spare RAM, but
- it would be too slow to be useful in the real-time loop. The 3B&nbsp;model + 128-token
- cap is the largest the current hardware can sustain, this is the documented LLM
- compute ceiling in <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>,
- and the upgrade path is a more powerful Jetson, a discrete GPU, or a USB AI accelerator,
- not a higher-capacity model on the same chip.
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:14px 18px; margin:18px 0; font-size:0.93rem; color:#5d4037;">
+ <strong style="font-size:1rem;">Why 16&nbsp;GB of RAM does not mean we can run a bigger LLM</strong>
+
+ <p style="margin:12px 0 8px;">
+ The Jetson has 16&nbsp;GB of unified memory shared between CPU and GPU, with only
+ ~2.5&nbsp;GB used. But LLM speed is limited by memory <strong>bandwidth</strong>
+ (how fast data moves), not <strong>capacity</strong> (how much fits). Every token
+ generated requires reading the full model weights once:
+ </p>
+
+ <svg viewBox="0 0 960 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:960px; margin:12px auto; display:block; font-family:system-ui,sans-serif;">
+   <rect width="960" height="340" rx="8" fill="#fafafa" stroke="#e0e0e0"/>
+
+   <!-- Title -->
+   <text x="480" y="28" text-anchor="middle" font-size="13" font-weight="700" fill="#333">Capacity vs. Bandwidth on the Jetson Orin NX (16 GB unified LPDDR5)</text>
+
+   <!-- CAPACITY ROW -->
+   <text x="20" y="68" font-size="12" font-weight="700" fill="#2e7d32">CAPACITY</text>
+   <text x="20" y="83" font-size="10" fill="#888">how much fits</text>
+
+   <rect x="120" y="55" width="650" height="38" rx="5" fill="#e8f5e9" stroke="#c8e6c9"/>
+   <rect x="120" y="55" width="100" height="38" rx="5" fill="#66bb6a"/>
+   <text x="170" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">2.5 GB</text>
+   <text x="445" y="79" text-anchor="middle" font-size="12" fill="#2e7d32">13.5 GB free</text>
+   <text x="790" y="79" font-size="11" font-weight="600" fill="#555">16 GB</text>
+
+   <text x="445" y="112" text-anchor="middle" font-size="11" font-style="italic" fill="#2e7d32">A 7B model (~4 GB) easily fits. Capacity is not the problem.</text>
+
+   <!-- BANDWIDTH SECTION -->
+   <text x="20" y="152" font-size="12" font-weight="700" fill="#1565c0">BANDWIDTH</text>
+   <text x="20" y="167" font-size="10" fill="#888">speed limit</text>
+
+   <!-- 3B bar -->
+   <rect x="120" y="140" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
+   <rect x="120" y="140" width="390" height="36" rx="5" fill="#42a5f5"/>
+   <text x="315" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3B: reads 2 GB/token = ~51 tok/s max</text>
+   <rect x="515" y="143" width="90" height="30" rx="4" fill="#e3f2fd" stroke="#90caf9"/>
+   <text x="560" y="162" text-anchor="middle" font-size="9" font-weight="600" fill="#1565c0">CV headroom</text>
+   <text x="790" y="163" font-size="10" font-weight="600" fill="#555">102 GB/s</text>
+
+   <!-- 7B bar -->
+   <rect x="120" y="186" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
+   <rect x="120" y="186" width="650" height="36" rx="5" fill="#ef5350" opacity="0.85"/>
+   <text x="445" y="209" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">7B: reads 4 GB/token = ~25 tok/s max, saturates entire bus</text>
+   <text x="790" y="209" font-size="10" font-weight="600" fill="#c62828">102 GB/s</text>
+
+   <!-- Separator -->
+   <line x1="40" y1="240" x2="920" y2="240" stroke="#d0d7de"/>
+
+   <!-- Comparison table header -->
+   <text x="130" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Model</text>
+   <text x="300" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Size (Q4)</text>
+   <text x="440" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fits in 16 GB?</text>
+   <text x="600" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Tokens/s (with CV)</text>
+   <text x="790" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fast enough for tips?</text>
+
+   <!-- 3B row -->
+   <text x="130" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Qwen2.5-3B</text>
+   <text x="300" y="290" text-anchor="middle" font-size="11" fill="#333">~2 GB</text>
+   <text x="440" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
+   <text x="600" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">~30-40 tok/s</text>
+   <text x="790" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">&#x2713; Yes</text>
+
+   <!-- 7B row -->
+   <text x="130" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#333">7B-8B model</text>
+   <text x="300" y="318" text-anchor="middle" font-size="11" fill="#333">~4 GB</text>
+   <text x="440" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
+   <text x="600" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">&lt;15 tok/s</text>
+   <text x="790" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">&#x2715; Too slow</text>
+ </svg>
+
+ <p style="margin:10px 0 4px;">
+ The 3B model is the sweet spot for this hardware. The upgrade path is
+ <strong>faster hardware</strong> (more powerful Jetson, dedicated GPU, or USB AI
+ accelerator), not a bigger model on the same chip. See
+ <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>.
+ </p>
  </div>
 
  <p style="font-size:0.92rem; color:#444;">
  With frame rate, compute, output stability, and resource sharing all handled, the
  action model now runs reliably in real time, the foundation that the rest of this
- section builds on top of.
+ section builds on top of. Licensing implications of the tech stack (including YOLO's
+ AGPL-3.0 licence) are addressed on the
+ <a href="robot-intelligence.html">landing page</a>.
  </p>
 
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.3 AI SPARRING ENGINE -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.3 AI Sparring Engine</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-sparring">5.3.2.3 AI Sparring Engine</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-6</sl-badge>
  </div>
 
  <p>
- The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
- their first-order Markov chain combo generation, including the transition matrix
- worked example and the weakness-blending alpha, are introduced in
- <a href="gui.html">Section 5.1 GUI</a>. This section covers the
- <em>ROS-side execution</em> that turns those style definitions into live robot behaviour.
- The <code>sparring_engine</code> node has to do five things in a loop, every round,
- for every opponent style: <strong>pace attacks</strong> at the right intensity,
- <strong>adapt</strong> to the user's weak areas, <strong>stay safe</strong> when something
- else in the system goes wrong, <strong>read the user's response</strong> to each strike,
- and provide a simpler <strong>reactive mode</strong> for unstructured practice. Each
- subsection below covers one of those five jobs.
+ The 5 sparring styles and their Markov chain combo generation are introduced in
+ <a href="gui.html">5.1 GUI</a>. This section covers the <em>ROS-side execution</em>:
+ how <code>sparring_engine</code> turns those style definitions into live robot behaviour.
+ Five jobs run in a loop every round:
  </p>
+
+ <ol style="margin:8px 0 16px; line-height:1.6; font-size:0.93rem;">
+   <li><strong>Pace attacks</strong> at the right intensity (difficulty scaling)</li>
+   <li><strong>Adapt</strong> to the user's weak areas (weakness tracking)</li>
+   <li><strong>Stay safe</strong> when something else in the system goes wrong (engine safeguards)</li>
+   <li><strong>Read the user's response</strong> to each strike (defence detection)</li>
+   <li><strong>Reactive mode</strong> for unstructured practice (free training)</li>
+ </ol>
 
  <h3>1. Pacing attacks, difficulty scaling</h3>
 
@@ -700,8 +773,8 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.4 LLM COACH -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.4 LLM Coach</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-llm">5.3.2.4 LLM Coach</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge>
  </div>
 
@@ -971,7 +1044,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.5 SESSION MANAGEMENT -->
- <h2>5.3.2.5 Session Management</h2>
+ <h2 id="int-sessions">5.3.2.5 Session Management</h2>
 
  <p>
  Every other node on this page, fusion, inference, sparring, LLM, needs to know

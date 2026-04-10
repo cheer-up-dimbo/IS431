@@ -14,6 +14,7 @@
  <script src="../components/report-nav/report-nav.js" defer></script>
  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
  <style>
+ .stepper-link:hover { background:#6a1b9a !important; color:#fff !important; border-color:#6a1b9a !important; }
  .page-nav-row {
  display: flex;
  justify-content: space-between;
@@ -42,7 +43,7 @@
  /* Strong visual break between MAIN sections */
  .content sl-divider {
  --width: 3px;
- --color: #2e7d32;
+ --color: #7b1fa2;
  margin: 56px 0 36px !important;
  border-radius: 2px;
  }
@@ -50,7 +51,7 @@
  .content > h2,
  .content > div > h2 {
  font-size: 1.7rem !important;
- color: #1b5e20 !important;
+ color: #4a148c !important;
  letter-spacing: -0.3px;
  }
  .content > div:has(> h2) {
@@ -68,7 +69,12 @@
  </a>
  <br>
 
- <h2>5.3.3 Dashboard & Analytics</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.3 Dashboard &amp; Analytics</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5, RI-7</sl-badge>
+ </div>
+
+ <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#sw-comms" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Communication</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#sw-analytics" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Analytics</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#sw-coach" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">AI coach</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#sw-flows" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Backend</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#sw-api" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Database</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#sw-gamification" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Gamification</a></div>
 
  <p>
  Training data is only useful if users can see it, understand it, and act on it. This
@@ -77,7 +83,7 @@
  conveniently from their phone, all without requiring internet access.
  </p>
 
- <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:12px 16px; margin:14px 0; font-size:0.92rem;">
+ <div style="background:#f8f9fa; border-left:3px solid #7b1fa2; padding:12px 16px; margin:14px 0; font-size:0.92rem;">
  <strong>Where the dashboard is split between Section 5.1 and Section 5.3.3</strong>
  <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px;">
  <div>
@@ -105,7 +111,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.1 COMMUNICATION ARCHITECTURE -->
- <h2>5.3.3.1 Communication Architecture</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-comms" style="margin:0;">5.3.3.1 Communication Architecture</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5</sl-badge></div>
 
  <p>
  Three software layers connect the robot's ROS 2 backend, the desktop touchscreen GUI,
@@ -156,7 +162,7 @@
  configuration and no shared network.
  </p>
 
- <div style="background:#f8f9fa; border-left:3px solid #4CAF50; padding:12px 16px; margin:14px 0; font-size:0.93rem;">
+ <div style="background:#f8f9fa; border-left:3px solid #7b1fa2; padding:12px 16px; margin:14px 0; font-size:0.93rem;">
  <div style="font-weight:600; color:#1b5e20; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #d8ead8;">How the public tunnel works</div>
  <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #d8ead8;">
  <span style="font-weight:600; color:#1565c0;">Tunnel,</span>
@@ -193,7 +199,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.2 ANALYTICS & PERFORMANCE INSIGHTS -->
- <h2>5.3.3.2 Analytics & Performance Insights</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-analytics" style="margin:0;">5.3.3.2 Analytics &amp; Performance Insights</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5</sl-badge></div>
 
  <p>
  Every training session generates a wealth of data, punch types, force levels,
@@ -242,7 +248,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.3 AI COACH ANALYSIS -->
- <h2>5.3.3.3 AI Coach on the Dashboard</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-coach" style="margin:0;">5.3.3.3 AI Coach on the Dashboard</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge></div>
 
  <p>
  The LLM coaching system (described in <a href="robot-intelligence-integration.html">Section 5.3.2</a>)
@@ -276,7 +282,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.4 PHONE DASHBOARD BACKEND -->
- <h2>5.3.3.4 Two Backend Flows in Detail</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-flows" style="margin:0;">5.3.3.4 Two Backend Flows in Detail</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5, RI-7</sl-badge></div>
 
  <p>
  The frontend stack (Vue 3 + Pinia + Tailwind + Chart.js) and the 5 user-facing views
@@ -385,7 +391,7 @@
  typing on the touchscreen.
  </p>
 
- <div style="display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:wrap;">
+ <div style="display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:nowrap; overflow-x:auto;">
  <div style="max-width:220px;">
  <image-component tag="image" source="../assets/robot_intelligence/dashboard/ai_coach.jpg" subtitle="Figure: AI Coach chat" width="100%"></image-component>
  </div>
@@ -412,7 +418,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.5 API & DATABASE DESIGN -->
- <h2>5.3.3.5 API & Database Design</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-api" style="margin:0;">5.3.3.5 API &amp; Database Design</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5</sl-badge></div>
 
  <p>
  The phone dashboard communicates with the robot through a FastAPI backend running on the
@@ -520,7 +526,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.6 GAMIFICATION BACKEND -->
- <h2>5.3.3.6 Gamification (Backend)</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-gamification" style="margin:0;">5.3.3.6 Gamification (Backend)</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5</sl-badge></div>
 
  <p>
  The gamification layer, 6 rank tiers, 12+ achievement badges, daily streaks, and
@@ -545,7 +551,7 @@
  touchscreen GUI:
  </p>
 
- <div style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 16px;">
+ <div style="display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin:10px 0 16px;">
  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/profile</span>
  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/achievements</span>
  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.85rem; background:#f0f4f8; border:1px solid #d0d7de; border-radius:4px; padding:4px 10px; color:#1a7f37;">/leaderboard</span>
@@ -583,7 +589,7 @@
  gamification router.
  </p>
 
- <div style="display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:wrap;">
+ <div style="display:flex; justify-content:center; gap:16px; margin:16px 0; flex-wrap:nowrap; overflow-x:auto;">
  <div style="max-width:220px;">
  <image-component tag="image" source="../assets/robot_intelligence/dashboard/welcome.jpg" subtitle="Figure: Home view, XP, rank, daily streak" width="100%"></image-component>
  </div>
