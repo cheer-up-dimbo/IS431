@@ -3,7 +3,7 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>IS-431: 5.3.1 Computer Vision & Action Prediction</title>
+ <title>IS-431: 5.3.1 CV & Action Prediction</title>
  <link rel="icon" href="../favicon.ico" type="image/x-icon">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/themes/light.css" />
  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.16.0/cdn/shoelace-autoloader.js"></script>
@@ -13,6 +13,7 @@
  <script src="../components/scroll-to-top/scroll-to-top.js"></script>
  <script src="../components/report-nav/report-nav.js" defer></script>
  <style>
+    .stepper-link:hover { background:#6a1b9a !important; color:#fff !important; border-color:#6a1b9a !important; }
     /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
     code {
       background: #f0f4f8;
@@ -89,7 +90,7 @@
  /* Strong visual break between MAIN sections */
  .content sl-divider {
  --width: 3px;
- --color: #2e7d32;
+ --color: #7b1fa2;
  margin: 56px 0 36px !important;
  border-radius: 2px;
  }
@@ -97,7 +98,7 @@
  .content > h2,
  .content > div > h2 {
  font-size: 1.7rem !important;
- color: #1b5e20 !important;
+ color: #4a148c !important;
  letter-spacing: -0.3px;
  }
  .content > div:has(> h2) {
@@ -116,8 +117,8 @@
  <br>
 
  <!-- 5.3.1 INTRO -->
- <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.1 Computer Vision & Action Prediction</h2>
+ <div style="display:flex; align-items:center; gap:16px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;">5.3.1 CV & Action Prediction</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-3, RI-5</sl-badge>
  <a href="https://github.com/Yogee-s/boxing_action_recognition" target="_blank" style="text-decoration:none;">
  <sl-button variant="default" size="small">
@@ -127,6 +128,8 @@
  </a>
  </div>
 
+ <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#cv-problem" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Problem</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#cv-architecture" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Architecture</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#cv-iterations" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">9 iterations</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#cv-data" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Data &amp; training</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#cv-ablation" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Ablation</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#cv-results" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Secondary</a></div>
+
  <p>
  The CV subsystem delivers three functions: the <strong>action prediction model</strong> (core),
  <strong>reaction time detection</strong>, and <strong>human tracking</strong>. The latter two consume
@@ -135,26 +138,45 @@
 
  <image-component tag="image" source="../assets/robot_intelligence/needs_to_features.png" subtitle="Figure: Product needs mapped to CV functions, action prediction feeds both reaction time detection and human tracking"></image-component>
 
- <h3>The Problem: Predicting Punches Before They Land</h3>
+ <h3 id="cv-problem">The Problem: Predicting Punches Before They Land</h3>
 
  <p>
- Most action recognition research focuses on classifying actions <em>after</em> they have been
- fully performed, the system watches an entire video clip and then labels what happened.
- This project requires something fundamentally harder: <strong>action prediction</strong>, where the
- system must identify the punch type <em>while the motion is still in progress</em>, early enough
- for the robot to respond with a counter-punch. A typical boxing jab completes in under 300ms,
- leaving very little time for the model to observe, classify, and trigger a motor response.
+ Most action recognition research classifies actions <em>after</em> they are fully
+ performed. This project requires <strong>action prediction</strong>: identifying the
+ punch type <em>while the motion is still in progress</em>, early enough for the robot
+ to counter-punch. A typical jab completes in under 300 ms.
  </p>
 
+ <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;">
+   <div style="background:#ffebee; border-left:3px solid #c62828; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#c62828; text-transform:uppercase; letter-spacing:0.5px;">Action recognition (standard)</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Watch the <strong>entire clip</strong>, then label what happened. Sees the full motion before deciding.</div>
+   </div>
+   <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">Action prediction (this project)</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Classify <strong>frame-by-frame</strong> using only the frames seen so far (causal). Must commit before the punch finishes.</div>
+   </div>
+ </div>
+
  <p>
- This creates a unique engineering challenge. The model cannot simply wait for the full punch
- to finish and then classify, it must make streaming, frame-by-frame predictions using
- only the frames seen so far (causal inference). It also needs to handle the natural variation
- in punch speed: a fast jab and a slow hook look very different at any given point in their
- trajectory, so the model must be temporally flexible rather than relying on a fixed-length window.
- This is why a <strong>causal Transformer</strong> architecture (Vaswani et al., 2017) was chosen because its attention
- mechanism can dynamically weigh recent and earlier frames to capture both fast and slow motions.
+ This means the model must handle punches at <strong>very different speeds</strong>: a
+ fast jab and a slow hook look nothing alike at any given frame. Three mechanisms
+ address this:
  </p>
+ <ul style="margin:8px 0 14px; line-height:1.65; font-size:0.93rem;">
+   <li><strong>Depth-based motion detection</strong> — the voxel branch uses the depth
+   camera to sense the hand moving forward in 3D, which is the earliest physical
+   signal that a punch is starting, regardless of speed.</li>
+   <li><strong>Dual-speed temporal channels</strong> — the voxel grid compares snapshots
+   at two timescales: a <strong>fast channel</strong> (2-frame / ~67 ms) that catches
+   the sharp onset and a <strong>slow channel</strong> (8-frame / ~267 ms) that captures
+   the full arc. Together they cover both quick jabs and slow hooks.</li>
+   <li><strong>Causal Transformer + multi-window training</strong> — a
+   <strong>causal Transformer</strong> (Vaswani et al., 2017) lets the attention
+   mechanism dynamically weigh recent vs. earlier frames instead of relying on a
+   fixed window. During training, the model sees windows of both 9 and 12 frames,
+   forcing it to generalise across different punch durations.</li>
+ </ul>
 
  <h3>Physical Constraints</h3>
 
@@ -190,23 +212,26 @@
  <h3>The Pose Estimation Paradox</h3>
 
  <p>
- The natural approach to recognising body movements is pose estimation, tracking
- joint positions frame by frame. The catch is that off-the-shelf pose estimators like
- YOLO Pose are trained on datasets such as COCO (a standard public dataset of everyday
- photos used to teach computer vision models what people, hands, and joints look like)
- where hands and wrists are almost always visible as discrete features, bare
- skin, fingers, fine joint contours.
- <span style="background:#fff3cd; padding:1px 4px; border-radius:3px;">Boxing breaks every
- one of those assumptions:</span> the wrists are buried inside thick padded gloves, so
- the model has nothing recognisable to lock onto at the exact body part it cares about
- most.
+ The natural approach to recognising body movements is pose estimation. But off-the-shelf
+ models like YOLO Pose are trained on <strong>COCO</strong> (a dataset where hands are
+ bare and clearly visible). Boxing gloves remove everything the model expects to see:
  </p>
 
+ <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0;">
+   <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">What YOLO expects</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Bare skin, fingers, fine joint contours. Wrists are always visible.</div>
+   </div>
+   <div style="background:#ffebee; border-left:3px solid #c62828; padding:10px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#c62828; text-transform:uppercase; letter-spacing:0.5px;">What boxing gives it</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Thick padded gloves burying the wrists. Nothing recognisable to lock onto at punch extension.</div>
+   </div>
+ </div>
+
  <p>
- The result is exactly the wrong failure mode for action recognition: the skeleton breaks
- or jumps during punch extension, the moment when the discriminative motion is
- actually happening. Pose estimation alone peaked at <strong>~67% accuracy</strong> in
- early iterations for this reason.
+ The skeleton breaks or jumps at exactly the wrong moment: <strong>during punch
+ extension</strong>, when the discriminative motion is happening. Pose estimation alone
+ peaked at <strong>~67% accuracy</strong> in early iterations.
  </p>
 
  <div class="video-row two-up">
@@ -218,34 +243,24 @@
  </div>
  </div>
 
- <p>
- The fix has two parts. <strong>Confidence gating</strong> handles the failures: YOLO
- reports a confidence for each detected joint, and the model automatically scales down
- the pose signal whenever those drop, falling back on the voxel branch instead.
- Without this, the broken skeleton would actively mislead the network.
- </p>
+ <dl style="margin:14px 0; line-height:1.55;">
+   <dt style="font-weight:600; color:#1565c0; margin-top:10px;">Fix 1: Confidence gating</dt>
+   <dd style="margin:2px 0 0 18px;">YOLO reports a confidence for each joint. When confidence drops (as it does during extension), the model automatically scales down the pose signal and leans on the <strong>voxel branch</strong> instead. Without this, broken skeleton data would actively mislead the network.</dd>
+
+   <dt style="font-weight:600; color:#1565c0; margin-top:10px;">Fix 2: The key insight, pose fails during extension, not preparation</dt>
+   <dd style="margin:2px 0 0 18px;">In the first <strong>100&ndash;200 ms</strong> before the arm extends, the joints are still visible and they reliably reveal <strong>which hand is moving</strong>, information voxels alone cannot provide. The model gets the critical left/right call early from pose, then smoothly transitions to voxel-only reasoning as the punch extends. This is the core idea behind the <strong>dual-branch fusion architecture</strong>.</dd>
+ </dl>
 
  <p>
- The second part is the insight that turned pose from a liability into the missing piece
- of the final model: <strong>pose only fails during extension, not during preparation</strong>.
- In the first 100&ndash;200&nbsp;ms before the arm extends, the joints are still visible
- and they reliably reveal which hand is moving, information depth-based voxels
- alone cannot provide. The model gets the critical left/right call early from pose, then
- smoothly transitions to voxel-only reasoning as the punch extends. This is the core
- idea behind the dual-branch fusion architecture.
- </p>
-
- <p>
- The model classifies 8 actions: <strong>jab</strong>, <strong>cross</strong>,
- <strong>left hook</strong>, <strong>right hook</strong>, <strong>left uppercut</strong>,
- <strong>right uppercut</strong>, <strong>block</strong>, and <strong>idle</strong>
- (the neutral baseline that prevents false positives when the user is not punching).
+ The model classifies <strong>8 actions</strong>: jab, cross, left hook, right hook,
+ left uppercut, right uppercut, block, and idle (the neutral baseline that prevents
+ false positives when the user is not punching).
  </p>
 
  <sl-divider></sl-divider>
 
  <!-- 5.3.1.1 MODEL ARCHITECTURE -->
- <h2>5.3.1.1 Model Architecture</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="cv-architecture" style="margin:0;">5.3.1.1 Model Architecture</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-3</sl-badge></div>
  <h3>FusionVoxelPoseTransformerModel (~1.75M parameters)</h3>
 
  <p>
@@ -407,7 +422,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.1.2 FEATURE EXPLORATION -->
- <h2>5.3.1.2 Feature Exploration</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="cv-iterations" style="margin:0;">5.3.1.2 Feature Exploration</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-3</sl-badge></div>
  <h3>Development Journey</h3>
 
  <p>
@@ -613,62 +628,60 @@
  </div>
 
  <h3>Inference Results Across Iterations</h3>
+
  <p>
- The videos below show the most promising inference results from key iterations, each
- revealing specific limitations that drove the next approach. The earliest of them,
- the RGBD model from iterations 3&ndash;4, was so large it had to be trained on
- <strong>Google Colab</strong> rather than a local laptop, since the laptop GPU couldn't
- fit it. (<em>Colab is a cloud-hosted Jupyter notebook that provides a free GPU for ML
- training</em>.)
+ The videos below show two key earlier iterations side by side. They are doing
+ <strong>different tasks</strong> (see the recognition vs. prediction distinction at
+ the top of this page), so their accuracies are not directly comparable.
  </p>
 
- <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:12px 0; font-size:0.92rem; color:#5d4037;">
- <strong>Important, recognition vs. prediction.</strong> The two videos below
- are doing <em>different</em> tasks. The RGBD model on the left is offline action
- <strong>recognition</strong>: it watches the whole clip and labels it after the fact,
- with full bidirectional context. That's why its labels look so accurate (87.2% test
- accuracy), but it can't react to a punch in progress and is far too slow for
- real-time use. The voxel + colour tracking model on the right is true real-time
- action <strong>prediction</strong>, classifying each frame as the motion unfolds
- , the same task the final deployed model has to do, with the practical drawback
- of needing coloured gloves.
+ <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;">
+   <!-- RGBD card -->
+   <div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">
+     <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_inference.mp4" style="width:100%;"></video>
+     <div style="padding:10px 14px; background:#fafafa;">
+       <div style="font-weight:700; color:#333;">Iter. 3: RGBD Model</div>
+       <div style="font-size:0.85rem; color:#555; margin-top:4px;">
+         <strong>Offline recognition</strong> (labels after the punch finishes)<br>
+         87.2% test accuracy<br>
+         Too large for edge, required Google Colab (a cloud-hosted notebook with a free GPU) to train
+       </div>
+     </div>
+   </div>
+   <!-- Colour tracking card -->
+   <div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">
+     <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/multimodal_inference.mp4" style="width:100%;"></video>
+     <div style="padding:10px 14px; background:#fafafa;">
+       <div style="font-weight:700; color:#333;">Iter. 6: Voxel + Colour Tracking</div>
+       <div style="font-size:0.85rem; color:#555; margin-top:4px;">
+         <strong>Real-time prediction</strong> (classifies while punch is in progress)<br>
+         ~96% accuracy<br>
+         Required coloured gloves, impractical to deploy
+       </div>
+     </div>
+   </div>
  </div>
 
- <div class="video-row two-up">
- <div class="video-box">
- <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_inference.mp4"></video>
- <sub>RGBD Model (Iter. 3), <strong>offline recognition</strong>, 87.2% test accuracy, pixel-based, required Colab, too heavy for edge</sub>
- </div>
- <div class="video-box">
- <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/multimodal_inference.mp4"></video>
- <sub>Voxel + Colour Tracking (Iter. 6), <strong>real-time prediction</strong>, ~96%, but required coloured gloves</sub>
- </div>
- </div>
-
- <p style="font-size:0.92rem; color:#444; margin-top:14px;">
- The video below uses <strong>GradCAM</strong> (Gradient-weighted Class Activation
- Mapping) to visualise which image regions the RGBD model "looks at" when making a
- prediction. The brighter red areas show where the model's attention is concentrated
- , useful for sanity-checking that the model is learning real boxing motion
- rather than memorising backgrounds or other spurious cues.
- </p>
-
- <div class="video-row single" style="margin-top:12px;">
- <div class="video-box">
- <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_gradcam.mp4" style="max-width:700px;"></video>
- <sub>GradCAM Heatmap, highlights which image regions the RGBD model attends to (arms, shoulders)</sub>
- </div>
+ <!-- GradCAM -->
+ <div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden; margin:16px 0;">
+   <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/cv/rgbd_gradcam.mp4" style="width:100%;"></video>
+   <div style="padding:10px 14px; background:#fafafa;">
+     <div style="font-weight:700; color:#333;">GradCAM Heatmap (RGBD model)</div>
+     <div style="font-size:0.85rem; color:#555; margin-top:4px;">
+       Brighter red = where the model's attention is concentrated.
+       Confirms it learned <strong>arms and shoulders</strong>, not background.
+     </div>
+   </div>
  </div>
 
- <p style="font-size:0.92rem; color:#444;">
- <strong>Takeaway:</strong> deep networks <em>could</em> learn punch patterns offline
- , GradCAM confirmed attention on <strong>arms and shoulders</strong>, not
- background, but the RGBD model couldn't run live and was <strong>too heavy for
- edge deployment</strong>, and the colour-tracking real-time approach required
- <strong>impractical gloves</strong>. Together these limitations motivated the final
- <strong>voxel + pose fusion</strong> architecture, which had to combine the deep-network
- accuracy of the RGBD model with the real-time, glove-free operation of the voxel approach.
- </p>
+ <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px; margin:14px 0; font-size:0.93rem;">
+ <strong style="color:#1b5e20;">Takeaway:</strong> deep networks <em>could</em> learn
+ punch patterns (GradCAM proves it), but the RGBD model was
+ <strong>too heavy for edge</strong> and the colour-tracking approach needed
+ <strong>impractical gloves</strong>. The final architecture had to combine both
+ strengths: deep-network accuracy + real-time, glove-free operation =
+ <strong>voxel + pose fusion</strong>.
+ </div>
 
  <h3>Final Model Inference (Deployed v11)</h3>
 
@@ -696,7 +709,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.1.3 DATA COLLECTION AND TRAINING -->
- <h2>5.3.1.3 Data Collection and Training</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="cv-data" style="margin:0;">5.3.1.3 Data Collection and Training</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-3</sl-badge></div>
 
  <h3>Recording Infrastructure</h3>
  <p>
@@ -786,12 +799,12 @@
  </p>
 
  <p>
- Almost all of the dataset was annotated <strong>manually by me</strong>, and across the project I easily annotated
- <strong>thousands of segments</strong>. Every time something was wrong, a new camera angle, a different recording
- setup, a labelling-scheme change, days of footage had to be re-recorded and re-annotated from scratch.
- Building this GUI was essential to making that loop survivable: keyboard-driven labelling, drag-to-resize,
- segment shortcuts, and auto-save turned what would have been a hopelessly slow process into something that
- could keep up with the iteration pace of the rest of the project.
+ Almost all of the dataset was annotated <strong>manually by me</strong>,
+ <strong>thousands of segments</strong> across the project. Every time something
+ changed (camera angle, recording setup, labelling scheme), days of footage had to be
+ re-recorded and re-annotated from scratch. The annotation GUI (keyboard-driven
+ labelling, drag-to-resize, segment shortcuts, auto-save) was what made this
+ re-annotation loop survivable at the iteration pace the project demanded.
  </p>
 
  <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.94rem;">
@@ -1055,7 +1068,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.1.4 ABLATION STUDY -->
- <h2>5.3.1.4 Ablation Study</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="cv-ablation" style="margin:0;">5.3.1.4 Ablation Study</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-3</sl-badge></div>
 
  <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
  <thead>
@@ -1097,7 +1110,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.1.5 SECONDARY CV FUNCTIONS -->
- <h2>5.3.1.5 Secondary CV Functions</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="cv-results" style="margin:0;">5.3.1.5 Secondary CV Functions</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2</sl-badge></div>
 
  <p>
  The same YOLO pose output and depth bounding box that feed the action model are reused

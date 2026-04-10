@@ -14,6 +14,7 @@
  <script src="../components/report-nav/report-nav.js" defer></script>
  <script src="../components/svg-zoom/svg-zoom.js" defer></script>
  <style>
+    .stepper-link:hover { background:#6a1b9a !important; color:#fff !important; border-color:#6a1b9a !important; }
     /* Inline code identifiers (ROS nodes, messages, file paths, CLI flags) */
     code {
       background: #f0f4f8;
@@ -50,7 +51,7 @@
  /* Strong visual break between MAIN sections (5.3.2.1, 5.3.2.2, ...) */
  .content sl-divider {
  --width: 3px;
- --color: #2e7d32;
+ --color: #7b1fa2;
  margin: 56px 0 36px !important;
  border-radius: 2px;
  }
@@ -58,7 +59,7 @@
  .content > h2,
  .content > div > h2 {
  font-size: 1.7rem !important;
- color: #1b5e20 !important;
+ color: #4a148c !important;
  letter-spacing: -0.3px;
  }
  /* Tag the H2 wrapper divs (the ones containing an H2 + badge) with extra top padding */
@@ -78,22 +79,25 @@
  <br>
 
  <!-- 5.3.4 INTRO -->
- <h2>5.3.2 Intelligent Behaviour & Control</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+ <h2 style="margin:0;">5.3.2 Intelligent Behaviour &amp; Control</h2>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge>
+ </div>
+
+ <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#int-fusion" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Fusion</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-inference" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Inference</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sparring" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sparring</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-llm" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">LLM</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sessions" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sessions</a></div>
 
  <p>
  All intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on the Jetson,
- communicating via custom message types and services. Each subsection below corresponds to
- one or more ROS nodes that handle a specific aspect of the system, from fusing sensor
- data to generating AI coaching tips. Together they form the decision-making layer between
- the CV perception pipeline (<a href="robot-intelligence-cv.html">Section 5.3.1</a>) and the
- dashboard and analytics layer (<a href="robot-intelligence-software.html">Section 5.3.3</a>).
+ communicating via custom message types and services. Together they form the decision-making
+ layer between the CV perception pipeline (<a href="robot-intelligence-cv.html">5.3.1</a>)
+ and the dashboard (<a href="robot-intelligence-software.html">5.3.3</a>).
  </p>
 
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.1 CV + IMU SENSOR FUSION -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.1 CV + IMU Sensor Fusion</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-fusion">5.3.2.1 CV + IMU Sensor Fusion</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-4</sl-badge>
  </div>
 
@@ -157,8 +161,8 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.2 REAL-TIME INFERENCE PIPELINE -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.2 Real-Time Inference Pipeline</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-inference">5.3.2.2 Real-Time Inference Pipeline</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-5</sl-badge>
  </div>
 
@@ -583,24 +587,25 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.3 AI SPARRING ENGINE -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.3 AI Sparring Engine</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-sparring">5.3.2.3 AI Sparring Engine</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-6</sl-badge>
  </div>
 
  <p>
- The 5 sparring opponent styles (Boxer, Brawler, Counter-Puncher, Pressure, Switch) and
- their first-order Markov chain combo generation, including the transition matrix
- worked example and the weakness-blending alpha, are introduced in
- <a href="gui.html">Section 5.1 GUI</a>. This section covers the
- <em>ROS-side execution</em> that turns those style definitions into live robot behaviour.
- The <code>sparring_engine</code> node has to do five things in a loop, every round,
- for every opponent style: <strong>pace attacks</strong> at the right intensity,
- <strong>adapt</strong> to the user's weak areas, <strong>stay safe</strong> when something
- else in the system goes wrong, <strong>read the user's response</strong> to each strike,
- and provide a simpler <strong>reactive mode</strong> for unstructured practice. Each
- subsection below covers one of those five jobs.
+ The 5 sparring styles and their Markov chain combo generation are introduced in
+ <a href="gui.html">5.1 GUI</a>. This section covers the <em>ROS-side execution</em>:
+ how <code>sparring_engine</code> turns those style definitions into live robot behaviour.
+ Five jobs run in a loop every round:
  </p>
+
+ <ol style="margin:8px 0 16px; line-height:1.6; font-size:0.93rem;">
+   <li><strong>Pace attacks</strong> at the right intensity (difficulty scaling)</li>
+   <li><strong>Adapt</strong> to the user's weak areas (weakness tracking)</li>
+   <li><strong>Stay safe</strong> when something else in the system goes wrong (engine safeguards)</li>
+   <li><strong>Read the user's response</strong> to each strike (defence detection)</li>
+   <li><strong>Reactive mode</strong> for unstructured practice (free training)</li>
+ </ol>
 
  <h3>1. Pacing attacks, difficulty scaling</h3>
 
@@ -768,8 +773,8 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.4 LLM COACH -->
- <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
- <h2 style="margin:0;">5.3.2.4 LLM Coach</h2>
+ <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
+ <h2 style="margin:0;" id="int-llm">5.3.2.4 LLM Coach</h2>
  <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge>
  </div>
 
@@ -1039,7 +1044,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.5 SESSION MANAGEMENT -->
- <h2>5.3.2.5 Session Management</h2>
+ <h2 id="int-sessions">5.3.2.5 Session Management</h2>
 
  <p>
  Every other node on this page, fusion, inference, sparring, LLM, needs to know
