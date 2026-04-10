@@ -101,6 +101,113 @@
     table-component#gui-iterations .gridjs-td:nth-child(1) {
       min-width: 130px;
     }
+    table-component#gui-feature-set .gridjs-wrapper {
+      overflow-x: auto;
+    }
+    table-component#gui-feature-set .gridjs-table {
+      width: 100%;
+      min-width: 1240px;
+      max-width: none;
+      table-layout: fixed;
+    }
+    table-component#gui-feature-set .gridjs-th,
+    table-component#gui-feature-set .gridjs-td {
+      white-space: normal !important;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+    table-component#gui-feature-set .gridjs-th:nth-child(1),
+    table-component#gui-feature-set .gridjs-td:nth-child(1) {
+      width: 16%;
+      min-width: 170px;
+      font-weight: 600;
+      background: #eff6ff;
+    }
+    table-component#gui-feature-set .gridjs-th:nth-child(2),
+    table-component#gui-feature-set .gridjs-td:nth-child(2) {
+      width: 24%;
+      min-width: 270px;
+    }
+    table-component#gui-feature-set .gridjs-th:nth-child(3),
+    table-component#gui-feature-set .gridjs-td:nth-child(3) {
+      width: 60%;
+      min-width: 700px;
+    }
+    .proficiency-questions-wrap,
+    .markov-matrix-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .proficiency-questions-table {
+      width: 100%;
+      min-width: 1120px;
+      max-width: none;
+      table-layout: fixed;
+      margin: 0 auto !important;
+      font-size: 0.92rem;
+    }
+    .proficiency-questions-table th,
+    .proficiency-questions-table td {
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+      vertical-align: top;
+    }
+    .proficiency-questions-table th:nth-child(1),
+    .proficiency-questions-table td:nth-child(1) {
+      width: 34%;
+      min-width: 360px;
+      font-weight: 600;
+      background: #eff6ff;
+    }
+    .proficiency-questions-table th:nth-child(2),
+    .proficiency-questions-table td:nth-child(2),
+    .proficiency-questions-table th:nth-child(3),
+    .proficiency-questions-table td:nth-child(3),
+    .proficiency-questions-table th:nth-child(4),
+    .proficiency-questions-table td:nth-child(4) {
+      width: 22%;
+      min-width: 230px;
+    }
+    .proficiency-questions-table thead tr,
+    .markov-matrix-table thead tr {
+      background: #e2e8f0 !important;
+    }
+    .proficiency-questions-table tbody tr:nth-child(even),
+    .markov-matrix-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .markov-matrix-table {
+      width: 100%;
+      min-width: 1220px;
+      max-width: none;
+      table-layout: fixed;
+      margin: 0 auto !important;
+      font-size: 0.85rem;
+    }
+    .markov-matrix-table th,
+    .markov-matrix-table td {
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.4;
+      vertical-align: top;
+      text-align: center;
+    }
+    .markov-matrix-table th:nth-child(1),
+    .markov-matrix-table td:nth-child(1) {
+      width: 18%;
+      min-width: 200px;
+      text-align: left;
+      background: #eff6ff;
+    }
+    .markov-matrix-table th:not(:first-child),
+    .markov-matrix-table td:not(:first-child) {
+      width: 11.7%;
+      min-width: 125px;
+    }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>
 </head>
@@ -581,7 +688,8 @@
         level, with the option to override the suggestion before confirming.
       </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <div class="proficiency-questions-wrap">
+      <table class="proficiency-questions-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd;">Question</th>
@@ -629,6 +737,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
 
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.2-3: Proficiency Assessment Questions</p>
 
@@ -701,7 +810,8 @@
         to each next punch (or ending the combo).
       </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.85rem;">
+      <div class="markov-matrix-wrap">
+      <table class="markov-matrix-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.85rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:6px; border:1px solid #ddd;">From State</th>
@@ -724,6 +834,7 @@
           <tr><td style="padding:6px; border:1px solid #ddd;"><strong>6 (R.Upper)</strong></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;"></td><td style="padding:6px; border:1px solid #ddd;">1.00</td></tr>
         </tbody>
       </table>
+      </div>
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.2-6: Counter Puncher Markov Transition Matrix</p>
 
       <div class="markov-example">

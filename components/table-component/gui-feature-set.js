@@ -3,9 +3,9 @@ const guiFeatureSetEl = document.getElementById('gui-feature-set');
 if (guiFeatureSetEl) {
   new gridjs.Grid({
     columns: [
-      { name: 'Category', width: '20%' },
-      { name: 'Feature', width: '30%' },
-      { name: 'Description', width: '50%' }
+      { name: 'Category' },
+      { name: 'Feature' },
+      { name: 'Description' }
     ],
     data: [
       ['Training', 'Combo Curriculum', '50 punch combinations across Beginner, Intermediate, and Advanced levels with mastery-based progression'],

@@ -39,10 +39,52 @@
       vertical-align: top;
       word-break: break-word;
     }
-    .performance-criteria-table th,
-    .performance-criteria-table td {
+    .showcase-observations-table th,
+    .showcase-observations-table td {
       word-break: normal;
       overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+    .showcase-observations-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .showcase-observations-table {
+      width: 100%;
+      min-width: 1180px;
+      table-layout: fixed;
+      margin: 0 auto !important;
+      font-size: 0.9rem;
+    }
+    .showcase-observations-table th:nth-child(1),
+    .showcase-observations-table td:nth-child(1) {
+      width: 34%;
+      min-width: 340px;
+    }
+    .showcase-observations-table th:nth-child(2),
+    .showcase-observations-table td:nth-child(2) {
+      width: 22%;
+      min-width: 220px;
+    }
+    .showcase-observations-table th:nth-child(3),
+    .showcase-observations-table td:nth-child(3) {
+      width: 12%;
+      min-width: 130px;
+      white-space: nowrap;
+      text-align: center;
+      font-weight: 600;
+    }
+    .showcase-observations-table th:nth-child(4),
+    .showcase-observations-table td:nth-child(4) {
+      width: 32%;
+      min-width: 320px;
+    }
+    .showcase-observations-table thead tr {
+      background: #e2e8f0 !important;
+    }
+    .showcase-observations-table tbody tr:nth-child(even) {
+      background: #f8fafc;
     }
     .performance-criteria-wrap {
       width: 100%;
@@ -51,23 +93,45 @@
     }
     .performance-criteria-table {
       width: 100%;
-      min-width: 1040px;
+      min-width: 1220px;
       table-layout: fixed;
       margin: 0 auto !important;
+      font-size: 0.9rem;
+    }
+    .performance-criteria-table th,
+    .performance-criteria-table td {
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
     }
     .performance-criteria-table th:nth-child(1),
     .performance-criteria-table td:nth-child(1) {
       width: 11%;
-      min-width: 90px;
+      min-width: 95px;
       white-space: nowrap;
       text-align: center;
       font-weight: 600;
       background: #eff6ff;
     }
+    .performance-criteria-table th:nth-child(2),
+    .performance-criteria-table td:nth-child(2) {
+      width: 28%;
+      min-width: 320px;
+    }
+    .performance-criteria-table th:nth-child(3),
+    .performance-criteria-table td:nth-child(3) {
+      width: 23%;
+      min-width: 260px;
+    }
+    .performance-criteria-table th:nth-child(4),
+    .performance-criteria-table td:nth-child(4) {
+      width: 24%;
+      min-width: 280px;
+    }
     .performance-criteria-table th:nth-child(5),
     .performance-criteria-table td:nth-child(5) {
-      width: 12%;
-      min-width: 95px;
+      width: 14%;
+      min-width: 115px;
       white-space: nowrap;
       text-align: center;
       font-weight: 700;
@@ -229,11 +293,11 @@
       <table class="developer-tests-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd; width:8%;">TC</th>
-            <th style="padding:8px; border:1px solid #ddd; width:20%;">Category</th>
-            <th style="padding:8px; border:1px solid #ddd; width:28%;">Observation</th>
-            <th style="padding:8px; border:1px solid #ddd; width:28%;">Root Cause</th>
-            <th style="padding:8px; border:1px solid #ddd; width:16%;">Resolution</th>
+            <th style="padding:8px; border:1px solid #ddd;">TC</th>
+            <th style="padding:8px; border:1px solid #ddd;">Category</th>
+            <th style="padding:8px; border:1px solid #ddd;">Observation</th>
+            <th style="padding:8px; border:1px solid #ddd;">Root Cause</th>
+            <th style="padding:8px; border:1px solid #ddd;">Resolution</th>
           </tr>
         </thead>
         <tbody>
@@ -426,14 +490,14 @@
         results. Participant count was approximately 8 to 12 people who interacted with
         the robot during the event.
       </p>
-      <div class="performance-criteria-wrap">
-      <table class="performance-criteria-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <div class="showcase-observations-wrap">
+      <table class="showcase-observations-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd; width:30%;">Observation</th>
-            <th style="padding:8px; border:1px solid #ddd; width:20%;">Users Affected</th>
-            <th style="padding:8px; border:1px solid #ddd; width:15%;">Severity</th>
-            <th style="padding:8px; border:1px solid #ddd; width:35%;">Action Taken</th>
+            <th style="padding:8px; border:1px solid #ddd;">Observation</th>
+            <th style="padding:8px; border:1px solid #ddd;">Users Affected</th>
+            <th style="padding:8px; border:1px solid #ddd;">Severity</th>
+            <th style="padding:8px; border:1px solid #ddd;">Action Taken</th>
           </tr>
         </thead>
         <tbody>
@@ -469,6 +533,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.3-3: Showcase Event Observations - "Robotics and AI in Work and Play" (single event, directional evidence only)</p>
 
       <h4>Observations</h4>
@@ -509,7 +574,8 @@
         The table below maps each GUI requirement to its target, verification method,
         and outcome.
       </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <div class="performance-criteria-wrap">
+      <table class="performance-criteria-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd;">ID</th>
