@@ -159,7 +159,7 @@
  dashboard.
  </p>
  <p>
- At its core is a computer vision pipeline that classifies <strong>8 punch types</strong>
+ At its core is a computer vision pipeline that classifies <strong>8 boxing actions</strong> (6 punch types, block, and idle)
  using depth-based 3D voxel motion fused with 2D pose estimation. A
  <strong>ROS 2 workspace</strong> on an NVIDIA Jetson Orin NX orchestrates that
  perception output alongside IMU sensing, an adaptive sparring engine, and a local
@@ -175,7 +175,7 @@
  <li><strong>5.3.1</strong>: Computer Vision &amp; action prediction model</li>
  <li><strong>5.3.2</strong>: Sensor fusion, sparring AI, LLM coach</li>
  <li><strong>5.3.3</strong>: Dashboard backend &amp; analytics</li>
- <li><strong>5.3.4</strong>: Testing &amp; verification of all 7 requirements</li>
+ <li><strong>5.3.4</strong>: Testing &amp; verification of all 8 requirements</li>
  </ul>
  </div>
 
@@ -218,9 +218,10 @@
 
  <p style="font-size:0.92rem; color:#444; margin:0;">
  Together, the three fulfil the product needs from the
- <a href="../sections/problem-clarification.html">user research</a>:
- <strong>Realistic Training Partner</strong> (5.3.1 + 5.3.2),
- <strong>Adaptive Fight Intelligence</strong> (5.3.2), and
+ <a href="../index.html#problem-clarification">user research</a>:
+ <strong>Intelligent Sparring System</strong> (5.3.1 + 5.3.2),
+ <strong>Adaptive Fight Intelligence</strong> (5.3.2),
+ <strong>Skill Progression Studio</strong> (5.3.2), and
  <strong>Performance Analytics</strong> (5.3.3).
  </p>
  </div>
@@ -238,7 +239,7 @@
  <span style="font-size:0.85rem; color:#555;">validation accuracy on an unseen person</span>
  </div>
  <div style="font-size:0.88rem; color:#555; margin-top:8px;">
- Classifies <strong>8 punch types</strong> at <strong>30&nbsp;fps</strong> on an
+ Classifies <strong>8 boxing actions</strong> at <strong>30&nbsp;fps</strong> on an
  NVIDIA Jetson. Built over <strong>9 iterations</strong> as a dual-branch
  (voxel + pose) Transformer, full story in
  <a href="robot-intelligence-cv.html">5.3.1</a>.
@@ -264,8 +265,8 @@
  <span style="font-size:1.4rem; font-weight:700; color:#bf360c; line-height:1;">Vue&nbsp;3 + FastAPI</span>
  </div>
  <div style="font-size:0.88rem; color:#555; margin-top:8px;">
- Phone dashboard for remote training control, performance trends, AI coach chat,
- and <strong>population benchmarking</strong>. <strong>Public-URL tunnel</strong>
+ Phone dashboard for <strong>remote training control</strong>, performance trends, <strong>AI coach chat</strong>,
+ and population benchmarking. <strong>Public-URL tunnel</strong>
  lets any phone connect from any network, no shared WiFi required.
  </div>
  </div>
@@ -277,8 +278,8 @@
  <span style="font-size:0.85rem; color:#555;">unit + 28 integration tests</span>
  </div>
  <div style="font-size:0.88rem; color:#555; margin-top:8px;">
- <strong>CDE AI Fair</strong> real-world deployment with public users, full model
- interpretability analysis, and <strong>all 7 requirements verified</strong>
+ <strong>Real-world deployment</strong> with public users at the CDE AI Fair, full model
+ interpretability analysis, and <strong>all 8 requirements verified</strong>
  in <a href="robot-intelligence-testing.html">5.3.4</a>.
  </div>
  </div>
@@ -307,10 +308,10 @@
  <div id="requirements">
  <h3>Requirements and Design Considerations</h3>
  <p>
- This subsystem addresses <a href="../index.html#secondary-research">DO-1</a> (Performance Analytics),
- <a href="../index.html#secondary-research">DO-2</a> (Intelligent Sparring System),
- <a href="../index.html#secondary-research">DO-3</a> (Skill Progression Studio), and
- <a href="../index.html#secondary-research">DO-4</a> (Adaptive Fight Intelligence).
+ This subsystem addresses DO-1 (Performance Analytics),
+ DO-2 (Intelligent Sparring System),
+ DO-3 (Skill Progression Studio), and
+ DO-4 (Adaptive Fight Intelligence).
  See <a href="../index.html#conceptual-design">Section 5</a> for the full Design Objectives reference.
  </p>
  <p>
@@ -363,6 +364,11 @@
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time coaching feedback via local LLM</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Personalized technique guidance without cloud dependency</td>
  </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-8</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time person detection and user tracking for yaw and height motor control</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Robot must face the user during training; user adjusts height via phone or GUI before each session using CV-provided height data</td>
+ </tr>
  </tbody>
  </table>
  <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">
@@ -376,8 +382,8 @@
  <div>
    <h3>System Design Narrative</h3>
    <p>
-     Following the V-Model from <a href="../index.html#v-model">Section 3.2</a>,
-     RI-1 to RI-7 were fixed before any model architecture, ROS node, or LLM prompt
+     Following the V-Model from <a href="../index.html#design-methodology">Section 3.2</a>,
+     RI-1 to RI-8 were fixed before any model architecture, ROS node, or LLM prompt
      was written. The diagram below shows how each requirement decomposed into a design
      decision (left arm), was built and integrated (base), and then verified (right arm).
      The table underneath maps each V-Model stage to the specific BoxBunny RI work.
@@ -385,7 +391,7 @@
 
    <!-- RI V-Model SVG Diagram -->
    <div style="margin: 28px 0; text-align: center; overflow-x: auto;">
-     <svg viewBox="0 0 1260 530" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1260px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; box-shadow:0 2px 12px rgba(0,0,0,0.06);" font-family="Inter, system-ui, sans-serif">
+     <svg id="vmodel-svg" viewBox="0 0 1260 530" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1260px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; box-shadow:0 2px 12px rgba(0,0,0,0.06); cursor:pointer; transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" font-family="Inter, system-ui, sans-serif">
        <rect width="1260" height="530" rx="12" fill="#f8fafc"/>
 
        <text x="630" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a" letter-spacing="0.5">BoxBunny Robot Intelligence, Systems Engineering V-Model</text>
@@ -403,7 +409,7 @@
        <rect x="151" y="72" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
        <text x="246" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">01</text>
        <text x="246" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">RI Problem Framing</text>
-       <text x="246" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">RI-1 to RI-7 fixed</text>
+       <text x="246" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">RI-1 to RI-8 fixed</text>
 
        <!-- 02 System Architecture -->
        <rect x="261" y="192" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
@@ -435,13 +441,13 @@
        <rect x="809" y="192" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
        <text x="904" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">05</text>
        <text x="904" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Integration Testing</text>
-       <text x="904" y="245" text-anchor="middle" font-size="9" fill="#16a34a">28 cross-module tests, live CV+IMU fusion</text>
+       <text x="904" y="245" text-anchor="middle" font-size="9" fill="#16a34a">28 cross-module tests, CDE AI Fair</text>
 
        <!-- 06 System Validation -->
        <rect x="919" y="72" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
        <text x="1014" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">06</text>
        <text x="1014" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Validation</text>
-       <text x="1014" y="125" text-anchor="middle" font-size="9" fill="#16a34a">CDE AI Fair, all 7 RI verified</text>
+       <text x="1014" y="125" text-anchor="middle" font-size="9" fill="#16a34a">Full robot test, all 8 RI verified</text>
 
        <line x1="30" y1="498" x2="1230" y2="498" stroke="#e2e8f0" stroke-width="1"/>
        <rect x="38" y="506" width="12" height="12" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
@@ -455,9 +461,34 @@
      </svg>
 
      <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
-       Figure: Robot Intelligence Systems Engineering V-Model showing requirement decomposition (left), integration build (centre), and verification closure (right) for RI-1 to RI-7.
+       Figure: Robot Intelligence Systems Engineering V-Model showing requirement decomposition (left), integration build (centre), and verification closure (right) for RI-1 to RI-8.
      </sub>
    </div>
+
+   <!-- V-Model lightbox (same pattern as image-component) -->
+   <div id="vmodel-lightbox" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; cursor:zoom-out;">
+   </div>
+   <script>
+     (() => {
+       const svg = document.getElementById('vmodel-svg');
+       const lb = document.getElementById('vmodel-lightbox');
+       svg.addEventListener('click', () => {
+         lb.innerHTML = '';
+         const clone = svg.cloneNode(true);
+         clone.style.width = '92vw';
+         clone.style.maxWidth = '92vw';
+         clone.style.maxHeight = '92vh';
+         clone.style.cursor = 'zoom-out';
+         clone.style.borderRadius = '6px';
+         clone.removeAttribute('onmouseover');
+         clone.removeAttribute('onmouseout');
+         clone.style.opacity = '1';
+         lb.appendChild(clone);
+         lb.style.display = 'flex';
+       });
+       lb.addEventListener('click', () => { lb.style.display = 'none'; });
+     })();
+   </script>
 
    <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
      <thead>
@@ -472,7 +503,7 @@
        <tr>
          <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #2563eb; vertical-align:top; background:#f8faff;"><strong>Concept &amp; Requirements</strong></td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Fix measurable targets before any design work begins</td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">RI-1 to RI-7 derived from product needs and on-device deployment constraints. Each requirement drove a specific design choice downstream (see next rows)</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">RI-1 to RI-8 derived from product needs and on-device deployment constraints. Each requirement drove a specific design choice downstream (see next rows)</td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirements table above with rationale per requirement</td>
        </tr>
        <tr>
@@ -492,9 +523,9 @@
              <code>free_training_engine</code>
              <code>robot_node</code>
            </div>
-           <div style="margin-top:6px; font-size:0.88rem; color:#555;"><code>session_manager</code> 5-state machine is the single source of truth: all training modes flow through the same lifecycle</div>
+           <div style="margin-top:6px; font-size:0.88rem; color:#555;">The 5-state session machine is the single source of truth: all training modes flow through the same lifecycle</div>
          </td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Node graph + session state machine diagrams (below)</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Node graph (below) + session state machine in <a href="robot-intelligence-integration.html">5.3.2</a></td>
        </tr>
        <tr>
          <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #d97706; vertical-align:top; background:#fffdf5;"><strong>Detailed Design &amp; Build</strong></td>
@@ -503,22 +534,23 @@
            <strong>RI-1/2</strong>: ~24 ms per-frame budget shaped the dual-branch Transformer + TensorRT FP16 deployment<br>
            <strong>RI-3</strong>: 9-iteration CV model with leave-one-person-out validation<br>
            <strong>RI-4</strong>: <code>punch_processor</code> CV+IMU fusion with pad-constraint filtering<br>
-           <strong>RI-5</strong>: all inference on-device within the 16 GB shared-memory budget<br>
+           <strong>RI-5</strong>: all inference on-device within the 16 GB shared-memory budget; adaptive frame rate (6&nbsp;Hz idle / 30&nbsp;Hz active) shares GPU between CV and LLM<br>
            <strong>RI-6</strong>: <code>sparring_engine</code> with Markov chain styles + persistent weakness profile<br>
            <strong>RI-7</strong>: local Qwen2.5-3B LLM coach with 17-document boxing knowledge base + fallback tips<br>
+           <strong>RI-8</strong>: <code>cv_node</code> publishes <code>UserTracking</code> each frame; yaw motor faces the user, height adjusted by the user via phone or GUI<br>
            <span style="font-size:0.88rem; color:#555;">Vue 3 + FastAPI phone dashboard connected to per-user SQLite database</span>
          </td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Per-component design narratives in <a href="robot-intelligence-cv.html">5.3.1</a>, <a href="robot-intelligence-integration.html">5.3.2</a>, <a href="robot-intelligence-software.html">5.3.3</a></td>
        </tr>
        <tr>
          <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #16a34a; vertical-align:top; background:#f6fdf8;"><strong>Verification &amp; Validation</strong></td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Three-tier testing pyramid + real-world deployment to confirm RI-1 to RI-7</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Three-tier testing pyramid + real-world deployment to confirm RI-1 to RI-8</td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">
            <strong>Unit</strong>: 146 pytest tests (sensor fusion, gamification, database)<br>
-           <strong>Integration</strong>: 28 cross-module tests (ROS messages, fusion end-to-end, motor protocol)<br>
-           <strong>System</strong>: 12 notebook sections + CDE AI Fair real-world deployment + model interpretability analysis
+           <strong>Integration</strong>: 28 cross-module tests (ROS messages, fusion end-to-end, motor protocol) + CDE AI Fair early prototype deployment<br>
+           <strong>System</strong>: Full robot test with real camera, IMU, and motors + model interpretability analysis
          </td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;"><a href="robot-intelligence-testing.html">5.3.4.7</a> verification summary: all 7 RI requirements pass</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;"><a href="robot-intelligence-testing.html">5.3.4.7</a> verification summary: all 8 RI requirements pass</td>
        </tr>
      </tbody>
    </table>
@@ -708,7 +740,7 @@
  <text x="120" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" letter-spacing="0.6">1. CAPTURE</text>
  <text x="120" y="112" text-anchor="middle" font-size="14" font-weight="700" fill="#0d47a1">RealSense D435i</text>
  <text x="120" y="132" text-anchor="middle" font-size="11" fill="#1565c0">RGB + depth</text>
- <text x="120" y="148" text-anchor="middle" font-size="11" fill="#1565c0">848&times;480 @ 30 fps</text>
+ <text x="120" y="148" text-anchor="middle" font-size="11" fill="#1565c0">848&times;480 @ 60 fps</text>
  <text x="120" y="178" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">camera_node</text>
 
  <!-- Arrow 1→2 -->
@@ -719,9 +751,10 @@
  <rect x="252" y="60" width="180" height="30" rx="12" fill="#2e7d32"/>
  <rect x="252" y="75" width="180" height="15" fill="#2e7d32"/>
  <text x="342" y="81" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" letter-spacing="0.6">2. PERCEPTION</text>
- <text x="342" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#1b5e20">YOLO pose</text>
- <text x="342" y="130" text-anchor="middle" font-size="11" fill="#2e7d32">+ 3D voxel motion</text>
- <text x="342" y="148" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">&rarr; 8-class action</text>
+ <text x="342" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#1b5e20">YOLO pose</text>
+ <text x="342" y="124" text-anchor="middle" font-size="11" fill="#2e7d32">+ 3D voxel motion</text>
+ <text x="342" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">&rarr; 8-class action</text>
+ <text x="342" y="156" text-anchor="middle" font-size="10" fill="#2e7d32">sampled @ 30 fps</text>
  <text x="342" y="178" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">cv_node</text>
 
  <!-- Arrow 2→3 -->
@@ -802,7 +835,7 @@
  <image-component
  tag="image"
  source="../assets/robot_intelligence/ros/node_graph.svg"
- subtitle="Figure: BoxBunny ROS 2 System Node Graph, 10 nodes, 40+ topics, 6 services">
+ subtitle="Figure: BoxBunny ROS 2 System Node Graph, 10 nodes, 21 custom message types across 40+ topics, 6 services">
  </image-component>
 
  <p style="font-size:0.92rem; color:#444; margin-top:14px;">
@@ -839,7 +872,7 @@
  <sl-icon name="clipboard-check" style="font-size:1.6rem;"></sl-icon>
  <div>
  <h3>Testing &amp; Validation</h3>
- <p>CDE Fair deployment, 146 automated tests, model interpretability analysis</p>
+ <p>CDE Fair deployment, 146 unit + 28 integration tests, model interpretability analysis</p>
  </div>
  </a>
  </div>

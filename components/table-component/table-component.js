@@ -16,28 +16,42 @@ class TableComponent extends HTMLElement {
 
   attributeChangedCallback(name, _, newValue) {
     this[name] = newValue;
+    if (this.isConnected) {
+      this.render();
+    }
   }
 
   render() {
     const subtitle = this.subtitle || "";
-    const div = document.createElement("div");
-    div.innerHTML = `
-    <slot></slot>
-    ${subtitle ? `<sub>${subtitle}</sub>` : ""}
-    <style>
-      :host {
-        display: block;
-        text-align: center;
-      }
+    this.shadowRoot.innerHTML = `
+      <div class="table-shell">
+        <slot></slot>
+      </div>
+      ${subtitle ? `<sub class="table-caption">${subtitle}</sub>` : ""}
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+          margin: 16px auto;
+          text-align: center;
+        }
 
-      sub {
-        font-size: 1rem;
-        font-style: italic;
-      }
-    </style>
-  `;
+        .table-shell {
+          width: 100%;
+          max-width: 1100px;
+          margin: 0 auto;
+          overflow-x: auto;
+        }
 
-    this.shadowRoot.appendChild(div);
+        .table-caption {
+          display: block;
+          margin-top: 8px;
+          font-size: 0.9rem;
+          font-style: italic;
+          color: #4b5563;
+        }
+      </style>
+    `;
   }
 }
 

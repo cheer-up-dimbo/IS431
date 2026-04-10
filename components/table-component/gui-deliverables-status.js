@@ -3,9 +3,9 @@ const guiDeliverablesStatusEl = document.getElementById('gui-deliverables-status
 if (guiDeliverablesStatusEl) {
   new gridjs.Grid({
     columns: [
-      { name: 'Requirement', width: '25%' },
-      { name: 'Status', width: '12%' },
-      { name: 'Evidence', width: '63%' }
+      { name: 'Requirement', width: '24%' },
+      { name: 'Status', width: '16%' },
+      { name: 'Evidence', width: '60%' }
     ],
     data: [
       ['GUI-1: Ease of Use', 'Achieved', 'Hierarchical page stack navigation ensures intuitive drill-down and consistent back-button behaviour\nLarge touch targets (minimum 60px) for gloved-hand operation\nClear visual hierarchy with dark theme and color-coded punch types\nPattern lock authentication designed for gloved input'],
@@ -16,7 +16,7 @@ if (guiDeliverablesStatusEl) {
     sort: false,
     pagination: false,
     style: {
-      table: { 'white-space': 'pre-wrap' }
+      table: { 'white-space': 'normal' }
     }
   }).render(guiDeliverablesStatusEl);
 }

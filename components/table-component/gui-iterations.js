@@ -3,10 +3,10 @@ const guiIterationsEl = document.getElementById('gui-iterations');
 if (guiIterationsEl) {
   new gridjs.Grid({
     columns: [
-      { name: 'Iteration', width: '12%' },
+      { name: 'Iteration', width: '16%' },
       { name: 'Period', width: '18%' },
-      { name: 'Objective', width: '35%' },
-      { name: 'Key Outcome', width: '35%' }
+      { name: 'Objective', width: '33%' },
+      { name: 'Key Outcome', width: '33%' }
     ],
     data: [
       ['Iteration 1', 'Weeks 1-2 (Dec)', 'Application shell, PySide6 validation on Jetson Nano', 'QStackedWidget navigation confirmed, basic page transitions working on target hardware'],
