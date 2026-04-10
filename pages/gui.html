@@ -132,6 +132,35 @@
       display: block;
       min-width: 760px;
     }
+    .content table {
+      width: 100%;
+      max-width: 1100px;
+      margin: 16px auto !important;
+      border-collapse: collapse;
+    }
+    .content table th,
+    .content table td {
+      vertical-align: top;
+      word-break: break-word;
+    }
+    .content p[style*="Table:"] {
+      text-align: center;
+      font-style: italic;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+    .vmodel-map-table thead tr {
+      background: #e2e8f0 !important;
+    }
+    .vmodel-map-table .stage-decompose {
+      background: #eff6ff;
+    }
+    .vmodel-map-table .stage-build {
+      background: #fff7ed;
+    }
+    .vmodel-map-table .stage-verify {
+      background: #ecfdf5;
+    }
     sl-tab-group { margin: 20px 0; }
     sl-tab-panel p { margin: 8px 0; font-size: 0.95rem; line-height: 1.6; }
   </style>
@@ -218,7 +247,7 @@
         subsystem was developed in parallel with all hardware subsystems.
       </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <table class="vmodel-map-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd;">ID</th>
@@ -229,7 +258,7 @@
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-1</td>
-            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and physical button operable: large touch targets, minimal text input, IMU-based button navigation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Touchscreen and physical button operable: all interactive elements ≥60 px, minimal text input, IMU-based button navigation</td>
             <td style="padding:8px; border:1px solid #ddd;">User journey (Section 4.2), Function Spec display latency, Appendix 6 mapping</td>
           </tr>
           <tr>
@@ -255,7 +284,11 @@
         </tbody>
       </table>
 
-      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI Requirements and Sources</p>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1-1: GUI Requirements and Sources</p>
+      <p>
+        Touch target minimums for finger-operated interfaces are established in platform
+        human interface guidelines (Apple Inc., 2023; Google LLC, 2023).
+      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -390,25 +423,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="stage-decompose">
             <td style="padding:8px; border:1px solid #ddd;">Concept and Requirements</td>
             <td style="padding:8px; border:1px solid #ddd;">Define user-operable interface behaviour</td>
             <td style="padding:8px; border:1px solid #ddd;">GUI-1 to GUI-5 derived from user journey and function specifications</td>
             <td style="padding:8px; border:1px solid #ddd;">Requirement table and traceability mapping</td>
           </tr>
-          <tr>
+          <tr class="stage-decompose">
             <td style="padding:8px; border:1px solid #ddd;">High-Level Design</td>
             <td style="padding:8px; border:1px solid #ddd;">Partition features into coherent modules</td>
             <td style="padding:8px; border:1px solid #ddd;">Training, Performance, Sparring, Others, and Coach Station flows with shared navigation patterns</td>
             <td style="padding:8px; border:1px solid #ddd;">Screen-flow checks and navigation path tests</td>
           </tr>
-          <tr>
+          <tr class="stage-build">
             <td style="padding:8px; border:1px solid #ddd;">Detailed Design and Build</td>
             <td style="padding:8px; border:1px solid #ddd;">Assemble interface logic with stable subsystem contracts</td>
             <td style="padding:8px; border:1px solid #ddd;">Session setup, round HUD, results pages, and account-scoped history</td>
             <td style="padding:8px; border:1px solid #ddd;">Mode-by-mode functional testing</td>
           </tr>
-          <tr>
+          <tr class="stage-verify">
             <td style="padding:8px; border:1px solid #ddd;">Verification and Validation</td>
             <td style="padding:8px; border:1px solid #ddd;">Confirm performance against GUI requirements</td>
             <td style="padding:8px; border:1px solid #ddd;">Multi-user isolation checks, progression rule checks, and active-session usability checks</td>
@@ -416,7 +449,7 @@
           </tr>
         </tbody>
       </table>
-      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI application of the V-Model from decomposition to verification</p>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1-2: GUI application of the V-Model from decomposition to verification</p>
     </div>
 
     <sl-divider></sl-divider>
@@ -664,6 +697,36 @@
 
     <sl-divider></sl-divider>
 
+    <div>
+      <h3>Engineering and Design Readiness</h3>
+      <p>
+        This GUI work demonstrates end-to-end final-year capability: translating needs into
+        requirements, decomposing architecture, implementing a multi-mode production interface,
+        integrating with robot intelligence through stable contracts, and closing the loop with
+        verification evidence. The final subsystem is not only functional, but auditable in terms
+        of design decisions, iteration history, and measured outcomes.
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin:14px 0;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-top:4px solid #2563eb; border-radius:8px; padding:14px 16px;">
+          <div style="font-size:0.78rem; font-weight:700; color:#1d4ed8; text-transform:uppercase; letter-spacing:0.6px;">Engineering</div>
+          <div style="font-size:0.95rem; font-weight:600; margin-top:6px;">Layered architecture with integration boundaries</div>
+          <div style="font-size:0.88rem; color:#475569; margin-top:6px;">GUI behavior remains stable while hardware and backend matured in parallel.</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-top:4px solid #16a34a; border-radius:8px; padding:14px 16px;">
+          <div style="font-size:0.78rem; font-weight:700; color:#15803d; text-transform:uppercase; letter-spacing:0.6px;">Design</div>
+          <div style="font-size:0.95rem; font-weight:600; margin-top:6px;">User-centred flow under real training constraints</div>
+          <div style="font-size:0.88rem; color:#475569; margin-top:6px;">Touch targets, IMU navigation, and readability revisions were grounded in user observation.</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-top:4px solid #c2410c; border-radius:8px; padding:14px 16px;">
+          <div style="font-size:0.78rem; font-weight:700; color:#9a3412; text-transform:uppercase; letter-spacing:0.6px;">Innovation</div>
+          <div style="font-size:0.95rem; font-weight:600; margin-top:6px;">Product-level integration across GUI, CV, and coaching</div>
+          <div style="font-size:0.88rem; color:#475569; margin-top:6px;">The subsystem supports real-time training, progression, and AI-assisted feedback in one workflow.</div>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- NAV CARDS -->
     <div>
       <h3>Detailed Documentation</h3>
@@ -693,6 +756,17 @@
           <sl-icon slot="suffix" name="arrow-right"></sl-icon>
         </sl-button>
       </a>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>References</h3>
+      <ul>
+        <li>Apple Inc. (2023). <em>Human Interface Guidelines: Pointing and clicking</em>. Retrieved from developer.apple.com</li>
+        <li>Google LLC (2023). <em>Material Design: Accessibility: Touch targets</em>. Retrieved from m3.material.io</li>
+      </ul>
     </div>
 
     <sl-divider></sl-divider>

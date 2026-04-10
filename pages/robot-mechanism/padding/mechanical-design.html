@@ -22,7 +22,7 @@
   <script type="module" src="../../../components/video/video.js"></script>
   <link rel="stylesheet" href="../../../components/scroll-to-top/scroll-to-top.css">
   <script src="../../../components/scroll-to-top/scroll-to-top.js"></script>
-  <!-- 3D Explode Viewer -->
+  <!-- 3D Model Viewer -->
   <script type="module" src="../../../components/explode-viewer/explode-viewer.js"></script>
   <style>
     .iteration-card {
@@ -48,7 +48,14 @@
     }
     .calc-block code { background: #e8e8e8; padding: 2px 5px; border-radius: 3px; }
     .spec-table {
-      width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem;
+      width: 100%; border-collapse: collapse; margin: 12px auto; font-size: 0.88rem;
+    }
+    .spec-table caption {
+      caption-side: top;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #333;
     }
     .spec-table th, .spec-table td { padding: 7px; border: 1px solid #ddd; }
     .spec-table thead tr { background: #f0f0f0; }
@@ -102,127 +109,103 @@
     <div>
       <h3>Strike-Zone Placement</h3>
       <p>
-        Iteration 5 fixed the final mount geometry. The reference chain uses ANSUR II
-        for erect trunk proportions (Gordon et al., 2015) and a direct boxing-stance
-        self-check on a 177 cm male for the final practical gap.
+        Iteration 5 fixed the final mount geometry using the revised ergonomic
+        chain in <em>human_ergonomics_analysis_revised.md</em>. The design uses
+        pronasale (nose tip), subxiphoid (epigastric region), and right and left
+        costal-margin flank targets in boxing guard stance (Drillis and Contini,
+        1966; Gordon et al., 2014).
       </p>
 
-      <h4>Target Population and Reference Stature</h4>
+      <h4>Target Population and Guard Model</h4>
       <p>
-        The design target covers adults from 150 to 190 cm. A 170 cm reference
-        stature is used for the nominal gap because it sits at the midpoint of
-        the range and lands near the ANSUR II design value. ANSUR II is a US
-        military sample, so it is not globally representative, but this gap is a
-        trunk proportion, not a limb proportion, and the height-adjustable robot
-        decouples the absolute floor height from the final pad spacing.
+        The design target covers users from 150 to 190 cm. Final pad centres are
+        set from the mean of four profile calculations (150F, 150M, 190F, 190M)
+        after applying boxing-guard posture correction. This keeps the fixed frame
+        practical for the whole range while preserving realistic body-zone order in
+        stance.
       </p>
 
       <div class="calc-block">
-        <strong>Landmark chain used here:</strong> pronasale, the nose tip,
-        estimated with the 0.870H proportionality constant from Drillis and
-        Contini (1966); xiphoid process, estimated from ANSUR II chestheight and
-        tenthribheight; and the subxiphoid or epigastric region, which is the
-        soft tissue target just below the xiphoid. In boxing, solar plexus is the
-        colloquial term for this region.
+        <strong>Key design decision:</strong> the liver and stomach-side pads are
+        intentionally off-centred by <strong>3.0 cm below</strong> the middle
+        epigastric pad centreline. This 3.0 cm offset comes from the costal-margin
+        geometry used in the revised analysis and is held constant across the full
+        150 to 190 cm range.
       </div>
 
-      <h4>Gap Derivation from ANSUR II</h4>
+      <h4>Revised Ergonomic Outputs Used for CAD</h4>
       <p>
-        ANSUR II does not tabulate pronasale or xiphoid height directly, so the
-        gap is reconstructed from measured landmarks. Pronasale height is
-        estimated as 0.870H from Drillis and Contini (1966). Xiphoid height is
-        estimated as the midpoint of chestheight and tenthribheight, which places
-        it between the nipple level and the lower rib cage in the survey data.
-        The resulting erect nose-to-subxiphoid gap spans 28.5 to 33.3 cm across
-        the 150 to 190 cm design range, with male and female values at the same
-        stature differing by less than 0.5 cm.
-      </p>
-      <p>
-        The older geometric head-centre figure is not used for final sizing here
-        because it measures a different landmark chain.
+        The final robot uses the revised mean guard values: head pad centre at
+        127.3 cm, epigastric pad centre at 96.4 cm, and both side pads at
+        93.4 cm. This gives a head-to-epigastric gap of 30.9 cm and a fixed
+        epigastric-to-side-pad offset of 3.0 cm downward (Drillis and Contini,
+        1966; Gordon et al., 2014).
       </p>
 
-      <table class="spec-table" style="max-width:700px;">
+      <figure style="margin:18px 0 16px;text-align:center;">
+        <img
+          src="../../../assets/upper_mechanism/padding/strike-zone-landmarks-placeholder.png"
+          alt="Front-view strike-zone landmarks and final pad centres"
+          style="width:100%;max-width:580px;display:block;margin:0 auto;border:1px solid #e0e0e0;border-radius:6px;"
+        >
+        <figcaption style="font-size:0.82rem;color:#555;margin-top:6px;max-width:580px;margin-left:auto;margin-right:auto;">
+          Figure 5.2.4.1: Landmark overlay used for final placement. The side pads are intentionally off-centred by 3.0 cm below the middle pad centreline.
+        </figcaption>
+      </figure>
+
+      <table class="spec-table" style="max-width:680px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.1: Final strike-zone placement metrics used in CAD</caption>
         <thead>
           <tr>
-            <th>Stature</th>
-            <th>Male gap</th>
-            <th>Female gap</th>
-            <th>n (M)</th>
-            <th>n (F)</th>
+            <th>Design metric (boxing guard)</th>
+            <th>Value</th>
+            <th>Applied in mechanical layout</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>~150 cm</td>
-            <td>--</td>
-            <td>28.5 cm</td>
-            <td>&lt;5</td>
-            <td>41</td>
+            <td>Head pad centre (pronasale)</td>
+            <td>127.3 cm</td>
+            <td>Top target plane</td>
           </tr>
           <tr>
-            <td>~160 cm</td>
-            <td>30.2 cm</td>
-            <td>29.9 cm</td>
-            <td>31</td>
-            <td>254</td>
+            <td>Middle pad centre (epigastric)</td>
+            <td>96.4 cm</td>
+            <td>Reference centreline for torso pads</td>
           </tr>
           <tr>
-            <td>~170 cm</td>
-            <td>31.5 cm</td>
-            <td>31.0 cm</td>
-            <td>342</td>
-            <td>116</td>
+            <td>Side pad centre (liver, right)</td>
+            <td>93.4 cm</td>
+            <td>3.0 cm below middle pad centreline</td>
           </tr>
           <tr>
-            <td>~177 cm</td>
-            <td>32.4 cm</td>
-            <td>31.8 cm</td>
-            <td>491</td>
-            <td>28</td>
+            <td>Side pad centre (stomach-side, left)</td>
+            <td>93.4 cm</td>
+            <td>Mirrored to right-side height</td>
           </tr>
           <tr>
-            <td>~180 cm</td>
-            <td>32.7 cm</td>
-            <td>--</td>
-            <td>420</td>
-            <td>&lt;5</td>
+            <td>Head to middle pad gap</td>
+            <td>30.9 cm</td>
+            <td>Primary vertical spacing chain</td>
           </tr>
-          <tr>
-            <td>~190 cm</td>
-            <td>33.3 cm</td>
-            <td>--</td>
-            <td>57</td>
-            <td>&lt;5</td>
+          <tr style="background:#e8f5e9;">
+            <td><strong>Middle to side pad off-centre</strong></td>
+            <td><strong>3.0 cm down</strong></td>
+            <td><strong>Final selected torso offset rule</strong></td>
           </tr>
         </tbody>
       </table>
 
-      <figure style="margin:20px 0;text-align:center;">
-        <img
-          src="../../../assets/upper_mechanism/padding/strike-zone-landmarks-placeholder.png"
-          alt="Placeholder: strike-zone landmark diagram showing head centre, pronasale, epigastric centre, and subxiphoid region"
-          style="width:100%;max-width:560px;display:block;margin:0 auto;border:1px solid #e0e0e0;border-radius:6px;"
-        >
-        <figcaption style="font-size:0.82rem;color:#555;margin-top:6px;max-width:560px;margin-left:auto;margin-right:auto;">
-          Figure 5.2.4.1: Strike-zone landmark reference used for pad-spacing derivation.
-        </figcaption>
-      </figure>
-
-      <h4>Pad Size Evolution and Edge Contact</h4>
+      <h4>Pad Size and Coverage with 3.0 cm Off-Centre</h4>
       <p>
-        The first three iterations used body pads of approximately 150 mm by 100 mm,
-        based on a boxing-glove face. That version was visually broad but left a clear
-        break between adjacent pads and felt too forgiving as a target. The final
-        180 mm by 130 mm body pad is the tighter compromise: the 180 mm height gives
-        the strike face enough vertical overlap to absorb the roughly 5 cm ANSUR II
-        variation band, while the 130 mm width keeps the target strip narrow enough to
-        reward cleaner placement. In the angled side layout, that width lets adjacent
-        pads meet at the edges without creating an unstruck gap, but it still avoids a
-        broad chest plate feel.
+        The final body pad face remains 180 mm by 130 mm. With a 3.0 cm centre
+        offset, the side pads are clearly lower than the middle pad but still
+        overlap in usable strike area during motion. This avoids a dead vertical
+        strip while preserving the intended hook target level.
       </p>
 
-      <table class="spec-table" style="max-width:560px;">
+      <table class="spec-table" style="max-width:560px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.2: Body pad size evolution across iterations</caption>
         <thead>
           <tr>
             <th>Iterations</th>
@@ -244,42 +227,29 @@
         </tbody>
       </table>
 
-      <h4>Head Pad Sizing</h4>
+      <h4>Head Pad Sizing and Separation</h4>
       <p>
-        The head pad at 200 mm by 230 mm matches two separate reference checks.
-        Pheasant and Haslegrave report adult male head breadth at about 145 to 165 mm,
-        which leaves a small lateral margin for a 200 mm pad width (Pheasant and
-        Haslegrave, 2006). For height, Drillis and Contini place head height at about
-        0.130H, which gives roughly 225 to 234 mm across the 173 to 180 cm male mean
-        range. The chosen 230 mm height sits inside that band, so the head pad is tall
-        enough to catch realistic head motion without becoming so large that it stops
-        reading as a defined target. The head pad is therefore sized as a compact but
-        forgiving target, not as a broad surface.
+        The head pad remains 200 mm by 230 mm. The revised chain gives a 30.9 cm
+        centre-to-centre gap from head pad to middle body pad in boxing guard,
+        which matches the practical verification range (Pheasant and Haslegrave,
+        2006).
       </p>
 
-      <h4>Why the Liver and Stomach Pads Sit Below the Epigastric Region</h4>
+      <h4>Why Side Pads Are Off-Centred by 3.0 cm</h4>
       <p>
-        The liver-side target sits to the right of the epigastric centreline,
-        anchored at the right costal margin. Using the xiphoid at 0.618H as a
-        skeletal anchor, the right
-        midclavicular costal margin lies approximately 3 cm below the xiphoid.
-        The liver centre is then estimated by adding half the liver's
-        craniocaudal span (6.1 cm for males, 5.85 cm for females) measured from
-        Malaysian ultrasound data (Lim et al., 2017). This places the lower liver
-        target below the subxiphoid region, while still remaining in the right
-        side torso band.
+        The side targets are anchored to the costal-margin flank zone used in the
+        revised ergonomics analysis. In this model, the flank strike band is
+        3.0 cm below the subxiphoid reference. Therefore, both side pads are
+        mounted 3.0 cm below the middle pad centreline by design, not by tuning.
       </p>
       <p>
-        The epigastric region remains the central reference point. The liver pad
-        is placed lower than that centreline because the inferior liver margin sits
-        below the xiphoid in the anatomical drawings. The mirrored left-side pad
-        can be treated as a stomach-side target, since the stomach occupies the
-        left side of the upper abdomen and provides a better left-side analogue for this
-        layout. The table below shows the stance-corrected heights across all four
-        profiles and the resulting mean centre-to-centre gap.
+        The left side uses the same height as the right side for symmetric hook
+        training and repeatable mounting geometry. In oral terms, the rule is
+        simple: set the middle pad first, then drop each side pad exactly 3.0 cm.
       </p>
 
-      <table class="spec-table" style="max-width:640px;">
+      <table class="spec-table" style="max-width:640px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.3: Profile-based epigastric and side-pad centre heights in stance</caption>
         <thead>
           <tr>
             <th>Profile</th>
@@ -291,111 +261,41 @@
         <tbody>
           <tr>
             <td>150F</td>
-            <td>87.5 cm</td>
-            <td>79.3 cm</td>
-            <td>8.2 cm</td>
+            <td>83.5 cm</td>
+            <td>80.5 cm</td>
+            <td>3.0 cm</td>
           </tr>
           <tr>
             <td>150M</td>
-            <td>87.8 cm</td>
-            <td>80.5 cm</td>
-            <td>7.3 cm</td>
+            <td>84.7 cm</td>
+            <td>81.7 cm</td>
+            <td>3.0 cm</td>
           </tr>
           <tr>
             <td>190F</td>
-            <td>112.3 cm</td>
-            <td>102.6 cm</td>
-            <td>9.7 cm</td>
+            <td>107.9 cm</td>
+            <td>104.9 cm</td>
+            <td>3.0 cm</td>
           </tr>
           <tr>
             <td>190M</td>
-            <td>112.5 cm</td>
-            <td>104.1 cm</td>
-            <td>8.4 cm</td>
+            <td>109.4 cm</td>
+            <td>106.4 cm</td>
+            <td>3.0 cm</td>
           </tr>
-          <tr>
+          <tr style="background:#e8f5e9;">
             <td><strong>Mean</strong></td>
-            <td><strong>100.0 cm</strong></td>
-            <td><strong>91.6 cm</strong></td>
-            <td><strong>8.4 cm</strong></td>
+            <td><strong>96.4 cm</strong></td>
+            <td><strong>93.4 cm</strong></td>
+            <td><strong>3.0 cm</strong></td>
           </tr>
         </tbody>
       </table>
-
-      <figure style="margin:20px 0;text-align:center;">
-        <svg viewBox="0 0 470 310" style="width:100%;max-width:470px;display:block;margin:0 auto;" font-family="system-ui,sans-serif" aria-label="Front view of body pad heights from ground">
-          <defs>
-            <marker id="sz2-ke" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,1 L6,3 L0,5 Z" fill="#333"/></marker>
-            <marker id="sz2-ks" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto-start-reverse"><path d="M0,1 L6,3 L0,5 Z" fill="#333"/></marker>
-          </defs>
-          <!-- Y-axis -->
-          <line x1="50" y1="18" x2="50" y2="300" stroke="#bbb" stroke-width="1.5"/>
-          <text x="50" y="13" text-anchor="middle" font-size="10" fill="#555">cm</text>
-          <!-- Ticks: y(cm) = 20 + (112-cm)*7.57 -->
-          <!-- 110cm=35, 105cm=73, 100cm=111, 95cm=149, 90cm=187, 85cm=224, 80cm=262 -->
-          <line x1="45" y1="35" x2="55" y2="35" stroke="#bbb"/><text x="42" y="39" text-anchor="end" font-size="10" fill="#666">110</text>
-          <line x1="45" y1="73" x2="55" y2="73" stroke="#bbb"/><text x="42" y="77" text-anchor="end" font-size="10" fill="#666">105</text>
-          <line x1="45" y1="111" x2="55" y2="111" stroke="#bbb"/><text x="42" y="115" text-anchor="end" font-size="10" fill="#666">100</text>
-          <line x1="45" y1="149" x2="55" y2="149" stroke="#bbb"/><text x="42" y="153" text-anchor="end" font-size="10" fill="#666">95</text>
-          <line x1="45" y1="187" x2="55" y2="187" stroke="#bbb"/><text x="42" y="191" text-anchor="end" font-size="10" fill="#666">90</text>
-          <line x1="45" y1="224" x2="55" y2="224" stroke="#bbb"/><text x="42" y="228" text-anchor="end" font-size="10" fill="#666">85</text>
-          <line x1="45" y1="262" x2="55" y2="262" stroke="#bbb"/><text x="42" y="266" text-anchor="end" font-size="10" fill="#666">80</text>
-          <!-- Stomach pad: x=75-140, y=106-242 (100.6cm top, 82.6cm bottom) -->
-          <rect x="75" y="106" width="65" height="136" rx="3" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
-          <text x="107" y="163" text-anchor="middle" font-size="11" fill="#1565c0" font-weight="500">Stomach</text>
-          <text x="107" y="176" text-anchor="middle" font-size="11" fill="#1565c0">side</text>
-          <!-- Epigastric pad: x=183-248, y=106-243 (100.6cm top, 82.6cm bottom) -->
-          <rect x="183" y="43" width="65" height="136" rx="3" fill="#fff9c4" stroke="#f57f17" stroke-width="1.5"/>
-          <text x="215" y="100" text-anchor="middle" font-size="11" fill="#e65100" font-weight="500">Epigastric</text>
-          <text x="215" y="113" text-anchor="middle" font-size="11" fill="#e65100">region</text>
-          <!-- LIVER pad: x=288-353, y=106-242 -->
-          <rect x="288" y="106" width="65" height="136" rx="3" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
-          <text x="320" y="163" text-anchor="middle" font-size="11" fill="#2e7d32" font-weight="500">Liver</text>
-          <!-- Horizontal ref lines in gaps only -->
-          <!-- 100.0 cm line at y=111 (epigastric centre) -->
-          <line x1="55" y1="111" x2="183" y2="111" stroke="#666" stroke-width="1" stroke-dasharray="3,2"/>
-          <line x1="248" y1="111" x2="385" y2="111" stroke="#666" stroke-width="1" stroke-dasharray="3,2"/>
-          <text x="388" y="115" font-size="10" fill="#555">100.0 cm</text>
-          <!-- 91.6 cm line at y=174 (liver and stomach-side centre) -->
-          <line x1="55" y1="174" x2="75" y2="174" stroke="#f57f17" stroke-width="1" stroke-dasharray="3,2"/>
-          <line x1="140" y1="174" x2="183" y2="174" stroke="#f57f17" stroke-width="1" stroke-dasharray="3,2"/>
-          <line x1="248" y1="174" x2="288" y2="174" stroke="#f57f17" stroke-width="1" stroke-dasharray="3,2"/>
-          <line x1="353" y1="174" x2="385" y2="174" stroke="#f57f17" stroke-width="1" stroke-dasharray="3,2"/>
-          <text x="388" y="178" font-size="10" fill="#e65100">91.6 cm</text>
-          <!-- 8.4 cm gap arrow at x=360, from y=114 to y=171 -->
-          <line x1="362" y1="114" x2="362" y2="171" stroke="#333" stroke-width="1.5" marker-start="url(#sz2-ks)" marker-end="url(#sz2-ke)"/>
-          <text x="370" y="141" font-size="10" fill="#333" font-weight="600">8.4 cm</text>
-          <text x="370" y="153" font-size="9" fill="#555">centre gap</text>
-          <!-- Ground line -->
-          <line x1="55" y1="300" x2="420" y2="300" stroke="#999" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <text x="420" y="296" text-anchor="end" font-size="10" fill="#888">ground</text>
-        </svg>
-        <figcaption style="font-size:0.82rem;color:#555;margin-top:6px;max-width:470px;margin-left:auto;margin-right:auto;">
-          Front view: stance-corrected body pad heights from ground (population mean, 150 to 190 cm range). The epigastric pad centre sits at 100.0 cm; the liver and stomach-side pads share a centre at 91.6 cm. Each pad face is 180 mm tall. The 8.4 cm centre gap means the pad vertical ranges nearly overlap, which is anatomically correct.
-        </figcaption>
-      </figure>
-
       <p>
-        The mean centre-to-centre gap of 8.4 cm is small enough that a 180 mm
-        body pad mounted at 100.0 cm (epigastric centre) has its lower edge at
-        91.0 cm, which is just below the liver and stomach-side pad centre at
-        91.6 cm. In other words, the central pad is placed above the two lower
-        torso targets, and the vertical ranges nearly overlap. This is correct:
-        the epigastric region and the lateral upper-abdominal targets are close,
-        and a gap between the pads would create an unstruck band that does not
-        correspond to any real anatomical gap.
-      </p>
-
-      <h4>Treating the Stomach-Side Pad at the Same Height as the Liver Pad</h4>
-      <p>
-        The stomach occupies the upper left abdomen and extends into the
-        epigastric region. A strictly anatomical mount would place the
-        stomach-side pad at the same lower band as the liver pad, because both
-        targets are lateral to the epigastric centreline rather than directly on
-        it. Mounting the left-side pad at the same height as the liver pad keeps
-        left-right hook training symmetric and avoids introducing an asymmetric
-        mount geometry for a difference that falls within the 9 cm pad half-height
-        tolerance. The anatomical offset is covered by the pad face.
+        With 180 mm body pads (9.0 cm half-height), the 3.0 cm off-centre creates
+        a controlled vertical overlap between middle and side targets. That gives a
+        continuous strike corridor for combinations while still making the side pads
+        read as a lower hook band.
       </p>
 
       <h4>Pad Edge Contact and Spring Mechanism Clearance</h4>
@@ -416,7 +316,8 @@
 
       <h4>Final Pad Centre Heights</h4>
 
-      <table class="spec-table" style="max-width:560px;">
+      <table class="spec-table" style="max-width:560px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.4: Final mounted pad centre heights from ground</caption>
         <thead>
           <tr>
             <th>Pad</th>
@@ -427,28 +328,28 @@
         <tbody>
           <tr>
             <td>Epigastric region</td>
-            <td>100.0 cm</td>
-            <td>Mean stance-corrected central strike zone, 150 to 190 cm range</td>
+            <td>96.4 cm</td>
+            <td>Mean stance-corrected subxiphoid reference</td>
           </tr>
           <tr>
             <td>Liver (right side)</td>
-            <td>91.6 cm</td>
-            <td>Lower liver band below the subxiphoid region</td>
+            <td>93.4 cm</td>
+            <td>Fixed 3.0 cm below epigastric centreline</td>
           </tr>
           <tr>
             <td>Stomach-side (left side)</td>
-            <td>91.6 cm</td>
+            <td>93.4 cm</td>
             <td>Mirrored to liver height for symmetric hook training</td>
           </tr>
           <tr>
             <td>Epigastric to lower body pad gap</td>
-            <td>8.4 cm centre-to-centre</td>
-            <td>Mean across all four profiles</td>
+            <td>3.0 cm centre-to-centre</td>
+            <td>Constant geometry from revised ergonomic model</td>
           </tr>
           <tr>
             <td>Head pad bottom to epigastric pad top</td>
-            <td>31.8 cm edge-to-edge</td>
-            <td>Brackets the 30 to 38 cm measured nose-tip to subxiphoid range in boxing stance</td>
+            <td>~10.4 cm edge-to-edge</td>
+            <td>From centres 127.3 cm and 96.4 cm with 230 mm and 180 mm pad heights</td>
           </tr>
         </tbody>
       </table>
@@ -478,7 +379,7 @@
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_1.glb"
           alt="Iteration 1: Direct foam-to-frame mount"
-          height="350" explode-scale="1.5">
+          height="350" no-controls>
         </explode-viewer>
       </div>
 
@@ -496,7 +397,7 @@
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_2_front.glb"
           alt="Iteration 2: Front padding mount"
-          height="350" explode-scale="1.5">
+          height="350" no-controls>
         </explode-viewer>
       </div>
 
@@ -521,7 +422,7 @@
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_3_front.glb"
           alt="Iteration 3: Frame-side front mount (attaches to aluminium frame, holds spring)"
-          height="350" explode-scale="1.5">
+          height="350" no-controls>
         </explode-viewer>
       </div>
 
@@ -543,7 +444,7 @@
         <explode-viewer
           src="../../../assets/upper_mechanism/padding/iteration_4_final.glb"
           alt="Iteration 4 baseline: full assembly frame mount, spring, foam mount, and foam"
-          height="350" explode-scale="1.5">
+          height="350" no-controls>
         </explode-viewer>
       </div>
 
@@ -553,11 +454,12 @@
         <p>
           The new final iteration keeps the spring-loaded box architecture from
           Iteration 4 and applies the validated Strike-Zone Placement
-          targets directly to mount placement. The torso mounts were re-positioned so the
-          liver and mirrored stomach-side pads sit 8.4 cm below the epigastric
-          centreline, while the head-to-body spacing is about 31 cm at the pad
-          centre level. This ties the CAD directly to the validated anatomical
-          targets and keeps the practical gap near 30 cm in boxing stance.
+          targets directly to mount placement. The torso mounts were re-positioned so
+          both side pads are deliberately off-centred by 3.0 cm below the middle
+          epigastric centreline. Head-to-middle spacing is set to 30.9 cm
+          centre-to-centre. This ties the CAD directly to the revised ergonomic
+          model and makes the side hook band lower by construction, not by trial
+          and error.
         </p>
         <p>
           To solve pad rotation after repeated impacts, anti-rotation guides were
@@ -570,7 +472,7 @@
           src="../../../assets/upper_mechanism/padding/Final_Assembly_for_Showcase.glb"
           alt="Iteration 5 final: anatomy-guided pad layout with anti-rotation guides"
           model-rotation="0,180,0"
-          height="350" explode-scale="1.5">
+          height="350" no-controls>
         </explode-viewer>
       </div>
     </div>
@@ -587,75 +489,102 @@
     <div>
       <h3>Spring Calculations</h3>
       <p>
-        The spring must support the foam horizontally with minimal static sag.
-        The governing formula is:
+        Spring selection evolved in two stages. Iteration 3 started with a
+        1 kg design assumption and sag-control priority. Iterations 4 and 5
+        retained the same spring but shifted priority to impact absorption
+        after the enclosed box guide removed sag as a practical risk.
       </p>
 
-      <h4>Initial Spring Specification (Sag Prevention)</h4>
+      <h4>Stage 1: Initial Sag-Driven Requirement (Iteration 3)</h4>
       <p>
-        Before the box housing was introduced, the spring needed to support the
-        padding assembly against gravity while the robot arm moved. The initial design
-        assumed the end-effector assembly (foam layers, leather covering, and anti-vibration
-        mounts) weighed approximately 1 kg. Under this assumption, the minimum spring force
-        to prevent sag was:
+        Before the box housing was introduced, the mount was treated as a
+        partially unsupported horizontal spring system. The conservative assumption
+        was an end-effector mass of 1.0 kg. Static load is:
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
-        F<sub>sag</sub> = m &times; g = 1.0 &times; 9.81 = 9.81 N
+        F<sub>static</sub> = m &times; g = 1.0 &times; 9.81 = 9.81 N
       </p>
       <p>
-        With a spring rate of k = 8 N/mm, the static deflection under the assembly's
-        own weight would be:
+        For candidate spring rates, static axial sag follows Hooke's law:
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
-        x<sub>sag</sub> = F / k = 9.81 / 8 = 1.23 mm
+        x<sub>sag</sub> = F / k
       </p>
       <p>
-        This small deflection was acceptable, providing confidence that a k = 8 N/mm
-        spring would hold the padding securely without noticeable droop.
+        Using a 1 kg load case, the design-space checks are:
+      </p>
+      <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
+        k = 33 N/mm &rarr; x<sub>sag</sub> = 9.81/33 = 0.30 mm
+      </p>
+      <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
+        k = 20 N/mm &rarr; x<sub>sag</sub> = 9.81/20 = 0.49 mm
+      </p>
+      <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0 16px;">
+        k = 10 N/mm &rarr; x<sub>sag</sub> = 9.81/10 = 0.98 mm
+      </p>
+      <p>
+        This is why the early spring shortlist sat in the 25 to 30 N/mm range:
+        lower sag but noticeably stiffer punch feel.
       </p>
 
-      <h4>Revised Mass Estimate</h4>
+      <h4>Stage 2: Measured Mass and Impact-Response Tuning (Iterations 4 to 5)</h4>
       <p>
-        During prototyping, the actual end-effector assembly (foam, covering, and mounts)
-        was weighed and found to be significantly lighter than estimated, at approximately
-        150 to 200 g rather than the assumed 1 kg. With a mass of 0.175 kg (midpoint
-        estimate):
+        Prototype weighing showed the moving padding assembly was about 150 to
+        200 g, not 1 kg. Using a midpoint of 0.175 kg:
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
-        F<sub>sag</sub> = 0.175 &times; 9.81 = 1.72 N
+        F<sub>static</sub> = 0.175 &times; 9.81 = 1.72 N
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
         x<sub>sag</sub> = 1.72 / 8 = 0.21 mm
       </p>
       <p>
-        The sag under the actual assembly weight is negligible (0.21 mm). This confirmed
-        that the k = 8 N/mm spring was significantly over-specified for sag prevention alone.
-        This finding, combined with the introduction of the box housing in Iteration 4
-        which eliminated sag as a concern entirely, motivated a reframing of the spring
-        selection criteria toward shock absorption.
+        This sag is negligible. Also, in Iterations 4 and 5, the spring sits in a
+        boxed guide that constrains lateral droop. So practical spring selection
+        moved from sag prevention to impact feel and frame-load reduction.
       </p>
 
-      <h4>Reframed Spring Selection: Shock Absorption</h4>
+      <h4>Why 8 N/mm Is Safe for Iterations 4 and 5</h4>
       <p>
-        With the box housing introduced in Iteration 4, the spring no longer needs to support the padding assembly against gravity. Sag is eliminated by the rigid enclosure. This shifts the spring's primary role to shock absorption: the spring should be soft enough to compress meaningfully under a punch, absorbing impact energy before it reaches the robot's frame and internal electronics.
+        For the selected spring rate, compression under representative punch loads is:
       </p>
-      <p>
-        Pierce et al. (2006) measured punch forces during six professional boxing matches, reporting mean forces of 866 to 1149 N. For recreational users, who represent BoxBunny's target demographic, estimated punch forces are approximately 400 to 750 N. A design target of 500 N was adopted as a representative mid-range value for a recreational boxer.
+      <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
+        F = 200 N &rarr; x = 200 / 8 = 25.0 mm
       </p>
-      <p>
-        Using Hooke's Law (F = k * x), the compression under a 500 N punch with the current spring rate of k = 8 N/mm is:
+      <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
+        F = 300 N &rarr; x = 300 / 8 = 37.5 mm
+      </p>
+      <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
+        F = 400 N &rarr; x = 400 / 8 = 50.0 mm
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
-        x = F / k = 500 / 8 = 62.5 mm
+        F = 500 N &rarr; x = 500 / 8 = 62.5 mm
       </p>
       <p>
-        This compression is close to the spring's working range, providing meaningful energy absorption without bottoming out. The spring deflects enough to cushion the impact perceptibly, reducing the force transmitted to the robot frame.
+        These values are in a usable stroke range for a guided return mechanism.
+        The spring is compliant enough to absorb impact instead of passing a sharp
+        impulse to the frame. Relative to a nominal 140 mm free length, the
+        500 N check gives 62.5 mm compression, which is about 45% of free length.
+        This supports the 8 N/mm choice as compliant but still controllable in
+        the current enclosure.
       </p>
       <p>
-        For future iterations, now that sag is no longer a constraint, an even softer spring (k = 4 to 5 N/mm) could be considered. At k = 4 N/mm, a 500 N punch would produce 125 mm of compression, and at k = 5 N/mm, 100 mm. This would provide a softer, more forgiving feel, which may be preferable for extended training sessions. The box housing provides the structural support that previously required a stiffer spring, so softer options are now viable without risk of the padding assembly drooping under its own weight.
+        In short, 8 N/mm is safe because static sag is negligible for the measured
+        mass, the boxed guide controls droop, and dynamic stroke remains meaningful
+        without immediate bottom-out in the intended use range.
       </p>
 
-      <table class="spec-table">
+      <h4>Future Softer Spring Direction</h4>
+      <p>
+        Since sag is no longer a governing requirement in Iterations 4 and 5,
+        future revisions can test softer springs mainly for feel tuning. For
+        reference, at 500 N: k = 5 N/mm gives 100 mm compression, while
+        k = 4 N/mm gives 125 mm compression. These can improve forgiveness but
+        need stroke and coil-bind checks in the same box geometry.
+      </p>
+
+      <table class="spec-table" style="max-width:860px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.5: Spring specification evolution and final selected baseline</caption>
         <thead>
           <tr><th>Parameter</th><th>Iteration 3 (rejected)</th><th>Iteration 4 baseline (retained in Iteration 5 final)</th></tr>
         </thead>
@@ -675,6 +604,39 @@
         during robot rotation, keeping rotational inertia lower for faster
         turning response during sparring.
       </p>
+
+      <table class="spec-table" style="max-width:760px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.6: Compression check for selected spring rate (k = 8 N/mm)</caption>
+        <thead>
+          <tr>
+            <th>Applied load</th>
+            <th>Predicted compression</th>
+            <th>Interpretation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>200 N</td>
+            <td>25.0 mm</td>
+            <td>Responsive for average strikes</td>
+          </tr>
+          <tr>
+            <td>300 N</td>
+            <td>37.5 mm</td>
+            <td>Clear cushioning under stronger punches</td>
+          </tr>
+          <tr>
+            <td>400 N</td>
+            <td>50.0 mm</td>
+            <td>High absorption while remaining controllable</td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td><strong>500 N design check</strong></td>
+            <td><strong>62.5 mm</strong></td>
+            <td><strong>Selected safe upper working case for current layout</strong></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <sl-divider></sl-divider>
@@ -703,7 +665,7 @@
       <explode-viewer
         src="../../../assets/upper_mechanism/padding/honeycomb_sample.glb"
         alt="Concept: Horizontally oriented TPU honeycomb lattice for unidirectional dampening"
-        height="350" explode-scale="1.5">
+        height="350" no-controls>
       </explode-viewer>
       <h4>Manufacturing Considerations</h4>
       <p>
@@ -764,11 +726,7 @@
           Drillis, R. and Contini, R. (1966). Body Segment Parameters. Technical Report No. 1166-03, School of Engineering and Science, New York University.
         </li>
         <li>
-          Gordon, C.C. et al. (2015). 2012 Anthropometric Survey of U.S. Army Personnel: Methods and Summary Statistics. Report No. NATICK/TR-15/007.
-        </li>
-        <li>
-          Author's boxing-stance measurement (April 2026). Standing and defensive-stance
-          nose-tip to subxiphoid checks used to sanity-check the fixed about 31 cm pad spacing.
+          Gordon, C.C. et al. (2014). 2012 Anthropometric Survey of U.S. Army Personnel: Methods and Summary Statistics. Report No. NATICK/TR-15/007.
         </li>
         <li>
           Pierce, J.D., Reinbold, K.A., Lyngard, B.C., Goldman, R.J. and Pastore, C.M. (2006). Direct Measurement of Punch Force During Six Professional Boxing Matches. Journal of Quantitative Analysis in Sports, 2(2).

@@ -28,6 +28,130 @@
       box-shadow: 0 2px 12px rgba(15,23,42,0.06);
       overflow-x: auto;
     }
+    .content table {
+      width: 100%;
+      max-width: 1100px;
+      margin: 16px auto !important;
+      border-collapse: collapse;
+    }
+    .content table th,
+    .content table td {
+      vertical-align: top;
+      word-break: break-word;
+    }
+    .performance-criteria-table th,
+    .performance-criteria-table td {
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+    .performance-criteria-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .performance-criteria-table {
+      width: 100%;
+      min-width: 1040px;
+      table-layout: fixed;
+      margin: 0 auto !important;
+    }
+    .performance-criteria-table th:nth-child(1),
+    .performance-criteria-table td:nth-child(1) {
+      width: 11%;
+      min-width: 90px;
+      white-space: nowrap;
+      text-align: center;
+      font-weight: 600;
+      background: #eff6ff;
+    }
+    .performance-criteria-table th:nth-child(5),
+    .performance-criteria-table td:nth-child(5) {
+      width: 12%;
+      min-width: 95px;
+      white-space: nowrap;
+      text-align: center;
+      font-weight: 700;
+      background: #ecfdf5;
+      color: #166534;
+    }
+    .performance-criteria-table thead tr {
+      background: #e2e8f0 !important;
+    }
+    .performance-criteria-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .developer-tests-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .developer-tests-table {
+      width: 100%;
+      min-width: 1400px;
+      max-width: none;
+      table-layout: fixed;
+      margin: 0 auto !important;
+      font-size: 0.9rem;
+    }
+    .developer-tests-table th,
+    .developer-tests-table td {
+      word-break: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+    .developer-tests-table th:nth-child(1),
+    .developer-tests-table td:nth-child(1) {
+      width: 9%;
+      min-width: 90px;
+      text-align: center;
+      white-space: nowrap;
+      font-weight: 700;
+      background: #eff6ff;
+    }
+    .developer-tests-table th:nth-child(2),
+    .developer-tests-table td:nth-child(2) {
+      width: 14%;
+      min-width: 180px;
+    }
+    .developer-tests-table th:nth-child(3),
+    .developer-tests-table td:nth-child(3) {
+      width: 26%;
+      min-width: 300px;
+    }
+    .developer-tests-table th:nth-child(4),
+    .developer-tests-table td:nth-child(4) {
+      width: 29%;
+      min-width: 340px;
+    }
+    .developer-tests-table th:nth-child(5),
+    .developer-tests-table td:nth-child(5) {
+      width: 22%;
+      min-width: 260px;
+    }
+    .developer-tests-table thead tr {
+      background: #e2e8f0 !important;
+    }
+    .developer-tests-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    table-component {
+      width: 100%;
+      max-width: 1100px;
+      margin: 16px auto;
+    }
+    table-component .gridjs-th,
+    table-component .gridjs-td,
+    table-component .gridjs-th-content {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      word-break: break-word;
+      vertical-align: top;
+    }
+    table-component#gui-deliverables-status .gridjs-th:nth-child(2),
+    table-component#gui-deliverables-status .gridjs-td:nth-child(2) {
+      min-width: 140px;
+    }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>
 </head>
@@ -88,6 +212,137 @@
       </svg>
     </div>
 
+    <!-- DEVELOPER FUNCTIONAL TESTING -->
+    <div>
+      <h3>Developer Functional Testing</h3>
+      <p>
+        Testing was conducted incrementally throughout development. At each iteration,
+        new features were verified by navigating the full affected flow and checking both
+        the expected case and known failure modes. After each Copilot-assisted edit session,
+        a standard audit was run: navigate every affected page, confirm all
+        <code>PageIndex</code> constants matched their <code>addWidget</code> positions,
+        and verify that surrounding features were unaffected. The cases below document
+        defects discovered and resolved through this process.
+      </p>
+
+      <div class="developer-tests-wrap">
+      <table class="developer-tests-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; width:8%;">TC</th>
+            <th style="padding:8px; border:1px solid #ddd; width:20%;">Category</th>
+            <th style="padding:8px; border:1px solid #ddd; width:28%;">Observation</th>
+            <th style="padding:8px; border:1px solid #ddd; width:28%;">Root Cause</th>
+            <th style="padding:8px; border:1px solid #ddd; width:16%;">Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-01</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation integrity</td>
+            <td style="padding:8px; border:1px solid #ddd;">Performance page and Others page showed blank screens after sparring pages were added</td>
+            <td style="padding:8px; border:1px solid #ddd;">Sparring pages inserted at index 22 in the <code>addWidget</code> block, shifting all subsequent page indices</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full index audit; block restored to correct order</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-02</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation integrity</td>
+            <td style="padding:8px; border:1px solid #ddd;">Five pages (Performance, Others, PowerInstructions, StaminaInstructions, ReactionInstructions) showed blank screens after an edit session</td>
+            <td style="padding:8px; border:1px solid #ddd;">Page instantiation lines replaced with <code>QWidget()</code> stubs during automated editing; detection required searching <code>MainWindow.__init__</code> for all <code>self.x = QWidget()</code> patterns</td>
+            <td style="padding:8px; border:1px solid #ddd;">Pages restored to correct class instantiations; audit pattern added to post-edit checklist</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-03</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation integrity</td>
+            <td style="padding:8px; border:1px solid #ddd;">App crashed on launch with RecursionError (992 frames) after circular import fix</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>PunchCombinationPage.__init__</code> called <code>on_difficulty_clicked("Beginner")</code> immediately at construction rather than connecting it as a signal callback</td>
+            <td style="padding:8px; border:1px solid #ddd;">All button connections converted to lambda callbacks</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-04</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation integrity</td>
+            <td style="padding:8px; border:1px solid #ddd;">Self-Select button navigated to wrong page; console output showed <code>False button clicked</code></td>
+            <td style="padding:8px; border:1px solid #ddd;">Qt <code>clicked</code> signal passes a boolean <code>checked</code> argument that overrides lambda default parameters</td>
+            <td style="padding:8px; border:1px solid #ddd;">Pattern changed to <code>lambda checked=False: self.method("arg")</code> throughout all navigation lambdas</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-05</td>
+            <td style="padding:8px; border:1px solid #ddd;">Feature regression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Self-Select page showed Basic Parameters content after an edit session</td>
+            <td style="padding:8px; border:1px solid #ddd;">Entire <code>SelfSelectSequencePage</code> class silently replaced with a simplified version missing the numpad, defense buttons, and reorder list</td>
+            <td style="padding:8px; border:1px solid #ddd;">Class restored from last confirmed working version; verified by checking for <code>sequence_input</code>, <code>confirm_sequence</code>, and <code>move_sequence_up</code> identifiers</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-06</td>
+            <td style="padding:8px; border:1px solid #ddd;">Data layer</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combo training sessions failed to save after CV placeholder was wired to return 0-5 scores</td>
+            <td style="padding:8px; border:1px solid #ddd;">SQLite <code>CHECK(score BETWEEN 0.0 AND 1.0)</code> constraint rejected scores above 1.0</td>
+            <td style="padding:8px; border:1px solid #ddd;">Schema rebuilt with <code>CHECK(score BETWEEN 0.0 AND 5.0)</code>; mastery threshold updated to 3.0/5.0</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-07</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation integrity</td>
+            <td style="padding:8px; border:1px solid #ddd;">Back button on Performance History always returned to Settings regardless of entry path</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hardcoded back destinations on every page with no runtime state tracking</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation stack implemented in Iteration 5; entry point recorded before every transition</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-08</td>
+            <td style="padding:8px; border:1px solid #ddd;">Feature regression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Test account persisted in <code>users.json</code> after pressing Back on the proficiency checklist</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>self._username</code> was empty string at Back press because <code>load_for_user()</code> call sequence was incorrect in the signup flow</td>
+            <td style="padding:8px; border:1px solid #ddd;">Call sequence corrected; verified by creating and discarding a test account</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-09</td>
+            <td style="padding:8px; border:1px solid #ddd;">Feature regression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Fixed-size buttons on ProfiencyChecklistPage appeared at full navigation size (360x65 px) despite <code>setFixedSize()</code> calls</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>setup_navigation()</code> in <code>ButtonNavigationMixin</code> applies <code>min-width/min-height</code> stylesheet overrides to all QPushButton children after construction</td>
+            <td style="padding:8px; border:1px solid #ddd;"><code>SKIP_NAV_SETUP = True</code> class attribute added; inline <code>min-width: 1px; min-height: 1px</code> overrides applied</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-10</td>
+            <td style="padding:8px; border:1px solid #ddd;">Integration verification</td>
+            <td style="padding:8px; border:1px solid #ddd;">Tooltip text across Homepage and TrainingPage did not match agreed specification after implementation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Content mismatch between implemented strings and specified tooltip text</td>
+            <td style="padding:8px; border:1px solid #ddd;">Targeted correction pass across all <code>_attach_tooltips</code> methods; each tooltip verified against specification</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-11</td>
+            <td style="padding:8px; border:1px solid #ddd;">Data layer</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combo progress showed inflated percentage after few training sessions</td>
+            <td style="padding:8px; border:1px solid #ddd;">Progress formula averaged only attempted combos, excluding unplayed combos from the denominator</td>
+            <td style="padding:8px; border:1px solid #ddd;">Denominator fixed to always use total combo count at the user's level, so unplayed combos score as 0</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-12</td>
+            <td style="padding:8px; border:1px solid #ddd;">Data layer</td>
+            <td style="padding:8px; border:1px solid #ddd;">Session counts in CSV did not match combo attempt counts in database after migration</td>
+            <td style="padding:8px; border:1px solid #ddd;">Legacy CSV contained entries from all users mixed together from before per-user isolation was introduced</td>
+            <td style="padding:8px; border:1px solid #ddd;">CSV history reset on migration; per-user SQLite database became sole source of truth</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">TC-13</td>
+            <td style="padding:8px; border:1px solid #ddd;">Feature regression</td>
+            <td style="padding:8px; border:1px solid #ddd;">Beginner-level users could access Sparring mode after proficiency assessment was added</td>
+            <td style="padding:8px; border:1px solid #ddd;">Proficiency gate logic not yet wired into <code>SparPage</code> navigation handler</td>
+            <td style="padding:8px; border:1px solid #ddd;">Gate condition added; Beginner users see a lockout message; Intermediate and Advanced proceed normally</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">TC-14</td>
+            <td style="padding:8px; border:1px solid #ddd;">Integration verification</td>
+            <td style="padding:8px; border:1px solid #ddd;">LLM chat showed placeholder-looking responses with no indication of whether the model was loaded</td>
+            <td style="padding:8px; border:1px solid #ddd;">Fallback to hardcoded responses was silent; no status message distinguishing real LLM output from fallback</td>
+            <td style="padding:8px; border:1px solid #ddd;">Explicit status messages added; chat always shows whether the local model, Anthropic API fallback, or hardcoded fallback is active</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.3-1: Developer Functional Test Cases (incremental, across all six iterations)</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- FUNCTIONAL TESTING -->
     <div>
       <h3>Functional Testing</h3>
@@ -103,7 +358,7 @@
         to progress review without friction?
       </p>
 
-      <table-component id="gui-functional-testing" subtitle="Table: Functional Test Results"></table-component>
+      <table-component id="gui-functional-testing" subtitle="Table 5.1.3-2: Functional Test Results"></table-component>
 
       <p>
         All functional tests passed. The navigation stack test is worth highlighting: the
@@ -162,6 +417,60 @@
           width="85%">
         </image-component>
       </div>
+      <h4>Showcase Observations Summary</h4>
+      <p>
+        The following table summarises observations recorded at the showcase. This was
+        a single convenience-sample event, not a structured usability study. No task
+        completion times or formal rating scales were collected. Findings are treated
+        as directional evidence from direct observation, not statistically significant
+        results. Participant count was approximately 8 to 12 people who interacted with
+        the robot during the event.
+      </p>
+      <div class="performance-criteria-wrap">
+      <table class="performance-criteria-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; width:30%;">Observation</th>
+            <th style="padding:8px; border:1px solid #ddd; width:20%;">Users Affected</th>
+            <th style="padding:8px; border:1px solid #ddd; width:15%;">Severity</th>
+            <th style="padding:8px; border:1px solid #ddd; width:35%;">Action Taken</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Difficulty reading combo prompts on the 7-inch display during active training</td>
+            <td style="padding:8px; border:1px solid #ddd;">Majority of participants who attempted the 7-inch display</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c62828; font-weight:600;">High</td>
+            <td style="padding:8px; border:1px solid #ddd;">Display upgraded to 10.1-inch IPS capacitive touchscreen (1280x800)</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">Text too small to follow comfortably while focusing on punching technique</td>
+            <td style="padding:8px; border:1px solid #ddd;">Several participants (reported verbally)</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c62828; font-weight:600;">High</td>
+            <td style="padding:8px; border:1px solid #ddd;">Confirmed display upgrade decision; proportional layout meant no redesign was required</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Participants consistently gravitated toward the larger external monitor for reading results and navigating</td>
+            <td style="padding:8px; border:1px solid #ddd;">All participants who used both displays</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#e65100; font-weight:600;">Medium</td>
+            <td style="padding:8px; border:1px solid #ddd;">Validated the hardware revision direction before implementation</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">No readability or navigation complaints reported when using the larger monitor</td>
+            <td style="padding:8px; border:1px solid #ddd;">All who switched to larger monitor</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#2e7d32; font-weight:600;">None</td>
+            <td style="padding:8px; border:1px solid #ddd;">Confirmed adequate font sizing and layout hierarchy on larger display</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation between main menu and training pages required no verbal instruction</td>
+            <td style="padding:8px; border:1px solid #ddd;">All observed participants</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#2e7d32; font-weight:600;">None</td>
+            <td style="padding:8px; border:1px solid #ddd;">Navigation hierarchy confirmed intuitive for first-time users; no changes required</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.3-3: Showcase Event Observations - "Robotics and AI in Work and Play" (single event, directional evidence only)</p>
+
       <h4>Observations</h4>
       <p>
         During the session, participants and observers consistently gravitated toward the larger
@@ -235,20 +544,21 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Real-time session data display (combo prompts, round timers, performance metrics)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Combo prompt, timer, and punch counter update within one display frame</td>
-            <td style="padding:8px; border:1px solid #ddd;">Functional observation during live sessions; interface event-update checks</td>
+            <td style="padding:8px; border:1px solid #ddd;">Combo prompt, timer, and punch counter update within 33 ms (one frame at 30 fps, the Jetson Nano DSI display refresh rate)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Observed during live sessions; no visible lag between punch event and counter update; Qt event loop confirmed single-threaded update on signal receipt</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">GUI-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Hardware-independent development via an abstracted integration layer with mock interfaces</td>
-            <td style="padding:8px; border:1px solid #ddd;">Full GUI runs on Windows laptop with no connected robot hardware</td>
+            <td style="padding:8px; border:1px solid #ddd;">All pages navigable and all features operable with no serial hardware connected; mock-interface mode activates automatically on hardware-absent startup; no import errors or page crashes on laptop</td>
             <td style="padding:8px; border:1px solid #ddd;">Entire development cycle conducted on laptop; mock-interface tests confirmed expected behavior</td>
             <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">Yes</td>
           </tr>
         </tbody>
       </table>
-      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table: GUI Performance Criteria Assessment</p>
+      </div>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.3-4: GUI Performance Criteria Assessment</p>
     </div>
 
     <sl-divider></sl-divider>
@@ -260,7 +570,170 @@
         The table below maps each GUI requirement back to its verification evidence.
       </p>
 
-      <table-component id="gui-deliverables-status" subtitle="Table: Requirements Verification Summary"></table-component>
+      <table-component id="gui-deliverables-status" subtitle="Table 5.1.3-5: Requirements Verification Summary"></table-component>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Limitations</h3>
+      <p>
+        The following limitations apply to the testing evidence presented in this section.
+        They are stated to give an accurate picture of what the results can and cannot claim.
+      </p>
+
+      <h4>User Testing Scope</h4>
+      <p>
+        The showcase event was a single convenience-sample demonstration, not a structured
+        usability study with recruited participants. No task completion times, error counts,
+        or structured rating scales (such as the System Usability Scale) were collected.
+        Observations reflect what was directly visible during approximately two hours of
+        public interaction at one event. Conclusions drawn from this data are directional
+        only and cannot be generalised to the full target user population.
+      </p>
+
+      <h4>Display Upgrade Re-verification</h4>
+      <p>
+        The upgrade from 7-inch to 10.1-inch display was validated by the absence of
+        readability complaints on the larger monitor at the showcase. A formal re-verification
+        cycle was not conducted after the hardware change. Specifically, touch target
+        compliance (all interactive elements at or above 60 px) was not re-measured on the
+        10.1-inch display, and gloved-use operability under the new resolution was not tested
+        in a controlled setting.
+      </p>
+
+      <h4>IMU Navigation Under Fatigue</h4>
+      <p>
+        Physical button navigation via the IMU-based Arduino interface (GUI-1) was confirmed
+        functional during a live training session at the showcase. It was not tested under
+        gloved-use fatigue conditions or across extended multi-round sessions where hand
+        fatigue could affect button accuracy. These conditions represent the primary use case
+        for physical button navigation and remain unverified.
+      </p>
+
+      <h4>Hardware Access During Development</h4>
+      <p>
+        The GUI was developed predominantly on a Windows laptop using mock interfaces.
+        Integration testing against live robot hardware was limited by hardware availability
+        during the development phase. Some edge cases in serial communication, CV handshake
+        timing, and multi-subsystem state transitions may not have been surfaced under
+        the simulation conditions used.
+      </p>
+
+      <h4>Single-Developer Development</h4>
+      <p>
+        All GUI development was completed by one developer without peer code review. This
+        increases the risk of undiscovered edge cases, particularly in state management
+        across the 44-page navigation system. The pattern of silent page replacement
+        discovered during testing (TC-02) suggests that a code review checkpoint between
+        iterations would have provided earlier defect detection.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Reflection</h3>
+
+      <h4>What Worked</h4>
+      <h5>Iteration Control and Defect Containment</h5>
+      <p>
+        The iterative development approach was the correct call for this project. Every
+        significant defect discovered during testing was caught and resolved within the
+        iteration that introduced it. The score scale mismatch (TC-06), navigation stack
+        bug (TC-07), and blank page pattern (TC-02) would all have been costly to fix in
+        a later phase. Catching them early kept the codebase stable.
+      </p>
+      <h5>Mock Interfaces and Integration Readiness</h5>
+      <p>
+        The mock interface architecture was the single most valuable structural decision.
+        By abstracting all hardware communication behind a <code>GuiBridge</code> layer with
+        a swap-in mock, the full GUI was runnable and testable on a Windows laptop throughout
+        development. This meant that six complete iterations were validated before any
+        physical hardware connection was required. The integration work at the end of the
+        project was straightforward precisely because the interfaces had been designed and
+        tested in isolation first.
+      </p>
+      <h5>Data Isolation Confidence</h5>
+      <p>
+        The per-user SQLite database design also performed well under test. Five test accounts
+        were created and exercised across training, performance, and sparring flows with no
+        observed cross-user data contamination.
+      </p>
+
+      <h4>What Would Be Done Differently</h4>
+      <h5>Earlier Placement of Proficiency Gating</h5>
+      <p>
+        The proficiency assessment was added in Iteration 6, late in the development cycle.
+        It would have been more effective earlier, as the Sparring mode access gate depends
+        on it, and the gate was not verifiable until the assessment was in place.
+      </p>
+      <h5>Earlier Formalisation of Post-Edit Audits</h5>
+      <p>
+        A post-edit audit checklist should have been formalised after the first occurrence
+        of the blank <code>QWidget()</code> replacement pattern (TC-02). It was rediscovered
+        twice more in subsequent sessions before the detection method was standardised.
+        Writing it down after the first occurrence would have saved debugging time.
+      </p>
+      <h5>Immediate Re-Verification After Display Change</h5>
+      <p>
+        The display upgrade from 7-inch to 10.1-inch was evidence-driven and the right
+        decision. However, it would have been better to include a formal re-verification
+        pass of all touch targets and layout proportions on the new display immediately
+        after the hardware change, rather than deferring that check.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <div>
+      <h3>Future Work</h3>
+
+      <h4>Structured Usability Study</h4>
+      <p>
+        The most significant gap in the current evidence base is the absence of structured
+        user testing. A follow-on study with 8 to 12 recruited boxing gym members, using
+        timed task scenarios (login to session start, combo training completion, results
+        review) and a System Usability Scale questionnaire, would provide quantitative
+        usability data and allow comparison against benchmark scores. This should be
+        conducted on the physical robot in a gym environment, not in a lab.
+      </p>
+
+      <h4>Touch Target Re-verification on 10.1-inch Display</h4>
+      <p>
+        All touch targets should be re-measured on the upgraded display under gloved
+        conditions. The 60 px minimum was designed for the 7-inch form factor. On a larger
+        display at higher resolution, the physical pixel-to-millimetre ratio changes, and
+        targets that met the minimum at 7 inches may or may not do so at 10.1 inches in
+        practice.
+      </p>
+
+      <h4>Sparring Mode: CV-Informed Weakness Weighting</h4>
+      <p>
+        The current Markov chain generation uses a frequency-based weakness profile that
+        accumulates across sessions. Once the CV subsystem's punch classification output
+        is validated and stable, the weakness profile should be updated to incorporate
+        real-time detection data from live sparring rounds, rather than relying solely on
+        historical session summaries.
+      </p>
+
+      <h4>LLM Coaching Reliability</h4>
+      <p>
+        The local Qwen 2.5 3B model loads conditionally based on available RAM. On the
+        Jetson Nano 4 GB with all subsystems running simultaneously, the model cannot
+        always be loaded. A future improvement would be to pre-load the model at startup
+        if sufficient memory is available and keep it resident, rather than loading on
+        demand per session. Alternatively, a smaller quantised model could be evaluated
+        for the coaching use case specifically.
+      </p>
+
+      <h4>Expanded Performance History Analytics</h4>
+      <p>
+        The current history pages display tabular results. Trend visualisation across
+        sessions (power trend, stamina fatigue curve, reaction time improvement) would
+        provide more actionable insight for users tracking progress over weeks. The data
+        is already being stored per-user; the work is in the presentation layer only.
+      </p>
     </div>
 
     <!-- BOTTOM NAVIGATION -->
