@@ -61,20 +61,206 @@
     <div>
       <h3>Requirements &amp; Considerations</h3>
       <p>
-        The rotation subsystem responds to system-level requirements <strong>RM-4</strong>
-        (<em>Yaw rotation</em>), <strong>RM-1</strong> (<em>Stability</em>), <strong>RM-2</strong>
-        (<em>Compact footprint</em>), and <strong>RM-7</strong> (<em>Portability</em>) defined in the
-        <a href="../robot-mechanism.html">Robot Mechanism</a> landing page, along with several subsystem-specific engineering considerations:
+        This subsystem addresses <a href="../../index.html#secondary-research">DO-2</a> (Intelligent Sparring System) and
+        <a href="../../index.html#secondary-research">DO-4</a> (Adaptive Fight Intelligence).
+        Requirements were derived from the boxing coaching motion repertoire, structural loading under punch impact, and the need to integrate cleanly with the base and height-adjustment modules.
       </p>
-      <ul>
-        <li><strong>Yaw re-orientation:</strong> Provide yaw re-angling with a target angular velocity of approximately 150&deg;/s (25 rpm) to reproduce coach-like pivoting and angle changes during boxing drills.</li>
-        <li><strong>Stability under impact:</strong> Hold commanded angle and withstand combined axial, radial, and overturning loads from upper-body punches without structural failure.</li>
-        <li><strong>Compact and coherent packaging:</strong> Integrate at the bottom of the lower-mechanism stack to maximise overturning resistance without intruding into the boxer's footwork zone.</li>
-        <li><strong>Smooth torque transmission:</strong> Avoid slip, backlash, and poor controllability during positioning to ensure the motion feels deliberate and responsive.</li>
-        <li><strong>Manufacturability:</strong> Remain buildable and serviceable at prototype scale using accessible components, avoiding oversized or overly specialised parts.</li>
-        <li><strong>Portability integration:</strong> Coexist sensibly with the low-profile base and rear wheel transport logic without hindering tip-and-roll deployment.</li>
-      </ul>
+
+      <h4>System Requirements</h4>
+      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and govern all rotation subsystem design decisions:</p>
+      <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:10%;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:30%;">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Yaw re-orientation at &ge; 150&deg;/s to reproduce coach-like pivoting and angle changes</td>
+            <td style="padding:8px; border:1px solid #ddd;">Boxing coaching motion analysis (§3.1), DO-2 (Intelligent Sparring), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hold commanded angle and withstand combined axial, radial, and overturning loads from punches without structural failure</td>
+            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load Analysis (§5.2.2.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Compact footprint: integrate at the bottom of the lower-mechanism stack without intruding into the boxer's footwork zone</td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (§4.3), boxing gym spatial constraints, <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Coexist with rear-wheel transport logic; rotation module must not hinder tip-and-roll deployment</td>
+            <td style="padding:8px; border:1px solid #ddd;">Deployment flexibility, DO-5 (Modular Boxing Platform), dependency on Base (§5.2.1)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Subsystem Acceptance Criteria</h4>
+      <p>
+        The following acceptance criteria were derived by identifying which design decisions in this subsystem introduce new failure modes not covered by the system-level requirements above.
+        <strong>ROT-AC-1</strong> arises because the choice of a <em>timing-belt transmission</em> introduces a tooth-skip failure mode under shock loads and rapid reversals that RM-4 (which specifies speed only) does not capture — the belt could technically reach 150&deg;/s and still fail mechanically.
+        <strong>ROT-AC-2</strong> arises because the <em>wireless-only UDP command path</em> (eliminating physical cables through the rotating joint) introduces a packet-loss failure mode that no system-level requirement previously addressed, since all RM codes are concerned with physical performance, not communication reliability.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#e8f0fe;">
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:10%;">ID</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left;">Acceptance Criterion</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:22%;">Derives From</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:24%;">Verification Test</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #c7d7f9;">ROT-AC-1</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Transmission &amp; support integrity: zero tooth-skip under shock load/reversal; stable belt tension; cam-followers maintain contact</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Timing-belt drive design (§5.2.2.4) — mechanical failure mode beyond RM-4 speed criterion</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Rapid accel/reversal test + off-axis punch loading on assembled drive</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #c7d7f9;">ROT-AC-2</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Communication reliability: command frame loss rate &lt; 1% over 1,000 frames via WiFi UDP</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Wireless-only command path (§5.2.2.5) — comms failure mode not addressed in any RM</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">1,000-frame UDP packet-loss test at 20 Hz from Jetson to Arduino</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:4px;">Table: Rotation Subsystem Requirements and Acceptance Criteria</p>
     </div>
+
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2b. SYSTEM DESIGN NARRATIVE (V-MODEL APPLICATION)      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>System Design Narrative</h3>
+      <p>
+        Following the Systems Engineering V-Model introduced in Section 3.2,
+        RM-4, RM-1, RM-2, RM-3, ROT-AC-1, and ROT-AC-2 were fixed before
+        detailed bearing, transmission, or electrical decisions were made. The
+        diagram below applies the V-Model to the Rotation subsystem specifically.
+      </p>
+
+      <div style="margin: 28px 0; text-align: center; overflow-x: auto;">
+        <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
+        <svg width="100%" viewBox="0 0 1100 560" role="img" font-family="Inter, system-ui, sans-serif" xmlns="http://www.w3.org/2000/svg">
+  <title>BoxBunny Rotation — Systems Engineering V-Model</title>
+  <desc>V-Model diagram for the BoxBunny boxing robot Rotation subsystem.</desc>
+  <defs>
+    <filter id="card-shadow-rot">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#94a3b8" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <!-- Canvas -->
+  <rect x="8" y="8" width="1084" height="544" rx="18" fill="#f8fafc" filter="url(#card-shadow-rot)" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Title -->
+  <text x="550" y="38" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b" font-family="Inter, system-ui, sans-serif">BoxBunny Rotation — Systems Engineering V-Model</text>
+  <!-- Section labels -->
+  <text x="175" y="60" text-anchor="middle" font-size="10" font-weight="600" fill="#1d4ed8" letter-spacing="1.2" font-family="Inter, system-ui, sans-serif">DESIGN DECOMPOSITION</text>
+  <text x="925" y="60" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d" letter-spacing="1.2" font-family="Inter, system-ui, sans-serif">VERIFICATION AND VALIDATION</text>
+  <!-- Guide lines -->
+  <line x1="36" y1="105" x2="1064" y2="105" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+  <line x1="36" y1="235" x2="1064" y2="235" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+  <line x1="36" y1="360" x2="1064" y2="360" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+  <!-- V-shape polylines -->
+  <polyline points="175,105 300,235 400,360 550,462" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+  <polyline points="550,462 700,360 800,235 925,105" fill="none" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+  <!-- NODE 01 · System Requirements -->
+  <rect x="45" y="71" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <circle cx="73" cy="105" r="12" fill="#2563eb"/>
+  <text x="73" y="109" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">01</text>
+  <text x="193" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">System Requirements</text>
+  <text x="193" y="109" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">RM-4, RM-1, RM-2, RM-3</text>
+  <text x="193" y="125" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">ROT-AC-1, ROT-AC-2 defined</text>
+  <!-- NODE 02 · Design Ideation -->
+  <rect x="170" y="201" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <circle cx="198" cy="235" r="12" fill="#2563eb"/>
+  <text x="198" y="239" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">02</text>
+  <text x="318" y="221" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Design Ideation</text>
+  <text x="318" y="239" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Bearing / motor / drive</text>
+  <text x="318" y="255" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">concept matrices</text>
+  <!-- NODE 03 · Mechanical Design -->
+  <rect x="270" y="326" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <circle cx="298" cy="360" r="12" fill="#2563eb"/>
+  <text x="298" y="364" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">03</text>
+  <text x="418" y="346" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Mechanical Design</text>
+  <text x="418" y="364" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Slewing ring, timing belt</text>
+  <text x="418" y="380" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Cam-follower supports</text>
+  <!-- NODE 04 · Yaw Module Assembly -->
+  <ellipse cx="550" cy="462" rx="145" ry="40" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <circle cx="430" cy="462" r="12" fill="#d97706"/>
+  <text x="430" y="466" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">04</text>
+  <text x="568" y="450" text-anchor="middle" font-size="13" font-weight="700" fill="#92400e" font-family="Inter, system-ui, sans-serif">Yaw Module Assembly</text>
+  <text x="568" y="467" text-anchor="middle" font-size="10" fill="#b45309" font-family="Inter, system-ui, sans-serif">Belt tensioned &amp; cams set</text>
+  <text x="568" y="483" text-anchor="middle" font-size="10" fill="#b45309" font-family="Inter, system-ui, sans-serif">WiFi interface online</text>
+  <!-- NODE 05 · Load Analysis -->
+  <rect x="570" y="326" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="598" cy="360" r="12" fill="#16a34a"/>
+  <text x="598" y="364" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">05</text>
+  <text x="718" y="346" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Load Analysis</text>
+  <text x="718" y="364" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Fa, Fr, Mk vs bearing</text>
+  <text x="718" y="380" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">envelope confirmed</text>
+  <!-- NODE 06 · Physical Testing -->
+  <rect x="670" y="201" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="698" cy="235" r="12" fill="#16a34a"/>
+  <text x="698" y="239" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">06</text>
+  <text x="818" y="221" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Physical Testing</text>
+  <text x="818" y="239" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Speed, punch disturbance</text>
+  <text x="818" y="255" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Transmission &amp; comms</text>
+  <!-- NODE 07 · Requirement Closure -->
+  <rect x="795" y="71" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="823" cy="105" r="12" fill="#16a34a"/>
+  <text x="823" y="109" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">07</text>
+  <text x="943" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Requirement Closure</text>
+  <text x="943" y="109" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">RM-4, RM-1, RM-2/3 → Validation</text>
+  <text x="943" y="125" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">ROT-AC-1/2 → Validation</text>
+  <!-- LEGEND -->
+  <rect x="30" y="518" width="1040" height="24" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="0.8"/>
+  <rect x="46" y="524" width="26" height="11" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.2"/>
+  <text x="78" y="534" font-size="10" font-weight="600" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Design Decomposition</text>
+  <rect x="272" y="524" width="26" height="11" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/>
+  <text x="304" y="534" font-size="10" font-weight="600" fill="#92400e" font-family="Inter, system-ui, sans-serif">Integration Build</text>
+  <rect x="460" y="524" width="26" height="11" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+  <text x="492" y="534" font-size="10" font-weight="600" fill="#14532d" font-family="Inter, system-ui, sans-serif">Verification &amp; Validation</text>
+  <line x1="692" y1="530" x2="720" y2="530" stroke="#2563eb" stroke-width="2"/>
+  <text x="726" y="534" font-size="10" fill="#1e40af" font-family="Inter, system-ui, sans-serif">Design arm</text>
+  <line x1="826" y1="530" x2="854" y2="530" stroke="#16a34a" stroke-width="2"/>
+  <text x="860" y="534" font-size="10" fill="#166534" font-family="Inter, system-ui, sans-serif">V&amp;V arm</text>
+</svg>
+        </div>
+        <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
+          Figure: Rotation Subsystem V-Model — requirement decomposition (left), yaw module integration (centre), and test verification closure (right) for RM-4, RM-1, RM-2, RM-3, ROT-AC-1, and ROT-AC-2.
+        </sub>
+      </div>
+
+      <h4>Left Side of the V: Design Decomposition</h4>
+      <p>
+        RM-4 (yaw speed) drove the selection of the BLDC servo motor with a 25:1 planetary gearbox and the S8M timing-belt transmission at a 1:3.5 pulley ratio.
+        RM-1 (structural stability) drove the choice of the 010.10.120 four-point contact slewing ring over a lighter turntable bearing, and the addition of discrete cam-follower edge supports.
+        RM-2 (compact footprint) constrained the drive system to remain off-axis on the fixed base, keeping the rotating stage low-profile.
+        RM-3 (portability coexistence) ensured the rear transport interfaces were positioned away from the bearing and belt routing.
+        ROT-AC-1 and ROT-AC-2 drove the tooth-skip mitigation strategy and the WiFi UDP communication architecture respectively.
+      </p>
+
+      <h4>Base of the V: Integration Build</h4>
+      <p>
+        At integration stage, the slewing ring, timing-belt drive, cam-follower supports, motor controller (Arduino Uno R4 WiFi), and AS5047P encoder were assembled into a unified yaw module. Belt tension was set, cam-follower track contact was confirmed, and the wireless command interface was brought online against the Jetson host.
+      </p>
+
+      <h4>Right Side of the V: Verification Closure</h4>
+      <p>
+        Verification is planned against the same requirements used during decomposition. Physical speed testing will close RM-4 (sustained &ge; 150&deg;/s confirmed against encoder logs). Lateral punch testing will close RM-1 (&le; 5&deg; deflection, recovery within 500 ms). Transmission integrity testing will close ROT-AC-1 (zero tooth-skip under shock and reversal). UDP packet-loss testing will close ROT-AC-2 (&lt; 1% loss). Full test procedures are in <a href="rotation/testing-evaluation.html">Testing &amp; Evaluation</a>.
+      </p>
+    </div>
+
+
 
     <sl-divider></sl-divider>
 
@@ -311,19 +497,52 @@
       <table style="width:100%; border-collapse:collapse; margin:0 0 16px 0; font-size:0.9rem;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Req</th>
-            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Description</th>
-            <th style="padding:8px; border:1px solid #ddd; text-align:center;">System-Level Status</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:9%;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:22%;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:25%;">Verification Method</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Measured Result</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:center; width:10%;">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
-            <td style="padding:8px; border:1px solid #ddd;">Yaw rotation at target angular velocity ~150&deg;/s</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#78716c;">Pending: calculated 205.7&deg;/s analytically; physical test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd;">Yaw angular velocity &ge; 150&deg;/s</td>
+            <td style="padding:8px; border:1px solid #ddd;">Physical speed test via encoder logs (90&deg; step, &le; 0.6 s)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Analysis confirms 34.3 rpm / 205.7&deg;/s capability; physical confirmation pending</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Hold commanded angle under punch loads (&le; 5&deg; deflection)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Lateral punch test (50 N), AS5047P encoder logs</td>
+            <td style="padding:8px; border:1px solid #ddd;">Slewing-ring and cam-follower architecture designed for combined-load capacity; physical test pending</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-2 / RM-3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Compact footprint; portability coexistence with base</td>
+            <td style="padding:8px; border:1px solid #ddd;">Package inspection; tip-and-roll test with rotation module integrated</td>
+            <td style="padding:8px; border:1px solid #ddd;">Off-axis motor keeps rotating stage low-profile; rear transport integration designed</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">ROT-AC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Transmission integrity (zero tooth-skip under shock/reversal)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Rapid acceleration/reversal and off-axis punch test on assembled drive</td>
+            <td style="padding:8px; border:1px solid #ddd;">S8M belt, 32 mm width, 70-tooth driven pulley, stiff mount — design basis sound; physical test pending</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">ROT-AC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">WiFi UDP frame loss &lt; 1% over 1,000 frames</td>
+            <td style="padding:8px; border:1px solid #ddd;">1,000-frame UDP packet-loss test at 20 Hz</td>
+            <td style="padding:8px; border:1px solid #ddd;">Arduino Uno R4 WiFi + UDP architecture implemented; packet-loss test pending</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
         </tbody>
       </table>
+
       <p>
         At the current stage, the rotation subsystem has been validated partly through <strong>concept selection, load-path reasoning, and transmission calculations</strong>, and partly through the coherence of the realised CAD assembly. It has not yet been fully validated through all intended physical tests.
       </p>
@@ -489,5 +708,39 @@
   </script>
   <script type="module" src="../../components/table-component/table-component.js"></script>
   <script src="../../components/table-component/tables.js"></script>
+  <!-- V-Model lightbox -->
+  <dialog id="vmodel-lightbox" style="border:none;border-radius:16px;padding:0;max-width:96vw;width:96vw;background:transparent;box-shadow:0 8px 48px rgba(0,0,0,0.32);">
+    <div style="position:relative;">
+      <button id="vmodel-close" aria-label="Close" style="position:absolute;top:10px;right:14px;z-index:10;background:#1e293b;color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;line-height:1;">&times;</button>
+      <div id="vmodel-lightbox-content" style="padding:0;"></div>
+    </div>
+  </dialog>
+  <style>
+    .vmodel-wrap { cursor: zoom-in; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; }
+    .vmodel-wrap:hover { box-shadow: 0 4px 24px rgba(37,99,235,0.18); }
+    .vmodel-wrap:focus { outline: 2px solid #2563eb; outline-offset: 3px; }
+    #vmodel-lightbox::backdrop { background: rgba(15,23,42,0.72); backdrop-filter: blur(2px); }
+    #vmodel-lightbox svg { width: 100%; display: block; }
+  </style>
+  <script>
+    (function () {
+      var wraps = document.querySelectorAll('.vmodel-wrap');
+      var dialog = document.getElementById('vmodel-lightbox');
+      var content = document.getElementById('vmodel-lightbox-content');
+      var closeBtn = document.getElementById('vmodel-close');
+      wraps.forEach(function (w) {
+        function openLightbox() {
+          var svg = w.querySelector('svg');
+          if (!svg || !dialog) return;
+          content.innerHTML = svg.outerHTML;
+          dialog.showModal();
+        }
+        w.addEventListener('click', openLightbox);
+        w.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(); } });
+      });
+      if (closeBtn) closeBtn.addEventListener('click', function () { dialog.close(); });
+      if (dialog) dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+    })();
+  </script>
 </body>
 </html>

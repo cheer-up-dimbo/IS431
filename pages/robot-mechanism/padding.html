@@ -44,18 +44,183 @@
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Requirements &amp; Considerations</h3>
-      <p>Responds to system-level requirement <strong>RM-6</strong>
-        (<em>Absorb repeated strikes without damage; provide impact
-        detection</em>) defined in the
-        <a href="../robot-mechanism.html">Robot Mechanism</a> landing page:
+      <p>
+        This subsystem addresses <a href="../../index.html#secondary-research">DO-1</a> (Performance Analytics) and
+        <a href="../../index.html#secondary-research">DO-4</a> (Adaptive Fight Intelligence).
+        Requirements were derived from the need to absorb repeated punch impacts safely and provide strike-zone discrimination for training analytics.
       </p>
-      <ul>
-        <li><strong>User safety:</strong> Low-threat, lightweight contact surface preventing over-extension injuries.</li>
-        <li><strong>Structural protection:</strong> Isolate 3D-printed drivetrain and electronics from repeated impacts.</li>
-        <li><strong>Sensing fidelity:</strong> IMU sensors must detect impacts above threshold without motion contamination.</li>
-        <li><strong>Training realism:</strong> Polyethylene foam training sticks encourage realistic defensive engagement.</li>
-      </ul>
+
+      <h4>System Requirements</h4>
+      <p>The following system-level requirement is inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and governs all padding design decisions:</p>
+      <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:10%;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:30%;">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-6</td>
+            <td style="padding:8px; border:1px solid #ddd;">Absorb repeated strikes without damage; provide impact detection across all three target zones (Head, Celiac Plexus, Liver)</td>
+            <td style="padding:8px; border:1px solid #ddd;">DO-1 (Performance Analytics), DO-4 (Adaptive Fight Intelligence), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Subsystem Acceptance Criteria</h4>
+      <p>
+        The following acceptance criteria were derived from design decisions specific to this subsystem that introduce failure modes not captured by the system-level requirement above.
+        <strong>PAD-AC-1</strong> arises because RM-6 states "provide impact detection" but does not specify a minimum detection rate — the choice to use an <em>IMU threshold-based algorithm</em> (L2 norm &ge; 2.0 g) introduces a miss-detection failure mode driven by threshold calibration, sensor placement, and padding damping. A 95% true-positive rate is needed to make training analytics meaningful.
+        <strong>PAD-AC-2</strong> arises because RM-6 does not specify that the sensing system must <em>differentiate</em> force intensity — the IMU L2 vector norm response must be monotonically ordered (light &lt; medium &lt; heavy) for the analytics layer to provide meaningful skill-level feedback. This is a data-quality failure mode not captured by any RM code.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#e8f0fe;">
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:10%;">ID</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left;">Acceptance Criterion</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:22%;">Derives From</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:24%;">Verification Test</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #c7d7f9;">PAD-AC-1</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">IMU strike detection rate &ge; 95% true positive across all three zones (60-punch controlled test)</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">IMU threshold algorithm (L2 norm &ge; 2.0 g) — detection-rate failure mode not specified in RM-6</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">20 controlled punches × 3 zones = 60 total; &ge; 57 detected for pass</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #c7d7f9;">PAD-AC-2</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Impact force differentiation monotonic: mean L2 norm light &lt; medium &lt; heavy (3 users, one-way ANOVA p &lt; 0.05)</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">IMU L2 norm analytics (§5.2.4.2) — force-differentiation quality not addressed in RM-6</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">3 users × 30 punches (10 per intensity); ANOVA on L2 norm distributions</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:4px;">Table: Padding Subsystem Requirements and Acceptance Criteria</p>
     </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2b. SYSTEM DESIGN NARRATIVE (V-MODEL APPLICATION)      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>System Design Narrative</h3>
+      <p>
+        Following the Systems Engineering V-Model introduced in Section 3.2,
+        RM-6, PAD-AC-1, and PAD-AC-2 were fixed before detailed foam selection, sensor placement, or detection algorithm decisions were made.
+        The diagram below applies the V-Model to the Padding subsystem specifically.
+      </p>
+
+      <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
+      <svg width="100%" viewBox="0 0 1100 560" role="img" font-family="Inter, system-ui, sans-serif" xmlns="http://www.w3.org/2000/svg">
+        <title>BoxBunny Padding — Systems Engineering V-Model</title>
+        <desc>V-Model diagram for the BoxBunny boxing robot Padding subsystem.</desc>
+        <defs>
+          <filter id="card-shadow-pad">
+            <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#94a3b8" flood-opacity="0.18"/>
+          </filter>
+        </defs>
+        <rect x="8" y="8" width="1084" height="544" rx="18" fill="#f8fafc" filter="url(#card-shadow-pad)" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="550" y="38" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b" font-family="Inter, system-ui, sans-serif">BoxBunny Padding — Systems Engineering V-Model</text>
+        <text x="175" y="60" text-anchor="middle" font-size="10" font-weight="600" fill="#1d4ed8" letter-spacing="1.2" font-family="Inter, system-ui, sans-serif">DESIGN DECOMPOSITION</text>
+        <text x="925" y="60" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d" letter-spacing="1.2" font-family="Inter, system-ui, sans-serif">VERIFICATION AND VALIDATION</text>
+        <line x1="36" y1="105" x2="1064" y2="105" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+        <line x1="36" y1="235" x2="1064" y2="235" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+        <line x1="36" y1="360" x2="1064" y2="360" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+        <polyline points="175,105 300,235 400,360 550,462" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="550,462 700,360 800,235 925,105" fill="none" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+        <!-- NODE 01 · System Requirements -->
+        <rect x="45" y="71" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <circle cx="73" cy="105" r="12" fill="#2563eb"/>
+        <text x="73" y="109" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">01</text>
+        <text x="193" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">System Requirements</text>
+        <text x="193" y="109" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">RM-6</text>
+        <text x="193" y="125" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">PAD-AC-1, PAD-AC-2 defined</text>
+        <!-- NODE 02 · Mechanical Design -->
+        <rect x="170" y="201" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <circle cx="198" cy="235" r="12" fill="#2563eb"/>
+        <text x="198" y="239" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">02</text>
+        <text x="318" y="221" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Mechanical Design</text>
+        <text x="318" y="239" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Multi-layer foam</text>
+        <text x="318" y="255" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Isolation mounts</text>
+        <!-- NODE 03 · Electrical Integration -->
+        <rect x="270" y="326" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <circle cx="298" cy="360" r="12" fill="#2563eb"/>
+        <text x="298" y="364" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">03</text>
+        <text x="418" y="346" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Electrical Integration</text>
+        <text x="418" y="364" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Quad-IMU I²C topology</text>
+        <text x="418" y="380" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">L2 norm pipeline</text>
+        <!-- NODE 04 · Padding Assembly -->
+        <ellipse cx="550" cy="462" rx="145" ry="40" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+        <circle cx="430" cy="462" r="12" fill="#d97706"/>
+        <text x="430" y="466" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">04</text>
+        <text x="568" y="450" text-anchor="middle" font-size="13" font-weight="700" fill="#92400e" font-family="Inter, system-ui, sans-serif">Padding Assembly</text>
+        <text x="568" y="467" text-anchor="middle" font-size="10" fill="#b45309" font-family="Inter, system-ui, sans-serif">4× IMU wired &amp; confirmed</text>
+        <text x="568" y="483" text-anchor="middle" font-size="10" fill="#b45309" font-family="Inter, system-ui, sans-serif">/strike_events active</text>
+        <!-- NODE 05 · IMU Calibration -->
+        <rect x="570" y="326" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+        <circle cx="598" cy="360" r="12" fill="#16a34a"/>
+        <text x="598" y="364" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">05</text>
+        <text x="718" y="346" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">IMU Calibration</text>
+        <text x="718" y="364" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Threshold 2.0 g</text>
+        <text x="718" y="380" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Bus-hang HARD STOP</text>
+        <!-- NODE 06 · Controlled Tests -->
+        <rect x="670" y="201" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+        <circle cx="698" cy="235" r="12" fill="#16a34a"/>
+        <text x="698" y="239" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">06</text>
+        <text x="818" y="221" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Controlled Tests</text>
+        <text x="818" y="239" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">60-punch detection</text>
+        <text x="818" y="255" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">L2 norm monotonicity</text>
+        <!-- NODE 07 · Requirement Closure -->
+        <rect x="795" y="71" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+        <circle cx="823" cy="105" r="12" fill="#16a34a"/>
+        <text x="823" y="109" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">07</text>
+        <text x="943" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Validation</text>
+        <text x="943" y="109" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">RM-6, PAD-AC-1</text>
+        <text x="943" y="125" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">PAD-AC-2</text>
+        <!-- LEGEND -->
+        <rect x="30" y="518" width="1040" height="24" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="0.8"/>
+        <rect x="46" y="524" width="26" height="11" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.2"/>
+        <text x="78" y="534" font-size="10" font-weight="600" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Design Decomposition</text>
+        <rect x="272" y="524" width="26" height="11" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/>
+        <text x="304" y="534" font-size="10" font-weight="600" fill="#92400e" font-family="Inter, system-ui, sans-serif">Integration Build</text>
+        <rect x="460" y="524" width="26" height="11" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+        <text x="492" y="534" font-size="10" font-weight="600" fill="#14532d" font-family="Inter, system-ui, sans-serif">Verification &amp; Validation</text>
+        <line x1="692" y1="530" x2="720" y2="530" stroke="#2563eb" stroke-width="2"/>
+        <text x="726" y="534" font-size="10" fill="#1e40af" font-family="Inter, system-ui, sans-serif">Design arm</text>
+        <line x1="826" y1="530" x2="854" y2="530" stroke="#16a34a" stroke-width="2"/>
+        <text x="860" y="534" font-size="10" fill="#166534" font-family="Inter, system-ui, sans-serif">V&amp;V arm</text>
+      </svg>
+      </div>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Figure: Systems Engineering V-Model for the BoxBunny Padding subsystem, tracing RM-6, PAD-AC-1, and PAD-AC-2 from design decomposition through integration to verification closure.</p>
+
+
+      <h4>Left Side of the V: Design Decomposition</h4>
+      <p>
+        RM-6 (absorb strikes + impact detection) drove the multi-layer padding architecture: polyethylene foam outer layer, anti-vibration isolation mounts to protect the drivetrain, and MPU6050 IMU sensors embedded between the foam surface and the isolation interface.
+        PAD-AC-1 (95% detection rate) drove the IMU threshold calibration (L2 norm ≥ 2.0 g), the dual-bus I²C topology (four sensors across two hardware buses on Teensy 4.0), and the Hard STOP bus-hang recovery protocol.
+        PAD-AC-2 (force differentiation) drove using the L2 norm magnitude as the sensing metric rather than a binary threshold, ensuring graded response across punch intensities.
+      </p>
+
+      <h4>Base of the V: Integration Build</h4>
+      <p>
+        At integration stage, the foam pads with embedded IMU sensors were mounted to the arm assembly via anti-vibration isolation mounts. Four MPU6050 sensors were wired across two I²C buses on the Teensy 4.0, firmware initialised and confirmed communicating, and the <code>/strike_events</code> ROS 2 topic was verified publishing correctly during initial impact tests.
+      </p>
+
+      <h4>Right Side of the V: Verification Closure</h4>
+      <p>
+        PAD-AC-1 closes via the 60-punch controlled detection test (≥ 57 punches detected).
+        PAD-AC-2 closes via the L2-norm monotonicity test (3 users × 3 intensities, one-way ANOVA).
+        RM-6 (structural survivability) closes via the 200-punch mechanical endurance test.
+        Full test procedures are in <a href="padding/testing-evaluation.html">Testing &amp; Evaluation</a>.
+      </p>
+    </div>
+
+
 
     <sl-divider></sl-divider>
 
@@ -220,61 +385,45 @@
     <div>
       <h3>Validation</h3>
       <p>
-        The following table summarises the system-level requirement mapping for the padding subsystem, corresponding to the
+        The following table summarises the verification outcome for the padding subsystem, tracing closure back to the
         <a href="../robot-mechanism.html#verification">Robot Mechanism verification matrix</a>.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:0 0 16px 0; font-size:0.9rem;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Req</th>
-            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Description</th>
-            <th style="padding:8px; border:1px solid #ddd; text-align:center;">System-Level Status</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:9%;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:22%;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:25%;">Verification Method</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Measured Result</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:center; width:10%;">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-6</td>
-            <td style="padding:8px; border:1px solid #ddd;">Absorb repeated strikes without damage; provide impact detection (&ge; 95% true positive)</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#78716c;">Pending: 60-punch controlled test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd;">Absorb repeated strikes without damage; multi-layer foam survives 200-punch endurance session</td>
+            <td style="padding:8px; border:1px solid #ddd;">200-punch mechanical endurance test; visual inspection post-session</td>
+            <td style="padding:8px; border:1px solid #ddd;">Multi-layer foam + isolation mount design confirmed; formal 200-punch endurance test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-AC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate &ge; 95% true positive (60-punch test across 3 zones)</td>
+            <td style="padding:8px; border:1px solid #ddd;">20 punches × 3 zones; &ge; 57 detected for pass; GUI IMU Diagnostics Tab + video evidence</td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU 4-sensor topology confirmed operational; 60-punch controlled test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-AC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">L2 norm force differentiation monotonic: light &lt; medium &lt; heavy (3 users, ANOVA p &lt; 0.05)</td>
+            <td style="padding:8px; border:1px solid #ddd;">3 users × 30 punches; one-way ANOVA on L2 norm distributions per intensity level</td>
+            <td style="padding:8px; border:1px solid #ddd;">L2 norm algorithm implemented and verified in integration; statistical differentiation test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
         </tbody>
       </table>
-      <p>
-        The padding subsystem is validated against two system-level
-        performance criteria from the
-        <a href="padding/testing-evaluation.html">Testing
-        &amp; Evaluation</a> page:
-      </p>
-      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd;">ID</th>
-            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
-            <th style="padding:8px; border:1px solid #ddd;">Target</th>
-            <th style="padding:8px; border:1px solid #ddd;">Mapping</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-1</td>
-            <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
-            <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
-            <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-2</td>
-            <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
-            <td style="padding:8px; border:1px solid #ddd;">Monotonic increase: light &lt; medium &lt; heavy</td>
-            <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm (3 users)</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>Additional mechanical validation:</p>
-      <ul>
-        <li><strong>Mechanical:</strong> Padding survives repeated high-velocity strikes without delamination.</li>
-        <li><strong>Electrical:</strong> IMU I²C communication reliable during active sparring (Hard STOP protocol eliminates bus hang).</li>
-      </ul>
     </div>
+
 
 
 
@@ -298,7 +447,7 @@
         <a href="padding/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
           <h3>Testing &amp; Evaluation</h3>
-          <p>PAD-PC-1 detection rate, PAD-PC-2 force differentiation, endurance testing</p>
+          <p>PAD-AC-1 detection rate, PAD-AC-2 force differentiation, endurance testing</p>
         </a>
 
       </div>
@@ -328,5 +477,39 @@
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
     <sl-icon name="arrow-up" label="Settings"></sl-icon>
   </sl-button>
+  <!-- V-Model lightbox -->
+  <dialog id="vmodel-lightbox" style="border:none;border-radius:16px;padding:0;max-width:96vw;width:96vw;background:transparent;box-shadow:0 8px 48px rgba(0,0,0,0.32);">
+    <div style="position:relative;">
+      <button id="vmodel-close" aria-label="Close" style="position:absolute;top:10px;right:14px;z-index:10;background:#1e293b;color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;line-height:1;">&times;</button>
+      <div id="vmodel-lightbox-content" style="padding:0;"></div>
+    </div>
+  </dialog>
+  <style>
+    .vmodel-wrap { cursor: zoom-in; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; }
+    .vmodel-wrap:hover { box-shadow: 0 4px 24px rgba(37,99,235,0.18); }
+    .vmodel-wrap:focus { outline: 2px solid #2563eb; outline-offset: 3px; }
+    #vmodel-lightbox::backdrop { background: rgba(15,23,42,0.72); backdrop-filter: blur(2px); }
+    #vmodel-lightbox svg { width: 100%; display: block; }
+  </style>
+  <script>
+    (function () {
+      var wraps = document.querySelectorAll('.vmodel-wrap');
+      var dialog = document.getElementById('vmodel-lightbox');
+      var content = document.getElementById('vmodel-lightbox-content');
+      var closeBtn = document.getElementById('vmodel-close');
+      wraps.forEach(function (w) {
+        function openLightbox() {
+          var svg = w.querySelector('svg');
+          if (!svg || !dialog) return;
+          content.innerHTML = svg.outerHTML;
+          dialog.showModal();
+        }
+        w.addEventListener('click', openLightbox);
+        w.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(); } });
+      });
+      if (closeBtn) closeBtn.addEventListener('click', function () { dialog.close(); });
+      if (dialog) dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+    })();
+  </script>
 </body>
 </html>

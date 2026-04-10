@@ -34,8 +34,8 @@
       <sl-icon slot="icon" name="check-circle"></sl-icon>
       <strong>V-Model Traceability:</strong> This page validates
       <strong>RM-6</strong> (<em>Absorb repeated strikes without damage;
-      provide impact detection</em>) through performance criteria PAD-PC-1 and
-      PAD-PC-2, plus additional subsystem-level tests designed to ensure
+      provide impact detection</em>) through acceptance criteria PAD-AC-1 and
+      PAD-AC-2, plus additional subsystem-level tests designed to ensure
       reliability under real sparring conditions.
     </sl-alert>
 
@@ -48,7 +48,7 @@
       <h3>Performance Criteria</h3>
       <p>
         The padding subsystem is validated against the following
-        performance criteria, cascading from system-level requirement
+        acceptance criteria, cascading from system-level requirement
         <strong>RM-6</strong>:
       </p>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
@@ -63,14 +63,14 @@
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-AC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU strike detection rate</td>
             <td style="padding:8px; border:1px solid #ddd;">≥ 95% true positive</td>
             <td style="padding:8px; border:1px solid #ddd;">60-punch controlled test across three body zones</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">PAD-PC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">PAD-AC-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact force differentiation</td>
             <td style="padding:8px; border:1px solid #ddd;">Monotonic: light &lt; medium &lt; heavy</td>
             <td style="padding:8px; border:1px solid #ddd;">IMU L2 vector norm comparison (3 users)</td>
@@ -81,13 +81,14 @@
 
       <sl-alert variant="neutral" open>
         <sl-icon slot="icon" name="link-45deg"></sl-icon>
-        <strong>Cross-reference:</strong> PAD-PC-1 and PAD-PC-2 also appear on the
+        <strong>Cross-reference:</strong> PAD-AC-1 and PAD-AC-2 also appear on the
         <a href="../arm-actuation/testing-evaluation.html">Arm Actuation
         Testing &amp; Evaluation</a> page, since they validate the
         integration between the padding IMU pipeline and the arm's FSM
         response.
       </sl-alert>
     </div>
+
 
     <sl-divider></sl-divider>
 
@@ -97,7 +98,7 @@
     <div>
       <h3>Test Procedures</h3>
 
-      <h4>PAD-PC-1: Strike Detection Rate Test</h4>
+      <h4>PAD-AC-1: Strike Detection Rate Test</h4>
       <p>
         <strong>Equipment:</strong> BoxBunny robot (arm stationary at nominal
         height), padding assembly with 4× MPU6050 IMUs active, GUI V3 with
@@ -115,7 +116,7 @@
         test session.
       </p>
 
-      <h4>PAD-PC-2: Force Differentiation Test</h4>
+      <h4>PAD-AC-2: Force Differentiation Test</h4>
       <p>
         <strong>Equipment:</strong> Three users of different skill levels,
         GUI V3 with L2 norm logging.<br>

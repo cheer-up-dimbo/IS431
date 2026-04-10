@@ -59,17 +59,199 @@
     <div>
       <h3>Requirements &amp; Considerations</h3>
       <p>
-        The height-adjustment subsystem responds to system-level requirement <strong>RM-3</strong>
-        (<em>Provide &ge; 400 mm vertical stroke</em>), along with several subsystem-specific
-        engineering considerations:
+        This subsystem addresses <a href="../../index.html#secondary-research">DO-5</a> (Modular Boxing Platform) and
+        <a href="../../index.html#secondary-research">DO-2</a> (Intelligent Sparring System).
+        Requirements were derived from the user height range, structural loading during punching, and the need for safe, self-locking actuation.
       </p>
-      <ul>
-        <li><strong>Vertical stroke:</strong> Provide a minimum stroke of 400 mm to reposition the head and torso targets across a meaningful user height range, preserving anatomically credible target alignment.</li>
-        <li><strong>Practical setup speed:</strong> Adjust vertically in a reasonable time for gym and demo setup. The engineering target is approximately 32 seconds over the full 400 mm stroke (&approx; 0.75 m/min). The ideal user preference of ~10 seconds is aspirational but constrained by the current actuator choice.</li>
-        <li><strong>Structural separation:</strong> Do not compromise the robot's ability to resist punching disturbances. The lifting actuator must be isolated from lateral punching loads to avoid side-loading, binding, and wear.</li>
-        <li><strong>Robustness &amp; safety:</strong> Operate safely in public demo or workshop conditions where minor bumps and start-stop transients are realistic (requiring a light-shock service factor of ~1.5). The mechanism must be self-locking to prevent back-driving under load.</li>
-        <li><strong>Manufacturability:</strong> Remain robust at prototype scale by avoiding excessive part count, tolerance stack-up, and overly delicate guide hardware.</li>
-      </ul>
+
+      <h4>System Requirements</h4>
+      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and govern all height-adjustment design decisions:</p>
+      <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:10%;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:30%;">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Provide &ge; 400 mm vertical stroke for height adjustment; full stroke completed in &le; 32 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">User height range 150–190 cm (§4.3), DO-5 (Modular Boxing Platform), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Remain upright and maintain alignment under combined axial and lateral punch loads without structural failure</td>
+            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load &amp; Stability Analysis (§5.2.1.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Compact footprint: mechanism must not intrude into boxer's footwork zone during height adjustment or at rest</td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (§4.3), boxing gym spatial constraints</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Subsystem Acceptance Criteria</h4>
+      <p>
+        The following acceptance criteria were derived from design decisions specific to this subsystem that introduce failure modes not captured by the system-level requirements above.
+        <strong>HA-AC-1</strong> arises because the choice of a <em>motorised screw-jack drive</em> introduces a speed-limitation failure mode: RM-5 specifies stroke and time, but does not address whether the chosen actuator's back-calculated ~800 rpm input requirement can be reliably delivered under load by the selected DC motor. This is a sub-requirement of speed capability, not of stroke provision.
+        <strong>HA-AC-2</strong> arises because the <em>Delrin wear-pad guide interface</em> introduces a long-term wear failure mode — the column geometry and load-path separation may be correct, but if the pads wear excessively, the column will develop backlash and lose the stiffness that satisfies RM-1. This is not captured by any RM code.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#e8f0fe;">
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:10%;">ID</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left;">Acceptance Criterion</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:22%;">Derives From</th>
+            <th style="padding:8px; border:1px solid #c7d7f9; text-align:left; width:24%;">Verification Test</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #c7d7f9;">HA-AC-1</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Full 400 mm stroke completed in &le; 32 s under full payload (22.5 kg design load); no stalling or drive degradation over 5 consecutive cycles</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Screw-jack/motor drive (§5.2.3.3) — speed capability failure mode not fully specified by RM-5 alone</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Timed full-stroke test under load, 5 consecutive cycles</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #c7d7f9;">HA-AC-2</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Delrin guide pad wear: &lt; 1 mm surface wear after 200 adjustment cycles; column backlash &lt; 2 mm lateral play at top of stroke</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Delrin wear-pad guide design (§5.2.3.2) — long-term wear failure mode not captured by RM-1 or RM-5</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">200-cycle endurance test; micrometer wear measurement and lateral backlash check</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:4px;">Table: Height Adjustment Subsystem Requirements and Acceptance Criteria</p>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2b. SYSTEM DESIGN NARRATIVE (V-MODEL APPLICATION)      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
+      <h3>System Design Narrative</h3>
+      <p>
+        Following the Systems Engineering V-Model introduced in Section 3.2,
+        RM-5, RM-1, RM-2, HA-AC-1, and HA-AC-2 were fixed before detailed actuator, column, or control decisions were made.
+        The diagram below applies the V-Model to the Height Adjustment subsystem specifically.
+      </p>
+
+      <div style="margin: 28px 0; text-align: center; overflow-x: auto;">
+        <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
+        <svg width="100%" viewBox="0 0 1100 560" role="img" font-family="Inter, system-ui, sans-serif" xmlns="http://www.w3.org/2000/svg">
+  <title>BoxBunny Height Adjustment — Systems Engineering V-Model</title>
+  <desc>V-Model diagram for the BoxBunny boxing robot Height Adjustment subsystem.</desc>
+  <defs>
+    <filter id="card-shadow-ha">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#94a3b8" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <!-- Canvas -->
+  <rect x="8" y="8" width="1084" height="544" rx="18" fill="#f8fafc" filter="url(#card-shadow-ha)" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Title -->
+  <text x="550" y="38" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b" font-family="Inter, system-ui, sans-serif">BoxBunny Height Adjustment — Systems Engineering V-Model</text>
+  <!-- Section labels -->
+  <text x="175" y="60" text-anchor="middle" font-size="10" font-weight="600" fill="#1d4ed8" letter-spacing="1.2" font-family="Inter, system-ui, sans-serif">DESIGN DECOMPOSITION</text>
+  <text x="925" y="60" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d" letter-spacing="1.2" font-family="Inter, system-ui, sans-serif">VERIFICATION AND VALIDATION</text>
+  <!-- Guide lines -->
+  <line x1="36" y1="105" x2="1064" y2="105" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+  <line x1="36" y1="235" x2="1064" y2="235" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+  <line x1="36" y1="360" x2="1064" y2="360" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="5 5"/>
+  <!-- V-shape polylines -->
+  <polyline points="175,105 300,235 400,360 550,462" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+  <polyline points="550,462 700,360 800,235 925,105" fill="none" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+  <!-- NODE 01 · System Requirements -->
+  <rect x="45" y="71" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <circle cx="73" cy="105" r="12" fill="#2563eb"/>
+  <text x="73" y="109" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">01</text>
+  <text x="193" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">System Requirements</text>
+  <text x="193" y="109" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">RM-5, RM-1, RM-2</text>
+  <text x="193" y="125" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">HA-AC-1, HA-AC-2 defined</text>
+  <!-- NODE 02 · Design Ideation -->
+  <rect x="170" y="201" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <circle cx="198" cy="235" r="12" fill="#2563eb"/>
+  <text x="198" y="239" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">02</text>
+  <text x="318" y="221" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Design Ideation</text>
+  <text x="318" y="239" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Stroke, guide &amp; actuator</text>
+  <text x="318" y="255" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">concept matrices</text>
+  <!-- NODE 03 · Mechanical Design -->
+  <rect x="270" y="326" width="260" height="68" rx="28" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <circle cx="298" cy="360" r="12" fill="#2563eb"/>
+  <text x="298" y="364" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">03</text>
+  <text x="418" y="346" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Mechanical Design</text>
+  <text x="418" y="364" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Telescopic column</text>
+  <text x="418" y="380" text-anchor="middle" font-size="10" fill="#1d4ed8" font-family="Inter, system-ui, sans-serif">Screw-jack integration</text>
+  <!-- NODE 04 · Height Adj. Assembly -->
+  <ellipse cx="550" cy="462" rx="145" ry="40" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <circle cx="430" cy="462" r="12" fill="#d97706"/>
+  <text x="430" y="466" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">04</text>
+  <text x="568" y="450" text-anchor="middle" font-size="13" font-weight="700" fill="#92400e" font-family="Inter, system-ui, sans-serif">Height Adj. Assembly</text>
+  <text x="568" y="467" text-anchor="middle" font-size="10" fill="#b45309" font-family="Inter, system-ui, sans-serif">Motor coupled &amp; stroke set</text>
+  <text x="568" y="483" text-anchor="middle" font-size="10" fill="#b45309" font-family="Inter, system-ui, sans-serif">Delrin pads confirmed</text>
+  <!-- NODE 05 · Load Analysis -->
+  <rect x="570" y="326" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="598" cy="360" r="12" fill="#16a34a"/>
+  <text x="598" y="364" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">05</text>
+  <text x="718" y="346" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Load Analysis</text>
+  <text x="718" y="364" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Payload 22.5 kg, 800 rpm</text>
+  <text x="718" y="380" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">motor calc verified</text>
+  <!-- NODE 06 · Physical Testing -->
+  <rect x="670" y="201" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="698" cy="235" r="12" fill="#16a34a"/>
+  <text x="698" y="239" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">06</text>
+  <text x="818" y="221" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Physical Testing</text>
+  <text x="818" y="239" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">Stroke, deflection, wear</text>
+  <text x="818" y="255" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">200-cycle endurance</text>
+  <!-- NODE 07 · Requirement Closure -->
+  <rect x="795" y="71" width="260" height="68" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <circle cx="823" cy="105" r="12" fill="#16a34a"/>
+  <text x="823" y="109" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff" font-family="Inter, system-ui, sans-serif">07</text>
+  <text x="943" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d" font-family="Inter, system-ui, sans-serif">Requirement Closure</text>
+  <text x="943" y="109" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">RM-5/1/2, HA-AC-1 → Validation</text>
+  <text x="943" y="125" text-anchor="middle" font-size="10" fill="#15803d" font-family="Inter, system-ui, sans-serif">HA-AC-2 → Validation</text>
+  <!-- LEGEND -->
+  <rect x="30" y="518" width="1040" height="24" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="0.8"/>
+  <rect x="46" y="524" width="26" height="11" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.2"/>
+  <text x="78" y="534" font-size="10" font-weight="600" fill="#1e3a8a" font-family="Inter, system-ui, sans-serif">Design Decomposition</text>
+  <rect x="272" y="524" width="26" height="11" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/>
+  <text x="304" y="534" font-size="10" font-weight="600" fill="#92400e" font-family="Inter, system-ui, sans-serif">Integration Build</text>
+  <rect x="460" y="524" width="26" height="11" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+  <text x="492" y="534" font-size="10" font-weight="600" fill="#14532d" font-family="Inter, system-ui, sans-serif">Verification &amp; Validation</text>
+  <line x1="692" y1="530" x2="720" y2="530" stroke="#2563eb" stroke-width="2"/>
+  <text x="726" y="534" font-size="10" fill="#1e40af" font-family="Inter, system-ui, sans-serif">Design arm</text>
+  <line x1="826" y1="530" x2="854" y2="530" stroke="#16a34a" stroke-width="2"/>
+  <text x="860" y="534" font-size="10" fill="#166534" font-family="Inter, system-ui, sans-serif">V&amp;V arm</text>
+</svg>
+        </div>
+        <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
+          Figure: Height Adjustment Subsystem V-Model — requirement decomposition (left), module assembly (centre), and test verification closure (right) for RM-5, RM-1, RM-2, HA-AC-1, and HA-AC-2.
+        </sub>
+      </div>
+
+      <h4>Left Side of the V: Design Decomposition</h4>
+      <p>
+        RM-5 (stroke &amp; speed) drove the concept selection of a guided lift column plus screw jack and the back-calculation of ~800 rpm motor input speed.
+        RM-1 (structural stability) drove the architectural decision to separate the screw jack's axial load path from the telescopic column's lateral load path — a structural principle validated across Phases 2, 3, and 4 of the design evolution.
+        RM-2 (compact footprint) drove the consolidation from dual rear linear guides (Phase 2) to a single integrated telescopic column (Phase 3), eliminating rail protrusion.
+        HA-AC-1 drove the motor-sizing logic around 800 rpm speed capability.
+        HA-AC-2 drove the choice of Delrin wear pads as a sacrificial, inspectable guide interface rather than a press-fit or fixed guide.
+      </p>
+
+      <h4>Base of the V: Integration Build</h4>
+      <p>
+        At integration stage, the telescopic column (8080 inner extrusion + welded outer tube + Delrin pads), HK2T screw jack, travelling-nut mount, and 24 V DC gear motor were assembled into a unified height-adjustment module. Motor coupling was confirmed, and initial stroke tests were performed to validate drive engagement.
+      </p>
+
+      <h4>Right Side of the V: Verification Closure</h4>
+      <p>
+        Verification is planned against the same requirements used during decomposition. Timed stroke testing will close RM-5 (400 mm in &le; 32 s, 5 consecutive cycles under load). Load-path inspection will close RM-1 (lateral punch loads routed through column, screw jack kept axial). Wear testing will close HA-AC-2. Full test procedures are in <a href="height-adjustment/testing-evaluation.html">Testing &amp; Evaluation</a>.
+      </p>
+    </div>
+
+
 
       <style>
         /* Styling for the 3D Model Hotspot Buttons */
@@ -307,19 +489,52 @@
       <table style="width:100%; border-collapse:collapse; margin:0 0 16px 0; font-size:0.9rem;">
         <thead>
           <tr style="background:#f0f0f0;">
-            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Req</th>
-            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Description</th>
-            <th style="padding:8px; border:1px solid #ddd; text-align:center;">System-Level Status</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:9%;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:22%;">Requirement</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:25%;">Verification Method</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Measured Result</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:center; width:10%;">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
-            <td style="padding:8px; border:1px solid #ddd;">Provide &ge; 400 mm vertical stroke for height adjustment</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#78716c;">Pending: 400 mm stroke provision confirmed by design; formal timed test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Provide &ge; 400 mm vertical stroke; full stroke &le; 32 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">Timed full-stroke test under 22.5 kg design load</td>
+            <td style="padding:8px; border:1px solid #ddd;">400 mm stroke confirmed by design sizing; timed physical test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Remain upright under punch loads; lift/structure load path separation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Load-path design review; lateral deflection inspection under 2.7 kN design load</td>
+            <td style="padding:8px; border:1px solid #ddd;">Lift/structure separation confirmed by design (screw jack axial only, column carries lateral); quantitative deflection test pending</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Compact footprint — no intrusion into footwork zone</td>
+            <td style="padding:8px; border:1px solid #ddd;">Physical package inspection; integration check with base and rotation module</td>
+            <td style="padding:8px; border:1px solid #ddd;">Telescopic column consolidates guide into single profile; no lateral rail protrusion. Inspection confirmed.</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="success" pill>Pass</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">HA-AC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full stroke &le; 32 s under load; no stall over 5 cycles</td>
+            <td style="padding:8px; border:1px solid #ddd;">5-cycle timed stroke test with 22.5 kg payload</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor speed requirement back-calculated at ~800 rpm; selected motor meets spec; physical cycle test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">HA-AC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Delrin pad wear &lt; 1 mm after 200 cycles; backlash &lt; 2 mm at top of stroke</td>
+            <td style="padding:8px; border:1px solid #ddd;">200-cycle endurance test; micrometer wear + lateral backlash measurement</td>
+            <td style="padding:8px; border:1px solid #ddd;">Delrin wear-pad design rationale sound; long-term endurance test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
         </tbody>
       </table>
+
       <p>
         At the current stage, the height-adjustment subsystem has been validated partly through <strong>concept selection, packaging logic, and load-path reasoning</strong>, and partly through the coherence of the final mechanical assembly. It has not yet been fully closed through every intended physical validation test.
       </p>
@@ -443,5 +658,39 @@
   </script>
   <script type="module" src="../../components/table-component/table-component.js"></script>
   <script src="../../components/table-component/tables.js"></script>
+  <!-- V-Model lightbox -->
+  <dialog id="vmodel-lightbox" style="border:none;border-radius:16px;padding:0;max-width:96vw;width:96vw;background:transparent;box-shadow:0 8px 48px rgba(0,0,0,0.32);">
+    <div style="position:relative;">
+      <button id="vmodel-close" aria-label="Close" style="position:absolute;top:10px;right:14px;z-index:10;background:#1e293b;color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;line-height:1;">&times;</button>
+      <div id="vmodel-lightbox-content" style="padding:0;"></div>
+    </div>
+  </dialog>
+  <style>
+    .vmodel-wrap { cursor: zoom-in; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; }
+    .vmodel-wrap:hover { box-shadow: 0 4px 24px rgba(37,99,235,0.18); }
+    .vmodel-wrap:focus { outline: 2px solid #2563eb; outline-offset: 3px; }
+    #vmodel-lightbox::backdrop { background: rgba(15,23,42,0.72); backdrop-filter: blur(2px); }
+    #vmodel-lightbox svg { width: 100%; display: block; }
+  </style>
+  <script>
+    (function () {
+      var wraps = document.querySelectorAll('.vmodel-wrap');
+      var dialog = document.getElementById('vmodel-lightbox');
+      var content = document.getElementById('vmodel-lightbox-content');
+      var closeBtn = document.getElementById('vmodel-close');
+      wraps.forEach(function (w) {
+        function openLightbox() {
+          var svg = w.querySelector('svg');
+          if (!svg || !dialog) return;
+          content.innerHTML = svg.outerHTML;
+          dialog.showModal();
+        }
+        w.addEventListener('click', openLightbox);
+        w.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(); } });
+      });
+      if (closeBtn) closeBtn.addEventListener('click', function () { dialog.close(); });
+      if (dialog) dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+    })();
+  </script>
 </body>
 </html>

@@ -45,7 +45,19 @@
       The mechanical design of the rotation subsystem evolved through several iterations, each addressing a different engineering problem. The earliest concern was how to generate realistic yaw motion while keeping the robot stable under punching. Once the need for a dedicated yaw stage had been established, the design progressed through bearing selection, drive packaging, timing-belt sizing, and support refinement.
     </p>
 
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page documents the physical realisation
+      of the rotation subsystem, addressing <strong>RM-4</strong> (<em>Yaw rotation
+      &ge; 150&deg;/s</em>) through the timing-belt drive design, and
+      <strong>RM-1</strong> (<em>Structural stability under punching</em>) through the
+      cam-follower edge-support and slewing-ring architecture. Design decisions at each
+      phase directly correspond to verification tests in
+      <a href="testing-evaluation.html">Testing &amp; Evaluation</a>.
+    </sl-alert>
+
     <sl-divider></sl-divider>
+
 
     <!-- Phase 1 -->
     <div>

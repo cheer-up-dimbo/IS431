@@ -127,6 +127,12 @@
     <div>
       <h3>Design Requirements</h3>
       <p>
+        This subsystem addresses <a href="../index.html#secondary-research">DO-2</a> (Intelligent Sparring System),
+        <a href="../index.html#secondary-research">DO-4</a> (Adaptive Fight Intelligence), and
+        <a href="../index.html#secondary-research">DO-5</a> (Modular Boxing Platform).
+        See <a href="../index.html#conceptual-design">Section 5</a> for the full Design Objectives reference.
+      </p>
+      <p>
         The following system-level requirements govern the entire robot
         mechanism. Each subsystem page describes how these system requirements
         cascade into subsystem-specific design criteria.
@@ -135,45 +141,64 @@
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:10px; border:1px solid #ddd; text-align:left;">ID</th>
+            <th style="padding:10px; border:1px solid #ddd; text-align:left;">Subsystem</th>
             <th style="padding:10px; border:1px solid #ddd; text-align:left;">Requirement</th>
             <th style="padding:10px; border:1px solid #ddd; text-align:left;">Rationale</th>
           </tr>
         </thead>
         <tbody>
+          <!-- ── §5.2.1 Base ─────────────────────────────── -->
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-1</td>
+            <td style="padding:10px; border:1px solid #ddd;">Base</td>
             <td style="padding:10px; border:1px solid #ddd;">Remain upright under worst-credible punching loads with FoS ≥ 1.5</td>
             <td style="padding:10px; border:1px solid #ddd;">User safety; conservative margin for uncertainty in punch intensity and direction</td>
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-2</td>
+            <td style="padding:10px; border:1px solid #ddd;">Base</td>
             <td style="padding:10px; border:1px solid #ddd;">Compact footprint that preserves user footwork space</td>
             <td style="padding:10px; border:1px solid #ddd;">Boxing gyms are space-constrained; base must not obstruct pivots or stance changes</td>
           </tr>
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-3</td>
+            <td style="padding:10px; border:1px solid #ddd;">Base</td>
+            <td style="padding:10px; border:1px solid #ddd;">Portable: transportable by 1 person between venues</td>
+            <td style="padding:10px; border:1px solid #ddd;">Demo and gym deployment flexibility</td>
+          </tr>
+          <!-- ── §5.2.2 Rotation ─────────────────────────── -->
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-4</td>
+            <td style="padding:10px; border:1px solid #ddd;">Rotation</td>
+            <td style="padding:10px; border:1px solid #ddd;">Yaw rotation for re-angling with target angular velocity ~150°/s</td>
+            <td style="padding:10px; border:1px solid #ddd;">Replicate coach pivoting behaviour for realistic defensive and counter drills</td>
+          </tr>
+          <!-- ── §5.2.3 Height Adjustment ───────────────── -->
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-5</td>
+            <td style="padding:10px; border:1px solid #ddd;">Height Adjustment</td>
             <td style="padding:10px; border:1px solid #ddd;">Provide ≥ 400 mm vertical stroke for height adjustment</td>
             <td style="padding:10px; border:1px solid #ddd;">Accommodate user height range for anatomically correct target alignment</td>
           </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;">RM-4</td>
-            <td style="padding:10px; border:1px solid #ddd;">Yaw rotation for re-angling with target angular velocity ~150°/s</td>
-            <td style="padding:10px; border:1px solid #ddd;">Replicate coach pivoting behaviour for realistic defensive/counter drills</td>
-          </tr>
-          <tr>
-            <td style="padding:10px; border:1px solid #ddd;">RM-5</td>
-            <td style="padding:10px; border:1px solid #ddd;">Execute jab, hook, and uppercut motions at human-competitive speeds (90° in ≤ 0.25 s)</td>
-            <td style="padding:10px; border:1px solid #ddd;">Training fidelity requires realistic strike velocity</td>
-          </tr>
+          <!-- ── §5.2.4 Padding ─────────────────────────── -->
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-6</td>
-            <td style="padding:10px; border:1px solid #ddd;">Absorb repeated strikes without damage; provide impact detection</td>
+            <td style="padding:10px; border:1px solid #ddd;">Padding</td>
+            <td style="padding:10px; border:1px solid #ddd;">Absorb repeated strikes without damage; provide impact detection across all three target zones</td>
             <td style="padding:10px; border:1px solid #ddd;">Structural survivability and training analytics</td>
           </tr>
+          <!-- ── §5.2.5 Arm Actuation ───────────────────── -->
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-7</td>
-            <td style="padding:10px; border:1px solid #ddd;">Portable: transportable by 1 person between venues</td>
-            <td style="padding:10px; border:1px solid #ddd;">Demo and gym deployment flexibility</td>
+            <td style="padding:10px; border:1px solid #ddd;">Arm Actuation</td>
+            <td style="padding:10px; border:1px solid #ddd;">Deliver three distinct strike types: Jab (pitch), Hook (roll), and Uppercut (pitch + roll)</td>
+            <td style="padding:10px; border:1px solid #ddd;">Strike variety drives the 2-DOF coaxial differential joint concept selection and supports DO-3 drill progression</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #ddd;">RM-8</td>
+            <td style="padding:10px; border:1px solid #ddd;">Arm Actuation</td>
+            <td style="padding:10px; border:1px solid #ddd;">Execute a 90° arm sweep in ≤ 0.70 s</td>
+            <td style="padding:10px; border:1px solid #ddd;">Training fidelity requires realistic strike velocity; 0.25 s original target revised to 0.70 s to account for Damiao PID acceleration overhead</td>
           </tr>
         </tbody>
       </table>
@@ -252,7 +277,7 @@
           <rect x="809" y="192" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
           <text x="904" y="216" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">05</text>
           <text x="904" y="231" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Integration Test</text>
-          <text x="904" y="245" text-anchor="middle" font-size="9"  fill="#16a34a">RM-1 to RM-7 verify matrix</text>
+          <text x="904" y="245" text-anchor="middle" font-size="9"  fill="#16a34a">RM-1 to RM-8 verify matrix</text>
 
           <!-- NODE 06 — green pill, cx=1014 cy=110 -->
           <rect x="919" y="72" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>

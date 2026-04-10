@@ -40,6 +40,18 @@
       integration testing.
     </p>
 
+    <sl-alert variant="primary" open>
+      <sl-icon slot="icon" name="check-circle"></sl-icon>
+      <strong>V-Model Traceability:</strong> This page addresses <strong>RM-7</strong>
+      (<em>Deliver strike types</em>) and <strong>RM-8</strong>
+      (<em>90&deg; sweep &le; 0.70 s</em>) at the electrical layer — covering motor
+      platform selection (servo → ODrive → Damiao), dual-supply power architecture,
+      CAN bus topology, and regenerative braking protection. Each electrical design decision
+      traces to a specific failure mode or performance requirement encountered during
+      integration testing, closing <strong>ARM-AC-3</strong> (regenerative braking safety)
+      and informing <strong>ARM-AC-2</strong> (sparring endurance &lt; 60&deg;C).
+    </sl-alert>
+
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 0. MOTOR & ACTUATOR SELECTION                          -->
     <!-- ═══════════════════════════════════════════════════════ -->

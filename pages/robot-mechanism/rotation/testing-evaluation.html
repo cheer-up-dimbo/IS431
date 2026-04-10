@@ -30,9 +30,10 @@
     <sl-alert variant="primary" open>
       <sl-icon slot="icon" name="check-circle"></sl-icon>
       <strong>V-Model Traceability:</strong> This page validates
-      <strong>RM-4</strong> (<em>Yaw rotation &ge; 150°/s for rapid re-angling</em>),
-      plus subsystem criteria <strong>ROT-1</strong> (<em>Transmission &amp; support
-      integrity</em>) and <strong>ROT-2</strong> (<em>Communication reliability</em>).
+      <strong>RM-4</strong> (<em>Yaw rotation &ge; 150°/s for rapid re-angling</em>) and
+      <strong>RM-1</strong> (<em>Stability under impact loads</em>),
+      plus subsystem acceptance criteria <strong>ROT-AC-1</strong> (<em>Transmission &amp; support
+      integrity</em>) and <strong>ROT-AC-2</strong> (<em>Communication reliability</em>).
     </sl-alert>
 
     <sl-divider></sl-divider>
@@ -63,12 +64,12 @@
             <td>&le; 5&deg; overshoot under 50 N lateral punch, return within 500 ms</td>
           </tr>
           <tr>
-            <td><strong>ROT-1</strong></td>
+            <td><strong>ROT-AC-1</strong></td>
             <td>Transmission &amp; support integrity</td>
             <td>Zero tooth-skip under shock load/reversal; stable belt tension; cam-followers maintain contact</td>
           </tr>
           <tr>
-            <td><strong>ROT-2</strong></td>
+            <td><strong>ROT-AC-2</strong></td>
             <td>Communication reliability</td>
             <td>Command frame loss rate &lt; 1% over 1000 frames via WiFi UDP</td>
           </tr>
@@ -96,14 +97,14 @@
         <li><strong>Success Criteria:</strong> Maximum angular deflection &le; 5&deg;, with the system returning to the commanded position within 500 ms without extended oscillation.</li>
       </ul>
 
-      <h4>Test 3: Transmission &amp; Outboard Support Integrity (ROT-1)</h4>
+      <h4>Test 3: Transmission &amp; Outboard Support Integrity (ROT-AC-1)</h4>
       <ul>
         <li><strong>Setup:</strong> Assembled timing belt drive system and cam-follower supports.</li>
         <li><strong>Procedure:</strong> Command rapid acceleration and direction reversals. Apply off-axis loads (hooks) to the torso.</li>
         <li><strong>Success Criteria:</strong> Zero observed tooth-skip on the S8M belt. Cam followers maintain contact with the track, preventing visible plate tilt without binding or overconstraint.</li>
       </ul>
 
-      <h4>Test 4: Communication Reliability (ROT-2)</h4>
+      <h4>Test 4: Communication Reliability (ROT-AC-2)</h4>
       <ul>
         <li><strong>Setup:</strong> Arduino Uno R4 WiFi connected to the local network alongside the Jetson host.</li>
         <li><strong>Procedure:</strong> Transmit 1,000 sequential yaw command frames via UDP at the target 20 Hz GUI refresh rate.</li>
@@ -149,13 +150,13 @@
             <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
           <tr>
-            <td><strong>ROT-1</strong></td>
+            <td><strong>ROT-AC-1</strong></td>
             <td>Transmission &amp; support integrity</td>
             <td>Pending physical validation under dynamic shock and reversal loads.</td>
             <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
           <tr>
-            <td><strong>ROT-2</strong></td>
+            <td><strong>ROT-AC-2</strong></td>
             <td>Communication reliability</td>
             <td>Pending wireless UDP packet-loss tracking.</td>
             <td><sl-badge variant="warning" pill>Partial</sl-badge></td>
@@ -180,7 +181,7 @@
         </li>
         <li>
           <strong><a href="../../robot-mechanism.html">5.2 Robot Mechanism</a></strong>
-          — Definitions of the system-level requirement RM-4.
+          — Definitions of the system-level requirements (RM-4, RM-1) and acceptance criteria ROT-AC-1, ROT-AC-2 that this rotation subsystem satisfies.
         </li>
       </ul>
     </div>
