@@ -90,7 +90,7 @@
           </tr>
           <tr>
             <td><strong>Height Adjustment</strong></td>
-            <td>Motorised vertical column auto-aligns pad targets to the user's head position via CV bounding-box targeting at session start.</td>
+            <td>Motorised vertical column adjusted by the user via the phone dashboard or touchscreen GUI to align pad targets to their height before each session.</td>
           </tr>
           <tr>
             <td><strong>Arm Actuation</strong></td>
@@ -148,8 +148,8 @@
         is active: the boxer logs in, completes a proficiency assessment, and selects training mode and
         parameters. At the Countdown phase, all three subsystems initialise concurrently — the Robot
         Intelligence layer ramps computer vision inference from 6&nbsp;Hz to 30&nbsp;Hz and resets lateral
-        and depth tracking baselines, while the Robot Mechanism performs automatic height adjustment
-        using person-detection bounding-box targeting.
+        and depth tracking baselines, while the user adjusts the robot's height via the phone
+        dashboard or touchscreen GUI.
       </p>
       <p>
         During Active Training, the three subsystems operate in a continuous closed-loop: the Intelligence
@@ -220,9 +220,9 @@
             <title>3-2-1-GO countdown with sound cues; IMU switches to training mode</title>
           </g>
           <g class="swim-node"><rect x="243" y="118" width="98"  height="40" rx="6" fill="#2e7d32"/>
-            <text x="292" y="135" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Auto Height</text>
+            <text x="292" y="135" text-anchor="middle" fill="white" font-size="10" font-weight="bold">User Height</text>
             <text x="292" y="148" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Adjust</text>
-            <title>Height column auto-adjusts to user via CV person detection (bbox_top_y targeting 15% of frame)</title>
+            <title>Height column adjusted by user via phone or GUI before each session</title>
           </g>
           <g class="swim-node"><rect x="243" y="196" width="98"  height="40" rx="6" fill="#7b1fa2"/>
             <text x="292" y="213" text-anchor="middle" fill="white" font-size="10" font-weight="bold">CV Ramp-Up</text>
