@@ -379,11 +379,14 @@
 
  <h3>Pose Branch, Body Joint Tracking</h3>
  <p>
- A YOLO pose estimation model (Jocher et al., 2023) detects 7 upper-body joints
- (nose, shoulders, elbows, wrists) from the RGB camera image. From these joint positions,
- 42 features are computed: normalised coordinates, confidence scores, arm extension ratios,
- shoulder rotation, elbow bend angles, and joint velocities. The same YOLO model is used
- during both training and live inference to prevent any mismatch between the two.
+ A <strong>YOLO26 Nano Pose</strong> model (<code>yolo26n-pose</code>, Jocher et al., 2025)
+ detects 7 upper-body joints (nose, shoulders, elbows, wrists) from the RGB camera image
+ at ~16 ms per frame on the Jetson (see
+ <a href="robot-intelligence.html">landing page</a> for why YOLO26 was chosen).
+ From these joint positions, 42 features are computed: normalised coordinates, confidence
+ scores, arm extension ratios, shoulder rotation, elbow bend angles, and joint velocities.
+ The same YOLO model is used during both training and live inference to prevent any
+ mismatch between the two.
  </p>
 
  <p>

@@ -493,23 +493,91 @@
  </tbody>
  </table>
 
- <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.93rem; color:#5d4037;">
- <strong>Memory capacity is not the bottleneck for LLM speed.</strong> The combined
- footprint sits well below the 16&nbsp;GB ceiling, but free memory does <em>not</em>
- translate to free LLM throughput. LLM inference on the Jetson is bound by GPU compute
- (~100 sparse&nbsp;TFLOPS on the Orin NX) and memory <em>bandwidth</em> (~102&nbsp;GB/s
- of LPDDR5), not by capacity. A larger model would <em>fit</em> in the spare RAM, but
- it would be too slow to be useful in the real-time loop. The 3B&nbsp;model + 128-token
- cap is the largest the current hardware can sustain, this is the documented LLM
- compute ceiling in <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>,
- and the upgrade path is a more powerful Jetson, a discrete GPU, or a USB AI accelerator,
- not a higher-capacity model on the same chip.
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:14px 18px; margin:18px 0; font-size:0.93rem; color:#5d4037;">
+ <strong style="font-size:1rem;">Why 16&nbsp;GB of RAM does not mean we can run a bigger LLM</strong>
+
+ <p style="margin:12px 0 8px;">
+ The Jetson has 16&nbsp;GB of unified memory shared between CPU and GPU, with only
+ ~2.5&nbsp;GB used. But LLM speed is limited by memory <strong>bandwidth</strong>
+ (how fast data moves), not <strong>capacity</strong> (how much fits). Every token
+ generated requires reading the full model weights once:
+ </p>
+
+ <svg viewBox="0 0 960 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:960px; margin:12px auto; display:block; font-family:system-ui,sans-serif;">
+   <rect width="960" height="340" rx="8" fill="#fafafa" stroke="#e0e0e0"/>
+
+   <!-- Title -->
+   <text x="480" y="28" text-anchor="middle" font-size="13" font-weight="700" fill="#333">Capacity vs. Bandwidth on the Jetson Orin NX (16 GB unified LPDDR5)</text>
+
+   <!-- CAPACITY ROW -->
+   <text x="20" y="68" font-size="12" font-weight="700" fill="#2e7d32">CAPACITY</text>
+   <text x="20" y="83" font-size="10" fill="#888">how much fits</text>
+
+   <rect x="120" y="55" width="650" height="38" rx="5" fill="#e8f5e9" stroke="#c8e6c9"/>
+   <rect x="120" y="55" width="100" height="38" rx="5" fill="#66bb6a"/>
+   <text x="170" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">2.5 GB</text>
+   <text x="445" y="79" text-anchor="middle" font-size="12" fill="#2e7d32">13.5 GB free</text>
+   <text x="790" y="79" font-size="11" font-weight="600" fill="#555">16 GB</text>
+
+   <text x="445" y="112" text-anchor="middle" font-size="11" font-style="italic" fill="#2e7d32">A 7B model (~4 GB) easily fits. Capacity is not the problem.</text>
+
+   <!-- BANDWIDTH SECTION -->
+   <text x="20" y="152" font-size="12" font-weight="700" fill="#1565c0">BANDWIDTH</text>
+   <text x="20" y="167" font-size="10" fill="#888">speed limit</text>
+
+   <!-- 3B bar -->
+   <rect x="120" y="140" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
+   <rect x="120" y="140" width="390" height="36" rx="5" fill="#42a5f5"/>
+   <text x="315" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3B: reads 2 GB/token = ~51 tok/s max</text>
+   <rect x="515" y="143" width="90" height="30" rx="4" fill="#e3f2fd" stroke="#90caf9"/>
+   <text x="560" y="162" text-anchor="middle" font-size="9" font-weight="600" fill="#1565c0">CV headroom</text>
+   <text x="790" y="163" font-size="10" font-weight="600" fill="#555">102 GB/s</text>
+
+   <!-- 7B bar -->
+   <rect x="120" y="186" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
+   <rect x="120" y="186" width="650" height="36" rx="5" fill="#ef5350" opacity="0.85"/>
+   <text x="445" y="209" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">7B: reads 4 GB/token = ~25 tok/s max, saturates entire bus</text>
+   <text x="790" y="209" font-size="10" font-weight="600" fill="#c62828">102 GB/s</text>
+
+   <!-- Separator -->
+   <line x1="40" y1="240" x2="920" y2="240" stroke="#d0d7de"/>
+
+   <!-- Comparison table header -->
+   <text x="130" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Model</text>
+   <text x="300" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Size (Q4)</text>
+   <text x="440" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fits in 16 GB?</text>
+   <text x="600" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Tokens/s (with CV)</text>
+   <text x="790" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fast enough for tips?</text>
+
+   <!-- 3B row -->
+   <text x="130" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Qwen2.5-3B</text>
+   <text x="300" y="290" text-anchor="middle" font-size="11" fill="#333">~2 GB</text>
+   <text x="440" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
+   <text x="600" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">~30-40 tok/s</text>
+   <text x="790" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">&#x2713; Yes</text>
+
+   <!-- 7B row -->
+   <text x="130" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#333">7B-8B model</text>
+   <text x="300" y="318" text-anchor="middle" font-size="11" fill="#333">~4 GB</text>
+   <text x="440" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
+   <text x="600" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">&lt;15 tok/s</text>
+   <text x="790" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">&#x2715; Too slow</text>
+ </svg>
+
+ <p style="margin:10px 0 4px;">
+ The 3B model is the sweet spot for this hardware. The upgrade path is
+ <strong>faster hardware</strong> (more powerful Jetson, dedicated GPU, or USB AI
+ accelerator), not a bigger model on the same chip. See
+ <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>.
+ </p>
  </div>
 
  <p style="font-size:0.92rem; color:#444;">
  With frame rate, compute, output stability, and resource sharing all handled, the
  action model now runs reliably in real time, the foundation that the rest of this
- section builds on top of.
+ section builds on top of. Licensing implications of the tech stack (including YOLO's
+ AGPL-3.0 licence) are addressed on the
+ <a href="robot-intelligence.html">landing page</a>.
  </p>
 
  <sl-divider></sl-divider>
