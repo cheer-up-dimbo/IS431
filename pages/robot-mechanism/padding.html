@@ -51,7 +51,7 @@
       </p>
 
       <h4>System Requirements</h4>
-      <p>The following system-level requirement is inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and governs all padding design decisions:</p>
+      <p>The following system-level requirement is inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (Section 5.2)</a> requirements table and governs all padding design decisions:</p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
@@ -72,8 +72,8 @@
       <h4>Subsystem Acceptance Criteria</h4>
       <p>
         The following acceptance criteria were derived from design decisions specific to this subsystem that introduce failure modes not captured by the system-level requirement above.
-        <strong>PAD-AC-1</strong> arises because RM-6 states "provide impact detection" but does not specify a minimum detection rate — the choice to use an <em>IMU threshold-based algorithm</em> (L2 norm &ge; 2.0 g) introduces a miss-detection failure mode driven by threshold calibration, sensor placement, and padding damping. A 95% true-positive rate is needed to make training analytics meaningful.
-        <strong>PAD-AC-2</strong> arises because RM-6 does not specify that the sensing system must <em>differentiate</em> force intensity — the IMU L2 vector norm response must be monotonically ordered (light &lt; medium &lt; heavy) for the analytics layer to provide meaningful skill-level feedback. This is a data-quality failure mode not captured by any RM code.
+        PAD-AC-1 arises because RM-6 states "provide impact detection" but does not specify a minimum detection rate: the choice to use an <em>IMU threshold-based algorithm</em> (L2 norm &ge; 2.0 g) introduces a miss-detection failure mode driven by threshold calibration, sensor placement, and padding damping. A 95% true-positive rate is needed to make training analytics meaningful.
+        PAD-AC-2 arises because RM-6 does not specify that the sensing system must <em>differentiate</em> force intensity: the IMU L2 vector norm response must be monotonically ordered (light &lt; medium &lt; heavy) for the analytics layer to provide meaningful skill-level feedback. This is a data-quality failure mode not captured by any RM code.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
         <thead>
@@ -88,13 +88,13 @@
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">PAD-AC-1</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">IMU strike detection rate &ge; 95% true positive across all three zones (60-punch controlled test)</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">IMU threshold algorithm (L2 norm &ge; 2.0 g) — detection-rate failure mode not specified in RM-6</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">IMU threshold algorithm (L2 norm &ge; 2.0 g); detection-rate failure mode not specified in RM-6</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">20 controlled punches × 3 zones = 60 total; &ge; 57 detected for pass</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">PAD-AC-2</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Impact force differentiation monotonic: mean L2 norm light &lt; medium &lt; heavy (3 users, one-way ANOVA p &lt; 0.05)</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">IMU L2 norm analytics (§5.2.4.2) — force-differentiation quality not addressed in RM-6</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">IMU L2 norm analytics (Section 5.2.4.2); force-differentiation quality not addressed in RM-6</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">3 users × 30 punches (10 per intensity); ANOVA on L2 norm distributions</td>
           </tr>
         </tbody>
@@ -115,7 +115,8 @@
         The diagram below applies the V-Model to the Padding subsystem specifically.
       </p>
 
-      <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
+      <div style="margin: 28px 0; text-align: center; overflow-x: auto;">
+        <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
       <svg width="100%" viewBox="0 0 1100 560" role="img" font-family="Inter, system-ui, sans-serif" xmlns="http://www.w3.org/2000/svg">
         <title>BoxBunny Padding — Systems Engineering V-Model</title>
         <desc>V-Model diagram for the BoxBunny boxing robot Padding subsystem.</desc>
@@ -195,8 +196,9 @@
         <line x1="826" y1="530" x2="854" y2="530" stroke="#16a34a" stroke-width="2"/>
         <text x="860" y="534" font-size="10" fill="#166534" font-family="Inter, system-ui, sans-serif">V&amp;V arm</text>
       </svg>
+        </div>
+        <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Figure: Systems Engineering V-Model for the BoxBunny Padding subsystem, tracing RM-6, PAD-AC-1, and PAD-AC-2 from design decomposition through integration to verification closure.</p>
       </div>
-      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Figure: Systems Engineering V-Model for the BoxBunny Padding subsystem, tracing RM-6, PAD-AC-1, and PAD-AC-2 from design decomposition through integration to verification closure.</p>
 
 
       <h4>Left Side of the V: Design Decomposition</h4>

@@ -109,7 +109,7 @@
       <p>
         The arm actuation subsystem responds to system-level requirements
         <a href="../robot-mechanism.html">RM-7</a> (strike types) and
-        <a href="../robot-mechanism.html">RM-8</a> (strike speed), both defined in §5.2 Robot Mechanism.
+        <a href="../robot-mechanism.html">RM-8</a> (strike speed), both defined in the Robot Mechanism section (Section 5.2).
         The subsystem requirements below elaborate on how those system requirements
         are realised at the arm joint level.
       </p>
@@ -127,12 +127,12 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
             <td style="padding:8px; border:1px solid #ddd;">Deliver three distinct strike types: Jab (pitch), Hook (roll), Uppercut (pitch&thinsp;+&thinsp;roll)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Padwork rehabilitation literature; <a href="../robot-mechanism.html">§5.2 Robot Mechanism</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">Padwork rehabilitation literature; <a href="../robot-mechanism.html">Robot Mechanism (Section 5.2)</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-8</td>
             <td style="padding:8px; border:1px solid #ddd;">Execute a 90&deg; arm sweep in &le; 0.70 s; original 0.25 s target revised to account for Damiao PID acceleration overhead</td>
-            <td style="padding:8px; border:1px solid #ddd;"><a href="../robot-mechanism.html">§5.2 Robot Mechanism</a>; see <a href="arm-actuation/testing-evaluation.html">Testing §5.2.5.5</a> for PID overhead analysis</td>
+            <td style="padding:8px; border:1px solid #ddd;"><a href="../robot-mechanism.html">Robot Mechanism (Section 5.2)</a>; see <a href="arm-actuation/testing-evaluation.html">Testing and Evaluation (Section 5.2.5.5)</a> for PID overhead analysis</td>
           </tr>
         </tbody>
       </table>
@@ -204,7 +204,8 @@
         gear ratio sizing, or firmware architecture decisions were made.
       </p>
 
-      <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
+      <div style="margin: 28px 0; text-align: center; overflow-x: auto;">
+        <div class="vmodel-wrap" title="Click to expand" tabindex="0" role="button" aria-label="Expand V-Model diagram">
       <svg width="100%" viewBox="0 0 1100 560" role="img" font-family="Inter, system-ui, sans-serif" xmlns="http://www.w3.org/2000/svg">
         <title>BoxBunny Arm Actuation — Systems Engineering V-Model</title>
         <desc>V-Model diagram for the BoxBunny boxing robot Arm Actuation subsystem.</desc>
@@ -284,8 +285,9 @@
         <line x1="826" y1="530" x2="854" y2="530" stroke="#16a34a" stroke-width="2"/>
         <text x="860" y="534" font-size="10" fill="#166534" font-family="Inter, system-ui, sans-serif">V&amp;V arm</text>
       </svg>
+        </div>
+        <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Figure: Systems Engineering V-Model for the BoxBunny Arm Actuation subsystem, tracing RM-7, RM-8, and ARM-AC-1 through ARM-AC-5 from design decomposition through integration to verification closure.</p>
       </div>
-      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Figure: Systems Engineering V-Model for the BoxBunny Arm Actuation subsystem, tracing RM-7, RM-8, and ARM-AC-1 through ARM-AC-5 from design decomposition through integration to verification closure.</p>
 
 
       <h4>Left Side of the V: Design Decomposition</h4>
@@ -307,7 +309,7 @@
         ARM-AC-5 closed with 0.69 A peak current (N=43): <strong>Pass</strong>.<br>
         ARM-AC-2, ARM-AC-3, ARM-AC-4 pending formal test sessions: <strong>Partial</strong>.<br>
         RM-7 closes once all six strike types are demonstrated in sustained sparring (ARM-AC-2 session).
-        Full test procedures are in <a href="arm-actuation/testing-evaluation.html">Testing &amp; Evaluation §5.2.5.5</a>.
+        Full test procedures are in <a href="arm-actuation/testing-evaluation.html">Testing &amp; Evaluation (Section 5.2.5.5)</a>.
       </p>
     </div>
 

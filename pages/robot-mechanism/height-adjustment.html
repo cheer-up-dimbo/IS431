@@ -65,7 +65,7 @@
       </p>
 
       <h4>System Requirements</h4>
-      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and govern all height-adjustment design decisions:</p>
+      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (Section 5.2)</a> requirements table and govern all height-adjustment design decisions:</p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
@@ -78,17 +78,17 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Provide &ge; 400 mm vertical stroke for height adjustment; full stroke completed in &le; 32 s</td>
-            <td style="padding:8px; border:1px solid #ddd;">User height range 150–190 cm (§4.3), DO-5 (Modular Boxing Platform), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">User height range 150–190 cm (Section 4.3), DO-5 (Modular Boxing Platform), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Remain upright and maintain alignment under combined axial and lateral punch loads without structural failure</td>
-            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load &amp; Stability Analysis (§5.2.1.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load &amp; Stability Analysis (Section 5.2.1.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Compact footprint: mechanism must not intrude into boxer's footwork zone during height adjustment or at rest</td>
-            <td style="padding:8px; border:1px solid #ddd;">User journey (§4.3), boxing gym spatial constraints</td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (Section 4.3), boxing gym spatial constraints</td>
           </tr>
         </tbody>
       </table>
@@ -96,8 +96,8 @@
       <h4>Subsystem Acceptance Criteria</h4>
       <p>
         The following acceptance criteria were derived from design decisions specific to this subsystem that introduce failure modes not captured by the system-level requirements above.
-        <strong>HA-AC-1</strong> arises because the choice of a <em>motorised screw-jack drive</em> introduces a speed-limitation failure mode: RM-5 specifies stroke and time, but does not address whether the chosen actuator's back-calculated ~800 rpm input requirement can be reliably delivered under load by the selected DC motor. This is a sub-requirement of speed capability, not of stroke provision.
-        <strong>HA-AC-2</strong> arises because the <em>Delrin wear-pad guide interface</em> introduces a long-term wear failure mode — the column geometry and load-path separation may be correct, but if the pads wear excessively, the column will develop backlash and lose the stiffness that satisfies RM-1. This is not captured by any RM code.
+        HA-AC-1 arises because the choice of a <em>motorised screw-jack drive</em> introduces a speed-limitation failure mode: RM-5 specifies stroke and time, but does not address whether the chosen actuator's back-calculated approximately 800 rpm input requirement can be reliably delivered under load by the selected DC motor. This is a sub-requirement of speed capability, not of stroke provision.
+        HA-AC-2 arises because the <em>Delrin wear-pad guide interface</em> introduces a long-term wear failure mode: the column geometry and load-path separation may be correct, but if the pads wear excessively, the column will develop backlash and lose the stiffness that satisfies RM-1. This is not captured by any RM code.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
         <thead>
@@ -112,13 +112,13 @@
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">HA-AC-1</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Full 400 mm stroke completed in &le; 32 s under full payload (22.5 kg design load); no stalling or drive degradation over 5 consecutive cycles</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">Screw-jack/motor drive (§5.2.3.3) — speed capability failure mode not fully specified by RM-5 alone</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Screw-jack/motor drive (Section 5.2.3.3); speed capability failure mode not fully specified by RM-5 alone</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Timed full-stroke test under load, 5 consecutive cycles</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">HA-AC-2</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Delrin guide pad wear: &lt; 1 mm surface wear after 200 adjustment cycles; column backlash &lt; 2 mm lateral play at top of stroke</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">Delrin wear-pad guide design (§5.2.3.2) — long-term wear failure mode not captured by RM-1 or RM-5</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Delrin wear-pad guide design (Section 5.2.3.2); long-term wear failure mode not captured by RM-1 or RM-5</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">200-cycle endurance test; micrometer wear measurement and lateral backlash check</td>
           </tr>
         </tbody>
@@ -252,7 +252,12 @@
     </div>
 
 
+    <sl-divider></sl-divider>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2c. INTERACTIVE 3D MODEL                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div>
       <style>
         /* Styling for the 3D Model Hotspot Buttons */
         .Hotspot {

@@ -58,7 +58,7 @@
       </p>
 
       <h4>System Requirements</h4>
-      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and govern all base subsystem design decisions:</p>
+      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (Section 5.2)</a> requirements table and govern all base subsystem design decisions:</p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
@@ -71,12 +71,12 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Remain upright under worst-credible punching loads with FoS &ge; 1.5</td>
-            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load &amp; Stability Analysis (§5.2.1.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load &amp; Stability Analysis (Section 5.2.1.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Compact footprint that preserves user footwork space (no foot contact during pivots or stance changes)</td>
-            <td style="padding:8px; border:1px solid #ddd;">User journey (§4.3), boxing gym spatial constraints, <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (Section 4.3), boxing gym spatial constraints, <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
@@ -89,7 +89,7 @@
       <h4>Subsystem Acceptance Criteria</h4>
       <p>
         The following acceptance criterion was derived from a design decision specific to this subsystem that introduces a failure mode not captured by the system requirements above.
-        <strong>BAS-AC-1</strong> arises because the choice to use a <em>separate modular mounted plate</em> (screwed, not welded) as the structural datum for the rotation and height-adjustment stack above introduces a flatness and rigidity constraint that RM-1, RM-2, and RM-3 do not explicitly address. If this datum surface is not flat and rigid, the alignment of every subsystem above it is compromised regardless of whether the overall stability criterion (RM-1) is met.
+        BAS-AC-1 arises because the choice to use a <em>separate modular mounted plate</em> (screwed, not welded) as the structural datum for the rotation and height-adjustment stack above introduces a flatness and rigidity constraint that RM-1, RM-2, and RM-3 do not explicitly address. If this datum surface is not flat and rigid, the alignment of every subsystem above it is compromised regardless of whether the overall stability criterion (RM-1) is met.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
         <thead>
@@ -103,8 +103,8 @@
         <tbody>
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">BAS-AC-1</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">Provide a flat, rigid geometric datum for the mechanism stack — mounted plate passes visual and physical inspection for flatness and secure fastening</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">Modular mounted-plate design (§5.2.1.2) — integration constraint not captured by RM-1/2/3</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Provide a flat, rigid geometric datum for the mechanism stack; mounted plate passes visual and physical inspection for flatness and secure fastening</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Modular mounted-plate design (Section 5.2.1.2); integration constraint not captured by RM-1/2/3</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Visual inspection + physical check of plate seating and fastener torque</td>
           </tr>
         </tbody>

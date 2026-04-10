@@ -67,7 +67,7 @@
       </p>
 
       <h4>System Requirements</h4>
-      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (§5.2)</a> requirements table and govern all rotation subsystem design decisions:</p>
+      <p>The following system-level requirements are inherited from the <a href="../robot-mechanism.html#robot-mechanism">Robot Mechanism (Section 5.2)</a> requirements table and govern all rotation subsystem design decisions:</p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 20px 0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
@@ -80,22 +80,22 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Yaw re-orientation at &ge; 150&deg;/s to reproduce coach-like pivoting and angle changes</td>
-            <td style="padding:8px; border:1px solid #ddd;">Boxing coaching motion analysis (§3.1), DO-2 (Intelligent Sparring), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">Boxing coaching motion analysis (Section 3.1), DO-2 (Intelligent Sparring), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Hold commanded angle and withstand combined axial, radial, and overturning loads from punches without structural failure</td>
-            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load Analysis (§5.2.2.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">Structural safety, Load Analysis (Section 5.2.2.3), <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Compact footprint: integrate at the bottom of the lower-mechanism stack without intruding into the boxer's footwork zone</td>
-            <td style="padding:8px; border:1px solid #ddd;">User journey (§4.3), boxing gym spatial constraints, <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
+            <td style="padding:8px; border:1px solid #ddd;">User journey (Section 4.3), boxing gym spatial constraints, <a href="../../pages/appendix-product-mapping.html">Appendix 6</a></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Coexist with rear-wheel transport logic; rotation module must not hinder tip-and-roll deployment</td>
-            <td style="padding:8px; border:1px solid #ddd;">Deployment flexibility, DO-5 (Modular Boxing Platform), dependency on Base (§5.2.1)</td>
+            <td style="padding:8px; border:1px solid #ddd;">Deployment flexibility, DO-5 (Modular Boxing Platform), dependency on Base (Section 5.2.1)</td>
           </tr>
         </tbody>
       </table>
@@ -103,8 +103,8 @@
       <h4>Subsystem Acceptance Criteria</h4>
       <p>
         The following acceptance criteria were derived by identifying which design decisions in this subsystem introduce new failure modes not covered by the system-level requirements above.
-        <strong>ROT-AC-1</strong> arises because the choice of a <em>timing-belt transmission</em> introduces a tooth-skip failure mode under shock loads and rapid reversals that RM-4 (which specifies speed only) does not capture — the belt could technically reach 150&deg;/s and still fail mechanically.
-        <strong>ROT-AC-2</strong> arises because the <em>wireless-only UDP command path</em> (eliminating physical cables through the rotating joint) introduces a packet-loss failure mode that no system-level requirement previously addressed, since all RM codes are concerned with physical performance, not communication reliability.
+        ROT-AC-1 arises because the choice of a <em>timing-belt transmission</em> introduces a tooth-skip failure mode under shock loads and rapid reversals that RM-4 (which specifies speed only) does not capture: the belt could technically reach 150&deg;/s and still fail mechanically.
+        ROT-AC-2 arises because the <em>wireless-only UDP command path</em> (eliminating physical cables through the rotating joint) introduces a packet-loss failure mode that no system-level requirement previously addressed, since all RM codes are concerned with physical performance, not communication reliability.
       </p>
       <table style="width:100%; border-collapse:collapse; margin:12px 0 4px 0; font-size:0.92rem;">
         <thead>
@@ -119,13 +119,13 @@
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">ROT-AC-1</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Transmission &amp; support integrity: zero tooth-skip under shock load/reversal; stable belt tension; cam-followers maintain contact</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">Timing-belt drive design (§5.2.2.4) — mechanical failure mode beyond RM-4 speed criterion</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Timing-belt drive design (Section 5.2.2.4); mechanical failure mode beyond RM-4 speed criterion</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Rapid accel/reversal test + off-axis punch loading on assembled drive</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #c7d7f9;">ROT-AC-2</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">Communication reliability: command frame loss rate &lt; 1% over 1,000 frames via WiFi UDP</td>
-            <td style="padding:8px; border:1px solid #c7d7f9;">Wireless-only command path (§5.2.2.5) — comms failure mode not addressed in any RM</td>
+            <td style="padding:8px; border:1px solid #c7d7f9;">Wireless-only command path (Section 5.2.2.5); comms failure mode not addressed in any RM</td>
             <td style="padding:8px; border:1px solid #c7d7f9;">1,000-frame UDP packet-loss test at 20 Hz from Jetson to Arduino</td>
           </tr>
         </tbody>
