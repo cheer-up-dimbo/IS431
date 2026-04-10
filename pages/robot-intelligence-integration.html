@@ -78,10 +78,10 @@
  </a>
  <br>
 
- <!-- 5.3.4 INTRO -->
+ <!-- 5.3.2 INTRO -->
  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
  <h2 style="margin:0;">5.3.2 Intelligent Behaviour &amp; Control</h2>
- <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2, RI-4 to RI-8</sl-badge>
  </div>
 
  <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#int-fusion" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Fusion</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-inference" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Inference</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sparring" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sparring</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-llm" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">LLM</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sessions" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sessions</a></div>
@@ -609,7 +609,7 @@
 
  <h3>1. Pacing attacks, difficulty scaling</h3>
 
- <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem; text-align:center;">
  <thead>
  <tr style="background:#f0f0f0;">
  <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
@@ -643,11 +643,20 @@
  <h3>2. Adapting to the user, weakness tracking</h3>
  <p>
  Difficulty levels alone make sparring harder; they don't make it <em>smarter</em>.
- The <code>sparring_weakness_profile</code> table persistently tracks the user's
- per-punch-type defence success rate across sessions, and the engine biases attacks
- toward whichever punches the user has been worst at defending against. Over time the
- robot stops feeding the user openings they already handle well and concentrates on
- the gaps, forcing continuous improvement instead of comfortable repetition.
+ The <code>sparring_weakness_profile</code> database table records, for every punch
+ type, how often the user successfully blocked it versus how often they were hit.
+ These stats persist across sessions, so returning to the robot the next day
+ continues from where the user left off.
+ </p>
+ <div style="background:#f5f5f5; border-left:3px solid #f9a825; padding:10px 14px; margin:10px 0; font-size:0.92rem;">
+ <strong>Example:</strong> A user blocks 90% of jabs but only 40% of hooks. The engine
+ will throw more hooks and fewer jabs in subsequent rounds, forcing the user to
+ practise defending the punch type they struggle with most.
+ </div>
+ <p>
+ Over time the robot stops feeding the user openings they already handle well and
+ concentrates on the gaps, forcing continuous improvement instead of comfortable
+ repetition.
  </p>
 
  <h3>3. Staying safe, engine safeguards</h3>
@@ -741,26 +750,26 @@
  <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
  <thead>
  <tr style="background:#f0f0f0;">
- <th style="padding:8px; border:1px solid #ddd;">User Hits</th>
- <th style="padding:8px; border:1px solid #ddd;">Robot Responds With</th>
+ <th style="padding:8px; border:1px solid #ddd; text-align:center;">User Hits</th>
+ <th style="padding:8px; border:1px solid #ddd; text-align:center;">Robot Responds With</th>
  </tr>
  </thead>
  <tbody>
  <tr>
- <td style="padding:8px; border:1px solid #ddd;">Centre pad</td>
- <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Centre pad</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Jab or Cross</td>
  </tr>
  <tr>
- <td style="padding:8px; border:1px solid #ddd;">Left pad</td>
- <td style="padding:8px; border:1px solid #ddd;">Left Hook or Left Uppercut</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Left pad</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Left Hook or Left Uppercut</td>
  </tr>
  <tr>
- <td style="padding:8px; border:1px solid #ddd;">Right pad</td>
- <td style="padding:8px; border:1px solid #ddd;">Right Hook or Right Uppercut</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Right pad</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Right Hook or Right Uppercut</td>
  </tr>
  <tr>
- <td style="padding:8px; border:1px solid #ddd;">Head pad</td>
- <td style="padding:8px; border:1px solid #ddd;">Jab or Cross</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Head pad</td>
+ <td style="padding:8px; border:1px solid #ddd; text-align:center;">Jab or Cross</td>
  </tr>
  </tbody>
  </table>
@@ -999,11 +1008,6 @@
  <td style="padding:8px; border:1px solid #ddd; text-align:center;">4</td>
  <td style="padding:8px; border:1px solid #ddd;">Conditioning, common mistakes, coaching, FAQ</td>
  </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Official references</td>
- <td style="padding:8px; border:1px solid #ddd; text-align:center;">2</td>
- <td style="padding:8px; border:1px solid #ddd;">AIBA Coaches Manual (AIBA, 2015), APB Manual (AIBA, 2017)</td>
- </tr>
  </tbody>
  </table>
 
@@ -1044,7 +1048,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.2.5 SESSION MANAGEMENT -->
- <h2 id="int-sessions">5.3.2.5 Session Management</h2>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="int-sessions" style="margin:0;">5.3.2.5 Session Management</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5, RI-8</sl-badge></div>
 
  <p>
  Every other node on this page, fusion, inference, sparring, LLM, needs to know
@@ -1070,7 +1074,7 @@
    </div>
    <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
      <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">2. Countdown</div>
-     <div style="font-size:0.9rem; margin-top:6px; color:#555;">3-second pre-round window. The robot auto-adjusts its height to the user's shoulder line using the CV bounding box, the audio cue plays, and the sparring engine and drill manager arm themselves but don't fire yet.</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">3-second pre-round window. The user can adjust the robot's height via the phone or GUI before the round begins, the audio cue plays, and the sparring engine and drill manager arm themselves but don't fire yet.</div>
    </div>
    <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; padding:12px 14px; border-radius:4px;">
      <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">3. Active</div>

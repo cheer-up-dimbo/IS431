@@ -31,6 +31,7 @@
       font-size: inherit;
     }
 
+ .stepper-link:hover { background:#6a1b9a !important; color:#fff !important; border-color:#6a1b9a !important; }
  .page-nav-row { display: flex; justify-content: space-between; margin: 32px 0 16px; }
  .test-table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 0.92rem; }
  .test-table th { padding: 8px 12px; border: 1px solid #ddd; background: #f0f0f0; text-align: left; font-weight: 600; }
@@ -59,10 +60,25 @@
 
  <h2>Appendix 7: Robot Intelligence</h2>
 
+ <div style="background:#f8f9fa; border:1px solid #e0e0e0; border-radius:8px; padding:14px 20px; margin:16px 0;">
+ <div style="font-weight:700; font-size:0.95rem; margin-bottom:8px;">Table of Contents</div>
+ <div style="display:flex; flex-wrap:wrap; gap:8px;">
+ <a class="stepper-link" href="#app-features" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">A. Feature Exploration</a>
+ <a class="stepper-link" href="#app-unit-tests" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">B. Unit Tests</a>
+ <a class="stepper-link" href="#app-pose" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">C. Pose Features</a>
+ <a class="stepper-link" href="#app-challenges" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">D. Integration Challenges</a>
+ <a class="stepper-link" href="#app-deploy" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">E. Deployment</a>
+ <a class="stepper-link" href="#app-ros" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">F. ROS Catalogue</a>
+ <a class="stepper-link" href="#app-styles" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">G. Sparring &amp; Training</a>
+ <a class="stepper-link" href="#app-integration" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">H. Integration Tests</a>
+ <a class="stepper-link" href="#app-repos" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">I. Repositories</a>
+ </div>
+ </div>
+
  <sl-divider></sl-divider>
 
  <!-- A. DETAILED FEATURE EXPLORATION -->
- <h3>A. Detailed Feature Exploration, 9 Iterations</h3>
+ <h3 id="app-features">A. Detailed Feature Exploration, 9 Iterations</h3>
 
  <p>
  Section 5.3.1.2 summarises the development journey in a table. This appendix provides
@@ -184,7 +200,7 @@
  <sl-divider></sl-divider>
 
  <!-- B. FULL UNIT TEST BREAKDOWN -->
- <h3>B. Full Unit Test Breakdown</h3>
+ <h3 id="app-unit-tests">B. Full Unit Test Breakdown</h3>
  <p>
  146 unit tests across 3 test files, supported by 12 shared pytest fixtures
  in <code>conftest.py</code>.
@@ -250,8 +266,345 @@
 
  <sl-divider></sl-divider>
 
- <!-- C. REPOSITORY LINKS -->
- <h3>C. Repository Links</h3>
+ <!-- C. 42-DIM POSE FEATURE BREAKDOWN -->
+ <h3 id="app-pose">C. Pose Feature Breakdown (42 dimensions)</h3>
+
+ <p style="text-align:left;">
+ Section 5.3.1.1 references a 42-dimensional pose feature vector extracted from YOLO Pose.
+ This appendix itemises every dimension. All coordinates are normalised by shoulder midpoint
+ and shoulder width to be person-invariant. If shoulder width &lt; 15 pixels, the entire pose
+ vector is zeroed (invalid detection).
+ </p>
+
+ <h4>Static Features (26 dims)</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.85rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd; width:80px;">Indices</th>
+ <th style="padding:6px 8px; border:1px solid #ddd; width:50px;">Dims</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Content</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Purpose</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[0:14]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">14</td><td style="padding:6px 8px; border:1px solid #ddd;">Joint coordinates (x, y for 7 joints)</td><td style="padding:6px 8px; border:1px solid #ddd;">Where each joint is, shoulder-normalised</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[14:21]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">7</td><td style="padding:6px 8px; border:1px solid #ddd;">Joint confidence scores</td><td style="padding:6px 8px; border:1px solid #ddd;">YOLO detection reliability, used for confidence gating</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[21:23]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">2</td><td style="padding:6px 8px; border:1px solid #ddd;">Arm extension ratios</td><td style="padding:6px 8px; border:1px solid #ddd;">Wrist-to-shoulder distance / shoulder width per arm</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[23]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">1</td><td style="padding:6px 8px; border:1px solid #ddd;">Shoulder rotation</td><td style="padding:6px 8px; border:1px solid #ddd;">Body orientation (horizontal shoulder span ratio)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[24:26]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">2</td><td style="padding:6px 8px; border:1px solid #ddd;">Elbow angles</td><td style="padding:6px 8px; border:1px solid #ddd;">Hook vs jab: 0 = fully bent, 1 = fully straight (arccos/&pi; normalised)</td></tr>
+ </tbody>
+ </table>
+
+ <h4>Velocity Features (16 dims)</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.85rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd; width:80px;">Indices</th>
+ <th style="padding:6px 8px; border:1px solid #ddd; width:50px;">Dims</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Content</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Purpose</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[0:14]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">14</td><td style="padding:6px 8px; border:1px solid #ddd;">Joint velocities (dx, dy per joint)</td><td style="padding:6px 8px; border:1px solid #ddd;">Which hand is moving, in what direction</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>[14:16]</code></td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">2</td><td style="padding:6px 8px; border:1px solid #ddd;">Arm extension rate</td><td style="padding:6px 8px; border:1px solid #ddd;">Positive = extending (punch), negative = retracting</td></tr>
+ </tbody>
+ </table>
+
+ <p style="font-size:0.88rem; color:#666; font-style:italic;">
+ 7 upper-body COCO joints used: Nose, L/R Shoulder, L/R Elbow, L/R Wrist.
+ First frame of each clip has zero velocity (no previous frame).
+ The same YOLO model (<code>yolo26n-pose.pt</code>) is used for both training extraction
+ and live inference, so training noise matches deployment noise.
+ </p>
+
+ <sl-divider></sl-divider>
+
+ <!-- D. INTEGRATION CHALLENGES -->
+ <h3 id="app-challenges">D. Integration Challenges &amp; Solutions</h3>
+
+ <p style="text-align:left;">
+ During integration, four specific challenges were encountered that required architectural
+ solutions beyond what the individual components were designed for.
+ </p>
+
+ <div style="display:grid; grid-template-columns:1fr; gap:16px; margin:14px 0;">
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:12px 16px; border-radius:4px;">
+ <div style="font-weight:700; color:#5d4037;">1. Camera ownership conflicts</div>
+ <div style="font-size:0.92rem; margin-top:6px; color:#555;">
+ <strong>Problem:</strong> Multiple components need camera access (CV model, gesture recognition,
+ reaction test), but the RealSense only allows one process to open the camera.<br>
+ <strong>Solution:</strong> Single-owner architecture. The <code>cv_node</code> exclusively owns
+ the camera and publishes frames to ROS topics. All other consumers subscribe to these
+ topics. This also ensures a consistent frame rate for the action model.
+ </div>
+ </div>
+
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:12px 16px; border-radius:4px;">
+ <div style="font-weight:700; color:#5d4037;">2. GUI-Dashboard state synchronisation</div>
+ <div style="font-size:0.92rem; margin-top:6px; color:#555;">
+ <strong>Problem:</strong> The desktop GUI and phone dashboard both need to show the same
+ training state, but communicate through different channels (GUI uses ROS, dashboard
+ uses HTTP/WebSocket).<br>
+ <strong>Solution:</strong> Three synchronisation mechanisms:
+ <ol style="margin:6px 0 0; padding-left:20px;">
+ <li><strong>Shared SQLite database</strong> &mdash; GUI writes session data via
+ <code>session_manager</code>, dashboard reads via API queries</li>
+ <li><strong>JSON file polling</strong> &mdash; Dashboard writes commands to
+ <code>/tmp/boxbunny_gui_command.json</code>, GUI polls every 100ms</li>
+ <li><strong>WebSocket state buffering</strong> &mdash; Dashboard backend buffers last
+ known state per user, sends to phone on reconnect</li>
+ </ol>
+ </div>
+ </div>
+
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:12px 16px; border-radius:4px;">
+ <div style="font-weight:700; color:#5d4037;">3. LLM response reliability</div>
+ <div style="font-size:0.92rem; margin-top:6px; color:#555;">
+ <strong>Problem:</strong> The Qwen LLM can produce incomplete, cut-off, or markdown-cluttered
+ responses under GPU contention.<br>
+ <strong>Solution:</strong> Five mechanisms ensure complete, clean output:
+ <ol style="margin:6px 0 0; padding-left:20px;">
+ <li><strong>Short max_tokens (128)</strong> &mdash; limits response length so the model finishes within budget</li>
+ <li><strong>System prompt instruction</strong> &mdash; explicitly says &ldquo;keep tips SHORT (1&ndash;2 sentences)&rdquo;</li>
+ <li><strong>Inference timeout (20s)</strong> &mdash; background thread with hard timeout prevents hangs</li>
+ <li><strong>Markdown stripping</strong> &mdash; <code>_clean_markdown()</code> removes formatting artifacts</li>
+ <li><strong>Sentence completion</strong> &mdash; if a response doesn&rsquo;t end with <code>.</code>, <code>!</code>, or <code>?</code>, 8&ndash;32 additional tokens are generated to finish the thought</li>
+ </ol>
+ </div>
+ </div>
+ </div>
+
+ <sl-divider></sl-divider>
+
+ <!-- E. STANDALONE DEPLOYMENT PACKAGE -->
+ <h3 id="app-deploy">E. Standalone Deployment Package</h3>
+
+ <p style="text-align:left;">
+ A self-contained <code>action_prediction/</code> package for running live inference on the
+ Jetson without depending on the training pipeline. All models auto-convert on first run.
+ </p>
+
+ <h4>Conversion Flow</h4>
+ <div style="display:flex; align-items:center; gap:8px; margin:12px 0; flex-wrap:wrap; font-size:0.92rem;">
+ <code>.pth</code> <span style="color:#888;">&rarr;</span> <code>.onnx</code> <span style="color:#888;">&rarr;</span> <code>.trt</code> <span style="font-size:0.85rem; color:#555;">(Action model, TensorRT FP16)</span>
+ <span style="margin:0 12px; color:#ccc;">|</span>
+ <code>.pt</code> <span style="color:#888;">&rarr;</span> <code>.engine</code> <span style="font-size:0.85rem; color:#555;">(YOLO Pose, Ultralytics TensorRT FP16)</span>
+ </div>
+ <p style="font-size:0.88rem; color:#666;">
+ Engines are cached next to source files. Subsequent runs load instantly.
+ </p>
+
+ <h4>Inference Latency (Jetson Orin NX, TensorRT FP16)</h4>
+ <table style="width:100%; max-width:500px; border-collapse:collapse; margin:12px 0; font-size:0.88rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd;">Stage</th>
+ <th style="padding:6px 8px; border:1px solid #ddd; text-align:center;">Latency</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">YOLO Pose</td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">~16 ms</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">Action model</td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">~8 ms</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">Depth to voxel</td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">~8&ndash;10 ms</td></tr>
+ <tr style="background:#e8f5e9;"><td style="padding:6px 8px; border:1px solid #ddd; font-weight:600;">Total per frame</td><td style="padding:6px 8px; border:1px solid #ddd; text-align:center; font-weight:600;">~24 ms (~42 fps theoretical, 30 fps practical)</td></tr>
+ </tbody>
+ </table>
+
+ <h4>Known Jetson Issues</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.88rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd;">Issue</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Workaround</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">D435i IMU not working &mdash; <code>hid_sensor_hub</code> kernel module missing from Tegra kernel</td><td style="padding:6px 8px; border:1px solid #ddd;">Use <code>--camera-pitch</code> flag to set tilt manually</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">YOLO TensorRT overlay draws at wrong coordinates when using <code>.engine</code></td><td style="padding:6px 8px; border:1px solid #ddd;">Visualisation-only; pose features are extracted correctly</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">numpy 2.x crashes Jetson torch wheel</td><td style="padding:6px 8px; border:1px solid #ddd;">Pin to <code>numpy&gt;=1.26,&lt;2.0</code></td></tr>
+ </tbody>
+ </table>
+
+ <sl-divider></sl-divider>
+
+ <!-- F. ROS MESSAGE & SERVICE CATALOGUE -->
+ <h3 id="app-ros">F. ROS Message &amp; Service Catalogue</h3>
+
+ <p>
+ The 5.3 landing page references 21 custom message types and 6 services. This section
+ lists every definition with its key fields.
+ </p>
+
+ <h4>Custom Messages (21)</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.85rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd; width:30px;">#</th>
+ <th style="padding:6px 8px; border:1px solid #ddd; width:170px;">Message</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Key Fields</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">1</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>PadImpact</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, pad (left/centre/right/head), level (light/medium/hard), accel_magnitude</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">2</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>ArmStrike</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, arm (left/right), contact (bool)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">3</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>ArmStrikeEvent</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, arm (left/right), contact (bool)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">4</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>IMUStatus</code></td><td style="padding:6px 8px; border:1px solid #ddd;">left/centre/right/head pad connected flags, left/right arm connected, is_simulator</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">5</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>PunchEvent</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, pad, level, force_normalized (0.33/0.66/1.0), accel_magnitude</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">6</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>NavCommand</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, command (prev/next/enter/back)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">7</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>PunchDetection</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, punch_type, confidence, raw_class, consecutive_frames</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">8</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>PoseEstimate</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, keypoints (COCO-17 flattened), movement_delta</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">9</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>UserTracking</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, bbox_centre_x/y, bbox_top_y, bbox_width/height, depth, lateral/depth displacement, user_detected</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">10</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>ConfirmedPunch</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, punch_type, pad, level, force_normalized, cv_confidence, imu_confirmed, cv_confirmed, accel_magnitude</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">11</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>DefenseEvent</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, arm, robot_punch_code, struck, defense_type (block/slip/dodge/unknown)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">12</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>SessionPunchSummary</code></td><td style="padding:6px 8px; border:1px solid #ddd;">total_punches, punch/force/pad distribution JSON, defense_rate, defense_type_breakdown, movement metrics, session_duration, rounds_completed</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">13</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>SessionState</code></td><td style="padding:6px 8px; border:1px solid #ddd;">state (idle/countdown/active/rest/complete), mode, username</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">14</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>SessionConfig</code></td><td style="padding:6px 8px; border:1px solid #ddd;">mode, difficulty, combo_sequence (JSON), rounds, work/rest time, speed, style</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">15</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>RobotCommand</code></td><td style="padding:6px 8px; border:1px solid #ddd;">command_type (punch/set_speed), punch_code (1-6), speed (slow/medium/fast), source</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">16</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>HeightCommand</code></td><td style="padding:6px 8px; border:1px solid #ddd;">target_height_px, current_height_px, action (adjust/calibrate/manual_up/manual_down/stop)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">17</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>RoundControl</code></td><td style="padding:6px 8px; border:1px solid #ddd;">action (start/stop)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">18</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>DrillDefinition</code></td><td style="padding:6px 8px; border:1px solid #ddd;">drill_name, difficulty, combo_sequence (string[]), total_combos, target_speed</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">19</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>DrillEvent</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, event_type (combo_started/completed/missed/partial), combo_index, accuracy, timing_score</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">20</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>DrillProgress</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, combos_completed/remaining, overall_accuracy, current/best_streak</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">21</td><td style="padding:6px 8px; border:1px solid #ddd;"><code>CoachTip</code></td><td style="padding:6px 8px; border:1px solid #ddd;">timestamp, tip_text, tip_type (technique/encouragement/correction/suggestion), trigger, priority (0-2)</td></tr>
+ </tbody>
+ </table>
+
+ <h4>Services (6)</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.85rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd; width:160px;">Service</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Request</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Response</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>StartSession</code></td><td style="padding:6px 8px; border:1px solid #ddd;">mode, difficulty, config_json, username</td><td style="padding:6px 8px; border:1px solid #ddd;">success, session_id, message</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>EndSession</code></td><td style="padding:6px 8px; border:1px solid #ddd;">session_id</td><td style="padding:6px 8px; border:1px solid #ddd;">success, summary_json, message</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>StartDrill</code></td><td style="padding:6px 8px; border:1px solid #ddd;">drill_name, difficulty, rounds, work/rest time, speed</td><td style="padding:6px 8px; border:1px solid #ddd;">success, drill_id, message</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>SetImuMode</code></td><td style="padding:6px 8px; border:1px solid #ddd;">mode (navigation/training)</td><td style="padding:6px 8px; border:1px solid #ddd;">success, current_mode</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>CalibrateImuPunch</code></td><td style="padding:6px 8px; border:1px solid #ddd;">pad (left/centre/right/head/all)</td><td style="padding:6px 8px; border:1px solid #ddd;">success, message</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>GenerateLlm</code></td><td style="padding:6px 8px; border:1px solid #ddd;">prompt, context_json, system_prompt_key</td><td style="padding:6px 8px; border:1px solid #ddd;">success, response, generation_time_sec</td></tr>
+ </tbody>
+ </table>
+
+ <h4>Constants</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.85rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:6px 8px; border:1px solid #ddd;">Class</th>
+ <th style="padding:6px 8px; border:1px solid #ddd;">Values</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>PunchType</code></td><td style="padding:6px 8px; border:1px solid #ddd;">jab, cross, left_hook, right_hook, left_uppercut, right_uppercut, block, idle</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>PadLocation</code></td><td style="padding:6px 8px; border:1px solid #ddd;">left, centre, right, head</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>ImpactLevel</code></td><td style="padding:6px 8px; border:1px solid #ddd;">light (0.33), medium (0.66), hard (1.0)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>SessionState</code></td><td style="padding:6px 8px; border:1px solid #ddd;">idle, countdown, active, rest, complete</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>TrainingMode</code></td><td style="padding:6px 8px; border:1px solid #ddd;">training, sparring, free, power, stamina, reaction</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>Difficulty</code></td><td style="padding:6px 8px; border:1px solid #ddd;">beginner, intermediate, advanced</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>MotorSpeed</code></td><td style="padding:6px 8px; border:1px solid #ddd;">slow (8.0 rad/s), medium (15.0), fast (25.0), max (30.0)</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>DefenseType</code></td><td style="padding:6px 8px; border:1px solid #ddd;">block, slip, dodge, hit, unknown</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;"><code>NavCommand</code></td><td style="padding:6px 8px; border:1px solid #ddd;">prev (left pad), next (right pad), enter (centre pad), back (head pad)</td></tr>
+ </tbody>
+ </table>
+
+ <sl-divider></sl-divider>
+
+ <!-- E. SPARRING STYLES & TRAINING MODES -->
+ <h3 id="app-styles">G. Sparring Styles &amp; Training Modes</h3>
+
+ <p>
+ Section 5.3.2.3 references 5 adaptive AI sparring styles driven by Markov chain transition
+ matrices. This appendix provides the full behavioural profile for each style.
+ </p>
+
+ <h4>AI Sparring Styles (5)</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.88rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd; width:150px;">Style</th>
+ <th style="padding:8px; border:1px solid #ddd;">Profile</th>
+ <th style="padding:8px; border:1px solid #ddd;">Behaviour</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Boxer</td><td style="padding:8px; border:1px solid #ddd;">Technical, adaptive, balanced</td><td style="padding:8px; border:1px solid #ddd;">Mixes all punch types with balanced probabilities. Uses combinations rather than single punches. Moderate attack frequency with clean technique transitions.</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Brawler</td><td style="padding:8px; border:1px solid #ddd;">Aggressive, predictable, high-volume</td><td style="padding:8px; border:1px solid #ddd;">Heavily weighted toward power punches (hooks and crosses). Short gaps between attacks. High repetition of the same punch type. Predictable but overwhelming.</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Counter-Puncher</td><td style="padding:8px; border:1px solid #ddd;">Reactive, patient</td><td style="padding:8px; border:1px solid #ddd;">Low base attack frequency. Attack probability spikes immediately after detecting a user punch. Favours quick, precise counters (jabs and crosses). Long idle periods followed by sudden bursts.</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Pressure</td><td style="padding:8px; border:1px solid #ddd;">Relentless, overwhelming</td><td style="padding:8px; border:1px solid #ddd;">Very high attack frequency. Minimal gaps between punches. Mixes all punch types with shorter wind-up. Designed to test defensive endurance.</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Switch</td><td style="padding:8px; border:1px solid #ddd;">Unpredictable, mixed strategy</td><td style="padding:8px; border:1px solid #ddd;">Periodically transitions between the other four styles. Transition timing is randomised. Creates an unpredictable opponent requiring continuous adaptation.</td></tr>
+ </tbody>
+ </table>
+
+ <h4>Combo Drill Library (50 combinations)</h4>
+ <p style="text-align:left;">
+ 50 progressive combinations across three difficulty levels, defined in <code>config/drills.yaml</code>:
+ </p>
+ <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;">
+ <div style="background:#e3f2fd; border-left:3px solid #1565c0; padding:10px 14px; border-radius:4px;">
+ <div style="font-weight:600; color:#0d47a1;">Beginner (15)</div>
+ <div style="font-size:0.88rem; margin-top:4px; color:#555;">2&ndash;3 punches per combo. Fundamental jab, cross, and basic hook combinations (e.g. 1-2, 1-1-2, 1-2-3).</div>
+ </div>
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; border-radius:4px;">
+ <div style="font-weight:600; color:#5d4037;">Intermediate (20)</div>
+ <div style="font-size:0.88rem; margin-top:4px; color:#555;">3&ndash;5 punches per combo. All six punch types with mixed combinations and uppercut introductions.</div>
+ </div>
+ <div style="background:#fce4ec; border-left:3px solid #c62828; padding:10px 14px; border-radius:4px;">
+ <div style="font-weight:600; color:#b71c1c;">Advanced (15)</div>
+ <div style="font-size:0.88rem; margin-top:4px; color:#555;">4&ndash;8 punches per combo. Complex sequences requiring fluid transitions, directional changes, and rapid sequencing.</div>
+ </div>
+ </div>
+
+ <h4>Performance Tests</h4>
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.88rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd; width:130px;">Test</th>
+ <th style="padding:8px; border:1px solid #ddd;">Description</th>
+ <th style="padding:8px; border:1px solid #ddd;">Key Metrics</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Power</td><td style="padding:8px; border:1px solid #ddd;">Measures maximum punch force via IMU accelerometer</td><td style="padding:8px; border:1px solid #ddd;">peak_force, avg_force, punch_count</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Stamina</td><td style="padding:8px; border:1px solid #ddd;">120-second sustained effort. Fatigue index = (punch rate last 30s) / (punch rate first 30s)</td><td style="padding:8px; border:1px solid #ddd;">total_punches, punches_per_minute, fatigue_index</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd; font-weight:600;">Reaction</td><td style="padding:8px; border:1px solid #ddd;">3 trials of visual stimulus using YOLO pose detection. Tiers: Lightning, Fast, Average, Developing</td><td style="padding:8px; border:1px solid #ddd;">avg/best/worst reaction_ms, tier</td></tr>
+ </tbody>
+ </table>
+
+ <sl-divider></sl-divider>
+
+ <!-- F. INTEGRATION TEST BREAKDOWN -->
+ <h3 id="app-integration">H. Integration Test Breakdown</h3>
+
+ <p>
+ 28 integration tests in <code>notebooks/scripts/test_integration.py</code>, covering
+ 7 categories that verify cross-module communication:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.88rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Category</th>
+ <th style="padding:8px; border:1px solid #ddd;">What It Verifies</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr><td style="padding:8px; border:1px solid #ddd;">Config loading &amp; YAML validation</td><td style="padding:8px; border:1px solid #ddd;">All configuration files parse correctly and contain required fields</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd;">Pad-location constraint mapping</td><td style="padding:8px; border:1px solid #ddd;">Each punch type is only accepted on valid pads (e.g. jab/cross &rarr; centre pad only)</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd;">CV+IMU fusion algorithm</td><td style="padding:8px; border:1px solid #ddd;">Temporal matching, ring buffer behaviour, and fusion window correctness</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd;">ROS message field verification</td><td style="padding:8px; border:1px solid #ddd;">All 21 custom message types contain the expected fields and types</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd;">Motor protocol validation</td><td style="padding:8px; border:1px solid #ddd;">Punch codes 1&ndash;6 map correctly to the expected motor commands</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd;">Reaction time detection logic</td><td style="padding:8px; border:1px solid #ddd;">Depth-based proximity threshold triggers at the correct distances</td></tr>
+ <tr><td style="padding:8px; border:1px solid #ddd;">Punch sequence file parsing</td><td style="padding:8px; border:1px solid #ddd;">All combo drill YAML files parse correctly and contain valid punch sequences</td></tr>
+ </tbody>
+ </table>
+
+ <sl-divider></sl-divider>
+
+ <!-- I. REPOSITORY LINKS -->
+ <h3 id="app-repos">I. Repository Links</h3>
 
  <div style="display:flex; flex-direction:column; gap:16px; max-width:600px; margin:16px auto;">
  <div style="display:flex; align-items:center; gap:16px; padding:14px 20px; border:1px solid #ddd; border-radius:8px;">
