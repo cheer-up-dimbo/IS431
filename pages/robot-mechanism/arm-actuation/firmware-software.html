@@ -42,7 +42,7 @@
       <sl-icon slot="icon" name="check-circle"></sl-icon>
       <strong>V-Model Traceability:</strong> This page addresses <strong>RM-7</strong>
       (<em>Deliver jab, hook, and uppercut</em>) and <strong>RM-8</strong>
-      (<em>90&deg; sweep &le; 0.70 s</em>) at the firmware and software layer — covering the
+      (<em>90&deg; sweep &le; 0.25 s</em>) at the firmware and software layer — covering the
       200 Hz unified Teensy loop, kinematic decoupling equations, the Strike Library,
       state-aware motion planning, and the micro-ROS/ROS 2 interface. The Sparse
       Edge-Trigger strategy and deterministic loop timing directly enable
@@ -57,7 +57,7 @@
         The control system follows a two-tier hierarchical design.
         Tier 1 resides on the Jetson Orin NX running
         ROS 2 Humble, which hosts the GUI
-        (<code>unified_GUI_V4.py</code>), publishes motor commands at
+        (<code>unified_GUI_V3.py</code>), publishes motor commands at
         100 Hz, and performs all combat FSM decision-making, strike
         sequencing, and impact detection.
       </p>

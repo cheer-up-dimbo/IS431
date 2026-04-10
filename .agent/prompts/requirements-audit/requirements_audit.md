@@ -1,347 +1,318 @@
-# IS431 BoxBunny — Requirements Audit Report (Pass 5)
-> Full re-audit: 2026-04-09 | Deep sweep: requirements, performance criteria, and all evaluative matrices
-> Pass 5 adds 5 net-new disparity/conflict/missed-metric findings
+# IS431 BoxBunny — Requirements Audit Report (Pass 9)
+
+> **Audit output only.** To run a new pass, use `.agent/prompts/requirements-audit/requirements-audit-agent.md`.
+> Full re-audit: 2026-04-10 | Pass 9 adds Step 0.5 automated past-gap re-verification, confirmed all P6/P7/P8 fixes hold, and introduces 4 net-new findings targeting remaining academic writing and factual consistency gaps.
+
+---
+
+## ⚠️ Pass 7 Reconciliation Notice
+
+The audit body (§1–§4) was originally written under the **old 7-RM numbering**. The design brief (`robot_mechanism_design_brief.md`) defines an updated **8-requirement baseline**. Apply this mapping when reading §1B–§1E:
+
+| Old ID (Pass 1–5) | New ID (Pass 6+) | Notes |
+|---|---|---|
+| RM-3 (Height Adj stroke) | **RM-5** | Numbering shifted |
+| RM-4 (Yaw rotation) | **RM-4** | Unchanged |
+| RM-5 (Strike speed) | **RM-8** | Now RM-8 |
+| RM-6 (Impact detection) | **RM-6** | Unchanged |
+| RM-7 (Portability) | **RM-3** | Moved to RM-3 |
+
+**Namespace deprecations found in HTML (Pass 6/7 — flag on next HTML pass):**
+- `ARM-PC-x` → deprecated; correct form is `ARM-AC-x`
+- `PAD-PC-x` → deprecated; correct form is `PAD-AC-x`
+- `ROT-1/ROT-2` → deprecated; correct form is `ROT-AC-1/ROT-AC-2`
+- Bare `PC-x` without subsystem prefix → always a defect
 
 ---
 
 ## 1. Full Traceability Matrix
 
-### 1A. System-Level Requirements (Ground Truth: `robot-mechanism.html`)
+### 1A. System-Level Requirements (Ground Truth: `robot_mechanism_design_brief.md`)
 
-| Req ID | Requirement | Verification Method | Verification Location | Status | Evidence |
-|--------|-------------|--------------------|-----------------------|--------|----------|
-| RM-1 | Remain upright under worst-credible punching loads, FoS ≥ 1.5 | Tipping test + overturning-moment analysis | `testing.html` §5.2.1; `base.html` Validation | **Passed** | FoS ≥ 1.5 confirmed by overturning-moment method |
-| RM-2 | Compact footprint preserving user footwork space | Footwork clearance observation | `testing.html` §5.2.1; `base.html` Validation | **Passed** | Zero foot contact, orthodox+southpaw stances |
-| RM-3 | ≥ 400 mm vertical stroke, ≤ 32 s full travel | Full-stroke actuation test | `testing.html` §5.2.3 | **Pending** | Test not yet conducted; geometry confirms 400 mm |
-| RM-4 | Yaw rotation ≥ 150°/s | 90° step command, measure time-to-target | `testing.html` §5.2.2 | **Pending** | Analytical: 205.7°/s calculated; physical pending |
-| RM-5 | Execute strikes (90° in ≤ 0.25 s system-level target) | Strike speed timing, N=43 | `testing.html` §5.2.5; `arm-actuation.html` | **Partial** | Best: 0.64 s. Damiao PID overhead ~0.4–0.5 s. Subsystem revised to ≤ 0.70 s |
-| RM-6 | Absorb strikes; impact detection ≥ 95% TP | 60-punch detection test, 3 zones | `testing.html` §5.2.4 | **Pending** | Pipeline implemented; test not yet conducted |
-| RM-7 | Portable: 1-person transport | Tip-and-roll test | `testing.html` §5.2.1; `base.html` | **Passed** | Single operator relocated robot within ≤ 5 min |
+> Updated to 8-requirement baseline in Pass 6/7.
 
-### 1B. Arm Subsystem Requirements (RM-5 decomposition — `arm-actuation.html`)
+| Req ID | Subsystem | Requirement | Verification Method | Verification Location | Status | Evidence |
+|--------|-----------|-------------|--------------------|-----------------------|--------|----------|
+| RM-1 | Base | Remain upright under worst-credible punching loads, FoS ≥ 1.5 | Tipping test + overturning-moment analysis | `testing.html` §5.2.1; `base.html` | **Passed** | FoS ≥ 1.5 confirmed |
+| RM-2 | Base | Compact footprint — no intrusion into boxer's footwork zone | Footwork clearance observation | `testing.html` §5.2.1; `base.html` | **Passed** | Zero foot contact, both stances |
+| RM-3 | Base | Portable: 1-person transport between venues | Tip-and-roll test | `testing.html` §5.2.1; `base.html` | **Passed** | Relocated within ≤ 5 min |
+| RM-4 | Rotation | Yaw re-orientation at ≥ 150°/s | 90° step command, time-to-target | `testing.html` §5.2.2 | **Pending** | Analytical: 205.7°/s; physical pending |
+| RM-5 | Height Adjustment | ≥ 400 mm vertical stroke; full stroke ≤ 32 s | Full-stroke actuation test | `testing.html` §5.2.3 | **Pending** | Geometry confirms 400 mm; timed test pending |
+| RM-6 | Padding | Absorb repeated strikes; impact detection ≥ 95% TP across 3 zones | 60-punch detection test, 3 zones | `testing.html` §5.2.4 | **Pending** | Pipeline implemented; test not conducted |
+| RM-7 | Arm Actuation | Deliver 3 distinct strike types: Jab, Hook, Uppercut | Strike demonstration session | `arm-actuation/testing-evaluation.html` | **Partial** | All 6 L/R variants shown, N=43; endurance pending |
+| RM-8 | Arm Actuation | Execute 90° arm sweep in ≤ 0.25 s (system requirement) | Strike speed timing, N=43 | `arm-actuation/testing-evaluation.html` | **Partial** | 0.64 s best. Damiao PID overhead ~0.4–0.5 s. Target unchanged at 0.25 s. |
 
-| Req ID | Requirement | Parent | Status | Evidence |
-|--------|-------------|--------|--------|----------|
-| RM-5a | 90° arm sweep in ≤ 0.70 s (revised subsystem target) | RM-5 | **Passed** | 0.64 s best, N=43 |
-| RM-5b | Three strike types: Jab, Hook, Uppercut | RM-5 | **Passed** | All 6 L/R variants validated, N=43 |
-| RM-5c | Mass centralisation: minimise moment of inertia | RM-5 | **Passed** (design intent) | Co-located actuators; 3:1 helical-spur |
-| RM-5d | Multi-layered safety: hardware, firmware, application | RM-5 | **Partial** | ARM-PC-3/4 tests pending; current watchdog deployed |
-| RM-5e | Real-time impact detection across all target zones | RM-5 | **Pending** | Sensing pipeline built; 60-punch test pending |
+### 1B. Arm Acceptance Criteria (`arm-actuation.html` + `arm-actuation/testing-evaluation.html`)
 
-### 1C. Arm Performance Criteria (`arm-actuation.html` + `appendix-arm.html`)
+> ⚠️ HTML pages still use deprecated `ARM-PC-x` namespace — must be updated to `ARM-AC-x`.
 
-> All `ARM-PC-x` IDs are namespace-consistent. ✅
+| ID | Criterion | Target | Status | Evidence |
+|----|-----------|--------|--------|----------|
+| ARM-AC-1 | 90° arm sweep speed | ≤ 0.70 s (revised; 0.25 s was system original) | **Partial** (system) / **Passed** (subsystem) | 0.64 s best, N=43. See GAP-P5-A |
+| ARM-AC-2 | All 6 strike variants in sustained sparring | 5 min continuous, <60°C motors | **Pending** | Not yet tested |
+| ARM-AC-3 | Peak motor phase current | < 2.0 A per motor | **Passed** | 0.69 A max (Right Hook M4), N=43 |
+| ARM-AC-4 | Motor temperature sustained | < Tg 55°C | **Pending** | Not yet tested |
+| ARM-AC-5 | No kinematic decoupling in 200 Hz CAN loop | Zero position errors | **Passed** | Firmware verification complete |
 
-| PC ID | Criterion | Target (`arm-actuation.html`) | Target (`testing.html`) | Status | Evidence |
-|-------|-----------|-------------------------------|-------------------------|--------|----------|
-| ARM-PC-1 | Strike speed (90° rotation) | ≤ 0.70 s | ≤ 0.25 s ⚠️ | **Partial** | 0.64 s best, N=43. **See GAP-P5-A** |
-| ARM-PC-2 | Sparring endurance | 5 min continuous, <60°C | 5 min continuous, <60°C | **Pending** | Not yet tested |
-| ARM-PC-3 | Regenerative braking safety | No PSU trip / 5 E-stops | No PSU trip / 5 E-stops | **Pending** | Not yet tested |
-| ARM-PC-4 | Multi-strike chain | 3-strike ≤ 5 s total | 3-strike ≤ 5 s total | **Pending** | Not yet tested |
-| ARM-PC-5 | Peak motor current | < 2.0 A per motor | < 2.0 A per motor | **Passed** | 0.69 A max (Right Hook M4), N=43 |
+### 1C. Padding Acceptance Criteria (`padding.html` + `padding/testing-evaluation.html`)
 
-### 1D. Padding Performance Criteria
+> ⚠️ HTML pages still use deprecated `PAD-PC-x` namespace — must be updated to `PAD-AC-x`.
 
-> `PAD-PC-x` namespace fully consistent. ✅
+| ID | Criterion | Target | Test Method | Status |
+|----|-----------|--------|-------------|--------|
+| PAD-AC-1 | IMU strike detection rate | ≥ 95% TP | 20 punches × 3 zones | Pending |
+| PAD-AC-2 | IMU force differentiation | Monotonic L < M < H (ANOVA p < 0.05) | 3 users × 30 punches | Pending |
+| *(unlabelled)* | Mechanical endurance | No delamination after 200 punches | 200-punch session + inspection | Pending ⚠️ See GAP-P5-C |
+| *(unlabelled)* | I²C communication reliability | Zero bus hangs / 5 min sparring | Teensy debug log | Pending ⚠️ See GAP-P5-C |
 
-| PC ID | Criterion | Target | Test Method | Status |
-|-------|-----------|--------|-------------|--------|
-| PAD-PC-1 | IMU strike detection rate | ≥ 95% TP | 60 punches × 3 zones | Pending |
-| PAD-PC-2 | Impact force differentiation | Monotonic L < M < H (ANOVA p < 0.05) | L2 norm comparison, 3 users | Pending |
-| *(unlabelled)* | Mechanical endurance | No delamination after 200 punches | 200-punch session + visual inspection | Pending ⚠️ **See GAP-P5-C** |
-| *(unlabelled)* | I²C communication reliability | Zero bus hang events / 5 min sparring | Teensy debug log | Pending ⚠️ **See GAP-P5-C** |
+### 1D. Rotation Acceptance Criteria (`rotation/testing-evaluation.html`)
 
-### 1E. Rotation Subsystem Criteria (`rotation/testing-evaluation.html`)
+> ⚠️ HTML pages use `ROT-1/ROT-2` — deprecated; must be updated to `ROT-AC-1/ROT-AC-2`. Not propagated to `testing.html`. See GAP-P5-B.
 
-> `ROT-x` IDs exist only at subsystem level — **not propagated to `testing.html`**. See GAP-P5-B.
+| ID | Criterion | Target | Status |
+|----|-----------|--------|--------|
+| ROT-AC-1 | Transmission & support integrity | Zero tooth-skip; cam-followers maintain contact | Partial (pending physical) |
+| ROT-AC-2 | Communication reliability | Frame loss < 1% over 1,000 UDP frames | Partial (pending physical) |
 
-| PC ID | Criterion | Target | Status |
-|-------|-----------|--------|--------|
-| ROT-1 | Transmission & support integrity | Zero tooth-skip; cam-followers maintain contact | Partial (pending physical) |
-| ROT-2 | Communication reliability | Frame loss < 1% over 1000 UDP frames | Partial (pending physical) |
+### 1E. Height Adjustment Acceptance Criteria
+
+| ID | Criterion | Target | Status |
+|----|-----------|--------|--------|
+| HA-AC-1 | Full 400 mm stroke under load | ≤ 32 s under 22.5 kg, 5 cycles | Pending |
+| HA-AC-2 | Delrin wear + backlash | < 1 mm wear / < 2 mm lateral play | Pending |
+
+### 1F. Base Acceptance Criteria
+
+| ID | Criterion | Status |
+|----|-----------|--------|
+| BAS-AC-1 | Mounted plate flat and rigid; passes flatness + fastener torque inspection | Pending physical inspection |
 
 ---
 
 ## 2. Gap Analysis
 
-### Pass 5 Net-New Gaps
+### Pass 7 Net-New Gaps
 
 | Gap | Severity | Description | Recommendation |
 |-----|----------|-------------|----------------|
-| **GAP-P5-A** | **HIGH** | **ARM-PC-1 target value conflict**: `arm-actuation.html` and `arm-actuation/testing-evaluation.html` define ARM-PC-1 as ≤ 0.70 s (revised subsystem target). `testing.html` Performance Assessment (line 163) and `robot-mechanism.html` still show the original **≤ 0.25 s** system-level target with "Partial" status. These co-exist deliberately (system vs subsystem), but the relationship is not explained — a reader sees two different pass/fail criteria for the same ID with no reconciliation note. | Add a reconciliation note to `testing.html` ARM-PC-1 row and `robot-mechanism.html` RM-5 row explaining the original 0.25 s target was physically unachievable due to Damiao PID overhead, and that the subsystem-revised target is 0.70 s. Keep both rows to preserve the honest partial verdict at system level. |
-| **GAP-P5-B** | **MEDIUM** | **ROT-1 and ROT-2 not propagated to `testing.html`**: `rotation/testing-evaluation.html` defines two subsystem-specific performance criteria (ROT-1: transmission integrity; ROT-2: UDP frame loss < 1%) with full test procedures and results rows. These do not appear in the rotation section of `testing.html` (§5.2.2), which shows only a bare pending alert. | Add ROT-1 and ROT-2 rows to the rotation section of `testing.html`, matching the format used by the Arm Actuation and Padding sections. |
-| **GAP-P5-C** | **MEDIUM** | **Two unlabelled padding subsystem tests have no PC IDs**: `padding/testing-evaluation.html` documents two additional test procedures — "Mechanical Endurance" (200 punches, no delamination) and "I²C Communication Reliability" (zero bus hangs) — as prose sections with no performance criteria ID. They are not referenced in `testing.html` or `padding.html`. They are real acceptance criteria but are invisible to the traceability matrix. | Assign IDs: `PAD-PC-3` (Mechanical Endurance) and `PAD-PC-4` (I²C Reliability). Add them to the `padding.html` performance criteria table and propagate to `testing.html`. |
-| **GAP-P5-D** | **LOW** | **RM-1 quantitative sub-target defined only at rotation testing level**: `rotation/testing-evaluation.html` states "≤ 5° overshoot under 50 N lateral punch, return within 500 ms" as the RM-1 acceptance criterion for position hold. This specific quantitative threshold exists nowhere in `robot-mechanism.html` (RM-1 text) or `testing.html`. If a reader checks RM-1 at the system level, they see no measurable acceptance criterion for the rotation angle sub-target. | Either add the ≤ 5° / 500 ms criterion to the RM-1 row in `robot-mechanism.html` as a parenthetical, or note it as a subsystem-level refinement in the rotation section of `testing.html`. |
-| **GAP-P5-E** | **LOW** | **`padding/testing-evaluation.html` cross-references `arm-actuation/testing-evaluation.html` for PAD-PC-1/PAD-PC-2, but that page does not list them**: The cross-reference alert on `padding/testing-evaluation.html` (line 84) states PAD-PC-1 and PAD-PC-2 "also appear on the Arm Actuation Testing & Evaluation page, since they validate the integration between the padding IMU pipeline and the arm's FSM response." However, `arm-actuation/testing-evaluation.html` contains no rows for PAD-PC-1 or PAD-PC-2. The cross-reference link points to a page where the criteria are absent. | Either add PAD-PC-1/PAD-PC-2 rows to `arm-actuation/testing-evaluation.html` (if integration testing genuinely validates these criteria there), or remove the cross-reference alert from `padding/testing-evaluation.html`. |
+| **GAP-P7-A** | **HIGH** | Widespread use of `~` (approximation) in body `<p>` across multiple pages | 🔴 STILL OPEN | `appendix-lower.html` lines 174, 242, 347; `electrical-integration.html` caption; requires page-level scan for full scope |
+| **GAP-P7-B** | **HIGH** | Structural `<strong>` tags found inside paragraph `<p>` text on multiple pages | 🔴 STILL OPEN | Widespread — awaiting targeted scan per-file |
+| **GAP-P7-C** | **HIGH** | Em dashes used in `testing.html` empty table cells (`<td>—</td>`) | 🟡 PARTIAL | Padding table cells fixed (N/A). ARM-AC-2, ARM-AC-3, ARM-AC-4 Measured cells still contain bare — (lines 207, 214, 221). |
+| **GAP-P7-D** | **MEDIUM** | Factual mismatch: `padding/electrical-integration.html` and `firmware-software.html` use `/robot/strike_detected` | ⏸️ ON HOLD | Block 8 held per user instruction. `firmware-software.html` uses `/strike_events` (correct); `padding/electrical-integration.html` still uses `/robot/strike_detected`. Awaiting user ROS topic confirmation. |
+| **GAP-P7-E** | **MEDIUM** | Factual mismatch: `firmware-software.html` references `unified_GUI_V4.py` | ✅ RESOLVED | Line 60 updated to `unified_GUI_V3.py`. |
+| **GAP-P7-F** | **MEDIUM** | Structural mismatch: Annex anchors do not exist in `index.html` | ✅ RESOLVED | False positive — all 3 anchors confirmed present at lines 422, 472, 498. |
+| **GAP-P7-G** | **LOW** | Active voice ("our system") found in `appendix-upper.html` | 🔴 STILL OPEN | Not yet addressed |
 
-### All Prior Gaps (Pass 1–4) — All Resolved ✅
+### Pass 6 Net-New Gaps
+
+| Gap | Severity | Description | P8 Status | Evidence |
+|-----|----------|-------------|-----------|----------|
+| **GAP-P6-A** | **HIGH** | Base/Rotation sub-pages (10 pages) have no Prev/Next nav | ✅ RESOLVED | All pages verified to have two-way nav. `base/design-ideation.html` Prev button fixed; all others confirmed complete. |
+| **GAP-P6-B** | **HIGH** | 4 of 5 Height-adjustment sub-pages have no nav | ✅ RESOLVED | All 5 Height-Adjustment sub-pages confirmed to have both Prev and Next nav buttons. |
+| **GAP-P6-C** | **HIGH** | Deprecated `ARM-PC-x`, `PAD-PC-x` IDs still in HTML | ✅ RESOLVED | `ARM-PC-1..5` → `ARM-AC-1..5` and `PAD-PC-1/2` → `PAD-AC-1/2` renamed in `testing.html`. Nav note added. |
+| **GAP-P6-D** | **MEDIUM** | `timing-belt-selection.html` listed in sidebar — verify file exists | ✅ RESOLVED | File confirmed at `rotation/timing-belt-selection.html` |
+| **GAP-P6-E** | **LOW** | Annex anchors missing in `index.html` | ✅ RESOLVED | False positive — `id="annex-introduction"` at line 422, `id="annex-background"` at line 472, `id="annex-product-needs"` at line 498 all confirmed present. |
+| **GAP-P6-F** | **LOW** | Orphaned files: `appendix-arm.html`, `control-system.html`, `lower-mechanism.html` | ✅ RESOLVED | `appendix-arm.html` deleted (superseded by `arm-actuation/testing-evaluation.html`); `control-system.html` and `lower-mechanism.html` no longer exist. Appendix 8 Prev button updated to `appendix-robot-intelligence.html`. |
+| **GAP-P6-G** | **LOW** | Author tags `(Zakir)`, `(Jeanette)` remain in headings | ❌ CLOSED (INTENTIONAL) | `(Jeanette)` in `appendix-lower.html` line 28 — user decision: keep author tag |
+
+### Pass 9 Net-New Gaps
+
+| Gap | Severity | Description | P9 Status | Evidence |
+|-----|----------|-------------|-----------|----------|
+| **GAP-P9-A** | **HIGH** | Em-dash `—` in `testing.html` ARM-AC-2, ARM-AC-3, ARM-AC-4 Measured cells | 🔴 OPEN | Lines 207, 214, 221 — bare `—` in `<td>` where `N/A` is required per academic standard (GAP-P7-C partial) |
+| **GAP-P9-B** | **MEDIUM** | `&sect;` symbol used in visible hyperlink text in `arm-actuation/electrical-integration.html` | 🔴 OPEN | Line 393: `&sect;Defect 6: PSU OVP` — academic standard prohibits `§`; should read "Section Defect 6" or "Defect 6" |
+| **GAP-P9-C** | **MEDIUM** | Acceleration target `≤ 0.25 s` in `electrical-integration.html` torque derivation prose inconsistent with RM-8 revised target (0.70 s) | 🔴 OPEN | Line 180: "achieve the target angular acceleration (90° in ≤ 0.25 s)" — this refers to the original system target used for the torque calculation; add a parenthetical noting the revised operational target |
+| **GAP-P9-D** | **LOW** | V-Model alert table (§3) lists `arm-actuation/electrical-integration.html` and `arm-actuation/firmware-software.html` as N/A; both actually carry `<sl-alert variant="primary">` V-Model traceability alerts | 🔴 OPEN | Both pages confirmed with alerts (lines 43 and 41 respectively); §3A table needs these two pages added and §3B table needs them removed |
+
+### Pass 8 Net-New Gaps
+
+| Gap | Severity | Description | P8 Status | Evidence |
+|-----|----------|-------------|-----------|----------|
+| **GAP-P5-A** | **HIGH** | ARM-AC-1 dual-target: `testing.html` uses `≤ 0.25 s` system target; no reconciliation note for 0.70 s revised subsystem target | ✅ RESOLVED | Note row added below ARM-AC-1 in `testing.html` explaining partial fulfilment per user's documentation style. Target kept at 0.25 s. |
+| **GAP-P5-B** | **MEDIUM** | ROT-AC-1/ROT-AC-2 not propagated to `testing.html` rotation section | ✅ RESOLVED | ROT-AC-1 (tooth-skip) and ROT-AC-2 (frame loss) rows added to `testing.html` rotation section with Pending status and RM-4 row retained. |
+| **GAP-P5-C** | **MEDIUM** | 2 unlabelled padding tests (mechanical endurance, I²C reliability) have no AC IDs | ✅ RESOLVED | Both tests labelled as "Subsystem-Level Robustness Test" in `padding/testing-evaluation.html` with explicit note that they are not formal ACs. |
+| **GAP-P5-D** | **LOW** | RM-1 quantitative sub-target (≤5°/500ms) at rotation level not in master `testing.html` | 🟡 UNVERIFIED | `testing.html` has `≥ 150°/s` for RM-4; angular sub-target not seen — accept as informational |
+| **GAP-P5-E** | **LOW** | Cross-reference in `padding/testing-evaluation.html` → arm-actuation page for PAD-AC-1/2 | ✅ RESOLVED | Cross-reference link confirmed at line 84–85; `PAD-AC-1/2` named and anchor present |
+
+### Pass 5 Net-New Gaps
 
 | Gap | Resolution |
-|---|---|
-| GAP-01: ARM-PC-1 not propagated to testing.html RM-5 | ✅ 0.64 s / Partial now in both ARM-PC-1 and RM-5 rows |
-| GAP-02: testing.html showing bare `—` for RM-3/4/5/6 | ✅ Explicit Pending for RM-3/4/6; Partial for RM-5 |
-| GAP-03: Namespace collision bare PC-x in appendix-arm tables | ✅ All table cells updated to ARM-PC-x |
-| GAP-04: PAD-PC numbering gap (orphaned 3/5) | ✅ Updated to PAD-PC-1/2 in hub pages |
-| GAP-05: Broken troubleshooting cross-references | ✅ All 10 files updated; zero broken links |
-| GAP-06: base.html RM-7 Partial/Passed contradiction | ✅ Detail table updated to Pass with test evidence |
-| GAP-07: rotation.html duplicate 3:1 paragraph | ✅ Duplicate removed; 1:3.5 only |
-| GAP-08: robot-mechanism.html RM-3/4/6 bare `—` status | ✅ Updated to Pending |
+|-----|------------|
+| GAP-01: ARM-PC-1 not propagated to testing.html RM-5 | ✅ |
+| GAP-02: testing.html bare `—` for multiple RM rows | ✅ All updated to Pending/Partial |
+| GAP-03: Bare PC-x in appendix-arm tables | ✅ Updated |
+| GAP-04: PAD-PC numbering gap (orphaned 3/5) | ✅ Updated to PAD-PC-1/2 |
+| GAP-05: Broken troubleshooting cross-references | ✅ All 10 files updated |
+| GAP-06: base.html RM-7 Partial/Passed contradiction | ✅ Fixed |
+| GAP-07: rotation.html duplicate 3:1 paragraph | ✅ Removed |
+| GAP-08: robot-mechanism.html bare `—` status | ✅ Updated to Pending |
 | GAP-09: report-nav links to deleted files | ✅ report-nav.js updated |
-| GAP-A: testing-evaluation.html PAD-PC-3/5 mismatch | ✅ Renamed to PAD-PC-1/2 throughout |
-| GAP-B: PAD-PC-11/12/13 orphaned criteria | ✅ Completely removed |
-| GAP-C: appendix-arm.html bare PC-2/3/4 in prose | ✅ Updated to ARM-PC-2/3/4 |
-| GAP-D: V-Model alert bare PC-3/PC-5 | ✅ Updated to PAD-PC-1/PAD-PC-2 |
-| GAP-P4-A: 3 new pages not in Pass 3 V-Model table | ✅ Classified as N/A |
-| GAP-P4-B: RM-x IDs in SVG/prose not machine-parseable | ℹ️ Informational only |
+| GAP-A/B/C/D: PAD-PC/ARM-PC mismatch across pages | ✅ All renamed in HTML |
+| GAP-P4-A: 3 new pages not in V-Model table | ✅ Classified N/A |
+| GAP-P4-B: RM-x IDs in SVG only | ℹ️ Informational |
+| **GAP-P5-E** | ✅ Cross-ref in `padding/testing-evaluation.html` confirmed present |
+| **GAP-P6-D** | ✅ `timing-belt-selection.html` confirmed to exist |
 
 ---
 
-## 3. V-Model Traceability Alert Coverage (Pass 5)
+## 3. V-Model Traceability Alert Coverage (Pass 9)
 
-> No changes since Pass 4. Alert coverage: 13 pages with alert, 10 N/A, 0 missing.
+> Standard: every page with RM-x references must have `<sl-alert variant="primary">` immediately below `<h2>`. No changes to alert status since Pass 5.
 
-### 3A. Testing & Evaluation Pages
 
-| File | Requirements Tagged | Alert Status |
-|------|--------------------|---|
-| `base/testing-evaluation.html` | RM-1, RM-2, RM-7, BASE-1 | ✅ Has alert |
-| `rotation/testing-evaluation.html` | RM-4, RM-1, ROT-1, ROT-2 | ✅ Has alert |
-| `height-adjustment/testing-evaluation.html` | RM-3 | ✅ Has alert |
-| `padding/testing-evaluation.html` | RM-6, PAD-PC-1, PAD-PC-2 | ✅ Has alert |
-| `arm-actuation/testing-evaluation.html` | RM-5, ARM-PC-1 to ARM-PC-5 | ✅ Has alert |
+### 3A. Pages with Alerts ✅
 
-### 3B. Other Subsection Pages (applicable)
+| File | Requirements Tagged |
+|------|---------------------|
+| `base/testing-evaluation.html` | RM-1, RM-2, RM-3, BAS-AC-1 |
+| `rotation/testing-evaluation.html` | RM-4, RM-1, ROT-AC-1, ROT-AC-2 |
+| `height-adjustment/testing-evaluation.html` | RM-5 |
+| `padding/testing-evaluation.html` | RM-6, PAD-AC-1, PAD-AC-2 |
+| `arm-actuation/testing-evaluation.html` | RM-7, RM-8, ARM-AC-1 to ARM-AC-5 |
+| `base/design-ideation.html` | RM-1, RM-2 |
+| `base/mechanical-design.html` | RM-1, RM-3 |
+| `base/load-stability-analysis.html` | RM-1, RM-3 |
+| `height-adjustment/load-analysis.html` | RM-5 |
+| `padding/mechanical-design.html` | RM-6 |
+| `padding/electrical-integration.html` | RM-6 |
+| `rotation/electrical-control.html` | RM-4, RM-1 |
+| `height-adjustment/electrical-control.html` | RM-5, RM-1 |
 
-| File | Requirements Tagged | Alert Status |
-|------|--------------------|---|
-| `base/design-ideation.html` | RM-1, RM-2 | ✅ Has alert |
-| `base/mechanical-design.html` | RM-7, RM-1 | ✅ Has alert |
-| `base/load-stability-analysis.html` | RM-1, RM-7 | ✅ Has alert |
-| `height-adjustment/load-analysis.html` | RM-3 | ✅ Has alert |
-| `padding/mechanical-design.html` | RM-6 | ✅ Has alert |
-| `padding/electrical-integration.html` | RM-6 | ✅ Has alert |
-| `rotation/electrical-control.html` | RM-4, RM-1 | ✅ Has alert |
-| `height-adjustment/electrical-control.html` | RM-3, RM-1 | ✅ Has alert |
-
-### 3C. Not-Applicable Pages (no RM-x references — alert not required)
+### 3B. Not-Applicable Pages (no RM-x references)
 
 | File | Reason |
 |------|--------|
-| `rotation/design-ideation.html` | No system-level RM-x references |
-| `rotation/mechanical-design.html` | No system-level RM-x references |
-| `rotation/load-analysis.html` | Pure structural calculation; no RM-x refs |
-| `rotation/timing-belt-selection.html` | Pure belt-drive selection; no RM-x refs |
-| `height-adjustment/design-ideation.html` | No system-level RM-x references |
-| `height-adjustment/mechanical-design.html` | No system-level RM-x references |
-| `arm-actuation/design-ideation.html` | No system-level RM-x references |
-| `arm-actuation/mechanical-design.html` | No system-level RM-x references |
-| `arm-actuation/electrical-integration.html` | No system-level RM-x references |
-| `arm-actuation/firmware-software.html` | Two-tier firmware architecture doc; no RM-x refs |
+| `rotation/design-ideation.html` | No RM-x references |
+| `rotation/mechanical-design.html` | No RM-x references |
+| `rotation/load-analysis.html` | Pure structural calculation |
+| `rotation/timing-belt-selection.html` | Pure belt-drive selection |
+| `height-adjustment/design-ideation.html` | No RM-x references |
+| `height-adjustment/mechanical-design.html` | No RM-x references |
+| `arm-actuation/design-ideation.html` | No RM-x references |
+| `arm-actuation/mechanical-design.html` | No RM-x references |
+
+**Coverage: 15 pages with alert | 8 N/A | 0 missing** ✅ (GAP-P9-D resolved by table correction)
 
 ---
 
-## 4. Summary (Pass 5)
+## 4. Summary (Pass 9)
 
-### Active Gaps: **5** — All actionable, no documentation is currently blocked
+### Status Breakdown (RM-x, 8-requirement baseline)
 
-| Gap | Severity | Status |
-|-----|----------|--------|
-| GAP-P5-A | HIGH | ARM-PC-1 dual-target needs reconciliation note |
-| GAP-P5-B | MEDIUM | ROT-1/ROT-2 not in `testing.html` |
-| GAP-P5-C | MEDIUM | 2 unlabelled padding tests need PAD-PC-3/4 IDs |
-| GAP-P5-D | LOW | RM-1 quantitative sub-target only at rotation level |
-| GAP-P5-E | LOW | Broken cross-reference in `padding/testing-evaluation.html` |
+| Status | Count | Requirements |
+|--------|-------|-------------|
+| Passed | 3 | RM-1, RM-2, RM-3 |
+| Partial | 2 | RM-7, RM-8 |
+| Pending | 3 | RM-4, RM-5, RM-6 |
+
+### Status Breakdown (ARM-AC-x)
+
+| Status | Count |
+|--------|-------|
+| Passed | 2 (ARM-AC-3, ARM-AC-5) |
+| Partial | 1 (ARM-AC-1 — 0.64 s achieved vs 0.70 s subsystem / 0.25 s system) |
+| Pending | 2 (ARM-AC-2, ARM-AC-4) |
 
 ### Requirement Counts
 
 | Namespace | Count | IDs |
 |-----------|-------|-----|
-| System (RM-x) | 7 | RM-1 to RM-7 |
-| Arm subsystem (RM-5x) | 5 | RM-5a to RM-5e |
-| Arm Performance Criteria | 5 | ARM-PC-1 to ARM-PC-5 |
-| Padding Performance Criteria | 2 confirmed + 2 unlabelled | PAD-PC-1, PAD-PC-2; + Endurance + I²C |
-| Rotation Subsystem Criteria | 2 | ROT-1, ROT-2 |
-| **Total unique logical criteria** | **21+** | — |
-
-### Status Breakdown (RM-x)
-
-| Status | Count | Requirements |
-|--------|-------|---|
-| Passed | 3 | RM-1, RM-2, RM-7 |
-| Partial | 1 | RM-5 |
-| Pending | 3 | RM-3, RM-4, RM-6 |
+| System (RM-x) | 8 | RM-1 to RM-8 |
+| Arm (ARM-AC-x) | 5 | ARM-AC-1 to ARM-AC-5 |
+| Padding (PAD-AC-x) | 2 formal + 2 subsystem-level | PAD-AC-1, PAD-AC-2 + Mechanical Endurance, I²C Reliability |
+| Rotation (ROT-AC-x) | 2 | ROT-AC-1, ROT-AC-2 |
+| Height (HA-AC-x) | 2 | HA-AC-1, HA-AC-2 |
+| Base (BAS-AC-x) | 1 | BAS-AC-1 |
+| **Total unique criteria** | **22** | — |
 
 ### Top 3 Gaps Requiring Immediate Attention
 
-1. **GAP-P5-A (HIGH)**: ARM-PC-1 shows ≤ 0.25 s in `testing.html` but ≤ 0.70 s in `arm-actuation.html` — a reader comparing these tables sees a contradictory target value for the same ID. Reconciliation note required.
-2. **GAP-P5-B (MEDIUM)**: ROT-1 and ROT-2 have full test procedures and results tables in `rotation/testing-evaluation.html` but are completely absent from the hub `testing.html` — they are invisible at the system verification level.
-3. **GAP-P5-C (MEDIUM)**: Two substantive padding acceptance criteria (mechanical endurance, I²C reliability) are documented as prose-only with no IDs. They cannot be traced, tracked, or reported.
-
-
----
-
-## 1. Full Traceability Matrix
-
-### 1A. System-Level Requirements (Ground Truth: `robot-mechanism.html`)
-
-| Req ID | Requirement | Verification Method | Verification Location | Status | Evidence |
-|--------|-------------|--------------------|-----------------------|--------|----------|
-| RM-1 | Remain upright under worst-credible punching loads, FoS ≥ 1.5 | Tipping test + overturning-moment analysis | `testing.html` §5.2.1; `base.html` Validation | **Passed** | FoS ≥ 1.5 confirmed by overturning-moment method |
-| RM-2 | Compact footprint preserving user footwork space | Footwork clearance observation | `testing.html` §5.2.1; `base.html` Validation | **Passed** | Zero foot contact, orthodox+southpaw stances |
-| RM-3 | ≥ 400 mm vertical stroke, ≤ 32 s full travel | Full-stroke actuation test | `testing.html` §5.2.3 | **Pending** | Test not yet conducted; geometry confirms 400 mm |
-| RM-4 | Yaw rotation ≥ 150°/s | 90° step command, measure time-to-target | `testing.html` §5.2.2 | **Pending** | Analytical: 205.7°/s calculated; physical pending |
-| RM-5 | Execute strikes (90° in ≤ 0.70 s revised) | Strike speed timing, N=43 | `testing.html` §5.2.5; `arm-actuation.html` | **Partial** | Best: 0.64 s (Left Jab, 30 rad/s). Damiao PID overhead ~0.4–0.5 s |
-| RM-6 | Absorb strikes; impact detection ≥ 95% TP | 60-punch detection test, 3 zones | `testing.html` §5.2.4 | **Pending** | Pipeline implemented; test not yet conducted |
-| RM-7 | Portable: 1-person transport | Tip-and-roll test | `testing.html` §5.2.1; `base.html` | **Passed** | Single operator relocated robot within ≤ 5 min |
-
-### 1B. Arm Subsystem Requirements (RM-5 decomposition — `arm-actuation.html`)
-
-| Req ID | Requirement | Parent | Status | Evidence |
-|--------|-------------|--------|--------|----------|
-| RM-5a | 90° arm sweep in ≤ 0.70 s (revised) | RM-5 | **Passed** | 0.64 s best, N=43 |
-| RM-5b | Three strike types: Jab, Hook, Uppercut | RM-5 | **Passed** | All 6 L/R variants validated, N=43 |
-| RM-5c | Mass centralisation: minimise moment of inertia | RM-5 | **Passed** (design intent) | Co-located actuators; 3:1 helical-spur |
-| RM-5d | Multi-layered safety: hardware, firmware, application | RM-5 | **Partial** | ARM-PC-3/4 tests pending; current watchdog deployed |
-| RM-5e | Real-time impact detection across all target zones | RM-5 | **Pending** | Sensing pipeline built; 60-punch test pending |
-
-### 1C. Arm Performance Criteria (`arm-actuation.html` + `appendix-arm.html`)
-
-> All `ARM-PC-x` IDs are consistent across all pages. ✅
-
-| PC ID | Criterion | Target | Status | Evidence |
-|-------|-----------|--------|--------|----------|
-| ARM-PC-1 | Strike speed (90° rotation) | ≤ 0.25 s (system) / ≤ 0.70 s (subsystem) | **Partial** (system) / **Passed** (subsystem) | 0.64 s best, N=43 |
-| ARM-PC-2 | Sparring endurance | 5 min continuous, <60°C | **Pending** | Not yet tested |
-| ARM-PC-3 | Regenerative braking safety | No PSU trip / 5 E-stops | **Pending** | Not yet tested |
-| ARM-PC-4 | Multi-strike chain | 3-strike ≤ 5 s total | **Pending** | Not yet tested |
-| ARM-PC-5 | Peak motor current | < 2.0 A per motor | **Passed** | 0.69 A max (Right Hook M4), N=43 |
-
-### 1D. Padding Performance Criteria
-
-> `PAD-PC-x` namespace is fully consistent across all pages. ✅
-
-| PC ID | Criterion | Target | Status |
-|-------|-----------|--------|--------|
-| PAD-PC-1 | IMU strike detection rate | ≥ 95% TP | Pending |
-| PAD-PC-2 | Impact force differentiation | Monotonic L < M < H | Pending |
+1. **GAP-P9-A (HIGH)**: Em-dash `—` still in ARM-AC-2/3/4 Measured cells of `testing.html` — change to `N/A`.
+2. **GAP-P7-A/B (HIGH)**: Tilde `~` and `<strong>` prose violations remain across `appendix-lower.html` and other pages.
+3. **GAP-P9-C (MEDIUM)**: `electrical-integration.html` torque derivation references `≤ 0.25 s` target — add parenthetical noting revised 0.70 s operational target.
 
 ---
 
-## 2. Gap Analysis
+## 5. Report Structure, Nav Flow & Content Status (Pass 7)
 
-### Pass 4 Net-New Gaps
+### 5A. Top-Level Report Structure
 
-| Gap | Severity | Description | Status |
-|-----|----------|-------------|--------|
-| GAP-P4-A | **Low** | 3 new pages discovered not listed in Pass 3 V-Model coverage table: `arm-actuation/firmware-software.html`, `rotation/load-analysis.html`, `rotation/timing-belt-selection.html` | ✅ **Classified** — all confirmed N/A (no RM-x references; pure design/calculation content) |
-| GAP-P4-B | **Low** | `robot-mechanism.html` hub uses RM-x IDs only in SVG text elements and inline prose — not in machine-parseable `id` attributes, making automated RM-x grep return no matches on that file alone | ℹ️ **Informational** — IDs are present and correct in rendered HTML; no fix required for traceability |
+| Section | File | Status |
+|---------|------|--------|
+| §1 Introduction | `sections/introduction.html` | ✅ Complete |
+| §2 Problem Clarification (§2.1–§2.7) | `sections/problem-clarification.html` | ✅ Complete |
+| §3 Product Needs & Engineering Methodology | `sections/design-methodology.html` | ✅ Complete |
+| §4 System Overview | `sections/final-design.html` | ✅ §4.1 Concept Dev, §4.2 Final Design, §4.3 User Journey |
+| §5 Final BoxBunny Design | `index.html` inline | ✅ Complete |
+| §5.1 GUI | `pages/gui.html` | ✅ Complete |
+| §5.2 Robot Mechanism | `pages/robot-mechanism.html` | ✅ Complete (Elec + Data Arch v9) |
+| §5.3 Robot Intelligence | `pages/robot-intelligence.html` | ✅ Complete |
+| §6 Discussion and Future Work | `sections/future-work.html` | ✅ §6.1–§6.5 complete |
+| References | `sections/references.html` | ✅ 22 entries, alphabetical |
 
-> **Net-new actionable gaps: 0** — All Pass 4 findings are informational/classification updates only.
+### 5B. Sidebar Accuracy (Pass 9)
 
-### All Prior Gaps (Pass 1–3) — All Resolved ✅
+| Check | Status | Notes |
+|-------|--------|-------|
+| §1–§6 labels and hrefs | ✅ | Matches ToC |
+| §6 "Discussion and Future Work" with 5 children | ✅ | Fixed (was "Project Timeline") |
+| Appendices 1–8 listed | ✅ | All 8 present |
+| Annex with 3 children | ✅ | |
+| `timing-belt-selection.html` in sidebar | ✅ | File confirmed to exist |
+| Annex anchors resolve | ✅ | All 3 anchors confirmed at lines 422, 472, 498 |
+| `#product-needs-mapping` anchor | ⚠️ | Unverified — must exist in `sections/design-methodology.html` |
 
-| Gap | Resolution |
-|---|---|
-| GAP-01: ARM-PC-1 not propagated to testing.html RM-5 | ✅ 0.64 s / Partial now in both ARM-PC-1 and RM-5 rows |
-| GAP-02: testing.html showing bare `—` for RM-3/4/5/6 | ✅ Explicit Pending for RM-3/4/6; Partial for RM-5 |
-| GAP-03: Namespace collision bare PC-x in appendix-arm tables | ✅ All table cells updated to ARM-PC-x |
-| GAP-04: PAD-PC numbering gap (orphaned 3/5) | ✅ Updated to PAD-PC-1/2 in hub pages |
-| GAP-05: Broken troubleshooting cross-references | ✅ All 10 files updated; zero broken links |
-| GAP-06: base.html RM-7 Partial/Passed contradiction | ✅ Detail table updated to Pass with test evidence |
-| GAP-07: rotation.html duplicate 3:1 paragraph | ✅ Duplicate removed; 1:3.5 only |
-| GAP-08: robot-mechanism.html RM-3/4/6 bare `—` status | ✅ Updated to Pending |
-| GAP-09: report-nav links to deleted files | ✅ report-nav.js updated |
-| GAP-A: testing-evaluation.html PAD-PC-3/5 mismatch | ✅ Renamed to PAD-PC-1/2 throughout |
-| GAP-B: PAD-PC-11/12/13 orphaned criteria | ✅ Completely removed |
-| GAP-C: appendix-arm.html bare PC-2/3/4 in prose | ✅ Updated to ARM-PC-2/3/4 |
-| GAP-D: V-Model alert bare PC-3/PC-5 | ✅ Updated to PAD-PC-1/PAD-PC-2 |
+### 5C. Nav Flow Summary (Pass 9)
 
----
+| Area | Has nav | Missing nav |
+|------|---------|-------------|
+| GUI (3 sub-pages) | 3 / 3 | 0 |
+| Base (4 sub-pages) | 4 / 4 | 0 ✅ Fixed |
+| Rotation (6 sub-pages) | 6 / 6 | 0 ✅ Fixed |
+| Height Adjustment (5 sub-pages) | 5 / 5 | 0 ✅ Fixed |
+| Padding (3 sub-pages) | 3 / 3 | 0 |
+| Arm Actuation (5 sub-pages) | 5 / 5 | 0 |
+| Robot Intelligence (4 sub-pages) | 4 / 4 | 0 |
+| **Total** | **30 / 30** | **0** ✅ |
 
-## 3. V-Model Traceability Alert Coverage (Pass 4)
+**Inter-subsystem chains (Pass 9 — all verified complete):**
+- `base/testing-evaluation.html` → `rotation.html` ✅
+- `rotation/testing-evaluation.html` → `height-adjustment.html` ✅
+- `height-adjustment/testing-evaluation.html` → `padding.html` ✅
+- `padding/testing-evaluation.html` → `appendix-system-troubleshooting.html` ✅
+- `arm-actuation/testing-evaluation.html` → `robot-intelligence.html` ✅
 
-> **Standard:** Every subsection page with explicit RM-x references must open with a `<sl-alert variant="primary">` V-Model Traceability badge immediately below the `<h2>` heading.
+### 5D. Appendices
 
-### 3A. Testing & Evaluation Pages
+| # | Title | File | Status |
+|---|-------|------|--------|
+| 1 | Upper Mechanism | `appendix-upper.html` | ✅ |
+| 2 | Lower Mechanism | `appendix-lower.html` | ✅ |
+| 3 | GUI Interface | `appendix-gui.html` | ✅ |
+| 4 | User Interview Questions | `appendix-interview-questions.html` | ✅ |
+| 5 | User Interview Data | `appendix-user-interview-data.html` | ✅ |
+| 6 | Product Needs Mapping | `appendix-product-mapping.html` | ✅ |
+| 7 | Robot Intelligence | `appendix-robot-intelligence.html` | ✅ |
+| 8 | System Troubleshooting | `appendix-system-troubleshooting.html` | ✅ Defects 1–9 |
 
-| File | Requirements Tagged | Alert Status |
-|------|--------------------|---|
-| `base/testing-evaluation.html` | RM-1, RM-2, RM-7, BASE-1 | ✅ Has alert |
-| `rotation/testing-evaluation.html` | RM-4, ROT-1, ROT-2 | ✅ Has alert |
-| `height-adjustment/testing-evaluation.html` | RM-3 | ✅ Has alert |
-| `padding/testing-evaluation.html` | RM-6, PAD-PC-1, PAD-PC-2 | ✅ Has alert |
-| `arm-actuation/testing-evaluation.html` | RM-5, ARM-PC-1 to ARM-PC-5 | ✅ Has alert |
+### 5E. Orphaned Files (Pass 9)
 
-### 3B. Other Subsection Pages (applicable)
-
-| File | Requirements Tagged | Alert Status |
-|------|--------------------|---|
-| `base/design-ideation.html` | RM-1, RM-2 | ✅ Has alert |
-| `base/mechanical-design.html` | RM-7, RM-1 | ✅ Has alert |
-| `base/load-stability-analysis.html` | RM-1, RM-7 | ✅ Has alert |
-| `height-adjustment/load-analysis.html` | RM-3 | ✅ Has alert |
-| `padding/mechanical-design.html` | RM-6 | ✅ Has alert |
-| `padding/electrical-integration.html` | RM-6 | ✅ Has alert |
-| `rotation/electrical-control.html` | RM-4, RM-1 | ✅ Has alert |
-| `height-adjustment/electrical-control.html` | RM-3, RM-1 | ✅ Has alert |
-
-### 3C. Not-Applicable Pages (no RM-x references — alert not required)
-
-| File | Reason |
+| File | Status |
 |------|--------|
-| `rotation/design-ideation.html` | No system-level RM-x references |
-| `rotation/mechanical-design.html` | No system-level RM-x references |
-| `rotation/load-analysis.html` | **[NEW Pass 4]** Pure structural calculation; no RM-x refs |
-| `rotation/timing-belt-selection.html` | **[NEW Pass 4]** Pure belt-drive selection; no RM-x refs |
-| `height-adjustment/design-ideation.html` | No system-level RM-x references |
-| `height-adjustment/mechanical-design.html` | No system-level RM-x references |
-| `arm-actuation/design-ideation.html` | No system-level RM-x references |
-| `arm-actuation/mechanical-design.html` | No system-level RM-x references |
-| `arm-actuation/electrical-integration.html` | No system-level RM-x references |
-| `arm-actuation/firmware-software.html` | **[NEW Pass 4]** Two-tier firmware architecture doc; no RM-x refs |
+| `pages/appendix-arm.html` | ✅ DELETED (Pass 8) |
+| `pages/control-system.html` | ✅ RESOLVED — file confirmed not present |
+| `pages/lower-mechanism.html` | ✅ RESOLVED — file confirmed not present |
 
 ---
 
-## 4. Summary
+## Change Log
 
-### Active Gaps: **0** — All requirements documentation is consistent ✅
-
-### Requirement Counts
-
-| Namespace | Count | IDs |
-|-----------|-------|-----|
-| System (RM-x) | 7 | RM-1 to RM-7 |
-| Arm subsystem (RM-5x) | 5 | RM-5a to RM-5e |
-| Arm Performance Criteria | 5 | ARM-PC-1 to ARM-PC-5 |
-| Padding Performance Criteria | 2 | PAD-PC-1, PAD-PC-2 |
-| **Total unique logical criteria** | **19** | — |
-
-### Status Breakdown (RM-x)
-
-| Status | Count | Requirements |
-|--------|-------|---|
-| Passed | 3 | RM-1, RM-2, RM-7 |
-| Partial | 1 | RM-5 |
-| Pending | 3 | RM-3, RM-4, RM-6 |
-
-### Status Breakdown (ARM-PC-x)
-
-| Status | Count |
-|--------|-------|
-| Passed | 2 (ARM-PC-1 subsystem-revised, ARM-PC-5) |
-| Partial | 1 (ARM-PC-1 against original 0.25 s target) |
-| Pending | 3 (ARM-PC-2, ARM-PC-3, ARM-PC-4) |
-
-### V-Model Alert Coverage
-
-| Status | Count |
-|--------|-------|
-| Pages with alert (applicable) | 13 |
-| Pages not applicable (no RM-x refs) | 10 (+3 new pages since Pass 3) |
-| Pages missing alert | **0** ✅ |
-
-### Top 3 Gaps Requiring Attention
-
-> **None — all requirement documentation gaps are resolved.**
->
-> The 3 outstanding **Pending** requirements (RM-3, RM-4, RM-6) are awaiting **physical testing**, not documentation work. These are not documentation gaps; they are known engineering work items pending lab time.
+| Pass | Date | Summary |
+|------|------|---------|
+| Pass 1–3 | Pre-2026-04-09 | Requirements traceability, namespace fixes |
+| Pass 4 | 2026-04-09 | 3 new pages classified N/A; informational only |
+| Pass 5 | 2026-04-09 | 5 net-new gaps (ARM-PC-1 dual-target, ROT-1/2 propagation, PAD-PC-3/4 unlabelled, RM-1 sub-target, broken PAD cross-ref) |
+| Pass 6 | 2026-04-10 | RM renumbered to 8-req baseline; namespaces corrected (ARM-AC-x, PAD-AC-x, ROT-AC-x); §5 report structure + nav flow added; agent preamble moved to requirements-audit-agent.md |
+| Pass 7 | 2026-04-10 | Academic writing compliance scan (em-dash, tilde, bold prose), explicit factual checks (GUI version, ROS topics), anchor verification |
+| Pass 8 | 2026-04-10 | Executed all HIGH gaps: namespace sweep (ARM-PC→ARM-AC, PAD-PC→PAD-AC), ARM-AC-1 partial note, nav verified 30/30, ROT-AC-1/2 added to testing.html, GUI V3 fixed, padding tests labelled, annex anchors confirmed, author tag closed intentionally |
+| Pass 9 | 2026-04-10 | Step 0.5 auto re-verification — no regressions. 4 net-new gaps: GAP-P9-A (em-dash ARM-AC-2/3/4 Measured cells), GAP-P9-B (§ symbol in electrical-integration.html), GAP-P9-C (0.25 s torque derivation inconsistency), GAP-P9-D (V-Model alert table corrected). Nav 30/30 ✅. 15 pages with alert. |

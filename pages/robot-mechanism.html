@@ -197,8 +197,8 @@
           <tr>
             <td style="padding:10px; border:1px solid #ddd;">RM-8</td>
             <td style="padding:10px; border:1px solid #ddd;">Arm Actuation</td>
-            <td style="padding:10px; border:1px solid #ddd;">Execute a 90° arm sweep in ≤ 0.70 s</td>
-            <td style="padding:10px; border:1px solid #ddd;">Training fidelity requires realistic strike velocity; 0.25 s original target revised to 0.70 s to account for Damiao PID acceleration overhead</td>
+            <td style="padding:10px; border:1px solid #ddd;">Execute a 90&deg; arm sweep in &le; 0.25 s</td>
+            <td style="padding:10px; border:1px solid #ddd;">Training fidelity requires realistic strike velocity; target remains &le; 0.25 s (system requirement). Best recorded result: 0.64 s (Partial &mdash; Damiao PID acceleration overhead)</td>
           </tr>
         </tbody>
       </table>
@@ -303,7 +303,7 @@
 
       <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
         Structural Foundation: Base and Rotation
-        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-1, RM-2, RM-4, RM-7</sl-badge>
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-1, RM-2, RM-4</sl-badge>
       </h4>
       <p>
         The trapezoidal base geometry resolves the tension between RM-1 (stability under punching loads) and RM-2 (compact footwork clearance) through a single geometric decision: the plan form is narrower at the front and wider at the rear, simultaneously increasing the restoring moment and reducing intrusion into the boxer's working zone. The rigid mounted plate at the top of the base serves as the geometric datum for the entire mechanism stack above. At the base of the stack, the rotation subsystem achieves RM-4 via a non-geared slewing bearing paired with an off-axis timing-belt drive, with outboard cam-follower supports extending anti-tilt resistance without enlarging the bearing footprint; full derivation is provided in Sections <a href="robot-mechanism/base.html">5.2.1</a> and <a href="robot-mechanism/rotation.html">5.2.2</a>.
@@ -311,7 +311,7 @@
 
       <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
         Adaptive Height Targeting: Height Adjustment
-        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-3</sl-badge>
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-5</sl-badge>
       </h4>
       <p>
         The critical design insight is the separation of vertical lift from lateral structural resistance within a single assembly: the screw jack operates in axial compression only, while all punching-induced lateral loads are resolved by the telescopic column structure and Delrin wear-pad interfaces. This decoupling prevents screw binding and provides inherent fail-safe position retention through the self-locking geometry of the jack. Full design rationale and load analysis are documented in <a href="robot-mechanism/height-adjustment.html">Section 5.2.3</a>.
@@ -327,10 +327,10 @@
 
       <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
         Strike Delivery: Arm Actuation
-        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-5</sl-badge>
+        <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-7 &amp; RM-8</sl-badge>
       </h4>
       <p>
-        The 2-DOF coaxial differential joint enables three strike types (jab, hook, uppercut) from a single compact pivot, with both actuators co-located at the pivot to minimise moment of inertia. Actuator platform selection iterated through servo and ODrive configurations before settling on the Damiao DM-J4310-2EC; a post-CDE Fair material revision replaced polymer shafts with a 6 mm stainless steel D-shaft to achieve sustained sparring capability. RM-5 is <em>partially fulfilled</em>: the arm's kinematic design is sufficient, but Damiao PID acceleration and deceleration ramps impose approximately 0.4 to 0.5 s of constant overhead per strike; the full analysis is in <a href="robot-mechanism/arm-actuation.html#limitations">Section 5.2.5 Limitations</a>.
+        The 2-DOF coaxial differential joint enables three strike types (jab, hook, uppercut) from a single compact pivot, with both actuators co-located at the pivot to minimise moment of inertia. Actuator platform selection iterated through servo and ODrive configurations before settling on the Damiao DM-J4310-2EC; a post-CDE Fair material revision replaced polymer shafts with a 6 mm stainless steel D-shaft to achieve sustained sparring capability. RM-8 is <em>partially fulfilled</em>: the arm's kinematic design is sufficient, but Damiao PID acceleration and deceleration ramps impose approximately 0.4 to 0.5 s of constant overhead per strike; the full analysis is in <a href="robot-mechanism/arm-actuation.html#limitations">Section 5.2.5 Limitations</a>.
       </p>
 
       <h4 style="margin-bottom: 8px;">System Integration</h4>
@@ -424,7 +424,7 @@
       <p>
         Following the V-Model framework introduced in
         <a href="../index.html#v-model">Section 3.2</a>, the verification
-        plan defines how each system-level requirement (RM-1 through RM-7)
+        plan defines how each system-level requirement (RM-1 through RM-8)
         will be verified at the subsystem and system levels. Verification
         plans are established <em>during</em> the decomposition phase (left
         side of the V) and executed during integration (right side).
@@ -463,10 +463,10 @@
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
-            <td style="padding:8px; border:1px solid #ddd;">Height Adj.</td>
-            <td style="padding:8px; border:1px solid #ddd;">Full-stroke actuation: command min → max height</td>
-            <td style="padding:8px; border:1px solid #ddd;">≥ 400 mm travel; ≤ 32 s full stroke</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#999;">Pending</td>
+            <td style="padding:8px; border:1px solid #ddd;">Base</td>
+            <td style="padding:8px; border:1px solid #ddd;">Transport test: 1-person tip-and-roll between two venues</td>
+            <td style="padding:8px; border:1px solid #ddd;">Successful transport without disassembly; &le; 5 min setup</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:green; font-weight:bold;">Passed</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
@@ -477,10 +477,10 @@
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
-            <td style="padding:8px; border:1px solid #ddd;">Arm Actuation</td>
-            <td style="padding:8px; border:1px solid #ddd;">Strike speed timing: command 90° arc, measure completion time</td>
-            <td style="padding:8px; border:1px solid #ddd;">90° in ≤ 0.25 s (jab, hook, and uppercut)</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#b45309; font-weight:bold;">Partial — kinematic speed achieved; Damiao PID ramps add ~0.4–0.5 s overhead. See <a href="robot-mechanism/arm-actuation.html#limitations">Section 5.2.5 Limitations</a>.</td>
+            <td style="padding:8px; border:1px solid #ddd;">Height Adj.</td>
+            <td style="padding:8px; border:1px solid #ddd;">Full-stroke actuation: command min &rarr; max height</td>
+            <td style="padding:8px; border:1px solid #ddd;">&ge; 400 mm travel; &le; 32 s full stroke</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#999;">Pending</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-6</td>
@@ -491,10 +491,17 @@
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
-            <td style="padding:8px; border:1px solid #ddd;">Base</td>
-            <td style="padding:8px; border:1px solid #ddd;">Transport test: 1-person tip-and-roll between two venues</td>
-            <td style="padding:8px; border:1px solid #ddd;">Successful transport without disassembly; ≤ 5 min setup</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:green; font-weight:bold;">Passed</td>
+            <td style="padding:8px; border:1px solid #ddd;">Arm Actuation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike type demonstration: all six strike variants (Left/Right Jab, Hook, Uppercut)</td>
+            <td style="padding:8px; border:1px solid #ddd;">All six strikes delivered correctly in sustained sparring session</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-8</td>
+            <td style="padding:8px; border:1px solid #ddd;">Arm Actuation</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike speed timing: command 90&deg; arc, measure completion time</td>
+            <td style="padding:8px; border:1px solid #ddd;">90&deg; in &le; 0.25 s (jab, hook, and uppercut) &mdash; Partial; best result 0.64 s</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center; color:#b45309; font-weight:bold;">Partial &mdash; kinematic speed achieved; Damiao PID ramps add ~0.4&ndash;0.5 s overhead. See <a href="robot-mechanism/arm-actuation.html#limitations">Section 5.2.5 Limitations</a>.</td>
           </tr>
         </tbody>
       </table>

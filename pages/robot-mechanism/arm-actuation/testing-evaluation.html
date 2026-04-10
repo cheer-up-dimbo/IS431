@@ -35,7 +35,7 @@
       <sl-icon slot="icon" name="check-circle"></sl-icon>
       <strong>V-Model Traceability:</strong> This page validates
       <strong>RM-7</strong> (<em>Deliver jab, hook, and uppercut strike types</em>) and
-      <strong>RM-8</strong> (<em>Execute 90&deg; arm sweep in &le; 0.70 s</em>) through
+      <strong>RM-8</strong> (<em>Execute 90&deg; arm sweep in &le; 0.25 s</em>) through
       acceptance criteria <strong>ARM-AC-1</strong> to <strong>ARM-AC-5</strong>, covering
       strike speed, sparring endurance, regenerative braking safety, multi-strike
       chain execution, and peak motor current.
@@ -63,7 +63,7 @@
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">ARM-AC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90&deg; rotation)</td>
-            <td style="padding:8px; border:1px solid #ddd;">&le; 0.70 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">&le; 0.25 s</td>
             <td style="padding:8px; border:1px solid #ddd;">Firmware timestamp delta (N=43 speed tests)</td>
           </tr>
           <tr>
@@ -118,9 +118,9 @@
           <tr style="background:#e8f5e9;">
             <td style="padding:8px; border:1px solid #ddd;">ARM-AC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Strike speed (90&deg;)</td>
-            <td style="padding:8px; border:1px solid #ddd;">&le; 0.70 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">&le; 0.25 s</td>
             <td style="padding:8px; border:1px solid #ddd;"><strong>0.64 s</strong> (best, 30 rad/s Jab)</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#2e7d32;"><strong>Pass</strong></td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c0832a;"><strong>Partial</strong></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;" colspan="5">
@@ -474,8 +474,9 @@
           <strong>Strike speed target revised:</strong> The original 0.25 s target
           assumed constant-velocity traversal. The Damiao PID
           controller&rsquo;s acceleration/deceleration ramp adds ~0.4&ndash;0.5 s
-          of irreducible overhead. The revised target of &le; 0.70 s was met
-          (0.64 s best). Feed-forward control could further reduce this.
+          of irreducible overhead. The system target of &le; 0.25 s remains as a
+          formal requirement (RM-8); the best recorded result of 0.64 s constitutes a partial
+          fulfilment. Feed-forward control could further reduce this overhead.
         </li>
 
       </ul>

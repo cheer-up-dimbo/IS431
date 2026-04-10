@@ -239,8 +239,14 @@
 
     <sl-divider></sl-divider>
 
-    <!-- NEXT SECTION NAVIGATION -->
-    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+    <style>.page-nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }</style>
+    <div class="page-nav-row">
+      <a href="../base.html">
+        <sl-button variant="default" size="medium">
+          <sl-icon slot="prefix" name="arrow-left"></sl-icon>
+          Prev: Base Subsystem
+        </sl-button>
+      </a>
       <a href="mechanical-design.html">
         <sl-button variant="default" size="medium">
           Next: Mechanical Design
