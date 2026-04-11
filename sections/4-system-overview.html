@@ -27,7 +27,7 @@
         primary punches while retracting to a guard position that leaves target zones unobstructed.
       </p>
 
-      <h4>Lower Mechanism Base</h4>
+      <h4>Lower Mechanism</h4>
       <p>
         Two base architectures were evaluated: an omnidirectional wheel system and a decoupled-axis
         design comprising a motorised linear rail for forward-backward travel and a slewing bearing
@@ -81,11 +81,15 @@
             <td>Structural foundation providing stability under punching impacts; designed for portability across gym and home environments.</td>
           </tr>
           <tr>
-            <td><strong>Linear Rail (Footwork)</strong></td>
-            <td>Ball-screw drive with closed-loop stepper motor; forward–backward stance adjustment ~300 mm stroke with high stiffness under repeated load.</td>
+            <td><strong>Footwork Mechanism: 
+              <ul>
+                <li>Linear Motion</strong></td>
+            <td>Linear guide rail with ball-screw drive and closed-loop stepper motor; forward–backward stance adjustment ~300 mm stroke with high stiffness under repeated load.</td>
           </tr>
           <tr>
-            <td><strong>Yaw Rotation</strong></td>
+            <td><strong>Footwork Mechanism: 
+              <ul>
+                <li>Yaw Rotation</strong></td>
             <td>Four-point contact ball slewing ring bearing driven by a pinion motor; tracks user lateral position from CV output.</td>
           </tr>
           <tr>
@@ -93,21 +97,29 @@
             <td>Motorised vertical column adjusted by the user via the phone dashboard or touchscreen GUI to align pad targets to their height before each session.</td>
           </tr>
           <tr>
-            <td><strong>Arm Actuation</strong></td>
+            <td><strong>Punch Execution:
+              <ul>
+                <li>Arm Actuation</strong></td>
             <td>2-DOF coaxial differential joint (pitch + yaw); executes jabs, hooks, and uppercuts at up to 6.04 rad/s with a 90 cm foam training stick. Retracts to a guard position leaving all strike zones clear.</td>
           </tr>
           <tr>
-            <td><strong>Padding</strong></td>
+            <td><strong>Striking Points:
+              <ul>
+                <li>Padding</strong></td>
             <td>Impact-sensing surfaces across head, shoulder, and body zones; ergonomically positioned for the 150–190 cm user population.</td>
           </tr>
           <!-- Robot Intelligence -->
           <tr>
             <td rowspan="4" style="vertical-align:middle; font-weight:bold; background:#f3e5f5;">Robot Intelligence</td>
-            <td><strong>Computer Vision (CV)</strong></td>
+            <td><strong>User Tracking:
+              <ul>
+                <li>Computer Vision (CV)</strong></td>
             <td>Person detection and punch-type classification at 30 Hz during active training; ramps from 6 Hz at session start.</td>
           </tr>
           <tr>
-            <td><strong>IMU Fusion</strong></td>
+            <td><strong>User Tracking:
+              <ul>
+                <li>IMU Fusion</strong></td>
             <td>Pad-mounted IMU confirms impact events; fused with CV output to produce validated punch classifications.</td>
           </tr>
           <tr>
@@ -123,19 +135,103 @@
 
 
 
-      <div style="margin: 24px 0;">
+      <style>
+        .Hotspot {
+          background: #0ea5e9;
+          border-radius: 32px;
+          border: 0;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          box-sizing: border-box;
+          cursor: pointer;
+          height: 12px;
+          padding: 8px;
+          position: relative;
+          transition: opacity 0.3s;
+          width: 12px;
+        }
+        .Hotspot:not([data-visible]) {
+          background: transparent;
+          border: 4px solid #fff;
+          box-shadow: none;
+        }
+        .Hotspot:focus {
+          border: 4px solid rgb(0, 128, 200);
+          height: 16px;
+          outline: none;
+          width: 16px;
+        }
+        .Hotspot > * {
+          opacity: 1;
+          transform: translateY(-50%);
+        }
+        .HotspotAnnotation{
+          background: #fff;
+          border-radius: 4px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+          color: rgba(0, 0, 0, 0.8);
+          display: block;
+          font-family: inherit;
+          font-size: 13px;
+          font-weight: 600;
+          left: calc(100% + 1em);
+          max-width: 200px;
+          overflow-wrap: break-word;
+          padding: 0.5em 1em;
+          position: absolute;
+          top: 50%;
+          width: max-content;
+        }
+        .Hotspot:not([data-visible]) > * {
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(calc(-50% + 4px));
+          transition: transform 0.3s, opacity 0.3s;
+        }
+        model-viewer.hide-hotspots .Hotspot {
+          opacity: 0;
+          pointer-events: none;
+        }
+      </style>
+
+      <div style="margin: 24px 0; position: relative;">
+        <sl-button id="toggle-hotspots-sys" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 10;" onclick="document.getElementById('sys-model-viewer').classList.toggle('hide-hotspots'); this.textContent = document.getElementById('sys-model-viewer').classList.contains('hide-hotspots') ? 'Show Annotations' : 'Hide Annotations';">
+          Hide Annotations
+        </sl-button>
         <model-viewer
+          id="sys-model-viewer"
           src="assets/3d_models/1Full_Assembly.glb"
-          alt="Figure 6: Interactive 3D Model — BoxBunny Full Assembly"
+          alt="Figure 6: Interactive 3D Model — BoxBunny Full Assembly (Interim Concept)"
           camera-controls
           touch-action="pan-y"
           auto-rotate
           shadow-intensity="1"
           exposure="0.8"
           style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
-        ></model-viewer>
-        <sub class="fig-caption">Figure 6: Interactive 3D Model — BoxBunny Full Assembly. Click and drag to
-          rotate; scroll to zoom; right-click to pan.</sub>
+        >
+          <button class="Hotspot" slot="hotspot-2" data-position="0.23568181085852835m -0.19911042596840112m 0.1281082439668788m" data-normal="0.9285585608822142m 0m 0.37118593590322285m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Base</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-4" data-position="0.04831440658176752m 0.05094613038051277m 0.21913834805490942m" data-normal="-1.3877880252702587e-17m 0.33035043191455243m 0.9438583538507612m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">User Interface</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-6" data-position="0.12604774418785736m 0.4065432323984226m -0.1478980064554749m" data-normal="0.7467628809436526m -0.22474781479809883m 0.6259661487558379m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Height Adjustment</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-7" data-position="0.2880754544602493m 0.8531854796587484m -0.139765805959492m" data-normal="0.9451193592256296m 2.9099063476674238e-8m 0.3267252619815838m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Punch Execution</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-8" data-position="0.24117297916758984m 0.10847106145522245m -0.13622115287964398m" data-normal="0.8498887391727475m 0.3448692263068047m -0.3984398922973244m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Footwork Mechanism</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-9" data-position="0.005295756358592401m 0.9581641674167168m -0.11736168986297496m" data-normal="-3.491481188143025e-15m -0.4999999066714142m 0.8660254576677163m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">User Tracking</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-10" data-position="-0.16742454100698803m 0.6834125517217602m 0.16874547393576503m" data-normal="-0.3907311661431458m -1.6159021614455214e-16m 0.920504837469319m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Striking Points / User Tracking</div>
+          </button>
+        </model-viewer>
+        <sub class="fig-caption">Figure 6: Interactive 3D Model — BoxBunny Full Assembly (Interim Concept).<br>
+          Click and drag to rotate; scroll to zoom; right-click to pan. Show/Hide Annotations for labelling.</sub>
       </div>
     </div>
 
@@ -146,15 +242,15 @@
         Figure 7 presents a swim-lane diagram illustrating how the three subsystems collaborate across
         the five phases of a structured training session. During the Setup phase, only the User Interface
         is active: the boxer logs in, completes a proficiency assessment, and selects training mode and
-        parameters. At the Countdown phase, all three subsystems initialise concurrently — the Robot
+        parameters. At the Countdown phase, all three subsystems initialise concurrently: Robot
         Intelligence layer ramps computer vision inference from 6&nbsp;Hz to 30&nbsp;Hz and resets lateral
         and depth tracking baselines, while the user adjusts the robot's height via the phone
         dashboard or touchscreen GUI.
       </p>
       <p>
-        During Active Training, the three subsystems operate in a continuous closed-loop: the Intelligence
-        layer detects and classifies user actions at 30&nbsp;Hz with IMU confirmation; the Mechanism responds
-        with arm actuation and yaw tracking; and the Interface presents live feedback, a round timer,
+        During Active Training, the three subsystems operate in a continuous closed-loop: Intelligence
+        layer detects and classifies user actions at 30&nbsp;Hz with IMU confirmation; Mechanism responds
+        with arm actuation and yaw tracking; and Interface presents live feedback, a round timer,
         combo display, and AI-generated coaching tips. A Rest phase between rounds displays round-level
         statistics, followed by a Results phase in which the Interface presents post-session analytics
         and the Intelligence layer generates personalised AI coach analysis using a large language model.
@@ -369,4 +465,3 @@
       });
     })();
   </script>
-

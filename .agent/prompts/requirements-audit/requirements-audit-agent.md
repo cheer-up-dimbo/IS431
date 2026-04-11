@@ -141,12 +141,12 @@ Check each of these on any page that discusses these topics:
 
 | Section | Fragment file | Key anchor IDs to verify |
 |---------|--------------|--------------------------|
-| §1 Introduction | `sections/introduction.html` | — |
-| §2 Problem Clarification | `sections/problem-clarification.html` | `#domain-overview`, `#background`, `#primary-research`, `#value-proposition`, `#secondary-research`, `#problem-of-interest`, `#value-proposition-statement` |
-| §3 Product Needs | `sections/design-methodology.html` | `#product-needs-mapping`, `#design-methodology` |
-| §4 System Overview | `sections/final-design.html` | `#system-overview`, `#concept-development-detail`, `#final-conceptual-design`, `#user-journey` |
+| §1 Introduction | `sections/1-introduction.html` | — |
+| §2 Problem Clarification | `sections/2-problem-clarification.html` | `#domain-overview`, `#background`, `#primary-research`, `#value-proposition`, `#secondary-research`, `#problem-of-interest`, `#value-proposition-statement` |
+| §3 Product Needs | `sections/3-product-needs-and-engineering-methodology.html` | `#product-needs-mapping`, `#design-methodology` |
+| §4 System Overview | `sections/4-system-overview.html` | `#system-overview`, `#concept-development-detail`, `#final-conceptual-design`, `#user-journey` |
 | §5 Final BoxBunny Design | `index.html` inline | `#conceptual-design` |
-| §6 Discussion & FW | `sections/future-work.html` | `#future-work`, `#discussion`, `#limitations`, `#recommendations`, `#test-plan`, `#conclusion` |
+| §6 Discussion & FW | `sections/6-discussion-and-future-work.html` | `#future-work`, `#discussion`, `#limitations`, `#recommendations`, `#test-plan`, `#conclusion` |
 | Annex | `index.html` inline | `#annex-introduction`, `#annex-background`, `#annex-product-needs` |
 
 ### 2B. Subsystem Pages to Audit (in priority order)

@@ -228,13 +228,17 @@
       <p>
         Chapter 5 presents the realised implementation of the BoxBunny system, advancing from the
         conceptual architecture established in Chapter 4 to the engineered, integrated, and verified
-        prototype. The system is structured across three primary subsystem domains: the User Interface
-        (Section 5.1), which translates user intent into training session control and presents
-        real-time performance feedback to the practitioner; the Robot Mechanism (Section 5.2), which
-        encompasses the physical actuation hardware, structural frame, and embedded electronics; and
-        the Robot Intelligence layer (Section 5.3), which provides computer vision-based punch
-        classification, adaptive sparring control, and on-device language model coaching. Each
-        subsystem domain was developed in accordance with the V-Model engineering framework
+        prototype. The system is structured across three primary subsystem domains:
+        <span style="display: block; margin-left: 3.5rem; text-indent: -1.5rem; margin-top: 0.5rem; text-align: left;">
+          <strong>1. User Interface (Section 5.1):</strong> Translates user intent into training session control and presents
+           real-time performance feedback to the practitioner.</span>
+        <span style="display: block; margin-left: 3.5rem; text-indent: -1.5rem; text-align: left;">
+          <strong>2. Robot Mechanism (Section 5.2):</strong> Encompasses the physical actuation hardware, structural frame, and
+           embedded electronics.</span>
+        <span style="display: block; margin-left: 3.5rem; text-indent: -1.5rem; margin-bottom: 0.5rem; text-align: left;">
+          <strong>3. Robot Intelligence layer (Section 5.3):</strong> Provides computer vision-based punch
+           classification, adaptive sparring control, and on-device language model coaching.</span>
+        Each subsystem domain was developed in accordance with the V-Model engineering framework
         introduced in Section 3.2, with measurable requirements established prior to design,
         subsystem design conducted before integration, and formal verification executed against
         pre-defined acceptance criteria. The interactive three-dimensional model below presents
@@ -566,11 +570,11 @@
     async function init() {
       // 1. Load all section HTML fragments first
       await Promise.all([
-        loadSection('sections/introduction.html', 'section-introduction'),
-        loadSection('sections/problem-clarification.html', 'section-problem-clarification'),
-        loadSection('sections/design-methodology.html', 'section-design-methodology'),
-        loadSection('sections/final-design.html', 'section-final-design'),
-        loadSection('sections/future-work.html', 'section-future-work'),
+        loadSection('sections/1-introduction.html', 'section-introduction'),
+        loadSection('sections/2-problem-clarification.html', 'section-problem-clarification'),
+        loadSection('sections/3-product-needs-and-engineering-methodology.html', 'section-design-methodology'),
+        loadSection('sections/4-system-overview.html', 'section-final-design'),
+        loadSection('sections/6-discussion-and-future-work.html', 'section-future-work'),
         loadSection('sections/references.html', 'section-references'),
       ]);
 
