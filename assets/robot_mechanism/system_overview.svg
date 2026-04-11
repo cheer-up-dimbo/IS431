@@ -37,9 +37,9 @@
   <text x="700" y="170.0" text-anchor="middle" font-size="11" fill="#4b5563">MPU6050 · 4 pads (C/L/R/H)</text>
 
   <!-- ================================================================ -->
-  <!-- TIER 2: HARDWARE BRIDGE                                          -->
+  <!-- TIER 2: PROCESSORS                                               -->
   <!-- ================================================================ -->
-  <text x="50" y="224.0" font-size="11" font-weight="700" fill="#94a3b8">HARDWARE</text>
+  <text x="50" y="224.0" font-size="11" font-weight="700" fill="#94a3b8">PROCESSORS</text>
   <line x1="50" y1="230.0" x2="950" y2="230.0" stroke="#e2e8f0"/>
 
   <!-- Arrows: sensing → hardware (straight down) -->
