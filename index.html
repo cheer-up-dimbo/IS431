@@ -246,8 +246,62 @@
       </p>
 
       <div class="model-viewer-container">
+        <style>
+          .Hotspot {
+            background: #1565c0;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            box-sizing: border-box;
+            cursor: pointer;
+            height: 16px;
+            padding: 0;
+            position: relative;
+            transition: opacity 0.3s;
+            width: 16px;
+          }
+          .Hotspot:not([data-visible]) {
+            opacity: 0;
+            pointer-events: none;
+          }
+          .HotspotAnnotation {
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            color: rgba(0, 0, 0, 0.8);
+            display: block;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            left: calc(100% + 1em);
+            max-width: 128px;
+            overflow-wrap: break-word;
+            padding: 0.5em 1em;
+            position: absolute;
+            top: 50%;
+            width: max-content;
+            transform: translateY(-50%);
+          }
+          .HotspotAnnotation::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: -1em;
+            width: 1em;
+            height: 2px;
+            background: #fff;
+            transform: translateY(-50%);
+          }
+          model-viewer.hide-hotspots .Hotspot {
+            opacity: 0;
+            pointer-events: none;
+          }
+        </style>
         <model-viewer
-          src="assets/3d_models/FINAL_ASSEM.glb"
+          id="assembly-viewer"
+          src="assets/3d_models/FINAL_ASSEM_frs_compressed.glb"
+          ar ar-modes="webxr scene-viewer quick-look"
+          tone-mapping="neutral"
           alt="BoxBunny Full Assembly 3D Model"
           camera-controls
           touch-action="pan-y"
@@ -255,10 +309,48 @@
           shadow-intensity="1"
           exposure="0.8"
           style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
-        ></model-viewer>
+        >
+          <button class="Hotspot" slot="hotspot-1" data-position="0.0432537704740021m 1.2396580153894172m 0.22460361180918076m" data-normal="0.9805838084333859m -0.11449666072736782m 0.1592039865096311m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">User Tracking</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-2" data-position="0.30028616192399166m 1.3042994586382188m 0.13827987632383792m" data-normal="-0.02909659516730802m 0.9925484090459534m 0.11832600665118695m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Strike Delivery</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-3" data-position="0.21137150569351026m 0.9867714396668535m 0.2698941863270391m" data-normal="0.49999981896683754m -2.753671601130985e-16m 0.8660255083039585m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Striking Points / User Tracking</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-4" data-position="-0.07061930534112698m 0.42024818674292164m 0.21743684353688592m" data-normal="8.35564121120705e-9m 0.49999998653882616m 0.866025411556251m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">User Interface</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-5" data-position="0.15799807012298808m 0.2703962910461777m 0.15207163767089213m" data-normal="0.9999999999999911m -1.6091448851880818e-18m -1.3435883843274954e-7m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Height Adjustment</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-7" data-position="0.25499999523162864m -0.0018452352425949448m 0.3302367660355918m" data-normal="1m 0m 0m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Base</div>
+          </button>
+          <button class="Hotspot" slot="hotspot-9" data-position="0.0881099227126234m -0.003043169005799585m 0.10285412511048626m" data-normal="0.9942173272467207m -0.0010512852248376928m -0.10738156732774502m" data-visibility-attribute="visible">
+              <div class="HotspotAnnotation">Footwork Mechanism</div>
+          </button>
+          <div class="progress-bar hide" slot="progress-bar">
+              <div class="update-bar"></div>
+          </div>
+          <button slot="ar-button" id="ar-button">
+              View in your space
+          </button>
+          <div id="ar-prompt">
+              <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
+          </div>
+          <sl-button id="toggle-annotations" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Show/Hide Annotations</sl-button>
+        </model-viewer>
         <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
-          Figure 6: Interactive 3D Model — BoxBunny Full Assembly
+          Figure 6: Interactive 3D Model — BoxBunny Full Assembly<br>
+          <span style="color: #666; font-size: 0.85rem;">Click and drag to rotate; scroll to zoom; right-click to pan. Show/Hide Annotations for labelling.</span>
         </sub>
+        <script>
+          document.getElementById('toggle-annotations').addEventListener('click', function() {
+            document.getElementById('assembly-viewer').classList.toggle('hide-hotspots');
+          });
+        </script>
       </div>
 
       <h3 style="margin-top: 2rem;">System Integration</h3>
