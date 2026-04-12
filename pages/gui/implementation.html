@@ -71,17 +71,31 @@
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       box-shadow: 0 2px 12px rgba(15,23,42,0.06);
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .content table {
       width: 100%;
-      max-width: 1100px;
+      max-width: 100%;
       margin: 16px auto !important;
       border-collapse: collapse;
+      display: table;
+      overflow-x: visible;
+      min-width: 820px;
+    }
+    .content table[style*="width:60%"] {
+      display: table !important;
+      overflow-x: visible !important;
     }
     .content table th,
     .content table td {
       vertical-align: top;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      min-width: 140px;
+    }
+    .content table th:first-child,
+    .content table td:first-child {
+      min-width: 200px;
     }
     table-component {
       width: 100%;
@@ -94,8 +108,32 @@
       white-space: normal !important;
       overflow: visible !important;
       text-overflow: clip !important;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      min-width: 140px;
       vertical-align: top;
+    }
+    table-component .gridjs-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table-component .gridjs-table {
+      width: 100%;
+      min-width: 900px;
+      max-width: none;
+      table-layout: auto;
+    }
+    table-component .gridjs-wrapper .gridjs-table {
+      display: table !important;
+      overflow-x: visible !important;
+    }
+    .iteration-timeline .gridjs-table {
+      display: table !important;
+      overflow-x: visible !important;
+    }
+    table-component .gridjs-th:first-child,
+    table-component .gridjs-td:first-child {
+      min-width: 200px;
     }
     table-component#gui-iterations .gridjs-th:nth-child(1),
     table-component#gui-iterations .gridjs-td:nth-child(1) {
@@ -103,10 +141,11 @@
     }
     table-component#gui-feature-set .gridjs-wrapper {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     table-component#gui-feature-set .gridjs-table {
       width: 100%;
-      min-width: 1240px;
+      min-width: 1080px;
       max-width: none;
       table-layout: fixed;
     }
@@ -128,22 +167,28 @@
     table-component#gui-feature-set .gridjs-th:nth-child(2),
     table-component#gui-feature-set .gridjs-td:nth-child(2) {
       width: 24%;
-      min-width: 270px;
+      min-width: 220px;
     }
     table-component#gui-feature-set .gridjs-th:nth-child(3),
     table-component#gui-feature-set .gridjs-td:nth-child(3) {
       width: 60%;
-      min-width: 700px;
+      min-width: 540px;
     }
     .proficiency-questions-wrap,
     .markov-matrix-wrap {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin: 16px 0;
+    }
+    .markov-matrix-wrap .markov-matrix-table,
+    .proficiency-questions-wrap .proficiency-questions-table {
+      display: table !important;
+      overflow-x: visible !important;
     }
     .proficiency-questions-table {
       width: 100%;
-      min-width: 1120px;
+      min-width: 960px;
       max-width: none;
       table-layout: fixed;
       margin: 0 auto !important;
@@ -159,7 +204,7 @@
     .proficiency-questions-table th:nth-child(1),
     .proficiency-questions-table td:nth-child(1) {
       width: 34%;
-      min-width: 360px;
+      min-width: 280px;
       font-weight: 600;
       background: #eff6ff;
     }
@@ -170,7 +215,7 @@
     .proficiency-questions-table th:nth-child(4),
     .proficiency-questions-table td:nth-child(4) {
       width: 22%;
-      min-width: 230px;
+      min-width: 180px;
     }
     .proficiency-questions-table thead tr,
     .markov-matrix-table thead tr {
@@ -182,7 +227,7 @@
     }
     .markov-matrix-table {
       width: 100%;
-      min-width: 1220px;
+      min-width: 980px;
       max-width: none;
       table-layout: fixed;
       margin: 0 auto !important;
@@ -199,14 +244,14 @@
     .markov-matrix-table th:nth-child(1),
     .markov-matrix-table td:nth-child(1) {
       width: 18%;
-      min-width: 200px;
+      min-width: 170px;
       text-align: left;
       background: #eff6ff;
     }
     .markov-matrix-table th:not(:first-child),
     .markov-matrix-table td:not(:first-child) {
       width: 11.7%;
-      min-width: 125px;
+      min-width: 95px;
     }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>

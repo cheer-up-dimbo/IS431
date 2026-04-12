@@ -132,16 +132,31 @@
       display: block;
       min-width: 760px;
     }
+    .table-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 16px 0;
+    }
     .content table {
       width: 100%;
-      max-width: 1100px;
-      margin: 16px auto !important;
+      max-width: 100%;
+      margin: 0 auto !important;
       border-collapse: collapse;
+      display: table;
+      overflow-x: visible;
+      min-width: 820px;
     }
     .content table th,
     .content table td {
       vertical-align: top;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      min-width: 140px;
+    }
+    .content table th:first-child,
+    .content table td:first-child {
+      min-width: 200px;
     }
     .content p[style*="Table:"] {
       text-align: center;
@@ -247,7 +262,8 @@
         subsystem was developed in parallel with all hardware subsystems.
       </p>
 
-      <table class="vmodel-map-table" style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <div class="table-scroll-wrap">
+      <table class="vmodel-map-table" style="width:100%; border-collapse:collapse; margin:0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd;">ID</th>
@@ -283,6 +299,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
 
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1-1: GUI Requirements and Sources</p>
       <p>
@@ -413,7 +430,8 @@
         requirement-to-verification loop for GUI-1 to GUI-5 (INCOSE, 2023).
       </p>
 
-      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+      <div class="table-scroll-wrap">
+      <table style="width:100%; border-collapse:collapse; margin:0; font-size:0.92rem;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd; text-align:left;">V-Model Stage</th>
@@ -449,6 +467,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1-2: GUI application of the V-Model from decomposition to verification</p>
     </div>
 

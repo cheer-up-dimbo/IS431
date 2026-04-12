@@ -30,14 +30,23 @@
     }
     .content table {
       width: 100%;
-      max-width: 1100px;
+      max-width: 100%;
       margin: 16px auto !important;
       border-collapse: collapse;
+      display: table;
+      overflow-x: visible;
+      min-width: 820px;
     }
     .content table th,
     .content table td {
       vertical-align: top;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      min-width: 140px;
+    }
+    .content table th:first-child,
+    .content table td:first-child {
+      min-width: 200px;
     }
     .showcase-observations-table th,
     .showcase-observations-table td {
@@ -48,11 +57,18 @@
     .showcase-observations-wrap {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin: 16px 0;
+    }
+    .showcase-observations-wrap .showcase-observations-table,
+    .performance-criteria-wrap .performance-criteria-table,
+    .developer-tests-wrap .developer-tests-table {
+      display: table !important;
+      overflow-x: visible !important;
     }
     .showcase-observations-table {
       width: 100%;
-      min-width: 1180px;
+      min-width: 980px;
       table-layout: fixed;
       margin: 0 auto !important;
       font-size: 0.9rem;
@@ -60,12 +76,12 @@
     .showcase-observations-table th:nth-child(1),
     .showcase-observations-table td:nth-child(1) {
       width: 34%;
-      min-width: 340px;
+      min-width: 280px;
     }
     .showcase-observations-table th:nth-child(2),
     .showcase-observations-table td:nth-child(2) {
       width: 22%;
-      min-width: 220px;
+      min-width: 170px;
     }
     .showcase-observations-table th:nth-child(3),
     .showcase-observations-table td:nth-child(3) {
@@ -78,7 +94,7 @@
     .showcase-observations-table th:nth-child(4),
     .showcase-observations-table td:nth-child(4) {
       width: 32%;
-      min-width: 320px;
+      min-width: 260px;
     }
     .showcase-observations-table thead tr {
       background: #e2e8f0 !important;
@@ -89,11 +105,12 @@
     .performance-criteria-wrap {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin: 16px 0;
     }
     .performance-criteria-table {
       width: 100%;
-      min-width: 1220px;
+      min-width: 1020px;
       table-layout: fixed;
       margin: 0 auto !important;
       font-size: 0.9rem;
@@ -116,17 +133,17 @@
     .performance-criteria-table th:nth-child(2),
     .performance-criteria-table td:nth-child(2) {
       width: 28%;
-      min-width: 320px;
+      min-width: 250px;
     }
     .performance-criteria-table th:nth-child(3),
     .performance-criteria-table td:nth-child(3) {
       width: 23%;
-      min-width: 260px;
+      min-width: 200px;
     }
     .performance-criteria-table th:nth-child(4),
     .performance-criteria-table td:nth-child(4) {
       width: 24%;
-      min-width: 280px;
+      min-width: 180px;
     }
     .performance-criteria-table th:nth-child(5),
     .performance-criteria-table td:nth-child(5) {
@@ -147,11 +164,12 @@
     .developer-tests-wrap {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin: 16px 0;
     }
     .developer-tests-table {
       width: 100%;
-      min-width: 1400px;
+      min-width: 1160px;
       max-width: none;
       table-layout: fixed;
       margin: 0 auto !important;
@@ -180,17 +198,17 @@
     .developer-tests-table th:nth-child(3),
     .developer-tests-table td:nth-child(3) {
       width: 26%;
-      min-width: 300px;
+      min-width: 240px;
     }
     .developer-tests-table th:nth-child(4),
     .developer-tests-table td:nth-child(4) {
       width: 29%;
-      min-width: 340px;
+      min-width: 260px;
     }
     .developer-tests-table th:nth-child(5),
     .developer-tests-table td:nth-child(5) {
       width: 22%;
-      min-width: 260px;
+      min-width: 200px;
     }
     .developer-tests-table thead tr {
       background: #e2e8f0 !important;
@@ -209,8 +227,28 @@
       white-space: normal !important;
       overflow: visible !important;
       text-overflow: clip !important;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      min-width: 140px;
       vertical-align: top;
+    }
+    table-component .gridjs-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table-component .gridjs-table {
+      width: 100%;
+      min-width: 900px;
+      max-width: none;
+      table-layout: auto;
+    }
+    table-component .gridjs-wrapper .gridjs-table {
+      display: table !important;
+      overflow-x: visible !important;
+    }
+    table-component .gridjs-th:first-child,
+    table-component .gridjs-td:first-child {
+      min-width: 200px;
     }
     table-component#gui-deliverables-status .gridjs-th:nth-child(2),
     table-component#gui-deliverables-status .gridjs-td:nth-child(2) {

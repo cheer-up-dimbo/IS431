@@ -20,19 +20,55 @@
     }
     .content table {
       width: 100%;
-      max-width: 1100px;
+      max-width: 100%;
       margin: 16px auto !important;
       border-collapse: collapse;
+      display: table;
+      overflow-x: visible;
+      min-width: 820px;
     }
     .content table th,
     .content table td {
       vertical-align: top;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      min-width: 140px;
+    }
+    .content table th:first-child,
+    .content table td:first-child {
+      min-width: 200px;
     }
     table-component {
       width: 100%;
       max-width: 1100px;
       margin: 16px auto;
+    }
+    table-component .gridjs-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table-component .gridjs-wrapper .gridjs-table {
+      display: table !important;
+      overflow-x: visible !important;
+    }
+    table-component .gridjs-table {
+      width: 100%;
+      min-width: 900px;
+      max-width: none;
+      table-layout: auto;
+    }
+    table-component .gridjs-th,
+    table-component .gridjs-td,
+    table-component .gridjs-th-content {
+      white-space: normal !important;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      min-width: 140px;
+      vertical-align: top;
+    }
+    table-component .gridjs-th:first-child,
+    table-component .gridjs-td:first-child {
+      min-width: 200px;
     }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>

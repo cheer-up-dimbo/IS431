@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "Bash(curl -s \"https://unpkg.com/gridjs/dist/theme/mermaid.min.css\")",
+      "Bash(curl -sL \"https://unpkg.com/gridjs@6.2.0/dist/theme/mermaid.min.css\")"
     ]
   }
 }

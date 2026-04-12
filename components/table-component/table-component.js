@@ -40,7 +40,6 @@ class TableComponent extends HTMLElement {
           width: 100%;
           max-width: 1100px;
           margin: 0 auto;
-          overflow-x: auto;
         }
 
         .table-caption {
