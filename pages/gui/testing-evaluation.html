@@ -701,18 +701,18 @@
         The upgrade from 7-inch to 10.1-inch display was validated by the absence of
         readability complaints on the larger monitor at the showcase. A formal re-verification
         cycle was not conducted after the hardware change. Specifically, touch target
-        compliance (all interactive elements at or above 60 px) was not re-measured on the
-        10.1-inch display, and gloved-use operability under the new resolution was not tested
-        in a controlled setting.
+        compliance (all interactive elements at or above 60 px for reliable padding-based
+        presses) was not re-measured on the 10.1-inch display, and operability via the padded
+        controls under the new resolution was not tested in a controlled setting.
       </p>
 
       <h4>IMU Navigation Under Fatigue</h4>
       <p>
         Physical button navigation via the IMU-based Arduino interface (GUI-1) was confirmed
         functional during a live training session at the showcase. It was not tested under
-        gloved-use fatigue conditions or across extended multi-round sessions where hand
-        fatigue could affect button accuracy. These conditions represent the primary use case
-        for physical button navigation and remain unverified.
+        extended fatigue conditions or across extended multi-round sessions where hand fatigue
+        could affect the reliability of padding-based screen presses. These conditions represent
+        the primary use case for physical button navigation and remain unverified.
       </p>
 
       <h4>Hardware Access During Development</h4>
@@ -805,11 +805,11 @@
 
       <h4>Touch Target Re-verification on 10.1-inch Display</h4>
       <p>
-        All touch targets should be re-measured on the upgraded display under gloved
-        conditions. The 60 px minimum was designed for the 7-inch form factor. On a larger
-        display at higher resolution, the physical pixel-to-millimetre ratio changes, and
-        targets that met the minimum at 7 inches may or may not do so at 10.1 inches in
-        practice.
+        All touch targets should be re-measured on the upgraded display under padding-based
+        interaction conditions. The 60 px minimum was designed for the 7-inch form factor to
+        ensure reliable presses from the robot's padded controls. On a larger display at higher
+        resolution, the physical pixel-to-millimetre ratio changes, and targets that met the
+        minimum at 7 inches may or may not do so at 10.1 inches in practice.
       </p>
 
       <h4>Sparring Mode: CV-Informed Weakness Weighting</h4>
