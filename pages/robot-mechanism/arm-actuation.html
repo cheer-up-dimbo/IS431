@@ -102,10 +102,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. DESIGN REQUIREMENTS                                 -->
+    <!-- DESIGN REQUIREMENTS                                 -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.1 Design Requirements</h3>
+      <h3>Design Requirements</h3>
       <p>
         The arm actuation subsystem responds to system-level requirements
         <a href="../robot-mechanism.html">RM-7</a> (strike types) and
@@ -318,10 +318,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. PERFORMANCE CRITERIA                                -->
+    <!-- PERFORMANCE CRITERIA                                -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.2 Acceptance Criteria Summary</h3>
+      <h3>Acceptance Criteria Summary</h3>
       <p>
         The following table recaps the five measurable acceptance criteria derived from the requirements above.
         Torque calculations supporting ARM-AC-1 are provided in
@@ -380,10 +380,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. SUBSECTION HIGHLIGHTS                               -->
+    <!-- SUBSECTION HIGHLIGHTS                               -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.3 Subsection Highlights</h3>
+      <h3>Subsection Highlights</h3>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
         <thead>
           <tr style="background:#f0f0f0;">
@@ -464,10 +464,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 4. FINAL ARM DESIGN                                    -->
+    <!-- FINAL ARM DESIGN                                    -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.4 Final Arm Design</h3>
+      <h3>Final Arm Design</h3>
       <p>
         The final deployed arm assembly consists of a compact 2-DOF coaxial
         differential joint, two Damiao DM-J4310-2EC integrated actuators mounted
@@ -494,23 +494,23 @@
           shadow-intensity="0.66"
           shadow-softness="1"
           style="width:100%; height:500px; border-radius:12px; background:#f0f0f0;">
-          <!-- 1. Motor 1 — Roll -->
+          <!-- Motor 1 — Roll -->
           <button class="Hotspot" slot="hotspot-motor1" data-position="-0.027009130254934774m 0.027992178471240803m -0.04305389864049759m" data-normal="0.18025513159793682m 0.9836198897605687m -1.3215802495993298e-7m" data-visibility-attribute="visible">
             <div class="HotspotAnnotation">Motor 1 — Roll (DM-J4310-2EC)</div>
           </button>
-          <!-- 2. Motor 2 — Pitch -->
+          <!-- Motor 2 — Pitch -->
           <button class="Hotspot" slot="hotspot-motor2" data-position="0.032742324634128746m 0.02847557348865756m -0.04155627676495496m" data-normal="0.06037839243513814m 0.9981755605738554m -1.34113708870663e-7m" data-visibility-attribute="visible">
             <div class="HotspotAnnotation">Motor 2 — Pitch (DM-J4310-2EC)</div>
           </button>
-          <!-- 3. Central Gear Stack (3:1 Herringbone Gear) -->
+          <!-- Central Gear Stack (3:1 Herringbone Gear) -->
           <button class="Hotspot" slot="hotspot-gear" data-position="0.0013267442323015508m 0.02330380535771693m -0.0030132951556644944m" data-normal="0.8478129181226903m 0.29563551787641623m -0.44024186129243953m" data-visibility-attribute="visible">
             <div class="HotspotAnnotation">Central Gear Stack (3:1 Herringbone Gear)</div>
           </button>
-          <!-- 4. Bevel Gear Coupling -->
+          <!-- Bevel Gear Coupling -->
           <button class="Hotspot" slot="hotspot-bevel" data-position="-0.0012330250149203835m 0.015137529120881288m 0.05579315541027723m" data-normal="-0.10509427200033826m 0.937739148535577m -0.33105963706935015m" data-visibility-attribute="visible">
             <div class="HotspotAnnotation">Bevel Gear Coupling</div>
           </button>
-          <!-- 5. Stainless Steel D-Shaft (6mm) -->
+          <!-- Stainless Steel D-Shaft (6mm) -->
           <button class="Hotspot" slot="hotspot-shaft" data-position="0.00003588621110451186m 0.0024999999441206455m 0.07403480349854283m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
             <div class="HotspotAnnotation">Stainless Steel D-Shaft (6 mm)</div>
           </button>
@@ -543,10 +543,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 5. POWER ARCHITECTURE                                  -->
+    <!-- POWER ARCHITECTURE                                  -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.5 Power Architecture</h3>
+      <h3>Power Architecture</h3>
       <p>
         The arm motor power subsystem operates from a Mean Well LRS-200-24
         (200 W, 24 V, 8.8 A) switched-mode PSU. All four Damiao motors receive
@@ -574,10 +574,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 6. DATA ARCHITECTURE                                   -->
+    <!-- DATA ARCHITECTURE                                   -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.6 Data Architecture</h3>
+      <h3>Data Architecture</h3>
       <p>
         The arm actuation data path spans three hardware layers. At the
         microcontroller level, the Teensy 4.0 issues Position-Speed mode
@@ -607,10 +607,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 7. TEST AND EVALUATION RESULTS                         -->
+    <!-- TEST AND EVALUATION RESULTS                         -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.0.7 Test and Evaluation Results</h3>
+      <h3>Test and Evaluation Results</h3>
       <p>
         A controlled speed-test benchmark was conducted across all six standard
         strikes at set speeds ranging from 10 to 30 rad/s, with a minimum of
@@ -678,10 +678,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 8. LIMITATIONS                                         -->
+    <!-- LIMITATIONS                                         -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div id="limitations">
-      <h3>5.2.5.0.8 Limitations</h3>
+      <h3>Limitations</h3>
 
       <h4>Damiao PID Firmware Acceleration and Deceleration Ramps</h4>
       <p>
@@ -706,7 +706,7 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 8. DETAILED DOCUMENTATION NAVIGATION                   -->
+    <!-- DETAILED DOCUMENTATION NAVIGATION                   -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Detailed Documentation</h3>
@@ -716,27 +716,27 @@
       <div class="section-nav-grid">
         <a href="arm-actuation/design-ideation.html" class="section-nav-card">
           <sl-icon name="lightbulb" style="font-size: 2rem;"></sl-icon>
-          <h3>5.2.5.1 Design &amp; Ideation</h3>
+          <h3>Design &amp; Ideation</h3>
           <p>Motion analysis, concept selection, motor selection rationale</p>
         </a>
         <a href="arm-actuation/mechanical-design.html" class="section-nav-card">
           <sl-icon name="wrench" style="font-size: 2rem;"></sl-icon>
-          <h3>5.2.5.2 Mechanical Design</h3>
+          <h3>Mechanical Design</h3>
           <p>Joint kinematics, gear reduction, structural revisions and material science</p>
         </a>
         <a href="arm-actuation/electrical-integration.html" class="section-nav-card">
           <sl-icon name="plug" style="font-size: 2rem;"></sl-icon>
-          <h3>5.2.5.3 Electrical Integration</h3>
+          <h3>Electrical Integration</h3>
           <p>Dual-rail power architecture, CAN bus, I2C IMU topology</p>
         </a>
         <a href="arm-actuation/firmware-software.html" class="section-nav-card">
           <sl-icon name="code-slash" style="font-size: 2rem;"></sl-icon>
-          <h3>5.2.5.4 Firmware &amp; Software</h3>
+          <h3>Firmware &amp; Software</h3>
           <p>200 Hz unified loop, GUI application, Strike Library, ROS 2 interface</p>
         </a>
         <a href="arm-actuation/testing-evaluation.html" class="section-nav-card">
           <sl-icon name="check2-circle" style="font-size: 2rem;"></sl-icon>
-          <h3>5.2.5.5 Testing &amp; Evaluation</h3>
+          <h3>Testing &amp; Evaluation</h3>
           <p>N=43 benchmark, PID overhead analysis, power budget validation</p>
         </a>
 

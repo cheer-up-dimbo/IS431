@@ -63,6 +63,39 @@
     model-viewer.hide-hotspots .Hotspot {
       display: none !important;
     }
+    /* ── Lightbox ── */
+    .zoomable-img {
+      cursor: zoom-in;
+      transition: opacity 0.15s ease;
+    }
+    .zoomable-img:hover { opacity: 0.88; }
+    #img-lightbox {
+      padding: 0;
+      border: none;
+      background: transparent;
+      max-width: 100vw;
+      max-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+    }
+    #img-lightbox::backdrop {
+      background: rgba(0,0,0,0.85);
+    }
+    #img-lightbox-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      cursor: zoom-out;
+    }
+    #img-lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
   </style>
   <script src="../../../components/report-nav/report-nav.js" defer></script>
 </head>
@@ -100,11 +133,11 @@
     </sl-alert>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 1. FINAL JOINT DESIGN                                  -->
+    <!-- FINAL JOINT DESIGN                                  -->
     <!-- ═══════════════════════════════════════════════════════ -->
 
     <div>
-      <h3>5.2.5.2.1 Final Joint Design — Coaxial Differential with Side-Mounted Motors</h3>
+      <h3>Final Joint Design — Coaxial Differential with Side-Mounted Motors</h3>
       <p>
         The selection of the Damiao DM-J4310-2EC motors informed the final
         mechanical architecture: two motors mounted
@@ -140,23 +173,23 @@
           shadow-softness="1"
           style="width: 100%; height: 500px; border-radius: 12px; background: #f0f0f0;"
         >
-          <!-- 1. Motor 1 — Roll -->
+          <!-- Motor 1 — Roll -->
           <button class="Hotspot" slot="hotspot-motor1" data-position="-0.027009130254934774m 0.027992178471240803m -0.04305389864049759m" data-normal="0.18025513159793682m 0.9836198897605687m -1.3215802495993298e-7m" data-visibility-attribute="visible">
               <div class="HotspotAnnotation">Motor 1 — Roll (DM-J4310-2EC)</div>
           </button>
-          <!-- 2. Motor 2 — Pitch -->
+          <!-- Motor 2 — Pitch -->
           <button class="Hotspot" slot="hotspot-motor2" data-position="0.032742324634128746m 0.02847557348865756m -0.04155627676495496m" data-normal="0.06037839243513814m 0.9981755605738554m -1.34113708870663e-7m" data-visibility-attribute="visible">
               <div class="HotspotAnnotation">Motor 2 — Pitch (DM-J4310-2EC)</div>
           </button>
-          <!-- 3. Central Gear Stack (3:1 Herringbone Gear) -->
+          <!-- Central Gear Stack (3:1 Herringbone Gear) -->
           <button class="Hotspot" slot="hotspot-gear" data-position="0.0013267442323015508m 0.02330380535771693m -0.0030132951556644944m" data-normal="0.8478129181226903m 0.29563551787641623m -0.44024186129243953m" data-visibility-attribute="visible">
               <div class="HotspotAnnotation">Central Gear Stack (3:1 Herringbone Gear)</div>
           </button>
-          <!-- 4. Bevel Gear Coupling -->
+          <!-- Bevel Gear Coupling -->
           <button class="Hotspot" slot="hotspot-bevel" data-position="-0.0012330250149203835m 0.015137529120881288m 0.05579315541027723m" data-normal="-0.10509427200033826m 0.937739148535577m -0.33105963706935015m" data-visibility-attribute="visible">
               <div class="HotspotAnnotation">Bevel Gear Coupling</div>
           </button>
-          <!-- 5. Stainless Steel D-Shaft (6mm) -->
+          <!-- Stainless Steel D-Shaft (6mm) -->
           <button class="Hotspot" slot="hotspot-shaft" data-position="0.00003588621110451186m 0.0024999999441206455m 0.07403480349854283m" data-normal="0m 1m 0m" data-visibility-attribute="visible">
               <div class="HotspotAnnotation">Stainless Steel D-Shaft (6mm)</div>
           </button>
@@ -191,10 +224,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 2. DRIVETRAIN LOGIC                                    -->
+    <!-- DRIVETRAIN LOGIC                                    -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.2.2 Drivetrain Logic</h3>
+      <h3>Drivetrain Logic</h3>
       <p>
         The gear reduction and kinematic derivation are presented as a
         unified system because the differential coupling between the
@@ -424,10 +457,10 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 3. MATERIAL SCIENCE & STRUCTURAL HARDENING             -->
+    <!-- MATERIAL SCIENCE & STRUCTURAL HARDENING             -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
-      <h3>5.2.5.2.3 Material Science &amp; Structural Hardening</h3>
+      <h3>Material Science &amp; Structural Hardening</h3>
       <p>
         The CDE Fair structural failures and the subsequent engineering
         response are documented as a material science transition, from a
@@ -469,7 +502,7 @@
       <image-component
         tag="image"
         source="../../../assets/upper_mechanism/structural_failures/broken_central_pla_shaft.jpg"
-        subtitle="Fractured FDM PLA central gear stack showing the bearing pocket and D-shaft bore. The shaft failed under torsional loading at the D-flat interface, with layer-line delamination characteristic of shear failure in FDM prints.">
+        subtitle="Fractured PLA central gear stack. Failure occurred under torsional loading via shear delamination at the D-flat motor interface.">
       </image-component>
 
       <h4>The Hybrid Interface Solution</h4>
@@ -503,7 +536,7 @@
               <td style="padding:10px; border:1px solid #c5cee0;">Alignment pin (2 mm)</td>
               <td style="padding:10px; border:1px solid #c5cee0;"><strong>Delrin (POM)</strong></td>
               <td style="padding:10px; border:1px solid #c5cee0;">Vibration / Impact</td>
-              <td style="padding:10px; border:1px solid #c5cee0;">Low friction coefficient (&mu; &asymp; 0.2), high impact resilience, and viscoelastic damping — absorbs impulse vibration at the gear interface rather than transmitting it into the PLA housing</td>
+              <td style="padding:10px; border:1px solid #c5cee0;">Absorbs impulse vibration at the gear interface rather than transmitting it into the housing</td>
             </tr>
             <tr>
               <td style="padding:10px; border:1px solid #c5cee0;">Reinforcement screws (M2)</td>
@@ -513,7 +546,7 @@
             </tr>
             <tr>
               <td style="padding:10px; border:1px solid #c5cee0;">Housing &amp; gears</td>
-              <td style="padding:10px; border:1px solid #c5cee0;"><strong>PLA (FDM)</strong></td>
+              <td style="padding:10px; border:1px solid #c5cee0;"><strong>PETG (FDM)</strong></td>
               <td style="padding:10px; border:1px solid #c5cee0;">Compression / Structure</td>
               <td style="padding:10px; border:1px solid #c5cee0;">Acceptable compressive strength for housing walls; rapid prototyping iteration capability; load-bearing walls thickened post-CDE-Fair</td>
             </tr>
@@ -532,6 +565,58 @@
         vibration damping, and PLA retained only for structural housing
         where compressive loads dominate.
       </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;">
+
+        <div style="display: flex; flex-direction: column;">
+          <div style="height: 320px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img
+              src="../../../assets/upper_mechanism/structural_revisions/top_down_d_shaft_holes.jpg"
+              alt="Top-down view of the stainless steel D-shaft."
+              class="zoomable-img" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; cursor: zoom-in;">
+          </div>
+          <div style="font-size: 0.82rem; color: #555; margin-top: 6px; padding: 0 2px;">
+            Top-down view: Stainless steel transmission shaft showing the milled D-flat, pin, and threaded screw bores.
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+          <div style="height: 320px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img
+              src="../../../assets/upper_mechanism/structural_revisions/side_view_delrin_pin.jpg"
+              alt="Side view of the D-shaft with Delrin alignment pins inserted."
+              class="zoomable-img" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; cursor: zoom-in;">
+          </div>
+          <div style="font-size: 0.82rem; color: #555; margin-top: 6px; padding: 0 2px;">
+            Side view: Delrin alignment pins installed to provide vibration-damped rotational coupling.
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+          <div style="height: 320px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img
+              src="../../../assets/upper_mechanism/structural_revisions/d_shaft_pin_gear_interface.jpg"
+              alt="D-shaft and pin interface with the bevel gear and helical gear stack."
+              class="zoomable-img" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; cursor: zoom-in;">
+          </div>
+          <div style="font-size: 0.82rem; color: #555; margin-top: 6px; padding: 0 2px;">
+            Shaft coupling: The pins and M2 screws securely lock both the bevel and central helical gears to the stainless steel shaft.
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column;">
+          <div style="height: 320px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img
+              src="../../../assets/upper_mechanism/structural_revisions/d_shaft_securing_screw.jpg"
+              alt="Close-up of the assembled V5 joint with M2 securing screw."
+              class="zoomable-img" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; cursor: zoom-in;">
+          </div>
+          <div style="font-size: 0.82rem; color: #555; margin-top: 6px; padding: 0 2px;">
+            Assembled V5 joint: The multi-material hybrid interface establishes the final torque path from motor to PLA gears.
+          </div>
+        </div>
+
+      </div>
 
       <!-- ─── Material Analysis: FDM Filament Selection ─── -->
       <h4>FDM Filament Selection for Gear Components</h4>
@@ -608,39 +693,46 @@
           mechanism in FDM filament is fundamentally different from that in
           continuous-fibre or woven composites:
         </p>
-        <p>
-          FDM-grade CF filament contains short chopped fibres (typically
-          &lt;200 &micro;m), randomly oriented within the polymer matrix.
-          These fibres do not form a continuous load-bearing network, and
-          the resulting in-plane stiffness gains are marginal
-          (approximately 10 to 20 percent relative to the base polymer),
-          compared to the orders-of-magnitude improvement observed in
-          woven or continuous-fibre composites.
-        </p>
-        <p>
-          Furthermore, the rigid fibre ends act as crack initiation sites
-          under dynamic loading. Fibre inclusions also prevent adequate
-          polymer chain fusion between successive printed layers, thereby
-          reducing inter-layer bond strength and rendering the part
-          significantly more brittle across the Z-axis than its non-CF
-          counterpart.
-        </p>
-        <p>
-          The net effect for gear applications is that CF variants offer
-          marginally higher in-plane stiffness (beneficial for tooth
-          profile accuracy) but substantially reduced impact toughness and
-          inter-layer strength. For gear teeth subjected to repeated
-          reversal shocks, this trade-off is unfavourable. Plain PLA
-          offers higher stiffness than PETG-CF at the component level
-          (3.5 GPa versus approximately 2.0 GPa) and prints with
-          significantly better layer adhesion, making it the preferred
-          choice for gear teeth.
-        </p>
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer; font-weight:600; color:#92400e; font-size:0.95rem; user-select:none;">
+            Show full technical analysis
+          </summary>
+          <div style="margin-top:12px;">
+            <p>
+              FDM-grade CF filament contains short chopped fibres (typically
+              &lt;200 &micro;m), randomly oriented within the polymer matrix.
+              These fibres do not form a continuous load-bearing network, and
+              the resulting in-plane stiffness gains are marginal
+              (approximately 10 to 20 percent relative to the base polymer),
+              compared to the orders-of-magnitude improvement observed in
+              woven or continuous-fibre composites.
+            </p>
+            <p>
+              Furthermore, the rigid fibre ends act as crack initiation sites
+              under dynamic loading. Fibre inclusions also prevent adequate
+              polymer chain fusion between successive printed layers, thereby
+              reducing inter-layer bond strength and rendering the part
+              significantly more brittle across the Z-axis than its non-CF
+              counterpart.
+            </p>
+            <p>
+              The net effect for gear applications is that CF variants offer
+              marginally higher in-plane stiffness (beneficial for tooth
+              profile accuracy) but substantially reduced impact toughness and
+              inter-layer strength. For gear teeth subjected to repeated
+              reversal shocks, this trade-off is unfavourable. Plain PLA
+              offers higher stiffness than PETG-CF at the component level
+              (3.5 GPa versus approximately 2.0 GPa) and prints with
+              significantly better layer adhesion, making it the preferred
+              choice for gear teeth.
+            </p>
+          </div>
+        </details>
       </div>
 
       <!-- ─── Final Material Strategy ─── -->
       <div style="background:#f0f7f0; border-left:4px solid #82b366; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#2d6a2d;">Selected Material Strategy: PLA Gears + PETG Housing</h4>
+        <h4 style="margin-top:0; color:#2d6a2d;">Selected Material Strategy: PETG Gears &amp; Housing</h4>
         <table style="width:100%; border-collapse:collapse; margin:8px 0;">
           <thead>
             <tr style="background:#d5e8d4;">
@@ -651,30 +743,12 @@
           </thead>
           <tbody>
             <tr>
-              <td style="padding:8px; border:1px solid #82b366;">Gear teeth</td>
-              <td style="padding:8px; border:1px solid #82b366;"><strong>PLA</strong></td>
-              <td style="padding:8px; border:1px solid #82b366;">Highest stiffness for meshing precision; brittleness mitigated by current-limit safety system</td>
-            </tr>
-            <tr>
-              <td style="padding:8px; border:1px solid #82b366;">Structural housing</td>
-              <td style="padding:8px; border:1px solid #82b366;"><strong>PETG</strong> (where thermal margin allows)</td>
+              <td style="padding:8px; border:1px solid #82b366;">Gear teeth &amp; housing</td>
+              <td style="padding:8px; border:1px solid #82b366;"><strong>PETG</strong></td>
               <td style="padding:8px; border:1px solid #82b366;">Ductility for impact absorption; ~20&deg;C higher thermal ceiling than PLA for sustained operation</td>
-            </tr>
-            <tr>
-              <td style="padding:8px; border:1px solid #82b366;">Not recommended</td>
-              <td style="padding:8px; border:1px solid #82b366;">PLA-CF, PETG-CF</td>
-              <td style="padding:8px; border:1px solid #82b366;">Carbon-fibre addition increases brittleness and inter-layer weakness without meaningful stiffness benefit for gear components</td>
             </tr>
           </tbody>
         </table>
-        <sl-alert variant="warning" open style="margin-top:12px;">
-          <sl-icon slot="icon" name="thermometer-half"></sl-icon>
-          <strong>PLA Thermal Monitor:</strong> PLA glass transition temperature
-          is approximately 55&ndash;60&deg;C. Sustained high-duty-cycle operation
-          risks thermal softening of gear teeth. Monitor motor casing temperatures;
-          if they approach 40&deg;C in proximity to printed components, PETG
-          substitution for gear teeth should be evaluated.
-        </sl-alert>
       </div>
 
       <h4>Supplementary Structural Revisions</h4>
@@ -689,29 +763,6 @@
         area, improving resistance to bending loads from off-axis impacts.
       </p>
 
-      <image-component
-        tag="image"
-        source="../../../assets/upper_mechanism/structural_revisions/top_down_d_shaft_holes.jpg"
-        subtitle="Top-down view of the stainless steel D-shaft showing the machined D-flat and drilled holes for the Delrin alignment pin and M2 securing screw.">
-      </image-component>
-
-      <image-component
-        tag="image"
-        source="../../../assets/upper_mechanism/structural_revisions/side_view_delrin_pin.jpg"
-        subtitle="Side view of the D-shaft with Delrin alignment pins inserted. The pins provide vibration damping at the gear interface while transmitting rotational force.">
-      </image-component>
-
-      <image-component
-        tag="image"
-        source="../../../assets/upper_mechanism/structural_revisions/d_shaft_pin_gear_interface.jpg"
-        subtitle="D-shaft and pin interface with the bevel gear (left) and helical gear stack (right). The pins and M2 screws lock the gears to the shaft, creating the hybrid steel–Delrin–PLA force-translation path.">
-      </image-component>
-
-      <image-component
-        tag="image"
-        source="../../../assets/upper_mechanism/structural_revisions/d_shaft_securing_screw.jpg"
-        subtitle="Close-up of the assembled V5 joint showing the bevel gear mounted on the stainless steel D-shaft with M2 securing screw visible. The hybrid interface transmits torque from motor → D-shaft → Delrin pin → M2 screws → PLA gear.">
-      </image-component>
     </div>
 
 
@@ -736,5 +787,31 @@
   <sl-button class="scroll-to-top" variant="primary" size="medium" circle onclick="scrollToTop()">
     <sl-icon name="arrow-up" label="Scroll to top"></sl-icon>
   </sl-button>
+
+  <!-- Lightbox dialog -->
+  <dialog id="img-lightbox">
+    <div id="img-lightbox-inner">
+      <img id="img-lightbox-img" src="" alt="">
+    </div>
+  </dialog>
+  <script>
+    (function () {
+      const dialog = document.getElementById('img-lightbox');
+      const dialogImg = document.getElementById('img-lightbox-img');
+      document.querySelectorAll('.zoomable-img').forEach(function (img) {
+        img.addEventListener('click', function () {
+          dialogImg.src = img.src;
+          dialogImg.alt = img.alt;
+          dialog.showModal();
+        });
+      });
+      document.getElementById('img-lightbox-inner').addEventListener('click', function () {
+        dialog.close();
+      });
+      dialog.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') dialog.close();
+      });
+    })();
+  </script>
 </body>
 </html>

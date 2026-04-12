@@ -20,6 +20,14 @@
     }
   </style>
   <script src="../../../components/report-nav/report-nav.js" defer></script>
+  <!-- MathJax for LaTeX equation rendering -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 </head>
 <body>
   <div class="content">
@@ -52,7 +60,7 @@
 
     <!-- ─── 1. Two-Tier Architecture ─── -->
     <div>
-      <h3>5.2.5.4.1 Two-Tier Hierarchical Architecture</h3>
+      <h3>Two-Tier Hierarchical Architecture</h3>
       <p>
         The control system follows a two-tier hierarchical design.
         Tier 1 resides on the Jetson Orin NX running
@@ -77,7 +85,7 @@
 
     <!-- ─── 2. Firmware V4 ─── -->
     <div>
-      <h3>5.2.5.4.2 Teensy 4.0 Firmware — 200 Hz Unified Loop</h3>
+      <h3>Teensy 4.0 Firmware — 200 Hz Unified Loop</h3>
       <p>
         The Teensy 4.0 executes a deterministic 200 Hz unified loop
         (5 ms period) integrating CAN motor control, I2C IMU polling, MDDS10 height
@@ -121,39 +129,120 @@
     <sl-divider></sl-divider>
 
 
-    <!-- ─── 3. Strike Library ─── -->
+    <!-- ─── 3. Kinematic Model ─── -->
     <div>
-      <h3>5.2.5.4.3 Strike Library</h3>
+      <h3>Kinematic Model</h3>
       <p>
-        Each strike in the library is defined by exactly two
-        motor-space nodes: a Windup position and an Apex (impact)
-        position. The operator records these positions using a live encoder
-        Teach Pendant. The process begins by disarming the
-        motors so that the arm is freely movable by hand. The operator then
-        positions the arm at the desired windup location and activates the
-        Record Windup function, which captures the raw
-        encoder values. The arm is subsequently repositioned to the apex
-        (impact) point, and the Record Apex function is
-        activated. The GUI then dynamically computes the recovery position
-        using proportional snap-back.
+        The coaxial differential joint couples Motor 1 (roll) and Motor 2 (pitch) through a
+        3:1 helical gear reduction into a shared bevel gear stack. Because the bevel gear walks
+        when only the roll motor moves, pitch and roll are mechanically coupled and cannot be
+        commanded independently without software decoupling.
       </p>
       <p>
-        Strike libraries are saved and loaded as JSON files containing both
-        left and right arm data:
+        Before deployment, a three-step Homing Wizard calibrates the digital twin to the
+        physical hardware. (1)&nbsp;<em>Set Roll Zero</em> — the operator positions the arm
+        at neutral and captures \(o_r\). (2)&nbsp;<em>Run Pitch Scan</em> — the software
+        drives the pitch motor automatically in 0.05&nbsp;rad steps until motor current
+        exceeds a configurable threshold (default 0.3&nbsp;A), discovering the physical
+        pitch limits. (3)&nbsp;<em>Calibrate Directions</em> — the GUI commands short
+        test movements and presents binary prompts (e.g. "did the arm swing FORWARD?"),
+        from which \(s_r\), \(s_p\), and \(c\) are resolved. The resulting constants are
+        persisted to <code>data/arm_config.yaml</code>, grounding all FK and IK calculations
+        to the specific build's tolerances.
       </p>
-      <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto;">
-{
-  "left":  { "Jab": {"windup": [...], "apex": [...]}, ... },
-  "right": { "Right Hook": {"windup": [...], "apex": [...]}, ... }
-}
-      </pre>
+
+      <h4>Forward Kinematics — Motor Space &rarr; Joint Space</h4>
+      <p>
+        The calibrated forward kinematics resolve the bevel coupling by incorporating the
+        home offsets and sign parameters:
+      </p>
+      $$\theta_{\text{roll}}  = s_r \cdot \frac{m_r - o_r}{G} \tag{Eq. 1}$$
+      $$\theta_{\text{pitch}} = s_p \cdot \frac{(m_p - o_p)\; +\; c\,(m_r - o_r)}{G} \tag{Eq. 2}$$
+      <p style="font-size:0.9rem; color:#555; margin-top:4px;">
+        where \(G = 3\) (helical gear reduction). Eq.&nbsp;2 exposes the differential
+        coupling: pitch depends on the sum of the pitch motor displacement and a
+        coupling-weighted roll motor displacement.
+      </p>
+
+      <h4>Cartesian Projection — Joint Space &rarr; Arm-Tip Direction</h4>
+      <p>
+        The joint angles are projected into a normalised Cartesian arm-tip direction vector
+        using the Rotation-Around-Arm-Axis model. At \(\theta_{\text{pitch}} = 0\) the arm
+        points straight outward along the X-axis; pitching the arm sweeps a circle in the
+        Y–Z plane whose orientation is governed by the roll angle:
+      </p>
+      $$d_x = s_x \cdot \cos(\theta_{\text{pitch}}) \tag{Eq. 3}$$
+      $$d_y = \sin(\theta_{\text{pitch}}) \cdot \cos(\theta_{\text{roll}}) \tag{Eq. 4}$$
+      $$d_z = \sin(\theta_{\text{pitch}}) \cdot \sin(\theta_{\text{roll}}) \tag{Eq. 5}$$
+      <p style="font-size:0.9rem; color:#555; margin-top:4px;">
+        where \(s_x = -1\) (left arm) or \(+1\) (right arm).
+      </p>
+      <p>
+        This Cartesian representation forms the software digital twin of permissible arm
+        configurations. Every incoming motor-space target is converted to joint space in
+        Python, validated, and — if necessary — clamped before any CAN command is issued to
+        the Teensy&nbsp;4.0. Pitch is constrained to a software operating zone of
+        &plusmn;1.0&nbsp;rad (physical hard-stop limit: &plusmn;1.57&nbsp;rad). Applying the
+        clamp in joint space rather than as independent per-motor bounds eliminates the
+        Jump-Back defect, where hardware-side endstops issued sudden counter-commands to an
+        uncommanded motor.
+      </p>
+
+      <h4>Inverse Kinematics — Joint Space &rarr; Motor Space</h4>
+      <p>
+        To command a desired joint-space pose, the inverse kinematics convert back to raw
+        motor positions and apply the software decoupling term that cancels the bevel walking
+        effect in real-time:
+      </p>
+      $$\Delta_r = \left(\frac{\theta_{\text{roll}}}{s_r}\right) \cdot G, \qquad m_r = \Delta_r + o_r \tag{Eq. 6}$$
+      $$m_p = \left[\left(\frac{\theta_{\text{pitch}}}{s_p}\right) \cdot G \;-\; c\,\Delta_r\right] + o_p \tag{Eq. 7}$$
+      </p>
 
       <div class="video-row single">
         <div class="video-box">
           <video controls preload="metadata">
+            <source src="../../../assets/upper_mechanism/videos/Arm_Calibration_Interface_Demo.mp4" type="video/mp4">
+          </video>
+          <sub>Calibration interface demonstration — the three-step Homing Wizard resolving roll zero, pitch scan limits, and direction signs, with results persisted to <code>arm_config.yaml</code>.</sub>
+        </div>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
+    <!-- ─── 4. Strike Library ─── -->
+    <div>
+      <h3>Strike Library</h3>
+      <p>
+        Each strike is defined by a Windup position and an Apex (impact) position, both
+        stored in joint space so that entries survive recalibration. Strikes are authored
+        interactively in the 3D digital twin: an azimuth slider selects one of 30 pre-computed
+        workspace arcs rendered against the calibrated arm model; clicking the arc places
+        Windup and Apex markers. A quadratic B&eacute;zier path is drawn in real-time
+        (green = within calibrated limits, red = out of limits). Curvature and arc-angle
+        sliders shape the trajectory before saving. Libraries are persisted as JSON:
+      </p>
+      <pre style="background:#f5f5f5; padding:12px; border-radius:8px; overflow-x:auto;">
+{
+  "left":  { "Jab": {"space": "joint", "windup": [roll, pitch],
+                      "apex": [roll, pitch], "curvature": 0.0,
+                      "arc_angle": 0.0, "waypoints": [...]} },
+  "right": { "Cross": { ... } }
+}
+      </pre>
+
+      <div class="video-row">
+        <div class="video-box">
+          <video controls preload="metadata">
+            <source src="../../../assets/upper_mechanism/videos/Strike_Library__Interface.mp4" type="video/mp4">
+          </video>
+          <sub>Strike library interface — authoring strikes in the 3D digital twin.</sub>
+        </div>
+        <div class="video-box">
+          <video controls preload="metadata" muted>
             <source src="../../../assets/upper_mechanism/videos/Arm_Chain_Execution.mp4" type="video/mp4">
           </video>
-          <sub>Strike library demonstration — chaining multiple strikes fluidly with vector alignment skip logic and proportional snap-back recovery.</sub>
+          <sub>Live View — 3D Strikes.</sub>
         </div>
       </div>
 
@@ -161,11 +250,27 @@
 
     <sl-divider></sl-divider>
 
+    <!-- ─── 3.6 State-Space Strike Planning ─── -->
+    <div>
+      <h3>State-Space Strike Planning</h3>
+      <p>
+        The Cartesian arm-tip vector produced by the kinematic model drives three planning
+        behaviours in the Dynamic Sparring FSM. Vector alignment skip logic computes the
+        dot-product angle between a strike's intended direction and the current approach
+        vector; if below 30&deg;, the Windup node is bypassed for a more fluid transition.
+        Perimeter orbit transit routing inserts ordered library Windup positions as via-points
+        when a direct inter-strike transit would cross the user-facing centre-line, keeping
+        the arm on a safe perimeter path. Synchronised per-motor speed scaling proportionally
+        adjusts each motor's speed to its share of the total travel distance, producing
+        straight-line motor-space trajectories between any two positions.
+      </p>
+    </div>
 
+    <sl-divider></sl-divider>
 
     <!-- ─── 4. ROS Control Interface ─── -->
     <div>
-      <h3>5.2.5.4.4 ROS Control Interface</h3>
+      <h3>ROS Control Interface</h3>
       <p>
         A dedicated ROS Control Tab enables external front-end integration
         via 7 ROS 2 topics:

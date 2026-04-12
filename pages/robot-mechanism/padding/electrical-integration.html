@@ -173,40 +173,7 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 4. WIRING CONSIDERATIONS                              -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <div>
-      <h3>Wiring Considerations</h3>
-      <p>
-        The IMU sensors are embedded within the padding zones, connected
-        to the Teensy 4.0 via 30&ndash;40 cm unshielded jumper
-        wires routed through the arm mechanism. This wire length
-        introduces parasitic capacitance that degrades signal integrity
-        at 400 kHz I2C Fast Mode.
-      </p>
-      <p>
-        During integration testing, this parasitic capacitance caused the
-        MPU6050's internal state machine to lock the SDA line permanently
-        when an I2C "Repeated Start" command was issued. The bus hang was
-        unrecoverable without a full power cycle. The resolution involved
-        replacing all Repeated Start transactions with a physical
-        Hard STOP (<code>endTransmission(true)</code>)
-        after every register write, resetting the sensor state machine
-        before each read. This adds approximately 20 &micro;s of latency
-        per sensor, well within the 5 ms loop budget.
-      </p>
-      <p>
-        Full root-cause analysis and signal-integrity timing diagrams are
-        documented in
-        <a href="../../../appendix-system-troubleshooting.html#defect-7">System Troubleshooting Appendix, Defect 7: I²C Bus Hang</a>
-        Hang on Long-Wire IMU Routing</a>.
-      </p>
-    </div>
-
-    <sl-divider></sl-divider>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 5. STRIKE DETECTION PIPELINE                          -->
+    <!-- 4. STRIKE DETECTION PIPELINE                          -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Strike Detection Pipeline</h3>
@@ -243,7 +210,7 @@
     <sl-divider></sl-divider>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- 6. IMU TIMING BUDGET                                  -->
+    <!-- 5. IMU TIMING BUDGET                                  -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>IMU Timing Budget</h3>
