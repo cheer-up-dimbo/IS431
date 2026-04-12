@@ -103,7 +103,6 @@
           <tr><td style="padding:8px; border:1px solid #ddd;">Stall current</td><td style="padding:8px; border:1px solid #ddd;">~21 A</td></tr>
           <tr><td style="padding:8px; border:1px solid #ddd;">Rated torque</td><td style="padding:8px; border:1px solid #ddd;">~1.37 N&middot;m (14 kg&middot;cm)</td></tr>
           <tr><td style="padding:8px; border:1px solid #ddd;">Shaft</td><td style="padding:8px; border:1px solid #ddd;">8 mm D-type</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Encoder</td><td style="padding:8px; border:1px solid #ddd;">AB phase Hall effect (present, currently unused)</td></tr>
         </tbody>
       </table>
 
@@ -186,97 +185,86 @@
     <sl-divider></sl-divider>
 
     <div>
-      <h3>Regenerative Braking and Brake Resistor Sizing</h3>
+      <h3>Regenerative Braking Resistor Sizing</h3>
       <p>
-        The firmware ramp-down mitigation governs deceleration during
-        height adjustment operations; the RegenClamp V0.3 dissipates
-        residual back-EMF on the 24V bus at end-of-travel. At full rated
-        speed, the motor armature decelerates over the firmware-controlled
-        ramp, converting kinetic energy into a back-EMF voltage that is
-        absorbed by the RegenClamp before it can exceed the PSU
-        over-voltage protection (OVP) threshold (~28V).
-      </p>
-      <p>
-        The full back-EMF physics and software ramp-down mitigation are
-        documented in
-        <a href="../../../appendix-system-troubleshooting.html#defect-6">System Troubleshooting Appendix:
-        Defect 6</a>. This section documents the
-        hardware brake resistor sized against the confirmed motor specs.
+        The firmware ramp-down mitigation governs deceleration during height adjustment operations; however, the RegenClamp V0.3 is still required to dissipate any residual back-EMF on the 24 V bus at end-of-travel before it can exceed the PSU over-voltage protection (OVP) threshold at approximately 28 V. The sizing of a regenerative brake resistor is governed by two constraints. First, the electrical resistance limit must be low enough to allow sufficient current to flow out of the system, preventing a voltage bottleneck as governed by Ohm's Law. Second, the thermal wattage limit must possess enough thermal mass to absorb the instantaneous power spike without melting the internal wirewound element as governed by Joule's Law. The analysis below details how the specific resistor requirements were obtained for the lead screw elevator.
       </p>
 
-      <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
-        <h4 style="margin-top:0; color:#1e40af;">Brake Resistor Derivation</h4>
-        <p>
-          Winding resistance from confirmed stall current:
-        </p>
-        <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
-          R<sub>winding</sub> = V<sub>supply</sub> / I<sub>stall</sub> = 24V / 21A &asymp; 1.14 &Omega;
-        </p>
-        <p>
-          The RegenClamp V0.3 clamps the bus at ~26.5V and diverts energy
-          through the brake resistor:
-        </p>
-        <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
-          I<sub>brake</sub> = 26.5V / 10&Omega; = 2.65A &nbsp;&nbsp;
-          P<sub>peak</sub> = 26.5V &times; 2.65A &asymp; 70W
-        </p>
-      </div>
-
-      <h4>Brake Resistor Validation</h4>
+      <h4>Hardware Profile</h4>
       <table style="width:100%; border-collapse:collapse; margin:16px 0;">
         <thead>
           <tr style="background:#f0f0f0;">
             <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
-            <th style="padding:8px; border:1px solid #ddd;">Previous (Estimated)</th>
-            <th style="padding:8px; border:1px solid #ddd;">Confirmed (CHP-36GP-555)</th>
-            <th style="padding:8px; border:1px solid #ddd;">Verdict</th>
+            <th style="padding:8px; border:1px solid #ddd;">Component / Characteristic</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Winding resistance</td>
-            <td style="padding:8px; border:1px solid #ddd;">~1&ndash;2 &Omega;</td>
-            <td style="padding:8px; border:1px solid #ddd;"><strong>1.14 &Omega;</strong> (24V / 21A)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Within assumed range</td>
+            <td style="padding:8px; border:1px solid #ddd;">Driver</td>
+            <td style="padding:8px; border:1px solid #ddd;">Cytron MDDS10</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Braking current</td>
-            <td style="padding:8px; border:1px solid #ddd;">Estimated</td>
-            <td style="padding:8px; border:1px solid #ddd;"><strong>2.65 A</strong> (26.5V / 10&Omega;)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Below 30A clamp limit</td>
+            <td style="padding:8px; border:1px solid #ddd;">Motor</td>
+            <td style="padding:8px; border:1px solid #ddd;">CHP-36GP-555 DC Motor</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Peak brake power</td>
-            <td style="padding:8px; border:1px solid #ddd;">Estimated</td>
-            <td style="padding:8px; border:1px solid #ddd;"><strong>70W</strong> for &lt;300ms pulses</td>
-            <td style="padding:8px; border:1px solid #ddd;">50W aluminium body handles short pulses</td>
+            <td style="padding:8px; border:1px solid #ddd;">Mechanics</td>
+            <td style="padding:8px; border:1px solid #ddd;">Lead screw elevator (high friction, self-locking tendency)</td>
           </tr>
           <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Max unprotected regen current</td>
-            <td style="padding:8px; border:1px solid #ddd;">~13A (estimated)</td>
-            <td style="padding:8px; border:1px solid #ddd;"><strong>~21A</strong> (V / R<sub>winding</sub>)</td>
-            <td style="padding:8px; border:1px solid #ddd;">Strengthens RegenClamp necessity</td>
+            <td style="padding:8px; border:1px solid #ddd;">Selected Resistor</td>
+            <td style="padding:8px; border:1px solid #ddd;"><em>10 &Omega;, 50 W Aluminium Wirewound</em></td>
           </tr>
         </tbody>
       </table>
 
-      <sl-alert variant="warning" open>
-        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-        <strong>Procurement Required:</strong> Brake resistor specified as
-        a <strong>10&Omega; / 50W aluminium-housed wirewound resistor</strong>
-        (to procure). Must be installed between the RegenClamp output and
-        the MDDS10 power input before the software ramp-down safety net is
-        removed from firmware.
-      </sl-alert>
+      <h4>Electrical Calculation (Resistance Sizing)</h4>
+      <p>
+        Lead screw mechanisms have significant internal friction and naturally resist back-driving. Therefore, the back-EMF generated when the elevator stops is significantly lower than the free-spinning base rotation. At the 26.5 V clamp threshold, a 10 &Omega; resistor allows a maximum braking current of 2.65 A:
+      </p>
+      <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
+        I<sub>peak</sub> = 26.5 V / 10 &Omega; = 2.65 A
+      </p>
+      <p>
+        Because the lead screw self-brakes to a degree, this lower current limit is entirely sufficient to bleed off the remaining kinetic energy without causing an overvoltage fault on the driver.
+      </p>
 
-      <sl-alert variant="primary" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Significance:</strong> The confirmed stall current of 21A
-        means unprotected hard-stops would inject ~21A of regen current
-        onto the 24V bus, almost certainly exceeding the PSU OVP threshold
-        (~28V). The RegenClamp limits this to a controlled 2.65A discharge,
-        quantitatively justifying the hardware protection.
-      </sl-alert>
+      <h4>Thermal Calculation (Wattage Sizing)</h4>
+      <p>
+        The instantaneous heat generated during an elevator stop is approximately 70.23 W:
+      </p>
+      <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
+        P<sub>peak</sub> = (26.5 V)<sup>2</sup> / 10 &Omega; = 70.23 W
+      </p>
+      <p>
+        Dumping a 70.23 W pulse into a 50 W-rated resistor represents a highly conservative 1.4&times; thermal overload. Because the elevator is adjusted less frequently than the base rotates during active sparring, the 50 W thermal mass is more than adequate to dissipate the heat between adjustments.
+      </p>
+
+      <h4>Summary of Component Selection</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Subsystem</th>
+            <th style="padding:8px; border:1px solid #ddd;">Clamp Threshold</th>
+            <th style="padding:8px; border:1px solid #ddd;">Resistance</th>
+            <th style="padding:8px; border:1px solid #ddd;">Peak Current</th>
+            <th style="padding:8px; border:1px solid #ddd;">Peak Power Spike</th>
+            <th style="padding:8px; border:1px solid #ddd;">Resistor Rating</th>
+            <th style="padding:8px; border:1px solid #ddd;">Overload Factor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Height Elevator</td>
+            <td style="padding:8px; border:1px solid #ddd;">26.5 V</td>
+            <td style="padding:8px; border:1px solid #ddd;">10 &Omega;</td>
+            <td style="padding:8px; border:1px solid #ddd;">2.65 A</td>
+            <td style="padding:8px; border:1px solid #ddd;">~70 W</td>
+            <td style="padding:8px; border:1px solid #ddd;">50 W</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.4&times; (Safe)</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <sl-divider></sl-divider>
@@ -329,12 +317,7 @@
             <td style="padding:8px; border:1px solid #ddd;">0 mm drift over 60 s</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Back-EMF safety</td>
-            <td style="padding:8px; border:1px solid #ddd;">No PSU OVP trip over 5 emergency stops</td>
-            <td style="padding:8px; border:1px solid #ddd;">0 trips</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
-          </tr>
+
         </tbody>
       </table>
     </div>

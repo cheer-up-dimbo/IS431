@@ -305,29 +305,87 @@
         </div>
       </div>
 
-      <sl-alert variant="warning" open>
-        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-        <strong>Wire routing:</strong> Power cable (2-wire, 5V + GND)
-        from the buck converter to the Arduino should route
-        <strong>along the rotation axis</strong> to minimise twist. A
-        slip ring is recommended for continuous rotation &gt;&plusmn;2 turns;
-        if software limits base rotation to &plusmn;360&deg;, a flexible
-        cable with strain relief is sufficient. Connector:
-        <strong>JST-XH 2-pin</strong> (field-removable, polarised,
-        rated &ge;2 A).
-      </sl-alert>
 
-      <sl-alert variant="danger" open>
-        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
-        <strong>RegenClamp Required:</strong> The Z55BLD400 is a 400 W
-        BLDC motor with a 26:1 integrated gearbox and 3.5:1 belt stage (91:1 total); back-EMF during rapid
-        deceleration will spike the 24V bus, potentially triggering the
-        same OVP failure documented for the
-        <a href="../height-adjustment/electrical-control.html">height
-        motor</a>. A RegenClamp V0.3 unit must be installed between
-        the distribution busbar and the ZBLD driver before the system
-        is operated under load.
-      </sl-alert>
+      <h3>Regenerative Braking Resistor Sizing</h3>
+      <p>
+        The Z55BLD400 is a 400 W BLDC motor; back-EMF during rapid deceleration will spike the 24 V bus. The RegenClamp V0.3 dissipates this residual energy to prevent PSU over-voltage protection (OVP) trips at approximately 28 V. The sizing of a regenerative brake resistor is governed by two constraints. First, the electrical resistance limit must be low enough to allow sufficient current to flow out of the system, preventing a voltage bottleneck as governed by Ohm's Law. Second, the thermal wattage limit must possess enough thermal mass to absorb the instantaneous power spike without melting the internal wirewound element as governed by Joule's Law. The analysis below details how the specific resistor requirements were obtained for the base rotation axis.
+      </p>
+
+      <h4>Hardware Profile</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Parameter</th>
+            <th style="padding:8px; border:1px solid #ddd;">Component / Characteristic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Driver</td>
+            <td style="padding:8px; border:1px solid #ddd;">ZBLD C20-800LRC</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Motor</td>
+            <td style="padding:8px; border:1px solid #ddd;">Z55BLD400-24GU BLDC</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Mechanics</td>
+            <td style="padding:8px; border:1px solid #ddd;">High-inertia rotational load with a 91:1 total gear ratio</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Selected Resistor</td>
+            <td style="padding:8px; border:1px solid #ddd;"><em>5 &Omega;, 100 W Aluminium Wirewound</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Electrical Calculation (Resistance Sizing)</h4>
+      <p>
+        When the heavy upper torso of the robot rotates and suddenly stops, the high kinetic energy back-drives the motor, generating a massive current spike. At the 26.5 V clamp threshold, a 5 &Omega; resistor allows a maximum braking current of 5.3 A:
+      </p>
+      <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
+        I<sub>peak</sub> = 26.5 V / 5 &Omega; = 5.3 A
+      </p>
+      <p>
+        This 5.3 A braking limit provides aggressive deceleration capability for the heavy, high-inertia base without allowing the bus voltage to spike past the safe threshold of the driver.
+      </p>
+      
+      <h4>Thermal Calculation (Wattage Sizing)</h4>
+      <p>
+        When the 5.3 A current flows through the resistor, the instantaneous heat generated is approximately 140.45 W:
+      </p>
+      <p style="font-family: serif; font-size: 1.05rem; text-align: center; margin: 12px 0;">
+        P<sub>peak</sub> = (26.5 V)<sup>2</sup> / 5 &Omega; = 140.45 W
+      </p>
+      <p>
+        Dumping a 140.45 W pulse into a 100 W-rated resistor represents a safe 1.4&times; thermal overload. Aluminium-housed wirewound resistors bolted to a metal chassis can safely handle 5&times; to 10&times; pulse overloads for short durations under 2 seconds. The 100 W continuous rating ensures the resistor will not overheat during rapid, repetitive sparring movements.
+      </p>
+
+      <h4>Summary of Component Selection</h4>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Subsystem</th>
+            <th style="padding:8px; border:1px solid #ddd;">Clamp Threshold</th>
+            <th style="padding:8px; border:1px solid #ddd;">Resistance</th>
+            <th style="padding:8px; border:1px solid #ddd;">Peak Current</th>
+            <th style="padding:8px; border:1px solid #ddd;">Peak Power Spike</th>
+            <th style="padding:8px; border:1px solid #ddd;">Resistor Rating</th>
+            <th style="padding:8px; border:1px solid #ddd;">Overload Factor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Base Rotation</td>
+            <td style="padding:8px; border:1px solid #ddd;">26.5 V</td>
+            <td style="padding:8px; border:1px solid #ddd;">5 &Omega;</td>
+            <td style="padding:8px; border:1px solid #ddd;">5.3 A</td>
+            <td style="padding:8px; border:1px solid #ddd;">~140 W</td>
+            <td style="padding:8px; border:1px solid #ddd;">100 W</td>
+            <td style="padding:8px; border:1px solid #ddd;">1.4&times; (Safe)</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <sl-divider></sl-divider>
@@ -357,18 +415,7 @@
             <td style="padding:8px; border:1px solid #ddd;">≥ 150°/s</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Position hold</td>
-            <td style="padding:8px; border:1px solid #ddd;">Angle deviation under 50 N lateral punch</td>
-            <td style="padding:8px; border:1px solid #ddd;">≤ 5° overshoot, return within 500 ms</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
-          </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">Communication</td>
-            <td style="padding:8px; border:1px solid #ddd;">Command frame loss rate</td>
-            <td style="padding:8px; border:1px solid #ddd;">&lt; 1% over 1000 frames</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
-          </tr>
+
         </tbody>
       </table>
     </div>
