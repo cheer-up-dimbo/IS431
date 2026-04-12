@@ -268,7 +268,7 @@
 
     <h2>Implementation</h2>
     <p>
-      The GUI was built over six iterations across 15 weeks (December 2025 to April 2026).
+      The GUI was built over seven iterations across 18 weeks (December 2025 to April 2026).
       Each iteration had a defined objective, produced working software, and closed with a
       review before the next iteration began. This section documents the development timeline,
       the system architecture, and the key engineering decisions that shaped the final system.
@@ -286,46 +286,52 @@
     <div class="iteration-timeline">
       <svg viewBox="0 0 1080 170" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:860px; height:auto; display:block;" aria-label="GUI iteration timeline">
         <rect x="0" y="0" width="1080" height="170" rx="12" fill="#f8fafc"/>
-        <text x="540" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Six-Iteration Build Timeline</text>
+        <text x="540" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Seven-Iteration Build Timeline</text>
         <text x="540" y="43" text-anchor="middle" font-size="11" fill="#64748b">Each iteration adds one layer of training flow, integration, or polish.</text>
 
-        <line x1="90" y1="92" x2="990" y2="92" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+        <line x1="60" y1="92" x2="1020" y2="92" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
 
         <g>
           <circle cx="120" cy="92" r="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
           <text x="120" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">1</text>
-          <text x="120" y="126" text-anchor="middle" font-size="11" fill="#334155">Foundation</text>
-          <text x="120" y="141" text-anchor="middle" font-size="10" fill="#64748b">login, layout, shell</text>
+          <text x="120" y="126" text-anchor="middle" font-size="11" fill="#334155">Shell</text>
+          <text x="120" y="141" text-anchor="middle" font-size="10" fill="#64748b">PySide6, nav, Jetson</text>
         </g>
         <g>
-          <circle cx="290" cy="92" r="18" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
-          <text x="290" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">2</text>
-          <text x="290" y="126" text-anchor="middle" font-size="11" fill="#334155">Session flow</text>
-          <text x="290" y="141" text-anchor="middle" font-size="10" fill="#64748b">navigation, rounds, start/end</text>
+          <circle cx="250" cy="92" r="18" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+          <text x="250" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">2</text>
+          <text x="250" y="126" text-anchor="middle" font-size="11" fill="#334155">Curriculum</text>
+          <text x="250" y="141" text-anchor="middle" font-size="10" fill="#64748b">combos, session UI</text>
         </g>
         <g>
-          <circle cx="460" cy="92" r="18" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
-          <text x="460" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">3</text>
-          <text x="460" y="126" text-anchor="middle" font-size="11" fill="#334155">Training logic</text>
-          <text x="460" y="141" text-anchor="middle" font-size="10" fill="#64748b">curriculum, scoring, history</text>
+          <circle cx="380" cy="92" r="18" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+          <text x="380" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">3</text>
+          <text x="380" y="126" text-anchor="middle" font-size="11" fill="#334155">Sparring</text>
+          <text x="380" y="141" text-anchor="middle" font-size="10" fill="#64748b">Markov, assessment</text>
         </g>
         <g>
-          <circle cx="630" cy="92" r="18" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
-          <text x="630" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#7e22ce">4</text>
-          <text x="630" y="126" text-anchor="middle" font-size="11" fill="#334155">Integration</text>
-          <text x="630" y="141" text-anchor="middle" font-size="10" fill="#64748b">bridge, mock mode, ROS flow</text>
+          <circle cx="510" cy="92" r="18" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
+          <text x="510" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#7e22ce">4</text>
+          <text x="510" y="126" text-anchor="middle" font-size="11" fill="#334155">Performance</text>
+          <text x="510" y="141" text-anchor="middle" font-size="10" fill="#64748b">tests, sensors</text>
         </g>
         <g>
-          <circle cx="800" cy="92" r="18" fill="#cffafe" stroke="#06b6d4" stroke-width="2"/>
-          <text x="800" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#0e7490">5</text>
-          <text x="800" y="126" text-anchor="middle" font-size="11" fill="#334155">Dashboard</text>
-          <text x="800" y="141" text-anchor="middle" font-size="10" fill="#64748b">phone companion and sync</text>
+          <circle cx="640" cy="92" r="18" fill="#cffafe" stroke="#06b6d4" stroke-width="2"/>
+          <text x="640" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#0e7490">5</text>
+          <text x="640" y="126" text-anchor="middle" font-size="11" fill="#334155">Navigation</text>
+          <text x="640" y="141" text-anchor="middle" font-size="10" fill="#64748b">stack, AI coaching</text>
         </g>
         <g>
-          <circle cx="970" cy="92" r="18" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-          <text x="970" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#b91c1c">6</text>
-          <text x="970" y="126" text-anchor="middle" font-size="11" fill="#334155">Polish</text>
-          <text x="970" y="141" text-anchor="middle" font-size="10" fill="#64748b">stability, tuning, validation</text>
+          <circle cx="770" cy="92" r="18" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+          <text x="770" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#b91c1c">6</text>
+          <text x="770" y="126" text-anchor="middle" font-size="11" fill="#334155">User mgmt</text>
+          <text x="770" y="141" text-anchor="middle" font-size="10" fill="#64748b">login, validation</text>
+        </g>
+        <g>
+          <circle cx="900" cy="92" r="18" fill="#fdf2f8" stroke="#ec4899" stroke-width="2"/>
+          <text x="900" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#be185d">7</text>
+          <text x="900" y="126" text-anchor="middle" font-size="11" fill="#334155">Dashboard</text>
+          <text x="900" y="141" text-anchor="middle" font-size="10" fill="#64748b">ROS 2, phone, design</text>
         </g>
       </svg>
     </div>
@@ -988,7 +994,7 @@ class CustomPage(ButtonNavigationMixin, QWidget):
     <div>
       <h3>Feature Set</h3>
       <p>
-        The complete feature set delivered across all six iterations is summarised below.
+        The complete feature set delivered across all seven iterations is summarised below.
       </p>
       <table-component id="gui-feature-set" subtitle="Table 5.1.2-7: Complete Feature Set"></table-component>
     </div>

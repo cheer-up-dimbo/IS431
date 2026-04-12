@@ -18,7 +18,7 @@ if (guiFeatureSetEl) {
       ['Performance', 'Stamina Test', '2-minute endurance test tracking total punches, punch rate, fatigue percentage'],
       ['Performance', 'Reaction Test', 'Reaction time measurement using CV pose estimation with tier classification'],
       ['Performance', 'History Hub', 'Unified history interface consolidating all training types with mode filtering'],
-      ['User Management', 'Pattern Lock', '3x3 grid authentication with 48px hit radius for gloved-hand input'],
+      ['User Management', 'Pattern Lock', '3x3 grid authentication with 48px hit radius for reliable padding-based screen interaction'],
       ['User Management', 'Proficiency Assessment', '6-question checklist on signup producing Beginner/Intermediate/Advanced classification'],
       ['User Management', 'Per-User Database', 'Complete data isolation via separate SQLite database files per user'],
       ['Companion', 'Phone Dashboard', 'Vue 3 web app served over WiFi AP for session history, analytics, remote control, and AI chat'],

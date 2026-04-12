@@ -10,14 +10,14 @@
     '<tr style="background:#ffebee;">' +
     '<td style="padding:10px;border:1px solid #ddd;">Username/Password</td>' +
     '<td style="padding:10px;border:1px solid #ddd;">Standard text-based login requiring keyboard input on the touchscreen.</td>' +
-    '<td style="padding:10px;border:1px solid #ddd;">Typing on a small touchscreen with boxing gloves is impractical. Acceptable for the phone dashboard but not as the primary touchscreen method.</td></tr>' +
+    '<td style="padding:10px;border:1px solid #ddd;">Requires fine-motor text input, which is slow and error-prone after warm-up or between rounds. A faster, more coarse-grained input method aligns better with training workflow pace.</td></tr>' +
     '<tr style="background:#ffebee;">' +
     '<td style="padding:10px;border:1px solid #ddd;">Biometric</td>' +
     '<td style="padding:10px;border:1px solid #ddd;">Fingerprint scanner or facial recognition for authentication.</td>' +
-    '<td style="padding:10px;border:1px solid #ddd;">Requires additional hardware. Face recognition is unreliable with headgear and sweat. Fingerprint sensors do not function through gloves.</td></tr>' +
+    '<td style="padding:10px;border:1px solid #ddd;">Requires additional hardware. Face recognition is unreliable with headgear and sweat. Fingerprint sensors require precise contact and are less reliable when hands are wet or fatigued.</td></tr>' +
     '<tr style="background:#e8f5e9;">' +
     '<td style="padding:10px;border:1px solid #ddd;font-weight:bold;">Pattern Lock + Password Fallback</td>' +
-    '<td style="padding:10px;border:1px solid #ddd;">A 3x3 grid pattern lock on the touchscreen with dot targets sized at 48px hit radius to accommodate gloved fingers. The pattern is SHA-256 hashed. Password login remains available on the phone dashboard for typed input.</td>' +
-    '<td style="padding:10px;border:1px solid #ddd;">Large touch targets work reliably with gloves. Drawing a pattern is faster than typing. The dual-method approach matches each interface to its appropriate input modality.</td></tr>' +
+    '<td style="padding:10px;border:1px solid #ddd;">A 3x3 grid pattern lock on the touchscreen with dot targets sized at 48px hit radius to accommodate reliable padding-based presses. The pattern is SHA-256 hashed. Password login remains available on the phone dashboard for typed input.</td>' +
+    '<td style="padding:10px;border:1px solid #ddd;">Large touch targets work reliably with the robot\'s padded controls. Drawing a pattern is faster than typing. The dual-method approach matches each interface to its appropriate input modality.</td></tr>' +
     '</tbody></table>';
 })();
