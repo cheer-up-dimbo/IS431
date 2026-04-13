@@ -911,14 +911,9 @@
  <td style="padding:8px; border:1px solid #ddd;"><strong>Fine-tune a custom pose estimator</strong> on our own recorded boxing footage with manually annotated keypoints, gloved hands, this camera viewpoint, our pose set. A pose model that was actually trained for the context would lift the load off the voxel branch and improve accuracy further</td>
  </tr>
  <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>LLM compute ceiling</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">The Jetson has 16&nbsp;GB but its GPU isn't built to run a heavy LLM in parallel with the CV pipeline, IMU fusion, sparring engine, and the rest of the system. A 3B model with a 128-token cap is the sweet spot the current hardware can sustain, anything larger and inference latency starts hurting the real-time loop</td>
- <td style="padding:8px; border:1px solid #ddd;">Several upgrade paths open up here: a <strong>more powerful Jetson</strong> (Orin AGX) with stronger GPU; a <strong>dedicated discrete GPU</strong> for the LLM separate from the CV GPU; or a <strong>USB AI accelerator</strong> (e.g. Hailo, Coral) to offload LLM inference. Cloud LLMs would unlock the largest models but break the &ldquo;everything local&rdquo; principle the system was designed around, so on-device upgrades are preferred</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Narrow camera field of view</td>
- <td style="padding:8px; border:1px solid #ddd;">When the user steps in or extends a punch, the hand and the lower body leave the frame entirely, useful information about footwork and full punch travel is lost. Multi-camera was deliberately ruled out as inconvenient and the current single-camera mount has already proved the concept works</td>
- <td style="padding:8px; border:1px solid #ddd;">Move to a wider field-of-view camera (or a slightly different mount that captures the full body) to recover footwork data and the parts of punches that currently leave the frame, without giving up the simplicity of a single camera</td>
+ <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Camera field of view</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">The RealSense D435i's field of view at the robot-mounted distance only captures the upper body. When the user steps in or extends a punch, hands can leave the frame, and the lower body (footwork, stance width, weight transfer) is never visible. These are critical coaching signals that the CV pipeline currently cannot provide</td>
+ <td style="padding:8px; border:1px solid #ddd;">Move to a wider field-of-view depth camera (or a slightly different mount angle) to capture the full body, unlocking lower-body analytics and full punch travel without giving up the simplicity of a single camera. Multi-camera was deliberately ruled out as impractical for a portable system</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Manual camera tilt calibration</td>

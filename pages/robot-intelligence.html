@@ -163,7 +163,7 @@
  using depth-based 3D voxel motion fused with 2D pose estimation. A
  <strong>ROS 2 workspace</strong> on an NVIDIA Jetson Orin NX orchestrates that
  perception output alongside IMU sensing, an adaptive sparring engine, and a local
- Qwen2.5-3B LLM coach, with everything running on-device, no cloud, no internet
+ Gemma 4 E2B LLM coach, with everything running on-device, no cloud, no internet
  required.
  </p>
 
@@ -254,7 +254,7 @@
  </div>
  <div style="font-size:0.88rem; color:#555; margin-top:8px;">
  Orchestrates CV inference, IMU sensor fusion, <strong>5 adaptive AI sparring
- styles</strong> with weakness tracking, and a local <strong>Qwen2.5-3B LLM
+ styles</strong> with weakness tracking, and a local <strong>Gemma 4 E2B LLM
  coach</strong> running entirely on-device.
  </div>
  </div>
@@ -536,7 +536,7 @@
            <strong>RI-4</strong>: <code>punch_processor</code> CV+IMU fusion with pad-constraint filtering<br>
            <strong>RI-5</strong>: all inference on-device within the 16 GB shared-memory budget; adaptive frame rate (6&nbsp;Hz idle / 30&nbsp;Hz active) shares GPU between CV and LLM<br>
            <strong>RI-6</strong>: <code>sparring_engine</code> with Markov chain styles + persistent weakness profile<br>
-           <strong>RI-7</strong>: local Qwen2.5-3B LLM coach with 17-document boxing knowledge base + fallback tips<br>
+           <strong>RI-7</strong>: local Gemma 4 E2B LLM coach (multimodal, edge-optimised) with 17-document boxing knowledge base + fallback tips<br>
            <strong>RI-8</strong>: <code>cv_node</code> publishes <code>UserTracking</code> each frame; yaw motor faces the user, height adjusted by the user via phone or GUI<br>
            <span style="font-size:0.88rem; color:#555;">Vue 3 + FastAPI phone dashboard connected to per-user SQLite database</span>
          </td>
@@ -612,7 +612,7 @@
  <div class="ts-pills">
  <span class="ts-pill model">Voxel-Pose Transformer 1.75M</span>
  <span class="ts-pill model">YOLO Pose nano</span>
- <span class="ts-pill model">Qwen2.5-3B GGUF Q4_K_M</span>
+ <span class="ts-pill model">Gemma 4 E2B GGUF Q4_K_M</span>
  <span class="ts-pill model">PyTorch &rarr; TensorRT FP16</span>
  <span class="ts-pill model">llama-cpp-python</span>
  </div>
@@ -673,7 +673,7 @@
        <td style="padding:6px 10px; border:1px solid #ddd;">OK if dynamically linked (the default), but must allow users to replace the Qt library</td>
      </tr>
      <tr>
-       <td style="padding:6px 10px; border:1px solid #ddd;">Everything else<br><span style="font-size:0.82rem; color:#888;">(Qwen2.5, llama-cpp, ROS 2, FastAPI, Vue 3)</span></td>
+       <td style="padding:6px 10px; border:1px solid #ddd;">Everything else<br><span style="font-size:0.82rem; color:#888;">(Gemma 4, llama-cpp, ROS 2, FastAPI, Vue 3)</span></td>
        <td style="padding:6px 10px; border:1px solid #ddd;">Apache 2.0 / MIT / BSD</td>
        <td style="padding:6px 10px; border:1px solid #ddd;">Permissive, no issues</td>
      </tr>

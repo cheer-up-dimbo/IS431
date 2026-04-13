@@ -36,7 +36,7 @@
         target (RI-3, 96.8% on an unseen person) and met the 150 ms
         end-to-end latency requirement (RI-2, ~120 ms). CV+IMU sensor
         fusion (RI-4), all five adaptive sparring styles (RI-6), and the
-        on-device Qwen2.5-3B LLM coach (RI-7) were validated through both
+        on-device Gemma 4 E2B LLM coach (RI-7) were validated through both
         automated tests and the CDE AI Fair real-world deployment. The
         fair also drove the largest design pivot of the project: the
         unreliable HSV colour-tracking prototype was replaced from
@@ -86,8 +86,8 @@
             <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO where hands are bare, so it has no concept of gloved hands or this camera angle. The wrist keypoints become unreliable exactly when they matter most (at punch extension), and the model is forced to lean on the voxel branch instead of getting two strong signals, capping how much further the fused architecture can be pushed</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc;">LLM compute ceiling on the Jetson</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">The Jetson has 16&nbsp;GB of memory but its GPU isn't built to run a heavy LLM in parallel with the CV pipeline. A 3B model with a 128-token output cap is the largest the current hardware can sustain without hurting the real-time loop, which limits how deep the post-session coaching analysis can go and how specific the drill suggestions can be</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Camera field of view limits full-body analysis</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The RealSense D435i's field of view at the robot-mounted distance only captures the upper body. Footwork, stance width, and weight transfer, all critical to boxing coaching, are invisible to the CV pipeline. A wider-angle or multi-camera setup would unlock lower-body analytics, but adds mechanical and calibration complexity</td>
           </tr>
         </tbody>
       </table>
@@ -134,8 +134,8 @@
             <td style="padding:10px 14px; border:1px solid #ccc;">Manually annotate keypoints on our own recorded footage (gloved hands, this camera viewpoint) and fine-tune YOLO Pose on it. A pose model that was actually trained for the context would let the pose stream pull its own weight instead of relying on the voxel branch to compensate, lifting the ceiling on the fused architecture</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Upgrade the LLM compute path</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Several upgrade paths preserve the &ldquo;everything local&rdquo; principle while unlocking richer post-session coaching from a larger 7B&ndash;8B model: a <strong>more powerful Jetson</strong> (Orin AGX), a <strong>dedicated discrete GPU</strong> for the LLM, or a <strong>USB AI accelerator</strong> (e.g. Hailo, Coral) to offload LLM inference</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Wider camera field of view</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">A wider-angle depth camera (or adjusted mount angle) would capture the full body including legs and feet, unlocking footwork analysis, stance width tracking, and weight transfer detection. These are critical coaching signals that the current upper-body-only view cannot provide. A single wider camera preserves the portability of the system without the complexity of multi-camera calibration</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #555;"><strong>System-Level</strong></td>
@@ -191,7 +191,7 @@
         dual-branch (voxel + pose) Transformer classifies 8 punch types at
         96.8% on an unseen person and 30&nbsp;fps, fused with IMU pad
         impacts for confirmed punches; five adaptive sparring styles drive
-        the robot's behaviour; a local Qwen2.5-3B LLM coach delivers
+        the robot's behaviour; a local Gemma 4 E2B LLM coach delivers
         real-time tips and post-session analysis; and a Vue&nbsp;3 + FastAPI
         phone dashboard surfaces all of it without leaving the device.
       </p>

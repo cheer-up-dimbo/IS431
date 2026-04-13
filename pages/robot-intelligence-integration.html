@@ -483,8 +483,8 @@
  <td style="padding:8px; border:1px solid #ddd;">~150MB</td>
  </tr>
  <tr>
- <td style="padding:8px; border:1px solid #ddd;">Qwen2.5-3B LLM</td>
- <td style="padding:8px; border:1px solid #ddd;">~2GB</td>
+ <td style="padding:8px; border:1px solid #ddd;">Gemma 4 E2B LLM</td>
+ <td style="padding:8px; border:1px solid #ddd;">~3.1GB</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Frame buffers</td>
@@ -492,17 +492,17 @@
  </tr>
  <tr style="font-weight:bold;">
  <td style="padding:8px; border:1px solid #ddd;">Total</td>
- <td style="padding:8px; border:1px solid #ddd;">~2.5GB / 16GB</td>
+ <td style="padding:8px; border:1px solid #ddd;">~3.6GB / 16GB</td>
  </tr>
  </tbody>
  </table>
 
  <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:14px 18px; margin:18px 0; font-size:0.93rem; color:#5d4037;">
- <strong style="font-size:1rem;">Why 16&nbsp;GB of RAM does not mean we can run a bigger LLM</strong>
+ <strong style="font-size:1rem;">Why 16&nbsp;GB of RAM does not mean we can run any LLM</strong>
 
  <p style="margin:12px 0 8px;">
  The Jetson has 16&nbsp;GB of unified memory shared between CPU and GPU, with only
- ~2.5&nbsp;GB used. But LLM speed is limited by memory <strong>bandwidth</strong>
+ ~3.6&nbsp;GB used. But LLM speed is limited by memory <strong>bandwidth</strong>
  (how fast data moves), not <strong>capacity</strong> (how much fits). Every token
  generated requires reading the full model weights once:
  </p>
@@ -518,9 +518,9 @@
    <text x="20" y="83" font-size="10" fill="#888">how much fits</text>
 
    <rect x="120" y="55" width="650" height="38" rx="5" fill="#e8f5e9" stroke="#c8e6c9"/>
-   <rect x="120" y="55" width="100" height="38" rx="5" fill="#66bb6a"/>
-   <text x="170" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">2.5 GB</text>
-   <text x="445" y="79" text-anchor="middle" font-size="12" fill="#2e7d32">13.5 GB free</text>
+   <rect x="120" y="55" width="146" height="38" rx="5" fill="#66bb6a"/>
+   <text x="193" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3.6 GB</text>
+   <text x="445" y="79" text-anchor="middle" font-size="12" fill="#2e7d32">12.4 GB free</text>
    <text x="790" y="79" font-size="11" font-weight="600" fill="#555">16 GB</text>
 
    <text x="445" y="112" text-anchor="middle" font-size="11" font-style="italic" fill="#2e7d32">A 7B model (~4 GB) easily fits. Capacity is not the problem.</text>
@@ -529,10 +529,10 @@
    <text x="20" y="152" font-size="12" font-weight="700" fill="#1565c0">BANDWIDTH</text>
    <text x="20" y="167" font-size="10" fill="#888">speed limit</text>
 
-   <!-- 3B bar -->
+   <!-- Gemma 4 E2B bar (2.3B active) -->
    <rect x="120" y="140" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
-   <rect x="120" y="140" width="390" height="36" rx="5" fill="#42a5f5"/>
-   <text x="315" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3B: reads 2 GB/token = ~51 tok/s max</text>
+   <rect x="120" y="140" width="420" height="36" rx="5" fill="#42a5f5"/>
+   <text x="330" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Gemma 4 E2B: reads ~3 GB/token = ~34 tok/s max</text>
    <rect x="515" y="143" width="90" height="30" rx="4" fill="#e3f2fd" stroke="#90caf9"/>
    <text x="560" y="162" text-anchor="middle" font-size="9" font-weight="600" fill="#1565c0">CV headroom</text>
    <text x="790" y="163" font-size="10" font-weight="600" fill="#555">102 GB/s</text>
@@ -553,11 +553,11 @@
    <text x="600" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Tokens/s (with CV)</text>
    <text x="790" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fast enough for tips?</text>
 
-   <!-- 3B row -->
-   <text x="130" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Qwen2.5-3B</text>
-   <text x="300" y="290" text-anchor="middle" font-size="11" fill="#333">~2 GB</text>
+   <!-- Gemma 4 E2B row -->
+   <text x="130" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Gemma 4 E2B</text>
+   <text x="300" y="290" text-anchor="middle" font-size="11" fill="#333">~3.1 GB</text>
    <text x="440" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
-   <text x="600" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">~30-40 tok/s</text>
+   <text x="600" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">~16-20 tok/s</text>
    <text x="790" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">&#x2713; Yes</text>
 
    <!-- 7B row -->
@@ -569,10 +569,14 @@
  </svg>
 
  <p style="margin:10px 0 4px;">
- The 3B model is the sweet spot for this hardware. The upgrade path is
- <strong>faster hardware</strong> (more powerful Jetson, dedicated GPU, or USB AI
- accelerator), not a bigger model on the same chip. See
- <a href="robot-intelligence-testing.html">5.3.4.8 Limitations</a>.
+ The system originally ran Qwen2.5-3B-Instruct (~2&nbsp;GB, text-only). Within months,
+ Google released <strong>Gemma&nbsp;4&nbsp;E2B</strong> (April 2026), an edge-optimised model
+ with a Per-Layer Embedding architecture that packs 5.1B total parameters into just
+ 2.3B active parameters per inference. Despite being a more capable model with
+ <strong>multimodal support</strong> (text + image), it fits in ~3.1&nbsp;GB and runs at
+ 16&ndash;20&nbsp;tok/s on the same Jetson, fast enough for real-time coaching tips.
+ The rapid pace of edge LLM development means this constraint continues to relax
+ with each generation of models.
  </p>
  </div>
 
@@ -828,11 +832,11 @@
  <tbody>
  <tr>
  <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:180px;">Model</td>
- <td style="padding:8px 12px; border:1px solid #ddd;">Qwen2.5-3B-Instruct, chosen for instruction-following ability at small size</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">Gemma 4 E2B (Google, April 2026), edge-optimised with Per-Layer Embeddings, 5.1B total / 2.3B active parameters, multimodal (text + image)</td>
  </tr>
  <tr>
  <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Quantisation</td>
- <td style="padding:8px 12px; border:1px solid #ddd;">GGUF Q4_K_M (~2GB), fits alongside CV models in shared GPU memory</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">GGUF Q4_K_M (~3.1GB), fits alongside CV models in shared GPU memory</td>
  </tr>
  <tr>
  <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Runtime</td>
@@ -848,14 +852,14 @@
  </tr>
  <tr>
  <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Generation limit</td>
- <td style="padding:8px 12px; border:1px solid #ddd;">128 tokens (prevents cut-off mid-sentence)</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">128 tokens for real-time tips; 100/256/512 tokens for chat (short/normal/detailed)</td>
  </tr>
  </tbody>
  </table>
 
  <h4 style="margin-top:24px;">When does the coach actually speak?</h4>
  <p style="font-size:0.94rem; color:#444;">
- Picking Qwen2.5-3B answers the &ldquo;what runs&rdquo; question, but a model loaded in
+ Picking Gemma 4 E2B answers the &ldquo;what runs&rdquo; question, but a model loaded in
  memory is just an idle model. The engine wakes the LLM in three different situations,
  each with its own context payload and output style:
  </p>
@@ -897,7 +901,7 @@
 
  <h3>3. Sounding like a coach, prompt, parameters, and knowledge base</h3>
  <p>
- A general-purpose 3B model doesn't know boxing out of the box and doesn't sound like
+ A general-purpose LLM doesn't know boxing out of the box and doesn't sound like
  a coach unless you tell it to. Three pieces of configuration shape its voice and its
  domain expertise: a system prompt that defines its persona, a tuned parameter set
  that balances quality against the real-time loop, and a curated knowledge base that
@@ -1040,7 +1044,7 @@
 
  <p style="font-size:0.92rem; color:#444;">
  Together the four steps above, constraint, model selection, voice, and fallback
- , turn a generic 3B LLM into a domain-specific coach that streams useful tips to
+ , turn a generic edge LLM into a domain-specific coach that streams useful tips to
  the user during real training sessions, on a single Jetson, with no internet, and
  degrades gracefully when anything goes wrong.
  </p>

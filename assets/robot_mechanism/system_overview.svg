@@ -97,7 +97,7 @@
   <!-- Support row: 2 boxes -->
   <rect x="104" y="476.0" width="200" height="44" rx="5" fill="#fff" stroke="#a78bfa" stroke-width="1"/>
   <text x="204" y="500.0" text-anchor="middle" font-size="12" font-weight="700" fill="#4c1d95">LLM Coach</text>
-  <text x="204" y="514.0" text-anchor="middle" font-size="9.5" fill="#4b5563">Qwen2.5-3B · on-device</text>
+  <text x="204" y="514.0" text-anchor="middle" font-size="9.5" fill="#4b5563">Gemma 4 E2B · on-device</text>
 
   <rect x="336" y="476.0" width="200" height="44" rx="5" fill="#fff" stroke="#a78bfa" stroke-width="1"/>
   <text x="436" y="500.0" text-anchor="middle" font-size="12" font-weight="700" fill="#4c1d95">Analytics</text>

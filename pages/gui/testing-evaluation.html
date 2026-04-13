@@ -823,8 +823,8 @@
 
       <h4>LLM Coaching Reliability</h4>
       <p>
-        The local Qwen 2.5 3B model loads conditionally based on available RAM. On the
-        Jetson Nano 4 GB with all subsystems running simultaneously, the model cannot
+        The local Gemma 4 E2B model loads conditionally based on available RAM. On the
+        Jetson with all subsystems running simultaneously, the model cannot
         always be loaded. A future improvement would be to pre-load the model at startup
         if sufficient memory is available and keep it resident, rather than loading on
         demand per session. Alternatively, a smaller quantised model could be evaluated
