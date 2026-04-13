@@ -203,14 +203,14 @@
 
       <h4>Left Side of the V: Design Decomposition</h4>
       <p>
-        RM-6 (absorb strikes + impact detection) drove the multi-layer padding architecture: polyethylene foam outer layer, anti-vibration isolation mounts to protect the drivetrain, and MPU6050 IMU sensors embedded between the foam surface and the isolation interface.
+        RM-6 (absorb strikes + impact detection) drove the multi-layer padding architecture: polyethylene foam outer layer, and MPU6050 IMU sensors embedded between the foam surface and the isolation interface.
         PAD-AC-1 (95% detection rate) drove the IMU threshold calibration (L2 norm ≥ 2.0 g), the dual-bus I²C topology (four sensors across two hardware buses on Teensy 4.0), and the Hard STOP bus-hang recovery protocol.
         PAD-AC-2 (force differentiation) drove using the L2 norm magnitude as the sensing metric rather than a binary threshold, ensuring graded response across punch intensities.
       </p>
 
       <h4>Base of the V: Integration Build</h4>
       <p>
-        At integration stage, the foam pads with embedded IMU sensors were mounted to the arm assembly via anti-vibration isolation mounts. Four MPU6050 sensors were wired across two I²C buses on the Teensy 4.0, firmware initialised and confirmed communicating, and the <code>/strike_events</code> ROS 2 topic was verified publishing correctly during initial impact tests.
+        At integration stage, the foam pads with embedded IMU sensors were mounted to the arm assembly. Four MPU6050 sensors were wired across two I²C buses on the Teensy 4.0, firmware initialised and confirmed communicating, and the <code>/strike_events</code> ROS 2 topic was verified publishing correctly during initial impact tests.
       </p>
 
       <h4>Right Side of the V: Verification Closure</h4>
@@ -234,17 +234,15 @@
 
       <h4>Multi-Layer Padding Architecture</h4>
       <p>
-        A <strong>multi-layer construction</strong> with anti-vibration
-        isolation mounts separates impact absorption (outer foam) from
+        A <strong>multi-layer construction</strong> separates impact absorption (outer foam) from
         structural mounting (isolation interface to arm mechanism).
       </p>
       <ul>
         <li><strong>Outer layer:</strong> Polyethylene foam — lightweight, sufficient energy absorption for repeated strikes</li>
-        <li><strong>Isolation mounts:</strong> Anti-vibration mounts decouple the padding from the 2-DOF arm mechanism, preventing impact vibration from propagating into 3D-printed drivetrain components</li>
         <li><strong>Sensing layer:</strong> MPU6050 IMU sensors at Head, Celiac Plexus, and Liver zones — embedded between the foam surface and the isolation interface</li>
       </ul>
       <p>
-        The isolation mount is critical because the
+        The outer layer is critical because the
         <a href="arm-actuation.html">Arm Actuation</a> subsystem's
         3D-printed gears and Delrin alignment pins are optimised for
         torsional and compressive loads, not repeated transverse impacts.
@@ -465,8 +463,7 @@
       <ul>
         <li>
           <strong><a href="arm-actuation.html">5.2.5 Arm Actuation</a></strong>
-          — The padding is mechanically attached to the 2-DOF arm via
-          anti-vibration isolation mounts. The integration between padding
+          — The padding is mechanically attached to the 2-DOF arm. The integration between padding
           sensing and arm control is discussed at the
           <a href="../robot-mechanism.html">Robot Mechanism</a> system
           level. Coordinated strike validation using IMU feedback as input
