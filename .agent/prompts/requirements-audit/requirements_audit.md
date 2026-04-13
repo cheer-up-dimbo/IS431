@@ -1,7 +1,7 @@
-# IS431 BoxBunny — Requirements Audit Report (Pass 9)
+# IS431 BoxBunny — Requirements Audit Report (Pass 10)
 
 > **Audit output only.** To run a new pass, use `.agent/prompts/requirements-audit/requirements-audit-agent.md`.
-> Full re-audit: 2026-04-10 | Pass 9 adds Step 0.5 automated past-gap re-verification, confirmed all P6/P7/P8 fixes hold, and introduces 4 net-new findings targeting remaining academic writing and factual consistency gaps.
+> Full re-audit: 2026-04-12 | Pass 10 re-verifies all open P9 gaps, closes GAP-P9-A, adds 3 net-new findings (Homing Wizard sensorless-style procedure in firmware-software.html, ROS topic still wrong in padding/electrical-integration.html, em-dash in appendix-robot-intelligence.html).
 
 ---
 
@@ -119,12 +119,21 @@ The audit body (§1–§4) was originally written under the **old 7-RM numbering
 
 | Gap | Severity | Description | P9 Status | Evidence |
 |-----|----------|-------------|-----------|----------|
-| **GAP-P9-A** | **HIGH** | Em-dash `—` in `testing.html` ARM-AC-2, ARM-AC-3, ARM-AC-4 Measured cells | 🔴 OPEN | Lines 207, 214, 221 — bare `—` in `<td>` where `N/A` is required per academic standard (GAP-P7-C partial) |
-| **GAP-P9-B** | **MEDIUM** | `&sect;` symbol used in visible hyperlink text in `arm-actuation/electrical-integration.html` | 🔴 OPEN | Line 393: `&sect;Defect 6: PSU OVP` — academic standard prohibits `§`; should read "Section Defect 6" or "Defect 6" |
-| **GAP-P9-C** | **MEDIUM** | Acceleration target `≤ 0.25 s` in `electrical-integration.html` torque derivation prose inconsistent with RM-8 revised target (0.70 s) | 🔴 OPEN | Line 180: "achieve the target angular acceleration (90° in ≤ 0.25 s)" — this refers to the original system target used for the torque calculation; add a parenthetical noting the revised operational target |
-| **GAP-P9-D** | **LOW** | V-Model alert table (§3) lists `arm-actuation/electrical-integration.html` and `arm-actuation/firmware-software.html` as N/A; both actually carry `<sl-alert variant="primary">` V-Model traceability alerts | 🔴 OPEN | Both pages confirmed with alerts (lines 43 and 41 respectively); §3A table needs these two pages added and §3B table needs them removed |
+| **GAP-P9-A** | **HIGH** | Em-dash `—` in `testing.html` ARM-AC-2, ARM-AC-3, ARM-AC-4 Measured cells | ✅ RESOLVED | Pass 10 grep: 0 `mdash` hits in testing.html |
+| **GAP-P9-B** | **HIGH** | `&sect;` symbol in visible hyperlink text in `height-adjustment/electrical-control.html` | 🔴 STILL OPEN | Pass 10: `&sect;Defect 6: PSU OVP` confirmed still present |
+| **GAP-P9-C** | **MEDIUM** | Acceleration target `≤ 0.25 s` in `arm-actuation/electrical-integration.html` torque derivation inconsistent with RM-8 revised target (0.70 s) | 🔴 STILL OPEN | Pass 10: `0.25` still in electrical-integration; parenthetical not added |
+| **GAP-P9-D** | **LOW** | V-Model alert table (§3) listed `arm-actuation/electrical-integration.html` and `arm-actuation/firmware-software.html` as N/A | ✅ RESOLVED | §3 table corrected in Pass 9 and confirmed correct in Pass 10 |
 
-### Pass 8 Net-New Gaps
+### Pass 10 Net-New Gaps
+
+> Pass 10 date: 2026-04-12
+
+| Gap | Severity | Description | Status | Evidence |
+|-----|----------|-------------|--------|----------|
+| **GAP-P10-A** | **HIGH** | `firmware-software.html` Kinematic Model section describes a **Homing Wizard** (3-step automated procedure) as the active calibration method. Ground truth (`report_validator_agent.md`) states the active method is the **Manual Calibration Tab** (operator jogs in 0.5 rad increments and reads live current spikes). Homing Wizard was superseded. | 🔴 OPEN | `firmware-software.html`: "Before deployment, a three-step Homing Wizard calibrates the digital twin..." — this conflicts with ground truth which states sensorless-style automated homing was superseded 2026-03-11. Verify with user whether Homing Wizard reflects a re-introduced feature or is an error. |
+| **GAP-P10-B** | **HIGH** | `padding/electrical-integration.html` still uses `/robot/strike_detected` ROS topic. Ground truth requires `/robot/strike_detected` is correct; `firmware-software.html` uses `/strike_events`. **Unresolved discrepancy** between the two pages — one of the two is wrong. | 🔴 OPEN | GAP-P7-D re-verified: `padding/electrical-integration.html` → `/robot/strike_detected`; `firmware-software.html` → `/strike_events`. User clarification needed on the authoritative ROS topic name. |
+| **GAP-P10-C** | **MEDIUM** | Em-dash `—` (`&mdash;`) in `appendix-robot-intelligence.html` inside a `<li>` element. Ground truth prohibits em-dash in `<li>`, `<td>`, or `<p>` body text. | 🔴 OPEN | Line ~372: `<li><strong>Sentence completion</strong> &mdash; if a response doesn't end...` — replace with `:` or `;`. |
+
 
 | Gap | Severity | Description | P8 Status | Evidence |
 |-----|----------|-------------|-----------|----------|
@@ -315,4 +324,4 @@ The audit body (§1–§4) was originally written under the **old 7-RM numbering
 | Pass 6 | 2026-04-10 | RM renumbered to 8-req baseline; namespaces corrected (ARM-AC-x, PAD-AC-x, ROT-AC-x); §5 report structure + nav flow added; agent preamble moved to requirements-audit-agent.md |
 | Pass 7 | 2026-04-10 | Academic writing compliance scan (em-dash, tilde, bold prose), explicit factual checks (GUI version, ROS topics), anchor verification |
 | Pass 8 | 2026-04-10 | Executed all HIGH gaps: namespace sweep (ARM-PC→ARM-AC, PAD-PC→PAD-AC), ARM-AC-1 partial note, nav verified 30/30, ROT-AC-1/2 added to testing.html, GUI V3 fixed, padding tests labelled, annex anchors confirmed, author tag closed intentionally |
-| Pass 9 | 2026-04-10 | Step 0.5 auto re-verification — no regressions. 4 net-new gaps: GAP-P9-A (em-dash ARM-AC-2/3/4 Measured cells), GAP-P9-B (§ symbol in electrical-integration.html), GAP-P9-C (0.25 s torque derivation inconsistency), GAP-P9-D (V-Model alert table corrected). Nav 30/30 ✅. 15 pages with alert. |
+| Pass 10 | 2026-04-12 | Step 0.5 re-verification: GAP-P9-A ✅ RESOLVED (0 mdash in testing.html); GAP-P9-B/C 🔴 STILL OPEN; GAP-P9-D ✅ already resolved in P9. 3 net-new gaps: GAP-P10-A (Homing Wizard described as active procedure in firmware-software.html — conflicts with ground truth), GAP-P10-B (ROS topic discrepancy /robot/strike_detected vs /strike_events still unresolved), GAP-P10-C (em-dash in appendix-robot-intelligence.html li element). ARM-PC/PAD-PC clean. PSU 8.3A clean. GUI V4 clean. |
