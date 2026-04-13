@@ -200,9 +200,15 @@
     <span class="rpm-val" id="rpmVal">500</span>
   </div>
   <div class="dir-row">
-    <button class="btn btn-fwd" id="btnFwd" disabled onclick="sendLeftCmd()">&#9664; LEFT</button>
+    <button class="btn btn-fwd" id="btnFwd" disabled
+      onmousedown="startMove('fwd')" ontouchstart="startMove('fwd')"
+      onmouseup="stopMove()"   ontouchend="stopMove()"
+      onmouseleave="stopMove()">&#9664; LEFT</button>
     <button class="btn btn-stop" id="btnStop" disabled onclick="sendCmd('S')">&#9632; STOP</button>
-    <button class="btn btn-rev" id="btnRev" disabled onclick="sendRightCmd()">RIGHT &#9654;</button>
+    <button class="btn btn-rev" id="btnRev" disabled
+      onmousedown="startMove('rev')" ontouchstart="startMove('rev')"
+      onmouseup="stopMove()"   ontouchend="stopMove()"
+      onmouseleave="stopMove()">RIGHT &#9654;</button>
   </div>
   
   <div class="card-title" style="margin-top:10px;">Target Angle (P: Command)</div>
@@ -281,6 +287,12 @@ const getRPM  = () => $('rpmSlider').value;
 
 function sendLeftCmd()  { sendCmd((flipped ? 'R:' : 'L:') + getRPM()); }
 function sendRightCmd() { sendCmd((flipped ? 'L:' : 'R:') + getRPM()); }
+
+function startMove(dir) {
+  if (dir === 'fwd') sendLeftCmd();
+  else               sendRightCmd();
+}
+function stopMove() { sendCmd('S'); }
 
 function updateRPMDisplay() {
   $('rpmVal').textContent = $('rpmSlider').value;
