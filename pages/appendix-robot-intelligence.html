@@ -348,11 +348,11 @@
  uses HTTP/WebSocket).<br>
  <strong>Solution:</strong> Three synchronisation mechanisms:
  <ol style="margin:6px 0 0; padding-left:20px;">
- <li><strong>Shared SQLite database</strong> &mdash; GUI writes session data via
+ <li><strong>Shared SQLite database</strong>: GUI writes session data via
  <code>session_manager</code>, dashboard reads via API queries</li>
- <li><strong>JSON file polling</strong> &mdash; Dashboard writes commands to
+ <li><strong>JSON file polling</strong>: Dashboard writes commands to
  <code>/tmp/boxbunny_gui_command.json</code>, GUI polls every 100ms</li>
- <li><strong>WebSocket state buffering</strong> &mdash; Dashboard backend buffers last
+ <li><strong>WebSocket state buffering</strong>: Dashboard backend buffers last
  known state per user, sends to phone on reconnect</li>
  </ol>
  </div>
@@ -365,11 +365,11 @@
  responses under GPU contention.<br>
  <strong>Solution:</strong> Five mechanisms ensure complete, clean output:
  <ol style="margin:6px 0 0; padding-left:20px;">
- <li><strong>Short max_tokens (128)</strong> &mdash; limits response length so the model finishes within budget</li>
- <li><strong>System prompt instruction</strong> &mdash; explicitly says &ldquo;keep tips SHORT (1&ndash;2 sentences)&rdquo;</li>
- <li><strong>Inference timeout (20s)</strong> &mdash; background thread with hard timeout prevents hangs</li>
- <li><strong>Markdown stripping</strong> &mdash; <code>_clean_markdown()</code> removes formatting artifacts</li>
- <li><strong>Sentence completion</strong> &mdash; if a response doesn&rsquo;t end with <code>.</code>, <code>!</code>, or <code>?</code>, 8&ndash;32 additional tokens are generated to finish the thought</li>
+ <li><strong>Short max_tokens (128)</strong>: limits response length so the model finishes within budget</li>
+ <li><strong>System prompt instruction</strong>: explicitly says &ldquo;keep tips SHORT (1&ndash;2 sentences)&rdquo;</li>
+ <li><strong>Inference timeout (20s)</strong>: background thread with hard timeout prevents hangs</li>
+ <li><strong>Markdown stripping</strong>: <code>_clean_markdown()</code> removes formatting artifacts</li>
+ <li><strong>Sentence completion</strong>: if a response doesn&rsquo;t end with <code>.</code>, <code>!</code>, or <code>?</code>, 8&ndash;32 additional tokens are generated to finish the thought</li>
  </ol>
  </div>
  </div>
@@ -420,7 +420,7 @@
  </tr>
  </thead>
  <tbody>
- <tr><td style="padding:6px 8px; border:1px solid #ddd;">D435i IMU not working &mdash; <code>hid_sensor_hub</code> kernel module missing from Tegra kernel</td><td style="padding:6px 8px; border:1px solid #ddd;">Use <code>--camera-pitch</code> flag to set tilt manually</td></tr>
+ <tr><td style="padding:6px 8px; border:1px solid #ddd;">D435i IMU not working: <code>hid_sensor_hub</code> kernel module missing from Tegra kernel</td><td style="padding:6px 8px; border:1px solid #ddd;">Use <code>--camera-pitch</code> flag to set tilt manually</td></tr>
  <tr><td style="padding:6px 8px; border:1px solid #ddd;">YOLO TensorRT overlay draws at wrong coordinates when using <code>.engine</code></td><td style="padding:6px 8px; border:1px solid #ddd;">Visualisation-only; pose features are extracted correctly</td></tr>
  <tr><td style="padding:6px 8px; border:1px solid #ddd;">numpy 2.x crashes Jetson torch wheel</td><td style="padding:6px 8px; border:1px solid #ddd;">Pin to <code>numpy&gt;=1.26,&lt;2.0</code></td></tr>
  </tbody>

@@ -206,14 +206,14 @@
  address this:
  </p>
  <ul style="margin:8px 0 14px; line-height:1.65; font-size:0.93rem;">
-   <li><strong>Depth-based motion detection</strong> — the voxel branch uses the depth
+   <li><strong>Depth-based motion detection</strong>: the voxel branch uses the depth
    camera to sense the hand moving forward in 3D, which is the earliest physical
    signal that a punch is starting, regardless of speed.</li>
-   <li><strong>Dual-speed temporal channels</strong> — the voxel grid compares snapshots
+   <li><strong>Dual-speed temporal channels</strong>: the voxel grid compares snapshots
    at two timescales: a <strong>fast channel</strong> (2-frame / ~67 ms) that catches
    the sharp onset and a <strong>slow channel</strong> (8-frame / ~267 ms) that captures
    the full arc. Together they cover both quick jabs and slow hooks.</li>
-   <li><strong>Causal Transformer + multi-window training</strong> — a
+   <li><strong>Causal Transformer + multi-window training</strong>: a
    <strong>causal Transformer</strong> (Vaswani et al., 2017) lets the attention
    mechanism dynamically weigh recent vs. earlier frames instead of relying on a
    fixed window. During training, the model sees windows of both 9 and 12 frames,
@@ -230,7 +230,7 @@
  <tbody>
  <tr>
  <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600; width:200px;">Single forward-facing camera</td>
- <td style="padding:8px 12px; border:1px solid #ddd;">One Intel RealSense D435i (RGB + depth) mounted on the robot, facing the user. No multi-camera triangulation, the system must work from a single viewpoint.</td>
+ <td style="padding:8px 12px; border:1px solid #ddd;">One Intel RealSense D435i (RGB + depth) mounted on the robot, facing the user. Budget constraints rule out multi-camera setups typical in sports analytics, so the system must work from a single viewpoint.</td>
  </tr>
  <tr>
  <td style="padding:8px 12px; border:1px solid #ddd; font-weight:600;">Punches toward camera</td>
@@ -588,9 +588,9 @@
  </div>
  <div style="text-align:center; color:#999; padding:2px 0;">&darr;</div>
  <div style="padding:8px 12px; background:#fff3e0; border-radius:6px; border-left:3px solid #e65100;">
- <strong>Lesson:</strong> Need compact, engineered features — raw pixels are too heavy for edge deployment.
+ <strong>Lesson:</strong> Need compact, engineered features; raw pixels are too heavy for edge deployment.
  </div>
- <div style="text-align:center; color:#999; padding:8px 0; font-style:italic; font-size:0.85rem;">Dead end — redirected the search</div>
+ <div style="text-align:center; color:#999; padding:8px 0; font-style:italic; font-size:0.85rem;">Dead end, redirected the search</div>
  </div>
 
  <!-- RIGHT: Voxels -->

@@ -315,64 +315,79 @@
  See <a href="../index.html#conceptual-design">Section 5</a> for the full Design Objectives reference.
  </p>
  <p>
- These requirements were derived from the Function Analysis, user journey,
- and the physical constraints of deploying real-time computer vision on an
- embedded platform during live boxing training.
+ These requirements were derived from the Function Analysis
+ (<a href="../sections/3-product-needs-and-engineering-methodology.html">Table 4, Section 3.1</a>),
+ the user journey defined in
+ <a href="../sections/4-system-overview.html">Section 4.3</a>,
+ the design objectives (DO-1 to DO-4), and the physical constraints of
+ deploying real-time computer vision on a single depth camera within an
+ embedded platform's memory and compute budget.
  </p>
 
+ <div class="table-scroll-wrap">
  <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
  <thead>
  <tr style="background:#f0f0f0;">
  <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">ID</th>
  <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirement</th>
  <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Rationale</th>
+ <th style="padding:8px; border:1px solid #ddd; vertical-align:top;">Source</th>
  </tr>
  </thead>
  <tbody>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-1</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classify 8 boxing actions in real-time at &gt;=30 FPS</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Match human defensive reaction speed; voxel temporal features depend on consistent 30fps frame intervals</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classify 8 boxing actions in real-time at &ge;30&nbsp;FPS</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">6 standard punches plus block and idle cover the full action vocabulary; 30 FPS matches human defensive reaction speed</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-2, DO-4; Product need: CV-based reactive movements (Section 3.1)</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-2</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">End-to-end latency (camera to motor command) &lt;=150ms</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">End-to-end latency (camera to motor command) &le;150&nbsp;ms</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Matches average intermediate boxer defensive reaction time</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-4; User journey active training phase (Section 4.3)</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-3</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &gt;=90% on unseen person validation set</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &ge;90% on unseen person validation set</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Reduce false triggers and incorrect counter-punches during live sparring</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-1; Appendix 6: accurate punch classification for analytics</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-4</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">CV + IMU sensor fusion for confirmed punch events</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Single-source detection unreliable; fusion eliminates false positives from camera noise and accidental pad contacts</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">The system must reliably distinguish landed punches from missed or shadow punches</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Session analytics, coaching feedback, and sparring engine responses all depend on accurate hit data; miscounts corrupt the training experience</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-1, DO-4; Product need: synchronise sensor data with CV for real-time insights (Section 3.1)</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-5</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device (NVIDIA Jetson Orin NX 16&nbsp;GB), no cloud</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency budget prohibits cloud round-trip; zero internet requirement</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">All inference on-device with no cloud dependency</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Gym WiFi unreliable; latency prohibits cloud round-trips; the system must work without internet</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-5; Product need: gym/home deployable, cost-efficient (Section 3.1)</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-6</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Multiple adaptive AI sparring styles with weakness tracking</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Prevent user habituation; support varied training objectives</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">A single sparring pattern becomes predictable; multiple styles keep the user challenged while weakness tracking targets the areas they struggle with most</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-2, DO-3; Product need: progressive training modules scaling with performance (Section 3.1)</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-7</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time coaching feedback via local LLM</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Personalized technique guidance without cloud dependency</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Interpret session performance data into personalised training guidance</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">A beginner seeing raw stats (e.g. 40% hook block rate) does not know what to fix; the system must explain what is going wrong and what to practise in plain language</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-1, DO-3, DO-4; Product need: real-time cues reinforcing correct form, rhythm, timing (Section 3.1)</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-8</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Real-time person detection and user tracking for yaw and height motor control</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Robot must face the user during training; user adjusts height via phone or GUI before each session using CV-provided height data</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">The robot must know the user's lateral position at all times during a session</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">The robot needs to stay oriented towards the user as they move; without real-time position data the yaw motor cannot track them</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-2; Appendix 6: robot maintains orientation relative to boxer</td>
  </tr>
  </tbody>
  </table>
+ </div>
  <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">
- Table: Robot Intelligence Requirements and Design Considerations
+ Table: Robot Intelligence Requirements, Rationale, and Sources
  </p>
  </div>
 

@@ -443,149 +443,17 @@
  <dd style="margin:2px 0 0 18px;">A class must hold for at least 2 frames at &ge;0.78 confidence before it is committed, and 3 more frames to stay committed. Block requires 4 consecutive frames because of its biomechanical similarity to uppercut onset.</dd>
  </dl>
 
- <h3>4. Resource sharing, coexisting with the LLM</h3>
- <p>
- Frame rate, compute, and output stability all assume the CV pipeline owns the GPU.
- In practice it shares the Jetson with the LLM coach, the touchscreen GUI, and the
- ROS messaging layer. Two mechanisms keep them out of each other's way:
+ <p style="font-size:0.92rem; color:#444;">
+ The CV pipeline also shares the Jetson's GPU with the LLM coach introduced in
+ <a href="#int-llm">Section 5.3.2.4</a>. How the two coexist (adaptive frame rate
+ and memory budgeting) is addressed there once the LLM architecture has been introduced.
  </p>
-
- <p>
- <strong>Adaptive frame rate.</strong> The <code>cv_node</code> runs at the full
- 30&nbsp;fps only during <em>active</em> training sessions. Outside of active rounds
- , idle, countdown, rest periods, it drops to ~6&nbsp;fps, freeing the
- GPU for LLM inference exactly when the user is reading a coaching tip rather than
- throwing punches.
- </p>
-
- <p>
- <strong>Shared-memory footprint.</strong> The Jetson Orin NX has 16&nbsp;GB of
- <em>unified</em> memory shared between CPU and GPU, so every model on the Jetson is
- drawing from the same pool. Knowing the exact footprint of each component matters
- because anything that exceeds the pool starts paging to disk and the real-time loop
- collapses. The footprint below has been measured under live load:
- </p>
-
- <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
- <thead>
- <tr style="background:#f0f0f0;">
- <th style="padding:8px; border:1px solid #ddd;">Component</th>
- <th style="padding:8px; border:1px solid #ddd;">Memory</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Action model (TensorRT)</td>
- <td style="padding:8px; border:1px solid #ddd;">~200MB</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
- <td style="padding:8px; border:1px solid #ddd;">~150MB</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Gemma 4 E2B LLM</td>
- <td style="padding:8px; border:1px solid #ddd;">~3.1GB</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Frame buffers</td>
- <td style="padding:8px; border:1px solid #ddd;">~100MB</td>
- </tr>
- <tr style="font-weight:bold;">
- <td style="padding:8px; border:1px solid #ddd;">Total</td>
- <td style="padding:8px; border:1px solid #ddd;">~3.6GB / 16GB</td>
- </tr>
- </tbody>
- </table>
-
- <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:14px 18px; margin:18px 0; font-size:0.93rem; color:#5d4037;">
- <strong style="font-size:1rem;">Why 16&nbsp;GB of RAM does not mean we can run any LLM</strong>
-
- <p style="margin:12px 0 8px;">
- The Jetson has 16&nbsp;GB of unified memory shared between CPU and GPU, with only
- ~3.6&nbsp;GB used. But LLM speed is limited by memory <strong>bandwidth</strong>
- (how fast data moves), not <strong>capacity</strong> (how much fits). Every token
- generated requires reading the full model weights once:
- </p>
-
- <svg viewBox="0 0 960 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:960px; margin:12px auto; display:block; font-family:system-ui,sans-serif;">
-   <rect width="960" height="340" rx="8" fill="#fafafa" stroke="#e0e0e0"/>
-
-   <!-- Title -->
-   <text x="480" y="28" text-anchor="middle" font-size="13" font-weight="700" fill="#333">Capacity vs. Bandwidth on the Jetson Orin NX (16 GB unified LPDDR5)</text>
-
-   <!-- CAPACITY ROW -->
-   <text x="20" y="68" font-size="12" font-weight="700" fill="#2e7d32">CAPACITY</text>
-   <text x="20" y="83" font-size="10" fill="#888">how much fits</text>
-
-   <rect x="120" y="55" width="650" height="38" rx="5" fill="#e8f5e9" stroke="#c8e6c9"/>
-   <rect x="120" y="55" width="146" height="38" rx="5" fill="#66bb6a"/>
-   <text x="193" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3.6 GB</text>
-   <text x="445" y="79" text-anchor="middle" font-size="12" fill="#2e7d32">12.4 GB free</text>
-   <text x="790" y="79" font-size="11" font-weight="600" fill="#555">16 GB</text>
-
-   <text x="445" y="112" text-anchor="middle" font-size="11" font-style="italic" fill="#2e7d32">A 7B model (~4 GB) easily fits. Capacity is not the problem.</text>
-
-   <!-- BANDWIDTH SECTION -->
-   <text x="20" y="152" font-size="12" font-weight="700" fill="#1565c0">BANDWIDTH</text>
-   <text x="20" y="167" font-size="10" fill="#888">speed limit</text>
-
-   <!-- Gemma 4 E2B bar (2.3B active) -->
-   <rect x="120" y="140" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
-   <rect x="120" y="140" width="420" height="36" rx="5" fill="#42a5f5"/>
-   <text x="330" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Gemma 4 E2B: reads ~3 GB/token = ~34 tok/s max</text>
-   <rect x="515" y="143" width="90" height="30" rx="4" fill="#e3f2fd" stroke="#90caf9"/>
-   <text x="560" y="162" text-anchor="middle" font-size="9" font-weight="600" fill="#1565c0">CV headroom</text>
-   <text x="790" y="163" font-size="10" font-weight="600" fill="#555">102 GB/s</text>
-
-   <!-- 7B bar -->
-   <rect x="120" y="186" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
-   <rect x="120" y="186" width="650" height="36" rx="5" fill="#ef5350" opacity="0.85"/>
-   <text x="445" y="209" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">7B: reads 4 GB/token = ~25 tok/s max, saturates entire bus</text>
-   <text x="790" y="209" font-size="10" font-weight="600" fill="#c62828">102 GB/s</text>
-
-   <!-- Separator -->
-   <line x1="40" y1="240" x2="920" y2="240" stroke="#d0d7de"/>
-
-   <!-- Comparison table header -->
-   <text x="130" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Model</text>
-   <text x="300" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Size (Q4)</text>
-   <text x="440" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fits in 16 GB?</text>
-   <text x="600" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Tokens/s (with CV)</text>
-   <text x="790" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fast enough for tips?</text>
-
-   <!-- Gemma 4 E2B row -->
-   <text x="130" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Gemma 4 E2B</text>
-   <text x="300" y="290" text-anchor="middle" font-size="11" fill="#333">~3.1 GB</text>
-   <text x="440" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
-   <text x="600" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">~16-20 tok/s</text>
-   <text x="790" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">&#x2713; Yes</text>
-
-   <!-- 7B row -->
-   <text x="130" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#333">7B-8B model</text>
-   <text x="300" y="318" text-anchor="middle" font-size="11" fill="#333">~4 GB</text>
-   <text x="440" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
-   <text x="600" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">&lt;15 tok/s</text>
-   <text x="790" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">&#x2715; Too slow</text>
- </svg>
-
- <p style="margin:10px 0 4px;">
- The system originally ran Qwen2.5-3B-Instruct (~2&nbsp;GB, text-only). Within months,
- Google released <strong>Gemma&nbsp;4&nbsp;E2B</strong> (April 2026), an edge-optimised model
- with a Per-Layer Embedding architecture that packs 5.1B total parameters into just
- 2.3B active parameters per inference. Despite being a more capable model with
- <strong>multimodal support</strong> (text + image), it fits in ~3.1&nbsp;GB and runs at
- 16&ndash;20&nbsp;tok/s on the same Jetson, fast enough for real-time coaching tips.
- The rapid pace of edge LLM development means this constraint continues to relax
- with each generation of models.
- </p>
- </div>
 
  <p style="font-size:0.92rem; color:#444;">
- With frame rate, compute, output stability, and resource sharing all handled, the
- action model now runs reliably in real time, the foundation that the rest of this
- section builds on top of. Licensing implications of the tech stack (including YOLO's
- AGPL-3.0 licence) are addressed on the
- <a href="robot-intelligence.html">landing page</a>.
+ With frame rate, compute, and output stability handled, the action model now runs
+ reliably in real time, the foundation that the rest of this section builds on
+ top of. Licensing implications of the tech stack (including YOLO's AGPL-3.0 licence)
+ are addressed on the <a href="robot-intelligence.html">landing page</a>.
  </p>
 
  <sl-divider></sl-divider>
@@ -792,11 +660,24 @@
  </div>
 
  <p>
- A local AI coach runs entirely on the Jetson, no cloud, no internet. Building one
- that's actually useful inside a real-time boxing system means answering four questions
- in order: <strong>why local at all</strong>, <strong>which model fits</strong>,
- <strong>how to make it sound like a coach</strong>, and <strong>what happens when it
- fails</strong>. The four subsections below tackle each in turn.
+ The CV pipeline and sparring engine
+ (<a href="#int-fusion">5.3.2.1</a>&ndash;<a href="#int-sparring">5.3.2.3</a>)
+ collect rich performance data (per-punch accuracy, block rates, power trends,
+ weakness profiles) and the dashboard
+ (<a href="robot-intelligence-software.html">5.3.3</a>) visualises it. But raw
+ statistics alone do not help a user improve. An experienced boxer seeing a
+ 40% hook block rate knows to tighten their guard on the open side; a beginner
+ seeing the same number does not know what is going wrong or what to practise.
+ RI-7 requires the system to bridge this gap by interpreting session data into
+ actionable, personalised guidance grounded in boxing domain knowledge.
+ </p>
+ <p>
+ A local AI coach running entirely on the Jetson meets this requirement without
+ cloud dependency. Building one that is actually useful inside a real-time boxing
+ system means answering five questions in order: <strong>why local at all</strong>,
+ <strong>which model fits</strong>, <strong>how to make it sound like a coach</strong>,
+ <strong>what happens when it fails</strong>, and <strong>how to share the GPU with
+ the CV pipeline</strong>. The subsections below tackle each in turn.
  </p>
 
  <h3>1. Why local?, the constraint that shapes everything else</h3>
@@ -891,13 +772,6 @@
  </tbody>
  </table>
 
- <p>
- The system also includes personality modes to keep interactions engaging, an
- <strong>advice mode</strong> for motivational pep talks and encouragement, and a
- <strong>Singlish mode</strong> that responds in Singaporean colloquial English, adding
- local flavour to the coaching experience. These modes are selectable via the chat
- interface and demonstrate the flexibility of the system prompt approach.
- </p>
 
  <h3>3. Sounding like a coach, prompt, parameters, and knowledge base</h3>
  <p>
@@ -970,12 +844,17 @@
 
  <image-component tag="image" source="../assets/robot_intelligence/ros/llm_chat.png" subtitle="Figure: LLM prompt tuning interface" width="70%"></image-component>
 
- <h4 style="margin-top:18px;">Boxing knowledge base</h4>
+ <h4 style="margin-top:18px;">Boxing knowledge base (retrieval-augmented generation)</h4>
  <p>
  The system prompt and parameters tell the model <em>how</em> to talk; the knowledge
- base tells it <em>what</em> to talk about. 17 documents are injected into the context
- during coaching analysis so the LLM's advice is grounded in real boxing expertise
- rather than general-purpose hallucination:
+ base tells it <em>what</em> to talk about. This follows a
+ <strong>retrieval-augmented generation (RAG)</strong> approach: 17 curated boxing
+ documents are injected into the LLM's context window during coaching analysis,
+ grounding its advice in verified boxing technique rather than the model's
+ general-purpose training data. This is the primary mechanism preventing
+ hallucination; without the knowledge base, the LLM could generate
+ plausible-sounding but incorrect technique advice that a beginner would have
+ no way to verify.
  </p>
 
  <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.92rem;">
@@ -1015,6 +894,20 @@
  </tbody>
  </table>
 
+ <p style="background:#f3e5f5; border-left:3px solid #7b1fa2; padding:10px 14px; margin:14px 0; font-size:0.93rem;">
+ <strong>Current status: functional MVP.</strong>
+ The LLM coach has been technically validated: tip generation timing (every ~18&nbsp;s),
+ fallback reliability (65 pre-written tips), cold-start fix (lazy loading at startup),
+ GPU coexistence with the CV pipeline, and 4-layer failure recovery are all tested and
+ working. However, the <em>quality</em> of coaching advice (whether tips are
+ genuinely useful, whether the knowledge base covers enough scenarios, and whether
+ advice depth matches user skill level effectively) requires structured user
+ testing with boxers across beginner, intermediate, and advanced levels. This testing
+ would inform iterative refinement of the knowledge base documents, system prompts,
+ and inference parameters to move the coach from a functional MVP to a validated
+ training tool.
+ </p>
+
  <h3>4. What if it fails?, reliability and fallback</h3>
  <p>
  Everything above describes the coach when it works. The harder problem is what happens
@@ -1048,6 +941,144 @@
  the user during real training sessions, on a single Jetson, with no internet, and
  degrades gracefully when anything goes wrong.
  </p>
+
+ <h3>5. Sharing the GPU, coexisting with the CV pipeline</h3>
+ <p>
+ Frame rate, compute, and output stability (covered in
+ <a href="#int-inference">5.3.2.2</a>) all assume the CV pipeline owns the GPU.
+ In practice it shares the Jetson with the LLM coach, the touchscreen GUI, and the
+ ROS messaging layer. Two mechanisms keep them out of each other's way:
+ </p>
+
+ <p>
+ <strong>Adaptive frame rate.</strong> The <code>cv_node</code> runs at the full
+ 30&nbsp;fps only during <em>active</em> training sessions. Outside of active rounds
+ (idle, countdown, rest periods) it drops to ~6&nbsp;fps, freeing the
+ GPU for LLM inference exactly when the user is reading a coaching tip rather than
+ throwing punches.
+ </p>
+
+ <p>
+ <strong>Shared-memory footprint.</strong> The Jetson Orin NX has 16&nbsp;GB of
+ <em>unified</em> memory shared between CPU and GPU, so every model on the Jetson is
+ drawing from the same pool. Knowing the exact footprint of each component matters
+ because anything that exceeds the pool starts paging to disk and the real-time loop
+ collapses. The footprint below has been measured under live load:
+ </p>
+
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <thead>
+ <tr style="background:#f0f0f0;">
+ <th style="padding:8px; border:1px solid #ddd;">Component</th>
+ <th style="padding:8px; border:1px solid #ddd;">Memory</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Action model (TensorRT)</td>
+ <td style="padding:8px; border:1px solid #ddd;">~200MB</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">YOLO Pose (TensorRT)</td>
+ <td style="padding:8px; border:1px solid #ddd;">~150MB</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Gemma 4 E2B LLM</td>
+ <td style="padding:8px; border:1px solid #ddd;">~3.1GB</td>
+ </tr>
+ <tr>
+ <td style="padding:8px; border:1px solid #ddd;">Frame buffers</td>
+ <td style="padding:8px; border:1px solid #ddd;">~100MB</td>
+ </tr>
+ <tr style="font-weight:bold;">
+ <td style="padding:8px; border:1px solid #ddd;">Total</td>
+ <td style="padding:8px; border:1px solid #ddd;">~3.6GB / 16GB</td>
+ </tr>
+ </tbody>
+ </table>
+
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:14px 18px; margin:18px 0; font-size:0.93rem; color:#5d4037;">
+ <strong style="font-size:1rem;">Why 16&nbsp;GB of RAM does not mean we can run any LLM</strong>
+
+ <p style="margin:12px 0 8px;">
+ The Jetson has 16&nbsp;GB of unified memory shared between CPU and GPU, with only
+ ~3.6&nbsp;GB used. But LLM speed is limited by memory <strong>bandwidth</strong>
+ (how fast data moves), not <strong>capacity</strong> (how much fits). Every token
+ generated requires reading the full model weights once:
+ </p>
+
+ <svg viewBox="0 0 960 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:960px; margin:12px auto; display:block; font-family:system-ui,sans-serif;">
+   <rect width="960" height="340" rx="8" fill="#fafafa" stroke="#e0e0e0"/>
+
+   <!-- Title -->
+   <text x="480" y="28" text-anchor="middle" font-size="13" font-weight="700" fill="#333">Capacity vs. Bandwidth on the Jetson Orin NX (16 GB unified LPDDR5)</text>
+
+   <!-- CAPACITY ROW -->
+   <text x="20" y="68" font-size="12" font-weight="700" fill="#2e7d32">CAPACITY</text>
+   <text x="20" y="83" font-size="10" fill="#888">how much fits</text>
+
+   <rect x="120" y="55" width="650" height="38" rx="5" fill="#e8f5e9" stroke="#c8e6c9"/>
+   <rect x="120" y="55" width="146" height="38" rx="5" fill="#66bb6a"/>
+   <text x="193" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3.6 GB</text>
+   <text x="445" y="79" text-anchor="middle" font-size="12" fill="#2e7d32">12.4 GB free</text>
+   <text x="790" y="79" font-size="11" font-weight="600" fill="#555">16 GB</text>
+
+   <text x="445" y="112" text-anchor="middle" font-size="11" font-style="italic" fill="#2e7d32">A 7B model (~4 GB) easily fits. Capacity is not the problem.</text>
+
+   <!-- BANDWIDTH SECTION -->
+   <text x="20" y="152" font-size="12" font-weight="700" fill="#1565c0">BANDWIDTH</text>
+   <text x="20" y="167" font-size="10" fill="#888">speed limit</text>
+
+   <!-- Gemma 4 E2B bar (2.3B active) -->
+   <rect x="120" y="140" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
+   <rect x="120" y="140" width="420" height="36" rx="5" fill="#42a5f5"/>
+   <text x="330" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Gemma 4 E2B: reads ~3 GB/token = ~34 tok/s max</text>
+   <rect x="515" y="143" width="90" height="30" rx="4" fill="#e3f2fd" stroke="#90caf9"/>
+   <text x="560" y="162" text-anchor="middle" font-size="9" font-weight="600" fill="#1565c0">CV headroom</text>
+   <text x="790" y="163" font-size="10" font-weight="600" fill="#555">102 GB/s</text>
+
+   <!-- 7B bar -->
+   <rect x="120" y="186" width="650" height="36" rx="5" fill="#f0f0f0" stroke="#e0e0e0"/>
+   <rect x="120" y="186" width="650" height="36" rx="5" fill="#ef5350" opacity="0.85"/>
+   <text x="445" y="209" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">7B: reads 4 GB/token = ~25 tok/s max, saturates entire bus</text>
+   <text x="790" y="209" font-size="10" font-weight="600" fill="#c62828">102 GB/s</text>
+
+   <!-- Separator -->
+   <line x1="40" y1="240" x2="920" y2="240" stroke="#d0d7de"/>
+
+   <!-- Comparison table header -->
+   <text x="130" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Model</text>
+   <text x="300" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Size (Q4)</text>
+   <text x="440" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fits in 16 GB?</text>
+   <text x="600" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Tokens/s (with CV)</text>
+   <text x="790" y="264" text-anchor="middle" font-size="10" font-weight="700" fill="#555">Fast enough for tips?</text>
+
+   <!-- Gemma 4 E2B row -->
+   <text x="130" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Gemma 4 E2B</text>
+   <text x="300" y="290" text-anchor="middle" font-size="11" fill="#333">~3.1 GB</text>
+   <text x="440" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
+   <text x="600" y="290" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">~16-20 tok/s</text>
+   <text x="790" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">&#x2713; Yes</text>
+
+   <!-- 7B row -->
+   <text x="130" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#333">7B-8B model</text>
+   <text x="300" y="318" text-anchor="middle" font-size="11" fill="#333">~4 GB</text>
+   <text x="440" y="318" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Yes</text>
+   <text x="600" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">&lt;15 tok/s</text>
+   <text x="790" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">&#x2715; Too slow</text>
+ </svg>
+
+ <p style="margin:10px 0 4px;">
+ The system originally ran Qwen2.5-3B-Instruct (~2&nbsp;GB, text-only). Within months,
+ Google released <strong>Gemma&nbsp;4&nbsp;E2B</strong> (April 2026), an edge-optimised model
+ with a Per-Layer Embedding architecture that packs 5.1B total parameters into just
+ 2.3B active parameters per inference. Despite being a more capable model with
+ <strong>multimodal support</strong> (text + image), it fits in ~3.1&nbsp;GB and runs at
+ 16&ndash;20&nbsp;tok/s on the same Jetson, fast enough for real-time coaching tips.
+ The rapid pace of edge LLM development means this constraint continues to relax
+ with each generation of models.
+ </p>
+ </div>
 
  <sl-divider></sl-divider>
 
