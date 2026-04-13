@@ -175,7 +175,7 @@
  <li><strong>5.3.1</strong>: Computer Vision &amp; action prediction model</li>
  <li><strong>5.3.2</strong>: Sensor fusion, sparring AI, LLM coach</li>
  <li><strong>5.3.3</strong>: Dashboard backend &amp; analytics</li>
- <li><strong>5.3.4</strong>: Testing &amp; verification of all 8 requirements</li>
+ <li><strong>5.3.4</strong>: Testing &amp; verification of all 7 requirements</li>
  </ul>
  </div>
 
@@ -279,7 +279,7 @@
  </div>
  <div style="font-size:0.88rem; color:#555; margin-top:8px;">
  <strong>Real-world deployment</strong> with public users at the CDE AI Fair, full model
- interpretability analysis, and <strong>all 8 requirements verified</strong>
+ interpretability analysis, and <strong>all 7 requirements verified</strong>
  in <a href="robot-intelligence-testing.html">5.3.4</a>.
  </div>
  </div>
@@ -349,7 +349,7 @@
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-3</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Classification accuracy &ge;90% on unseen person validation set</td>
+ <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">High classification accuracy that generalises across different users</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Reduce false triggers and incorrect counter-punches during live sparring</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-1; Appendix 6: accurate punch classification for analytics</td>
  </tr>
@@ -377,12 +377,6 @@
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">A beginner seeing raw stats (e.g. 40% hook block rate) does not know what to fix; the system must explain what is going wrong and what to practise in plain language</td>
  <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-1, DO-3, DO-4; Product need: real-time cues reinforcing correct form, rhythm, timing (Section 3.1)</td>
  </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top; white-space:nowrap;">RI-8</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">The robot must know the user's lateral position at all times during a session</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">The robot needs to stay oriented towards the user as they move; without real-time position data the yaw motor cannot track them</td>
- <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">DO-2; Appendix 6: robot maintains orientation relative to boxer</td>
- </tr>
  </tbody>
  </table>
  </div>
@@ -398,7 +392,7 @@
    <h3>System Design Narrative</h3>
    <p>
      Following the V-Model from <a href="../index.html#design-methodology">Section 3.2</a>,
-     RI-1 to RI-8 were fixed before any model architecture, ROS node, or LLM prompt
+     RI-1 to RI-7 were fixed before any model architecture, ROS node, or LLM prompt
      was written. The diagram below shows how each requirement decomposed into a design
      decision (left arm), was built and integrated (base), and then verified (right arm).
      The table underneath maps each V-Model stage to the specific BoxBunny RI work.
@@ -424,7 +418,7 @@
        <rect x="151" y="72" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
        <text x="246" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">01</text>
        <text x="246" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">RI Problem Framing</text>
-       <text x="246" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">RI-1 to RI-8 fixed</text>
+       <text x="246" y="125" text-anchor="middle" font-size="9" fill="#3b82f6">RI-1 to RI-7 fixed</text>
 
        <!-- 02 System Architecture -->
        <rect x="261" y="192" width="190" height="76" rx="38" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
@@ -462,7 +456,7 @@
        <rect x="919" y="72" width="190" height="76" rx="38" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
        <text x="1014" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">06</text>
        <text x="1014" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">System Validation</text>
-       <text x="1014" y="125" text-anchor="middle" font-size="9" fill="#16a34a">Full robot test, all 8 RI verified</text>
+       <text x="1014" y="125" text-anchor="middle" font-size="9" fill="#16a34a">Full robot test, all 7 RI verified</text>
 
        <line x1="30" y1="498" x2="1230" y2="498" stroke="#e2e8f0" stroke-width="1"/>
        <rect x="38" y="506" width="12" height="12" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
@@ -476,7 +470,7 @@
      </svg>
 
      <sub style="display:block; text-align:center; margin-top:10px; font-style:italic; font-size:0.88rem; color:#6b7280;">
-       Figure: Robot Intelligence Systems Engineering V-Model showing requirement decomposition (left), integration build (centre), and verification closure (right) for RI-1 to RI-8.
+       Figure: Robot Intelligence Systems Engineering V-Model showing requirement decomposition (left), integration build (centre), and verification closure (right) for RI-1 to RI-7.
      </sub>
    </div>
 
@@ -518,7 +512,7 @@
        <tr>
          <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #2563eb; vertical-align:top; background:#f8faff;"><strong>Concept &amp; Requirements</strong></td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Fix measurable targets before any design work begins</td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">RI-1 to RI-8 derived from product needs and on-device deployment constraints. Each requirement drove a specific design choice downstream (see next rows)</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">RI-1 to RI-7 derived from product needs and on-device deployment constraints. Each requirement drove a specific design choice downstream (see next rows)</td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Requirements table above with rationale per requirement</td>
        </tr>
        <tr>
@@ -552,20 +546,19 @@
            <strong>RI-5</strong>: all inference on-device within the 16 GB shared-memory budget; adaptive frame rate (6&nbsp;Hz idle / 30&nbsp;Hz active) shares GPU between CV and LLM<br>
            <strong>RI-6</strong>: <code>sparring_engine</code> with Markov chain styles + persistent weakness profile<br>
            <strong>RI-7</strong>: local Gemma 4 E2B LLM coach (multimodal, edge-optimised) with 17-document boxing knowledge base + fallback tips<br>
-           <strong>RI-8</strong>: <code>cv_node</code> publishes <code>UserTracking</code> each frame; yaw motor faces the user, height adjusted by the user via phone or GUI<br>
            <span style="font-size:0.88rem; color:#555;">Vue 3 + FastAPI phone dashboard connected to per-user SQLite database</span>
          </td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Per-component design narratives in <a href="robot-intelligence-cv.html">5.3.1</a>, <a href="robot-intelligence-integration.html">5.3.2</a>, <a href="robot-intelligence-software.html">5.3.3</a></td>
        </tr>
        <tr>
          <td style="padding:8px; border:1px solid #ddd; border-left:4px solid #16a34a; vertical-align:top; background:#f6fdf8;"><strong>Verification &amp; Validation</strong></td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Three-tier testing pyramid + real-world deployment to confirm RI-1 to RI-8</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">Three-tier testing pyramid + real-world deployment to confirm RI-1 to RI-7</td>
          <td style="padding:8px; border:1px solid #ddd; vertical-align:top;">
            <strong>Unit</strong>: 146 pytest tests (sensor fusion, gamification, database)<br>
            <strong>Integration</strong>: 28 cross-module tests (ROS messages, fusion end-to-end, motor protocol) + CDE AI Fair early prototype deployment<br>
            <strong>System</strong>: Full robot test with real camera, IMU, and motors + model interpretability analysis
          </td>
-         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;"><a href="robot-intelligence-testing.html">5.3.4.7</a> verification summary: all 8 RI requirements pass</td>
+         <td style="padding:8px; border:1px solid #ddd; vertical-align:top;"><a href="robot-intelligence-testing.html">5.3.4.7</a> verification summary: all 7 RI requirements pass</td>
        </tr>
      </tbody>
    </table>

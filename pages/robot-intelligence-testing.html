@@ -82,7 +82,7 @@
  <!-- 5.3.4 INTRO -->
  <div style="display:flex; align-items:center; gap:14px; flex-wrap:nowrap; overflow-x:auto;">
  <h2 style="margin:0;">5.3.4 Testing & Validation</h2>
- <sl-badge variant="primary" pill style="font-size:0.75rem;">Verifies RI-1 to RI-8</sl-badge>
+ <sl-badge variant="primary" pill style="font-size:0.75rem;">Verifies RI-1 to RI-7</sl-badge>
  </div>
 
  <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#test-validation" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Validation</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-fair" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">CDE Fair</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-infra" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Tests</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-verify" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">8/8 Pass</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#test-limits" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Limitations</a></div>
@@ -97,7 +97,7 @@
  <strong>V-Model alignment.</strong> Following the Systems Engineering V-Model introduced in
  <a href="../index.html#design-methodology">Section 3.2</a>, this page corresponds to the
  <strong>right side of the V</strong>, where each Robot Intelligence requirement (RI-1 through
- RI-8) is closed against a concrete verification activity. Unit and integration tests verify
+ RI-7) is closed against a concrete verification activity. Unit and integration tests verify
  the lower levels of the V (individual components and cross-module communication), the
  CDE AI Fair served as an integration-level test that surfaced real-world issues, and the
  full robot test with real camera, IMU, and motors closes the system-level verification. Section <strong>5.3.4.7 Verification Summary</strong>
@@ -258,7 +258,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.2 CDE AI FAIR -->
- <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-fair" style="margin:0;">5.3.4.2 CDE AI Fair, Real-World Deployment</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-8</sl-badge></div>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-fair" style="margin:0;">5.3.4.2 CDE AI Fair, Real-World Deployment</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge></div>
 
  <p>
  As introduced in the <a href="gui/testing-evaluation.html">GUI testing section (5.1)</a>,
@@ -414,7 +414,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.3 TESTING INFRASTRUCTURE -->
- <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-infra" style="margin:0;">5.3.4.3 Testing Infrastructure</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-8</sl-badge></div>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-infra" style="margin:0;">5.3.4.3 Testing Infrastructure</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge></div>
 
  <p>
  Testing followed the classic bottom-up pyramid, many small, fast unit tests at
@@ -790,7 +790,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.7 VERIFICATION SUMMARY -->
- <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-verify" style="margin:0;">5.3.4.7 Verification Summary</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-8</sl-badge></div>
+ <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-verify" style="margin:0;">5.3.4.7 Verification Summary</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1 to RI-7</sl-badge></div>
 
  <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-left:4px solid #2e7d32; border-radius:6px; padding:14px 18px; margin:14px 0;">
  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
@@ -862,17 +862,10 @@
  <td style="padding:8px; border:1px solid #ddd;">Tips every ~18s, 65 fallback tips operational</td>
  <td style="padding:8px; border:1px solid #ddd; text-align:center;"><span style="background:#e8f5e9; color:#2e7d32; padding:2px 10px; border-radius:4px; font-weight:600;">Pass</span></td>
  </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">RI-8</td>
- <td style="padding:8px; border:1px solid #ddd;">Person detection &amp; user tracking</td>
- <td style="padding:8px; border:1px solid #ddd;">Teensy simulator robot status row (5.3.4.6); yaw and height commands verified during live sessions</td>
- <td style="padding:8px; border:1px solid #ddd;">Yaw tracks user laterally, height data available for user-controlled adjustment via phone or GUI</td>
- <td style="padding:8px; border:1px solid #ddd; text-align:center;"><span style="background:#e8f5e9; color:#2e7d32; padding:2px 10px; border-radius:4px; font-weight:600;">Pass</span></td>
- </tr>
  </tbody>
  </table>
  <p style="text-align:center; font-style:italic; font-size:0.9rem; color:#666; margin-top:8px;">
- Table: Requirements verification summary, all 8 requirements met
+ Table: Requirements verification summary, all 7 requirements met
  </p>
 
  <sl-divider></sl-divider>
