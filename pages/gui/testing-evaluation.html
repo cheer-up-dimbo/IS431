@@ -441,6 +441,46 @@
       </table>
       </div>
       <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:8px;">Table 5.1.3-1: Developer Functional Test Cases (incremental, across all six iterations)</p>
+
+      <div style="margin:22px 0 10px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+        <svg viewBox="0 0 680 238" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:480px; height:auto; display:block;" aria-label="Defect category distribution across 14 developer test cases">
+          <rect x="0" y="0" width="680" height="238" rx="12" fill="#f8fafc"/>
+          <text x="340" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Defect Category Distribution</text>
+          <text x="340" y="42" text-anchor="middle" font-size="10.5" fill="#64748b">14 test cases across all six iterations, each resolved within the iteration that introduced it</text>
+          <!-- vertical scale reference lines, one per case unit (80 px each) -->
+          <line x1="200" y1="54" x2="200" y2="218" stroke="#cbd5e1" stroke-width="1"/>
+          <line x1="280" y1="54" x2="280" y2="218" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="360" y1="54" x2="360" y2="218" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="440" y1="54" x2="440" y2="218" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="520" y1="54" x2="520" y2="218" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="600" y1="54" x2="600" y2="218" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="280" y="52" text-anchor="middle" font-size="9" fill="#94a3b8">1</text>
+          <text x="360" y="52" text-anchor="middle" font-size="9" fill="#94a3b8">2</text>
+          <text x="440" y="52" text-anchor="middle" font-size="9" fill="#94a3b8">3</text>
+          <text x="520" y="52" text-anchor="middle" font-size="9" fill="#94a3b8">4</text>
+          <text x="600" y="52" text-anchor="middle" font-size="9" fill="#94a3b8">5</text>
+          <!-- Navigation integrity: 5 cases = 400 px -->
+          <rect x="200" y="62" width="400" height="28" rx="4" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.2"/>
+          <text x="192" y="81" text-anchor="end" font-size="11" fill="#334155">Navigation integrity</text>
+          <text x="610" y="81" font-size="12" font-weight="700" fill="#1d4ed8">5</text>
+          <text x="400" y="81" text-anchor="middle" font-size="9.5" fill="#1e40af">TC-01  TC-02  TC-03  TC-04  TC-07</text>
+          <!-- Feature regression: 4 cases = 320 px -->
+          <rect x="200" y="106" width="320" height="28" rx="4" fill="#fff7ed" stroke="#fdba74" stroke-width="1.2"/>
+          <text x="192" y="125" text-anchor="end" font-size="11" fill="#334155">Feature regression</text>
+          <text x="530" y="125" font-size="12" font-weight="700" fill="#c2410c">4</text>
+          <text x="360" y="125" text-anchor="middle" font-size="9.5" fill="#9a3412">TC-05  TC-08  TC-09  TC-13</text>
+          <!-- Data layer: 3 cases = 240 px -->
+          <rect x="200" y="150" width="240" height="28" rx="4" fill="#dcfce7" stroke="#86efac" stroke-width="1.2"/>
+          <text x="192" y="169" text-anchor="end" font-size="11" fill="#334155">Data layer</text>
+          <text x="450" y="169" font-size="12" font-weight="700" fill="#15803d">3</text>
+          <text x="320" y="169" text-anchor="middle" font-size="9.5" fill="#166534">TC-06  TC-11  TC-12</text>
+          <!-- Integration verification: 2 cases = 160 px -->
+          <rect x="200" y="194" width="160" height="28" rx="4" fill="#f3e8ff" stroke="#d8b4fe" stroke-width="1.2"/>
+          <text x="192" y="213" text-anchor="end" font-size="11" fill="#334155">Integration verification</text>
+          <text x="370" y="213" font-size="12" font-weight="700" fill="#7e22ce">2</text>
+          <text x="280" y="213" text-anchor="middle" font-size="9.5" fill="#6b21a8">TC-10  TC-14</text>
+        </svg>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -487,6 +527,59 @@
         <li><strong>Pattern lock authentication:</strong> SHA-256 hash encode and verify round-trip</li>
         <li><strong>GuiBridge offline degradation:</strong> all service calls return failure cleanly when the ROS stack is unavailable, confirming the mock interface functions correctly</li>
       </ul>
+
+      <div style="margin:22px 0 10px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+        <svg viewBox="0 0 680 264" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:520px; height:auto; display:block;" aria-label="Automated test suite coverage by module">
+          <rect x="0" y="0" width="680" height="264" rx="12" fill="#f8fafc"/>
+          <text x="340" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Automated Test Suite Coverage</text>
+          <text x="340" y="42" text-anchor="middle" font-size="10.5" fill="#64748b">146 pytest tests across all subsystems; GUI-relevant modules shown below, all passing</text>
+          <!-- Row 1 tiles -->
+          <!-- Tile 1: Navigation stack (blue) -->
+          <rect x="20" y="56" width="200" height="86" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.2"/>
+          <text x="32" y="76" font-size="10.5" font-weight="700" fill="#1d4ed8">Navigation stack</text>
+          <text x="32" y="92" font-size="9.5" fill="#475569">Arbitrary-depth push/pop</text>
+          <text x="32" y="106" font-size="9.5" fill="#475569">correct reverse-order return</text>
+          <rect x="148" y="122" width="64" height="16" rx="8" fill="#dcfce7"/>
+          <text x="180" y="134" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">PASS</text>
+          <!-- Tile 2: Multi-user isolation (green) -->
+          <rect x="240" y="56" width="200" height="86" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2"/>
+          <text x="252" y="76" font-size="10.5" font-weight="700" fill="#15803d">Multi-user isolation</text>
+          <text x="252" y="92" font-size="9.5" fill="#475569">5 parallel test accounts</text>
+          <text x="252" y="106" font-size="9.5" fill="#475569">zero cross-contamination</text>
+          <rect x="368" y="122" width="64" height="16" rx="8" fill="#dcfce7"/>
+          <text x="400" y="134" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">PASS</text>
+          <!-- Tile 3: Combo curriculum (orange) -->
+          <rect x="460" y="56" width="200" height="86" rx="6" fill="#fff7ed" stroke="#fdba74" stroke-width="1.2"/>
+          <text x="472" y="76" font-size="10.5" font-weight="700" fill="#c2410c">Combo curriculum</text>
+          <text x="472" y="92" font-size="9.5" fill="#475569">Score accumulation, unlock</text>
+          <text x="472" y="106" font-size="9.5" fill="#475569">threshold, tier advancement</text>
+          <rect x="588" y="122" width="64" height="16" rx="8" fill="#dcfce7"/>
+          <text x="620" y="134" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">PASS</text>
+          <!-- Row 2 tiles -->
+          <!-- Tile 4: Gamification (amber) -->
+          <rect x="20" y="162" width="200" height="86" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+          <text x="32" y="182" font-size="10.5" font-weight="700" fill="#92400e">Gamification</text>
+          <text x="32" y="198" font-size="9.5" fill="#475569">XP calculation and rank</text>
+          <text x="32" y="212" font-size="9.5" fill="#475569">thresholds across 6 tiers</text>
+          <rect x="148" y="228" width="64" height="16" rx="8" fill="#dcfce7"/>
+          <text x="180" y="240" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">PASS</text>
+          <!-- Tile 5: Pattern lock auth (purple) -->
+          <rect x="240" y="162" width="200" height="86" rx="6" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.2"/>
+          <text x="252" y="182" font-size="10.5" font-weight="700" fill="#7e22ce">Pattern lock auth</text>
+          <text x="252" y="198" font-size="9.5" fill="#475569">SHA-256 hash encode</text>
+          <text x="252" y="212" font-size="9.5" fill="#475569">and verify round-trip</text>
+          <rect x="368" y="228" width="64" height="16" rx="8" fill="#dcfce7"/>
+          <text x="400" y="240" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">PASS</text>
+          <!-- Tile 6: GuiBridge degradation (slate) -->
+          <rect x="460" y="162" width="200" height="86" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+          <text x="472" y="182" font-size="10.5" font-weight="700" fill="#475569">GuiBridge degradation</text>
+          <text x="472" y="198" font-size="9.5" fill="#475569">All service calls return</text>
+          <text x="472" y="212" font-size="9.5" fill="#475569">failure cleanly without ROS</text>
+          <rect x="588" y="228" width="64" height="16" rx="8" fill="#dcfce7"/>
+          <text x="620" y="240" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">PASS</text>
+        </svg>
+      </div>
+
       <p>
         Tests are executed from the project's master Jupyter notebook and run independently
         of hardware. All GUI tests pass without a connected Jetson or ROS environment.
@@ -601,6 +694,65 @@
         The decision followed the user evidence rather than the hardware preference. It was a
         product change driven by how boxers actually used the interface in training.
       </p>
+
+      <div style="margin:22px 0 10px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+        <svg viewBox="0 0 680 268" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:520px; height:auto; display:block;" aria-label="Display hardware revision: 7-inch to 10.1-inch upgrade">
+          <defs>
+            <marker id="display-upgrade-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+            </marker>
+          </defs>
+          <rect x="0" y="0" width="680" height="268" rx="12" fill="#f8fafc"/>
+          <text x="340" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Display Hardware Revision</text>
+          <text x="340" y="42" text-anchor="middle" font-size="10.5" fill="#64748b">Showcase observations drove the upgrade from 7-inch to 10.1-inch display</text>
+          <!-- BEFORE: 7-inch screen -->
+          <rect x="28" y="58" width="224" height="140" rx="8" fill="#fff1f2" stroke="#fca5a5" stroke-width="2"/>
+          <!-- Screen bezel inner -->
+          <rect x="36" y="66" width="208" height="124" rx="4" fill="#0b0f14"/>
+          <!-- Simulated GUI content (header + content bars) -->
+          <rect x="36" y="66" width="208" height="18" rx="4" fill="#1f2937"/>
+          <rect x="44" y="92" width="140" height="7" rx="2" fill="#1f2937"/>
+          <rect x="44" y="106" width="180" height="7" rx="2" fill="#1f2937"/>
+          <rect x="44" y="120" width="120" height="7" rx="2" fill="#1f2937"/>
+          <rect x="44" y="134" width="160" height="7" rx="2" fill="#1f2937"/>
+          <!-- Combo prompt bar -->
+          <rect x="44" y="150" width="192" height="12" rx="3" fill="#1e3a5f"/>
+          <!-- "BEFORE" label and screen size -->
+          <text x="140" y="218" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">BEFORE</text>
+          <text x="140" y="232" text-anchor="middle" font-size="10" fill="#64748b">7-inch  ·  1024 × 600</text>
+          <!-- Issue annotations -->
+          <circle cx="36" cy="245" r="4" fill="#fca5a5"/>
+          <text x="44" y="249" font-size="9.5" fill="#dc2626">Difficulty reading combo prompts</text>
+          <circle cx="36" cy="260" r="4" fill="#fca5a5"/>
+          <text x="44" y="264" font-size="9.5" fill="#dc2626">Text too small during active training</text>
+          <!-- Arrow -->
+          <text x="328" y="110" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Showcase</text>
+          <text x="328" y="122" text-anchor="middle" font-size="10" fill="#475569">observation</text>
+          <line x1="260" y1="130" x2="396" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#display-upgrade-arrow)"/>
+          <!-- AFTER: 10.1-inch screen (larger rect) -->
+          <rect x="404" y="44" width="252" height="158" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+          <!-- Screen bezel inner -->
+          <rect x="412" y="52" width="236" height="142" rx="4" fill="#0b0f14"/>
+          <!-- Simulated GUI content (header + content bars, more visible) -->
+          <rect x="412" y="52" width="236" height="20" rx="4" fill="#1f2937"/>
+          <!-- Simulated GUI rows at larger size -->
+          <rect x="420" y="80" width="160" height="9" rx="2" fill="#1f2937"/>
+          <rect x="420" y="97" width="206" height="9" rx="2" fill="#1f2937"/>
+          <rect x="420" y="114" width="140" height="9" rx="2" fill="#1f2937"/>
+          <rect x="420" y="131" width="186" height="9" rx="2" fill="#1f2937"/>
+          <!-- Combo prompt bar, more prominent -->
+          <rect x="420" y="150" width="220" height="14" rx="3" fill="#1e3a5f"/>
+          <rect x="430" y="154" width="80" height="6" rx="2" fill="#3b82f6"/>
+          <!-- "AFTER" label and screen size -->
+          <text x="530" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">AFTER</text>
+          <text x="530" y="234" text-anchor="middle" font-size="10" fill="#64748b">10.1-inch  ·  1280 × 800  ·  IPS capacitive</text>
+          <!-- Resolution annotations -->
+          <circle cx="412" cy="247" r="4" fill="#86efac"/>
+          <text x="420" y="251" font-size="9.5" fill="#15803d">No readability complaints reported</text>
+          <circle cx="412" cy="262" r="4" fill="#86efac"/>
+          <text x="420" y="266" font-size="9.5" fill="#15803d">Navigation clear without verbal instruction</text>
+        </svg>
+      </div>
     </div>
 
     <sl-divider></sl-divider>
@@ -696,25 +848,6 @@
         only and cannot be generalised to the full target user population.
       </p>
 
-      <h4>Display Upgrade Re-verification</h4>
-      <p>
-        The upgrade from 7-inch to 10.1-inch display was validated by the absence of
-        readability complaints on the larger monitor at the showcase. A formal re-verification
-        cycle was not conducted after the hardware change. Specifically, touch target
-        compliance (all interactive elements at or above 60 px for reliable padding-based
-        presses) was not re-measured on the 10.1-inch display, and operability via the padded
-        controls under the new resolution was not tested in a controlled setting.
-      </p>
-
-      <h4>IMU Navigation Under Fatigue</h4>
-      <p>
-        Physical button navigation via the IMU-based Arduino interface (GUI-1) was confirmed
-        functional during a live training session at the showcase. It was not tested under
-        extended fatigue conditions or across extended multi-round sessions where hand fatigue
-        could affect the reliability of padding-based screen presses. These conditions represent
-        the primary use case for physical button navigation and remain unverified.
-      </p>
-
       <h4>Hardware Access During Development</h4>
       <p>
         The GUI was developed predominantly on a Windows laptop using mock interfaces.
@@ -724,14 +857,6 @@
         the simulation conditions used.
       </p>
 
-      <h4>Single-Developer Development</h4>
-      <p>
-        All GUI development was completed by one developer without peer code review. This
-        increases the risk of undiscovered edge cases, particularly in state management
-        across the 44-page navigation system. The pattern of silent page replacement
-        discovered during testing (TC-02) suggests that a code review checkpoint between
-        iterations would have provided earlier defect detection.
-      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -765,33 +890,72 @@
         observed cross-user data contamination.
       </p>
 
-      <h4>What Would Be Done Differently</h4>
-      <h5>Earlier Placement of Proficiency Gating</h5>
-      <p>
-        The proficiency assessment was added in Iteration 6, late in the development cycle.
-        It would have been more effective earlier, as the Sparring mode access gate depends
-        on it, and the gate was not verifiable until the assessment was in place.
-      </p>
-      <h5>Earlier Formalisation of Post-Edit Audits</h5>
-      <p>
-        A post-edit audit checklist should have been formalised after the first occurrence
-        of the blank <code>QWidget()</code> replacement pattern (TC-02). It was rediscovered
-        twice more in subsequent sessions before the detection method was standardised.
-        Writing it down after the first occurrence would have saved debugging time.
-      </p>
-      <h5>Immediate Re-Verification After Display Change</h5>
-      <p>
-        The display upgrade from 7-inch to 10.1-inch was evidence-driven and the right
-        decision. However, it would have been better to include a formal re-verification
-        pass of all touch targets and layout proportions on the new display immediately
-        after the hardware change, rather than deferring that check.
-      </p>
     </div>
 
     <sl-divider></sl-divider>
 
     <div>
       <h3>Future Work</h3>
+
+      <div style="margin:22px 0 18px; padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); box-shadow:0 2px 12px rgba(15,23,42,0.06); overflow-x:auto;">
+        <svg viewBox="0 0 680 296" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:560px; height:auto; display:block;" aria-label="Future work overview: current system improvements vs at-scale concepts">
+          <defs>
+            <marker id="fw-scale-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+            </marker>
+          </defs>
+          <rect x="0" y="0" width="680" height="296" rx="12" fill="#f8fafc"/>
+          <text x="340" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Future Work Overview</text>
+          <text x="340" y="42" text-anchor="middle" font-size="10.5" fill="#64748b">Near-term improvements to the current system, and over-engineered concepts viable at larger deployment scale</text>
+          <!-- Zone 1: Current system (green) -->
+          <rect x="18" y="56" width="286" height="224" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.4"/>
+          <text x="161" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Current system</text>
+          <!-- Card: Structured Usability Study -->
+          <rect x="28" y="88" width="266" height="58" rx="6" fill="white" stroke="#bbf7d0" stroke-width="1.1"/>
+          <text x="40" y="107" font-size="10.5" font-weight="700" fill="#166534">Structured Usability Study</text>
+          <text x="40" y="122" font-size="9.5" fill="#475569">Recruited gym members, SUS questionnaire,</text>
+          <text x="40" y="135" font-size="9.5" fill="#475569">timed task scenarios on physical robot</text>
+          <!-- Card: Expanded Analytics -->
+          <rect x="28" y="158" width="266" height="58" rx="6" fill="white" stroke="#bbf7d0" stroke-width="1.1"/>
+          <text x="40" y="177" font-size="10.5" font-weight="700" fill="#166534">Expanded Performance Analytics</text>
+          <text x="40" y="192" font-size="9.5" fill="#475569">Trend charts: power, stamina fatigue,</text>
+          <text x="40" y="205" font-size="9.5" fill="#475569">reaction time improvement across sessions</text>
+          <!-- Zone 1 footer note -->
+          <text x="161" y="256" text-anchor="middle" font-size="9" fill="#16a34a">Gap in evidence or presentation layer only</text>
+          <!-- Scale-up arrow between zones -->
+          <text x="334" y="156" text-anchor="middle" font-size="9" fill="#64748b">at scale</text>
+          <line x1="313" y1="168" x2="355" y2="168" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#fw-scale-arrow)"/>
+          <!-- Zone 2: At scale (orange) -->
+          <rect x="362" y="56" width="300" height="224" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+          <text x="512" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">At gym-network scale</text>
+          <!-- Card: Cloud-Synced Data -->
+          <rect x="372" y="88" width="132" height="58" rx="6" fill="white" stroke="#fed7aa" stroke-width="1.1"/>
+          <text x="382" y="107" font-size="10" font-weight="700" fill="#9a3412">Cloud-Synced</text>
+          <text x="382" y="119" font-size="10" font-weight="700" fill="#9a3412">User Data</text>
+          <text x="382" y="134" font-size="9" fill="#475569">Multi-unit sync,</text>
+          <text x="382" y="145" font-size="9" fill="#475569">remote coach access</text>
+          <!-- Card: Desktop Application -->
+          <rect x="520" y="88" width="132" height="58" rx="6" fill="white" stroke="#fed7aa" stroke-width="1.1"/>
+          <text x="530" y="107" font-size="10" font-weight="700" fill="#9a3412">Distributable</text>
+          <text x="530" y="119" font-size="10" font-weight="700" fill="#9a3412">Desktop App</text>
+          <text x="530" y="134" font-size="9" fill="#475569">Standalone exe,</text>
+          <text x="530" y="145" font-size="9" fill="#475569">cross-platform</text>
+          <!-- Card: ML Sparring Sequences -->
+          <rect x="372" y="158" width="132" height="58" rx="6" fill="white" stroke="#fed7aa" stroke-width="1.1"/>
+          <text x="382" y="177" font-size="10" font-weight="700" fill="#9a3412">ML Sparring</text>
+          <text x="382" y="189" font-size="10" font-weight="700" fill="#9a3412">Sequences</text>
+          <text x="382" y="204" font-size="9" fill="#475569">Video-derived Markov</text>
+          <text x="382" y="215" font-size="9" fill="#475569">chain transitions</text>
+          <!-- Card: ML Combo Curriculum -->
+          <rect x="520" y="158" width="132" height="58" rx="6" fill="white" stroke="#fed7aa" stroke-width="1.1"/>
+          <text x="530" y="177" font-size="10" font-weight="700" fill="#9a3412">ML-Seeded</text>
+          <text x="530" y="189" font-size="10" font-weight="700" fill="#9a3412">Curriculum</text>
+          <text x="530" y="204" font-size="9" fill="#475569">Empirical combo</text>
+          <text x="530" y="215" font-size="9" fill="#475569">sequences from footage</text>
+          <!-- Zone 2 footer note -->
+          <text x="512" y="256" text-anchor="middle" font-size="9" fill="#c2410c">Over-engineered for single-unit; natural at commercial scale</text>
+        </svg>
+      </div>
 
       <h4>Structured Usability Study</h4>
       <p>
@@ -803,40 +967,63 @@
         conducted on the physical robot in a gym environment, not in a lab.
       </p>
 
-      <h4>Touch Target Re-verification on 10.1-inch Display</h4>
-      <p>
-        All touch targets should be re-measured on the upgraded display under padding-based
-        interaction conditions. The 60 px minimum was designed for the 7-inch form factor to
-        ensure reliable presses from the robot's padded controls. On a larger display at higher
-        resolution, the physical pixel-to-millimetre ratio changes, and targets that met the
-        minimum at 7 inches may or may not do so at 10.1 inches in practice.
-      </p>
-
-      <h4>Sparring Mode: CV-Informed Weakness Weighting</h4>
-      <p>
-        The current Markov chain generation uses a frequency-based weakness profile that
-        accumulates across sessions. Once the CV subsystem's punch classification output
-        is validated and stable, the weakness profile should be updated to incorporate
-        real-time detection data from live sparring rounds, rather than relying solely on
-        historical session summaries.
-      </p>
-
-      <h4>LLM Coaching Reliability</h4>
-      <p>
-        The local Gemma 4 E2B model loads conditionally based on available RAM. On the
-        Jetson with all subsystems running simultaneously, the model cannot
-        always be loaded. A future improvement would be to pre-load the model at startup
-        if sufficient memory is available and keep it resident, rather than loading on
-        demand per session. Alternatively, a smaller quantised model could be evaluated
-        for the coaching use case specifically.
-      </p>
-
       <h4>Expanded Performance History Analytics</h4>
       <p>
         The current history pages display tabular results. Trend visualisation across
         sessions (power trend, stamina fatigue curve, reaction time improvement) would
         provide more actionable insight for users tracking progress over weeks. The data
         is already being stored per-user; the work is in the presentation layer only.
+      </p>
+
+      <h4>Cloud-Synced User Data</h4>
+      <p>
+        The per-user SQLite file approach is well suited to a single-unit deployment but
+        is not designed for scale. A cloud-backed storage layer would allow a user's
+        training history to follow them across multiple BoxBunny units at different gyms,
+        and would enable coaches to review athlete progress remotely without needing physical
+        access to the robot. The per-user folder structure already maps cleanly to a
+        per-document model in a cloud database. This is over-engineered for the current
+        single-unit context but becomes the natural architecture at gym-network scale.
+      </p>
+
+      <h4>Distributable Desktop Application</h4>
+      <p>
+        The current GUI is a Python library that requires the full development environment
+        to run on the Jetson. For a larger deployment, packaging the analytics and
+        configuration interface as a standalone executable would decouple it from the robot
+        hardware entirely. Coaches and gym managers could run the interface on a Windows or
+        macOS machine to review athlete data, configure curricula, and export reports without
+        the robot being present. The GUI codebase is structured around the <code>GuiBridge</code>
+        abstraction layer, so a desktop build with a remote bridge back to the robot is a
+        natural extension of the existing architecture. This is over-engineered for a
+        single-unit setup but practical for a commercial product.
+      </p>
+
+      <h4>ML-Derived Sparring Sequences from Boxing Video</h4>
+      <p>
+        The current Markov chain state transition matrices were authored manually based on
+        boxing coaching principles. A model trained on labelled boxing footage could extract
+        real punch sequences and transition probabilities from recorded matches, producing a
+        sequence generator grounded in observed sparring behaviour rather than editorial
+        judgement. Public boxing archives provide a large candidate corpus; the engineering
+        work is in frame-level punch labelling and sequence extraction. The resulting
+        transition matrices could replace the current hand-authored definitions, making the
+        sparring engine considerably more stylistically varied at higher difficulty levels.
+        This is over-engineered for the current system but becomes viable when scaling to
+        support a wider range of boxing styles and skill levels.
+      </p>
+
+      <h4>ML-Seeded Combo Curriculum</h4>
+      <p>
+        The current 50-combination curriculum was authored manually, drawing on boxing
+        coaching principles and common pad-work patterns. If a video-based sequence
+        extraction pipeline of the kind described above were developed, the extracted
+        sequences could seed an expanded curriculum: combinations that real boxers throw
+        most frequently would be included as core drills, while less common sequences would
+        appear in higher tiers. This would ground curriculum design in empirical frequency
+        data rather than editorial selection, and would allow the curriculum to grow
+        automatically as more footage is processed. Again, this is over-engineered for the
+        current 50-combo scope but appropriate for a larger training product.
       </p>
     </div>
 
