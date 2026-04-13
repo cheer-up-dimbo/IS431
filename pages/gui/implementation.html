@@ -629,12 +629,365 @@
 
     <sl-divider></sl-divider>
     <div>
-      <h3>Phone Dashboard</h3>
+      <h3>Home Dashboard</h3>
       <p>
-        A companion phone dashboard gives users a quick way to check progress and make light
-        training adjustments without walking back to the robot. It is most useful between
-        rounds or after a session, when the boxer wants a fast summary rather than a full
-        touchscreen interaction. More detailed integration notes are in Section 5.3.
+        The home dashboard is the first screen a registered user reaches after
+        authentication. It consolidates the user's training status and provides
+        direct access to every training mode. The screen has four zones: a header
+        bar showing the user's display name, current rank, and active streak; a
+        gamification row with XP total and rank tier; a mode selection grid with
+        four large buttons (Training, Sparring, Free Training, Performance Tests);
+        and a recent sessions list showing the five most recent completed sessions
+        with mode, date, and key metric.
+      </p>
+
+      <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:700px; margin:16px auto; display:block;">
+        <text x="350" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Home Dashboard Layout Zones</text>
+        <rect x="40" y="40" width="620" height="310" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+
+        <rect x="55" y="55" width="590" height="45" rx="6" fill="#e0f2fe" stroke="#0284c7"/>
+        <text x="350" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#0c4a6e">Header: Display Name · Rank Tier · Active Streak</text>
+
+        <rect x="55" y="110" width="590" height="40" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+        <text x="350" y="134" text-anchor="middle" font-size="12" font-weight="bold" fill="#4c1d95">Gamification Row: Cumulative XP · Tier Progress Bar</text>
+
+        <text x="60" y="175" font-size="11" font-weight="bold" fill="#475569">Mode Selection Grid</text>
+        <g font-size="11" text-anchor="middle" fill="#1e293b">
+          <rect x="55"  y="185" width="140" height="70" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="125" y="225">Training</text>
+          <rect x="205" y="185" width="140" height="70" rx="6" fill="#fee2e2" stroke="#dc2626"/><text x="275" y="225">Sparring</text>
+          <rect x="355" y="185" width="140" height="70" rx="6" fill="#fef3c7" stroke="#d97706"/><text x="425" y="225">Free Training</text>
+          <rect x="505" y="185" width="140" height="70" rx="6" fill="#e0e7ff" stroke="#4f46e5"/><text x="575" y="225">Performance Tests</text>
+        </g>
+
+        <text x="60" y="280" font-size="11" font-weight="bold" fill="#475569">Recent Sessions (5 most recent)</text>
+        <g font-size="10" fill="#334155">
+          <rect x="55" y="290" width="590" height="18" rx="3" fill="#f1f5f9"/><text x="65" y="303">Training · 2026-04-13 · Accuracy 82%</text>
+          <rect x="55" y="310" width="590" height="18" rx="3" fill="#f1f5f9"/><text x="65" y="323">Sparring · 2026-04-12 · Defense 71%</text>
+          <rect x="55" y="330" width="590" height="18" rx="3" fill="#f1f5f9"/><text x="65" y="343">Training · 2026-04-11 · Accuracy 78%</text>
+        </g>
+      </svg>
+
+      <h4>Preset Quick-Start</h4>
+      <p>
+        Below the mode grid, the three most recently used presets are displayed as
+        quick-start cards. Tapping a preset card bypasses the configuration page
+        entirely and launches the session with the saved parameters. This reduces
+        the number of taps required to start a repeat session from five to two,
+        which matters at the start of a training block when the user already knows
+        what they want to do. The full preset library is accessible via a separate
+        Presets page linked from the header.
+      </p>
+
+      <h4>Recent Sessions</h4>
+      <p>
+        The recent sessions list queries the database sorted by completion time and
+        shows the five most recent entries. Each entry displays the session mode,
+        the date, and one summary metric: accuracy percentage for training sessions
+        and defense rate for sparring sessions. Tapping an entry navigates to the
+        corresponding results page with the full breakdown. This gives returning
+        users a quick reference for their last session without navigating to the
+        history page.
+      </p>
+
+      <h4>Coach Station View</h4>
+      <p>
+        Users with a coach account see an alternative home screen. Instead of
+        personal stats, the coach dashboard shows a grid of active stations. Each
+        station card displays the assigned user's name, the current training mode,
+        elapsed session time, and a live accuracy or defense rate reading. A coach
+        can stop any active session from this screen or assign a new drill to an
+        idle station. This view was designed for a gym context where one coach
+        manages several simultaneous users on separate BoxBunny units.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Training Mode Screens</h3>
+      <p>
+        Training mode executes a predetermined punch combination at a configured
+        speed across a set number of rounds. The user selects a combination from
+        the 50-combo library, configures the session parameters, then works through
+        the rounds with live feedback. Three screens make up the active training
+        flow: the live session HUD, the rest screen between rounds, and the results
+        screen after the final round.
+      </p>
+
+      <svg viewBox="0 0 740 180" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:740px; margin:16px auto; display:block;">
+        <text x="370" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Training Mode Screen Flow</text>
+        <defs>
+          <marker id="arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+          </marker>
+        </defs>
+        <g font-size="11" text-anchor="middle" fill="#1e293b">
+          <rect x="20"  y="70" width="110" height="50" rx="6" fill="#f1f5f9" stroke="#64748b"/><text x="75"  y="100">Configuration</text>
+          <rect x="170" y="70" width="110" height="50" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="225" y="93">Live Session</text><text x="225" y="108" font-size="10" fill="#475569">HUD (Round N)</text>
+          <rect x="320" y="70" width="110" height="50" rx="6" fill="#fef3c7" stroke="#d97706"/><text x="375" y="100">Rest Screen</text>
+          <rect x="620" y="70" width="110" height="50" rx="6" fill="#ede9fe" stroke="#7c3aed"/><text x="675" y="100">Results</text>
+        </g>
+        <g stroke="#475569" stroke-width="1.5" fill="none" marker-end="url(#arrT)">
+          <line x1="130" y1="95" x2="170" y2="95"/>
+          <line x1="280" y1="95" x2="320" y2="95"/>
+          <path d="M 375 70 Q 300 20 225 70"/>
+          <line x1="430" y1="95" x2="620" y2="95"/>
+        </g>
+        <text x="300" y="30" font-size="10" fill="#64748b">Loop until final round</text>
+        <text x="525" y="90" font-size="10" fill="#64748b">After final round</text>
+      </svg>
+
+      <h4>Custom Combo Builder</h4>
+      <p>
+        Before entering the configuration page, users can optionally build a custom
+        combination using the self-select screen. Six buttons represent the six
+        punch types (jab, cross, left hook, right hook, left uppercut, right
+        uppercut). Tapping a button appends that punch to the sequence, which is
+        displayed as a row of removable badges. The sequence is capped at ten
+        punches. A user who wants to drill a specific exchange that does not appear
+        in the preset library can construct it here and proceed directly to
+        configuration. The custom combination is held in memory for the session
+        and is not persisted unless the user explicitly saves it as a preset.
+      </p>
+
+      <h4>Live Session HUD</h4>
+      <p>
+        During an active round the screen shows the current round number and total
+        rounds, a countdown timer with a progress bar, the active combination
+        displayed as a numbered punch sequence with the current punch highlighted,
+        a running accuracy counter, and an AI coaching tip refreshed approximately
+        every ten seconds. The combination display advances in step with the
+        session timer so the user can track where they are in the sequence without
+        counting manually. Accuracy is updated each time the CV subsystem confirms
+        or rejects a detected punch against the expected punch at that position in
+        the sequence.
+      </p>
+      <p>
+        Two control buttons are present throughout the round: Pause and Stop
+        Session. Pausing freezes the round timer and suspends the combination
+        advance. Stopping ends the session early and navigates to the results
+        screen with the data collected up to that point.
+      </p>
+
+      <h4>Rest Screen</h4>
+      <p>
+        Between rounds the application transitions to a rest screen showing the
+        remaining rest time as a countdown and a progress bar, the upcoming round
+        number, and the combination that will be drilled next. Three seconds before
+        the rest period ends, the screen displays a "Get Ready" prompt. The user
+        can tap Skip Rest to advance immediately. The rest screen serves as a
+        deliberate pause point, giving the user time to recover and mentally
+        prepare for the next round without requiring any interaction unless they
+        choose to skip.
+      </p>
+
+      <h4>Training Results Screen</h4>
+      <p>
+        After the final round, the results screen presents the session summary. The
+        top section shows overall accuracy, the combination drilled, total session
+        duration, and the number of rounds completed. A punch-type breakdown table
+        lists accuracy for each punch type that appeared in the combination. Below
+        the breakdown, the XP earned for the session is displayed with a line
+        showing the base award, the accuracy bonus, and the difficulty multiplier.
+        An AI-generated coaching note appears at the bottom, highlighting the
+        weakest punch type and suggesting one specific improvement. The user can
+        save the session to their history, restart the same session, or return to
+        the home dashboard.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Sparring Mode Screens</h3>
+      <p>
+        Sparring mode positions the user as the defender and counter-puncher against
+        an AI-controlled robot opponent. The robot generates attack sequences
+        according to one of five selectable styles, each producing a distinct
+        pattern of punches that the user must read and respond to. The GUI's role
+        in sparring is to present each incoming attack clearly, accept the user's
+        defensive response, and display the exchange outcome in real time.
+      </p>
+
+      <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; margin:16px auto; display:block;">
+        <text x="380" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Sparring Exchange Loop</text>
+        <defs>
+          <marker id="arrS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+          </marker>
+        </defs>
+        <g font-size="11" text-anchor="middle" fill="#1e293b">
+          <rect x="20"  y="90" width="120" height="55" rx="6" fill="#fee2e2" stroke="#dc2626"/><text x="80"  y="113">Robot Attack</text><text x="80" y="130" font-size="10" fill="#475569">(style-driven)</text>
+          <rect x="170" y="90" width="120" height="55" rx="6" fill="#e0f2fe" stroke="#0284c7"/><text x="230" y="113">User Defence</text><text x="230" y="130" font-size="10" fill="#475569">Block / Slip</text>
+          <rect x="320" y="60" width="120" height="45" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="380" y="86">Defence OK</text>
+          <rect x="320" y="130" width="120" height="45" rx="6" fill="#f3f4f6" stroke="#6b7280"/><text x="380" y="156">Hit Logged</text>
+          <rect x="470" y="60" width="140" height="45" rx="6" fill="#fef3c7" stroke="#d97706"/><text x="540" y="80">Counter Window</text><text x="540" y="96" font-size="10" fill="#475569">user punches pad</text>
+          <rect x="640" y="90" width="100" height="55" rx="6" fill="#ede9fe" stroke="#7c3aed"/><text x="690" y="123">Exchange Log</text>
+        </g>
+        <g stroke="#475569" stroke-width="1.5" fill="none" marker-end="url(#arrS)">
+          <line x1="140" y1="117" x2="170" y2="117"/>
+          <path d="M 290 110 Q 305 83 320 83"/>
+          <path d="M 290 125 Q 305 152 320 152"/>
+          <line x1="440" y1="83" x2="470" y2="83"/>
+          <path d="M 610 83 Q 625 100 640 110"/>
+          <path d="M 440 152 Q 540 180 640 130"/>
+          <path d="M 690 145 Q 690 200 80 200 L 80 145"/>
+        </g>
+        <text x="380" y="215" text-anchor="middle" font-size="10" fill="#64748b">Loop continues for each attack until round timer expires</text>
+      </svg>
+
+      <h4>AI Opponent Styles</h4>
+      <p>
+        The five opponent styles available at the configuration screen are: Boxer,
+        Brawler, Counter-Puncher, Pressure, and Switch. Each style produces a
+        different attack rhythm and punch distribution, which changes the feel of
+        the sparring session for the user. The Boxer style mixes all punch types
+        with balanced frequency, creating a technically varied opponent. The
+        Brawler concentrates on hooks and power punches and attacks in short bursts.
+        The Counter-Puncher attacks infrequently but responds immediately after the
+        user lands a punch, making sessions feel reactive rather than relentless.
+        The Pressure style attacks continuously with minimal gaps, testing defensive
+        endurance. The Switch style rotates between the other four styles at
+        unpredictable intervals, preventing the user from settling into a single
+        defensive pattern.
+      </p>
+      <p>
+        The attack sequences produced by each style are not random. Each style uses
+        a Markov chain transition model, meaning the probability of each next punch
+        depends on what punch was thrown immediately before. This produces sequences
+        that feel stylistically coherent rather than arbitrary. For example, the
+        Boxer style is more likely to follow a jab with a cross than with an
+        uppercut, mirroring the 1-2 combination common in technical boxing. The
+        Robot Intelligence subsystem manages the transition probabilities and
+        generates the attack commands. The GUI receives each incoming attack as an
+        event and presents it to the user. The Markov chain internals are documented
+        in Section 5.3.
+      </p>
+
+      <h4>Live Sparring HUD</h4>
+      <p>
+        The sparring session screen shows the current round and timer at the top,
+        followed by an incoming attack panel in the centre. When the robot is about
+        to throw a punch, the panel displays the punch type and a short countdown
+        giving the user time to respond. Three defence buttons appear below the
+        panel: Block, Slip Left, and Slip Right. The user taps the appropriate
+        button or performs a physical defensive movement detected by the CV
+        subsystem. After each exchange, the outcome is appended to a scrolling log
+        below the defence buttons, showing what the robot threw, what the user did,
+        and whether the defence succeeded.
+      </p>
+      <p>
+        When the user successfully defends an attack, a counter-punch window opens
+        for a brief period. During this window the user can throw a punch at the
+        pads to register a counter. A visual indicator shows the window is open.
+        The window duration decreases at higher difficulty settings, requiring
+        faster reactions. After the window closes, the exchange log updates with the
+        counter outcome.
+      </p>
+      <p>
+        A round statistics bar at the bottom of the screen shows punches landed,
+        punches thrown, and defense rate for the current round. These update live
+        after each exchange.
+      </p>
+
+      <h4>Sparring Results Screen</h4>
+      <p>
+        The post-match summary shows the opponent style selected, difficulty level,
+        total duration, and a round-by-round exchange count. The defence breakdown
+        table lists defense rate for each of the six punch types. Punch types where
+        the user's defense rate fell below a threshold are flagged, identifying the
+        specific attacks the user struggled to respond to. This information feeds
+        into the opponent's bias in future sessions: the Robot Intelligence
+        subsystem reads the stored weakness profile and increases the probability of
+        those punch types appearing in the next sparring session, creating an
+        adaptive training loop. The GUI surfaces the outcome of this loop to the
+        user by showing which punch types are flagged and noting that the opponent
+        will target those areas. The XP earned is shown with the defense rate bonus
+        and difficulty multiplier applied. An AI coaching note summarises the
+        session and suggests a specific defensive adjustment. Details of the
+        weakness profile update and the bias mechanism are covered in Section 5.3.
+      </p>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Performance Test Screens</h3>
+      <p>
+        The performance test module offers three standalone tests: Power, Stamina,
+        and Reaction. Each test follows the same three-screen structure: an
+        instructions screen, a live test screen, and a results screen. Tests are
+        accessible from the home dashboard under Performance Tests and can be run
+        independently of any training session.
+      </p>
+
+      <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; margin:16px auto; display:block;">
+        <text x="380" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Performance Test Module Structure</text>
+        <g font-size="11" text-anchor="middle" fill="#1e293b">
+          <rect x="30"  y="50" width="220" height="150" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+          <text x="140" y="75" font-weight="bold" font-size="13">Power Test</text>
+          <text x="140" y="100" font-size="10" fill="#475569">5 max-force punches</text>
+          <text x="140" y="118" font-size="10" fill="#475569">5s rest between</text>
+          <text x="140" y="145" font-size="10" fill="#0f172a" font-weight="bold">Outputs</text>
+          <text x="140" y="162" font-size="10" fill="#475569">Peak · Average · Consistency</text>
+          <text x="140" y="178" font-size="10" fill="#475569">Personal best comparison</text>
+
+          <rect x="270" y="50" width="220" height="150" rx="8" fill="#fef3c7" stroke="#d97706"/>
+          <text x="380" y="75" font-weight="bold" font-size="13">Stamina Test</text>
+          <text x="380" y="100" font-size="10" fill="#475569">Sustained punching</text>
+          <text x="380" y="118" font-size="10" fill="#475569">60s default duration</text>
+          <text x="380" y="145" font-size="10" fill="#0f172a" font-weight="bold">Outputs</text>
+          <text x="380" y="162" font-size="10" fill="#475569">Total · Avg rate · Peak rate</text>
+          <text x="380" y="178" font-size="10" fill="#475569">Fatigue indicator</text>
+
+          <rect x="510" y="50" width="220" height="150" rx="8" fill="#e0f2fe" stroke="#0284c7"/>
+          <text x="620" y="75" font-weight="bold" font-size="13">Reaction Test</text>
+          <text x="620" y="100" font-size="10" fill="#475569">10 visual/audio trials</text>
+          <text x="620" y="118" font-size="10" fill="#475569">random stimulus delay</text>
+          <text x="620" y="145" font-size="10" fill="#0f172a" font-weight="bold">Outputs</text>
+          <text x="620" y="162" font-size="10" fill="#475569">Avg · Best · Worst · StDev</text>
+          <text x="620" y="178" font-size="10" fill="#475569">Percentile vs baseline</text>
+        </g>
+      </svg>
+
+      <h4>Power Test</h4>
+      <p>
+        The instructions screen explains that the user should throw five
+        maximum-force punches at the designated pad with five seconds of rest
+        between each punch. The live test screen counts down between punches and
+        updates a list of recorded strikes as each one is detected. After five
+        punches are recorded, or after a sixty-second timeout, the test ends
+        automatically. The results screen shows the peak force reading, the average
+        across all five punches, a consistency rating based on the spread of
+        readings, and the user's all-time personal best for comparison. Force
+        readings are sourced from the IMU subsystem. The GUI displays the values it
+        receives without performing its own force calculations.
+      </p>
+
+      <h4>Stamina Test</h4>
+      <p>
+        The instructions screen asks the user to throw punches continuously at
+        maximum sustainable rate for a configurable duration, with sixty seconds as
+        the default. The live test screen shows elapsed time, a progress bar, the
+        running punch count, and the current punches-per-minute rate. A prompt in
+        the centre of the screen updates with encouragement at regular intervals.
+        The results screen shows total punches thrown, average rate, peak rate with
+        the timestamp at which it occurred, and a fatigue indicator comparing the
+        punch rate in the first half of the test against the second half. A
+        declining rate in the second half is flagged as an indicator of stamina
+        drop-off.
+      </p>
+
+      <h4>Reaction Test</h4>
+      <p>
+        The instructions screen explains that the user should respond as quickly as
+        possible to a visual and audio stimulus by tapping the screen or striking a
+        pad. The live test screen presents a series of ten trials. Each trial begins
+        with a blank waiting period of random duration, after which the screen
+        flashes and a tone plays. The time between the stimulus and the user's
+        response is recorded. The results screen shows average reaction time, best
+        and worst single trials, consistency as the standard deviation across all
+        trials, and a percentile comparison against the population baseline stored
+        in the database. Reaction times below 200ms are rated excellent, 200-300ms
+        good, 300-400ms average, and above 400ms are flagged as slow (Kosinski,
+        2008).
       </p>
     </div>
 
@@ -642,9 +995,76 @@
     <div>
       <h3>Gamification System</h3>
       <p>
-        The rank and badge system gives users visible progress after a session, which helps
-        keep training feeling rewarding instead of repetitive. The detailed scoring and data
-        model are covered in Section 5.3.
+        Gamification elements are surfaced across multiple screens rather than isolated to a
+        single page. The design intent is for progression to feel like a natural part of the
+        training record, not a separate reward system bolted on (Hamari et al., 2014). The
+        rank and badge system gives users visible progress after a session, which helps keep
+        training feeling rewarding instead of repetitive. The detailed scoring and data model
+        are covered in Section 5.3.
+      </p>
+
+      <h4>Rank Tiers and XP Display</h4>
+      <p>
+        The home dashboard header shows the user's current rank title and XP total. Six rank
+        tiers are defined: Novice, Contender, Fighter, Warrior, Champion, and Elite, each
+        requiring progressively higher cumulative XP. The header displays the current tier
+        name and a small progress indicator showing how far through the current tier the user
+        is. When a session results screen awards XP that crosses a tier boundary, a rank-up
+        notification is shown before the standard results view.
+      </p>
+
+      <svg viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; margin:16px auto; display:block;">
+        <text x="380" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Rank Tier Progression</text>
+        <line x1="40" y1="95" x2="720" y2="95" stroke="#cbd5e1" stroke-width="2"/>
+        <g font-size="11" text-anchor="middle" fill="#1e293b">
+          <circle cx="70"  cy="95" r="10" fill="#94a3b8"/><text x="70"  y="75">Novice</text>    <text x="70"  y="120" font-size="10" fill="#64748b">0</text>
+          <circle cx="200" cy="95" r="10" fill="#60a5fa"/><text x="200" y="75">Contender</text> <text x="200" y="120" font-size="10" fill="#64748b">500</text>
+          <circle cx="330" cy="95" r="10" fill="#34d399"/><text x="330" y="75">Fighter</text>   <text x="330" y="120" font-size="10" fill="#64748b">1,500</text>
+          <circle cx="460" cy="95" r="10" fill="#fbbf24"/><text x="460" y="75">Warrior</text>   <text x="460" y="120" font-size="10" fill="#64748b">3,500</text>
+          <circle cx="590" cy="95" r="10" fill="#fb923c"/><text x="590" y="75">Champion</text>  <text x="590" y="120" font-size="10" fill="#64748b">7,000</text>
+          <circle cx="720" cy="95" r="10" fill="#ef4444"/><text x="720" y="75">Elite</text>     <text x="720" y="120" font-size="10" fill="#64748b">12,000</text>
+        </g>
+        <text x="380" y="150" text-anchor="middle" font-size="10" fill="#64748b">Cumulative XP thresholds (indicative; exact values set in Section 5.3)</text>
+      </svg>
+
+      <h4>Session XP Breakdown</h4>
+      <p>
+        Every results screen shows an XP breakdown with three components: a base award
+        determined by the training mode, an accuracy or defense rate bonus scaled by session
+        performance, and a difficulty multiplier. Showing the breakdown rather than just the
+        total makes the reward legible. A user who wants more XP can see that improving
+        accuracy or raising the difficulty setting has a direct numerical effect.
+      </p>
+
+      <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:700px; margin:16px auto; display:block;">
+        <text x="350" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Session XP Composition</text>
+        <g font-size="11" text-anchor="middle" fill="#1e293b">
+          <rect x="40"  y="55" width="130" height="60" rx="6" fill="#e0f2fe" stroke="#0284c7"/>
+          <text x="105" y="80" font-weight="bold">Base Award</text>
+          <text x="105" y="98" font-size="10" fill="#475569">per mode</text>
+          <text x="190" y="92" font-size="18" fill="#0f172a">+</text>
+          <rect x="215" y="55" width="150" height="60" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+          <text x="290" y="80" font-weight="bold">Performance Bonus</text>
+          <text x="290" y="98" font-size="10" fill="#475569">accuracy / defense rate</text>
+          <text x="385" y="92" font-size="18" fill="#0f172a">×</text>
+          <rect x="410" y="55" width="150" height="60" rx="6" fill="#fef3c7" stroke="#d97706"/>
+          <text x="485" y="80" font-weight="bold">Difficulty Mult.</text>
+          <text x="485" y="98" font-size="10" fill="#475569">selected level</text>
+          <text x="580" y="92" font-size="18" fill="#0f172a">=</text>
+          <rect x="605" y="55" width="80"  height="60" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="645" y="80" font-weight="bold">Session XP</text>
+          <text x="645" y="98" font-size="10" fill="#475569">awarded</text>
+        </g>
+        <text x="350" y="155" text-anchor="middle" font-size="10" fill="#64748b">Each results screen surfaces these three components alongside the final total.</text>
+      </svg>
+
+      <h4>Streak Tracking</h4>
+      <p>
+        The home dashboard displays the user's active training streak in days. A streak
+        increments when the user completes at least one session on a given calendar day.
+        Streaks reset to zero if a day is missed. The streak value is also one of the inputs
+        to the XP calculation at session end, providing an incentive for consistent daily
+        training.
       </p>
 
       <div style="margin-top:16px;">
@@ -655,6 +1075,17 @@
           width="85%">
         </image-component>
       </div>
+    </div>
+
+    <sl-divider></sl-divider>
+    <div>
+      <h3>Phone Dashboard</h3>
+      <p>
+        A companion phone dashboard gives users a quick way to check progress and make light
+        training adjustments without walking back to the robot. It is most useful between
+        rounds or after a session, when the boxer wants a fast summary rather than a full
+        touchscreen interaction. More detailed integration notes are in Section 5.3.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -1012,6 +1443,8 @@ class CustomPage(ButtonNavigationMixin, QWidget):
       <ul style="list-style:none; padding-left:0; font-size:0.92rem; line-height:1.7;">
         <li>Bloom, B.S. (1984). The 2 Sigma Problem: The Search for Methods of Group Instruction as Effective as One-to-One Tutoring. <em>Educational Researcher</em>, 13(6), 4-16.</li>
         <li>Gaver, W.W. (1989). The SonicFinder: An interface that uses auditory icons. <em>Human-Computer Interaction</em>, 4(1), 67-94.</li>
+        <li>Hamari, J., Koivisto, J. and Sarsa, H. (2014). Does gamification work? A literature review of empirical studies on gamification. <em>Proceedings of the 47th Hawaii International Conference on System Sciences</em>, 3025-3034.</li>
+        <li>Kosinski, R.J. (2008). A literature review on reaction time. <em>Clemson University</em>, 10, 1-19.</li>
         <li>Norman, D.A. (2013). <em>The Design of Everyday Things: Revised and Expanded Edition</em>. Basic Books.</li>
         <li>Norris, J.R. (1997). <em>Markov Chains</em>. Cambridge University Press.</li>
         <li>Parhi, P., Karlson, A.K. and Myers, B.A. (2006). Target size study for one-handed thumb use on small touchscreen devices. In <em>Proceedings of the 8th Conference on Human-Computer Interaction with Mobile Devices and Services (MobileHCI 2006)</em>, pp. 203-210.</li>
