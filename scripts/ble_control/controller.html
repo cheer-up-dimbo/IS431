@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxBunny Base Control</title>
+<style>
+  :root {
+    --bg: #0f0f13; --card: #1a1a24; --border: #2a2a3a;
+    --accent: #6c63ff; --green: #2ecc71; --red: #e74c3c;
+    --amber: #f39c12; --text: #e0e0e0; --muted: #888; --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 16px;
+  }
+  h1 {
+    font-size: 1.5rem; font-weight: 700; margin-bottom: 2px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .subtitle { color: var(--muted); font-size: 0.75rem; margin-bottom: 14px; }
+  .conn-bar {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; max-width: 520px; margin-bottom: 12px;
+  }
+  .conn-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--red); box-shadow: 0 0 6px var(--red); transition: background 0.3s;
+  }
+  .conn-dot.on { background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .conn-label { flex: 1; font-size: 0.85rem; }
+  .btn {
+    padding: 8px 16px; border: none; border-radius: var(--radius);
+    font-weight: 600; font-size: 0.8rem; cursor: pointer;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-connect { background: var(--accent); color: white; }
+  .btn-disconnect { background: var(--red); color: white; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+    width: 100%; max-width: 520px; margin-bottom: 10px;
+  }
+  .card-title {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--muted); margin-bottom: 8px;
+  }
+
+  /* Position bar */
+  .pos-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.65rem; color: var(--muted); margin-bottom: 3px;
+  }
+  .pos-track {
+    position: relative; height: 24px;
+    background: linear-gradient(90deg, #e74c3c22 0%, #2ecc7133 25%, #2ecc7133 75%, #e74c3c22 100%);
+    border-radius: 6px; overflow: hidden; border: 1px solid var(--border);
+  }
+  .pos-center {
+    position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+    background: var(--muted); opacity: 0.4;
+  }
+  .pos-marker {
+    position: absolute; top: 2px; width: 20px; height: 20px;
+    border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 8px var(--accent); transition: left 0.1s;
+    left: 50%; transform: translateX(-50%);
+  }
+  .pos-marker.limit { background: var(--red); box-shadow: 0 0 10px var(--red); }
+  .pos-value {
+    text-align: center; font-family: 'Courier New', monospace;
+    font-size: 1.4rem; font-weight: 700; margin-top: 4px; color: var(--accent);
+  }
+  .pos-value.limit { color: var(--red); }
+
+  /* Slider + presets */
+  .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--accent); height: 5px; }
+  .rpm-val {
+    font-family: 'Courier New', monospace; font-size: 1.1rem;
+    font-weight: 700; color: var(--accent); min-width: 70px; text-align: right;
+  }
+  .preset-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .btn-preset { flex: 1; background: #2a2a3a; color: var(--text); padding: 7px; font-size: 0.7rem; }
+  .btn-preset:hover { background: #3a3a4a; }
+
+  /* Direction */
+  .dir-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .btn-fwd { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; padding: 12px; font-size: 0.9rem; }
+  .btn-stop { background: linear-gradient(135deg, #c0392b, #e74c3c); color: white; padding: 12px; font-size: 0.9rem; }
+  .btn-rev { background: linear-gradient(135deg, #2980b9, #3498db); color: white; padding: 12px; font-size: 0.9rem; }
+
+  /* Controls row */
+  .ctrl-row { display: flex; gap: 6px; align-items: center; }
+  .flip-label { font-size: 0.8rem; flex: 1; }
+  .toggle {
+    position: relative; width: 44px; height: 24px;
+    background: #333; border-radius: 12px; cursor: pointer; transition: background 0.3s;
+  }
+  .toggle.on { background: var(--amber); }
+  .toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px; background: white; border-radius: 50%;
+    transition: transform 0.3s;
+  }
+  .toggle.on::after { transform: translateX(20px); }
+  .btn-zero { background: #333; color: var(--text); padding: 7px 12px; font-size: 0.7rem; }
+  /* Chart */
+  .chart-container { position: relative; margin-bottom: 6px; }
+  canvas { width: 100%; border-radius: 8px; background: #111118; border: 1px solid var(--border); }
+  .chart-legend {
+    display: flex; gap: 16px; justify-content: center;
+    font-size: 0.7rem; margin-top: 4px;
+  }
+  .legend-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 4px; vertical-align: middle;
+  }
+  .chart-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px;
+    margin-top: 6px;
+  }
+  .stat {
+    background: rgba(255,255,255,0.03); border-radius: 6px;
+    padding: 6px; text-align: center;
+  }
+  .stat-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
+  .stat-value {
+    font-family: 'Courier New', monospace; font-size: 1rem;
+    font-weight: 700; color: var(--green);
+  }
+
+  /* Feedback grid */
+  .feedback-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+  .fb-item { background: rgba(255,255,255,0.03); border-radius: 6px; padding: 6px; text-align: center; }
+  .fb-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .fb-value { font-family: 'Courier New', monospace; font-size: 1rem; font-weight: 700; color: var(--green); }
+  .fb-value.zero { color: var(--muted); }
+
+  /* Test status */
+  .test-status {
+    margin-top: 6px; padding: 7px 10px; border-radius: 6px;
+    background: rgba(142,68,173,0.15); border: 1px solid #8e44ad44;
+    font-size: 0.75rem; display: none;
+  }
+  .test-status.active { display: block; }
+
+  .log {
+    font-family: 'Courier New', monospace; font-size: 0.65rem;
+    color: var(--muted); background: rgba(0,0,0,0.3);
+    border-radius: 6px; padding: 6px; height: 120px;
+    overflow-y: auto; margin-top: 6px; line-height: 1.3;
+    user-select: text;
+  }
+  .log-controls {
+    display: flex; gap: 4px; margin-top: 4px;
+  }
+  .btn-log { background: #222; color: var(--muted); padding: 4px 8px; font-size: 0.6rem; border: 1px solid var(--border); }
+  .btn-log:hover { background: #333; color: var(--text); }
+  .footer { color: var(--muted); font-size: 0.65rem; margin-top: 6px; text-align: center; }
+  .btn-clear-chart { background: #333; color: var(--text); padding: 5px 10px; font-size: 0.65rem; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<h1>BoxBunny Base Control</h1>
+<p class="subtitle">91:1 Gear Ratio · ±90° Hard Limit · Direct RPM Control</p>
+
+<div class="conn-bar">
+  <div class="conn-dot" id="connDot"></div>
+  <span class="conn-label" id="connLabel">Disconnected</span>
+  <button class="btn btn-connect" id="btnConn" onclick="toggleConnect()">Connect</button>
+</div>
+
+<!-- Position -->
+<div class="card">
+  <div class="card-title">Base Position</div>
+  <div class="pos-labels"><span>-90°</span><span>0°</span><span>+90°</span></div>
+  <div class="pos-track">
+    <div class="pos-center"></div>
+    <div class="pos-marker" id="posMarker"></div>
+  </div>
+  <div class="pos-value" id="posValue">0.0°</div>
+</div>
+
+<!-- Motor Control -->
+<div class="card">
+  <div class="card-title">Motor Control</div>
+  <div class="slider-row">
+    <span style="font-size:0.75rem;">RPM</span>
+    <input type="range" id="rpmSlider" min="100" max="3400" value="500" step="50"
+           oninput="updateRPMDisplay()">
+    <span class="rpm-val" id="rpmVal">500</span>
+  </div>
+  <div class="dir-row">
+    <button class="btn btn-fwd" id="btnFwd" disabled onclick="sendLeftCmd()">&#9664; LEFT</button>
+    <button class="btn btn-stop" id="btnStop" disabled onclick="sendCmd('S')">&#9632; STOP</button>
+    <button class="btn btn-rev" id="btnRev" disabled onclick="sendRightCmd()">RIGHT &#9654;</button>
+  </div>
+  
+  <div class="card-title" style="margin-top:10px;">Target Angle (P: Command)</div>
+  <div class="slider-row">
+    <input type="number" id="targetAngle" value="0" min="-90" max="90" style="flex:1; padding:8px; border-radius:6px; background:#222; color:white; border:1px solid #444; font-family:'Courier New', monospace; text-align:center; font-size:1rem;">
+    <button class="btn btn-connect" id="btnGo" disabled style="padding:8px 20px;" onclick="sendCmd('P:' + $('targetAngle').value + ',' + getRPM())">GO</button>
+  </div>
+  <div class="preset-row">
+    <button class="btn btn-preset" id="btnP1" disabled onclick="sendCmd('P:-90,' + getRPM())">⇇ -90°</button>
+    <button class="btn btn-preset" id="btnP2" disabled onclick="sendCmd('P:0,' + getRPM())">Mid (0°)</button>
+    <button class="btn btn-preset" id="btnP3" disabled onclick="sendCmd('P:90,' + getRPM())">+90° ⇉</button>
+  </div>
+  <div class="ctrl-row">
+    <span class="flip-label">Flip Direction</span>
+    <div class="toggle" id="flipToggle" onclick="toggleFlip()"></div>
+    <button class="btn btn-zero" disabled id="btnZero" onclick="sendCmd('Z')">Zero</button>
+    <button class="btn btn-zero" disabled id="btnDiag" onclick="sendCmd('DIAG')" style="margin-left:auto;">DIAG</button>
+  </div>
+</div>
+
+<!-- Current & Power Chart -->
+<div class="card">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+    <span>Current & Power (CAN Driver)</span>
+    <button class="btn btn-clear-chart" onclick="clearChart()">Clear</button>
+  </div>
+  <div class="chart-container">
+    <canvas id="chart" height="180"></canvas>
+  </div>
+  <div class="chart-legend">
+    <span><span class="legend-dot" style="background:#e74c3c;"></span>Current (A)</span>
+    <span><span class="legend-dot" style="background:#f39c12;"></span>Power (W)</span>
+    <span><span class="legend-dot" style="background:#3498db;"></span>Position (°)</span>
+  </div>
+  <div class="chart-stats">
+    <div class="stat"><div class="stat-label">Peak I</div><div class="stat-value" id="statPkI">—</div></div>
+    <div class="stat"><div class="stat-label">Avg I</div><div class="stat-value" id="statAvgI">—</div></div>
+    <div class="stat"><div class="stat-label">Peak P</div><div class="stat-value" id="statPkP">—</div></div>
+    <div class="stat"><div class="stat-label">Avg P</div><div class="stat-value" id="statAvgP">—</div></div>
+  </div>
+</div>
+
+<!-- Feedback -->
+<div class="card">
+  <div class="card-title">Live Feedback</div>
+  <div class="feedback-grid">
+    <div class="fb-item"><div class="fb-label">Velocity</div><div class="fb-value zero" id="fbVel">—</div></div>
+    <div class="fb-item"><div class="fb-label">Bus Voltage</div><div class="fb-value zero" id="fbBusV">—</div></div>
+    <div class="fb-item"><div class="fb-label">Current</div><div class="fb-value zero" id="fbCurrent">—</div></div>
+    <div class="fb-item"><div class="fb-label">Direction</div><div class="fb-value zero" id="fbDir">—</div></div>
+    <div class="fb-item"><div class="fb-label">Limit</div><div class="fb-value zero" id="fbLimit">—</div></div>
+    <div class="fb-item"><div class="fb-label">Flipped</div><div class="fb-value zero" id="fbFlip">—</div></div>
+  </div>
+  <div class="log" id="log"></div>
+  <div class="log-controls">
+    <button class="btn btn-log" onclick="exportLog()">Export Log</button>
+    <button class="btn btn-log" onclick="exportChart()">Export Chart CSV</button>
+    <button class="btn btn-log" onclick="clearLog()">Clear Log</button>
+    <span style="margin-left:auto;font-size:0.6rem;color:var(--muted)" id="logCount">0 entries</span>
+  </div>
+</div>
+
+<p class="footer">Chrome / Edge / Opera · BLE: "BoxBunny Base" · Arduino Uno R4 WiFi · 26:1 × 3.5:1 = 91:1</p>
+
+<script>
+const SERVICE_UUID  = '00001820-0000-1000-8000-00805f9b34fb';
+const CMD_UUID      = '00002a68-0000-1000-8000-00805f9b34fb';
+const FEEDBACK_UUID = '00002a69-0000-1000-8000-00805f9b34fb';
+
+let device = null, server = null, cmdChar = null, fbChar = null;
+let flipped = false;
+let rawFeedbackLog = [];  // Store raw BLE feedback for export
+
+const $ = id => document.getElementById(id);
+const getRPM  = () => $('rpmSlider').value;
+
+function sendLeftCmd()  { sendCmd((flipped ? 'R:' : 'L:') + getRPM()); }
+function sendRightCmd() { sendCmd((flipped ? 'L:' : 'R:') + getRPM()); }
+
+function updateRPMDisplay() {
+  $('rpmVal').textContent = $('rpmSlider').value;
+}
+
+// ── Chart data ──
+const MAX_POINTS = 300;  // 30s at 10Hz
+let chartData = [];      // [{t, current, power, baseDeg}]
+let chartStart = null;
+
+let logEntries = [];
+function clearLog() { logEntries = []; $('log').textContent = ''; $('logCount').textContent = '0 entries'; }
+
+function log(msg) {
+  const el = $('log');
+  const ts = new Date().toLocaleTimeString('en-GB', {hour12:false});
+  const line = `[${ts}] ${msg}`;
+  el.textContent += line + '\n';
+  el.scrollTop = el.scrollHeight;
+  logEntries.push(line);
+  $('logCount').textContent = logEntries.length + ' entries';
+}
+
+function exportLog() {
+  // Include chart data summary and raw BLE log
+  let content = '=== BoxBunny Base Controller Log ===\n';
+  content += 'Exported: ' + new Date().toISOString() + '\n\n';
+  content += '--- Event Log ---\n';
+  content += logEntries.join('\n') + '\n\n';
+  content += '--- BLE Feedback Log (last 100) ---\n';
+  content += rawFeedbackLog.slice(-100).join('\n') + '\n\n';
+  content += '--- Chart Data (CSV) ---\n';
+  content += 'time_s,current_A,power_W,position_deg\n';
+  for (const d of chartData) {
+    content += `${d.t.toFixed(2)},${d.current.toFixed(2)},${d.power.toFixed(1)},${d.baseDeg.toFixed(1)}\n`;
+  }
+  downloadFile('base_controller_log.txt', content);
+}
+
+function exportChart() {
+  let csv = 'time_s,current_A,power_W,position_deg\n';
+  for (const d of chartData) {
+    csv += `${d.t.toFixed(3)},${d.current.toFixed(3)},${d.power.toFixed(2)},${d.baseDeg.toFixed(2)}\n`;
+  }
+  downloadFile('base_chart_data.csv', csv);
+}
+
+function downloadFile(filename, content) {
+  const blob = new Blob([content], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  log('Exported: ' + filename);
+}
+
+function setConnected(on) {
+  $('connDot').classList.toggle('on', on);
+  $('connLabel').textContent = on ? 'Connected' : 'Disconnected';
+  $('btnConn').textContent = on ? 'Disconnect' : 'Connect';
+  $('btnConn').className = on ? 'btn btn-disconnect' : 'btn btn-connect';
+  ['btnFwd','btnStop','btnRev','btnZero','btnDiag','btnGo','btnP1','btnP2','btnP3'].forEach(
+    id => $(id).disabled = !on
+  );
+}
+
+function setPreset(rpm) {
+  $('rpmSlider').value = rpm;
+  $('rpmVal').textContent = rpm;
+}
+
+async function toggleConnect() {
+  if (device && device.gatt.connected) { device.gatt.disconnect(); return; }
+  try {
+    log('Scanning...');
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: 'BoxBunny Base' }],
+      optionalServices: [SERVICE_UUID]
+    });
+    device.addEventListener('gattserverdisconnected', onDisconnect);
+    server = await device.gatt.connect();
+    const svc = await server.getPrimaryService(SERVICE_UUID);
+    cmdChar = await svc.getCharacteristic(CMD_UUID);
+    fbChar = await svc.getCharacteristic(FEEDBACK_UUID);
+    await fbChar.startNotifications();
+    fbChar.addEventListener('characteristicvaluechanged', onFeedback);
+    setConnected(true);
+    log('Connected!');
+  } catch (err) { log('Error: ' + err.message); setConnected(false); }
+}
+
+function onDisconnect() { setConnected(false); log('Disconnected'); cmdChar = null; fbChar = null; device = null; }
+
+async function sendCmd(cmd) {
+  if (!cmdChar) return;
+  try { await cmdChar.writeValue(new TextEncoder().encode(cmd)); log('→ ' + cmd); }
+  catch (err) { log('Send error: ' + err.message); }
+}
+
+function toggleFlip() {
+  // Flip is client-side only — firmware always sends dir=0/1/2 in CAN frame.
+  // Swapping L/R commands here achieves the same effect without an unhandled
+  // 'FLIP' command on the Arduino.
+  flipped = !flipped;
+  $('flipToggle').classList.toggle('on', flipped);
+  log('Direction flip: ' + (flipped ? 'ON' : 'OFF'));
+}
+
+
+
+function onFeedback(event) {
+  const raw = new TextDecoder().decode(event.target.value);
+  const ts = new Date().toLocaleTimeString('en-GB', {hour12:false, fractionalSecondDigits:1});
+  rawFeedbackLog.push(`[${ts}] ${raw}`);
+  if (rawFeedbackLog.length > 1000) rawFeedbackLog.shift();
+
+  // V3 format: "baseDeg,motorVelRPM,current_A,busV,dir,limit"
+  const p = raw.split(',');
+  if (p.length < 6) return;
+
+  const baseDeg = parseFloat(p[0]);
+  const baseVel = parseFloat(p[1]);  // motor shaft RPM (raw)
+  const current = parseFloat(p[2]);
+  const busV    = parseFloat(p[3]);
+  const dir     = parseInt(p[4]);
+  const limit   = parseInt(p[5]);
+  const power   = current * busV;
+
+  // Position bar
+  const pct = Math.max(2, Math.min(98, ((baseDeg + 90) / 180) * 100));
+  $('posMarker').style.left = pct + '%';
+  $('posMarker').classList.toggle('limit', limit > 0);
+  $('posValue').textContent = baseDeg.toFixed(1) + '°';
+  $('posValue').classList.toggle('limit', limit > 0);
+
+  // Feedback tiles
+  setFB('fbVel', baseVel.toFixed(0) + ' RPM', Math.abs(baseVel) > 10);
+  setFB('fbBusV', busV.toFixed(1) + 'V', busV > 10);
+  setFB('fbDir', dir === 1 ? 'LEFT' : dir === 2 ? 'RIGHT' : 'STOP', dir > 0);
+
+  const curEl = $('fbCurrent');
+  curEl.textContent = current.toFixed(2) + 'A';
+  curEl.classList.toggle('zero', current < 0.1);
+  curEl.style.color = current > 2 ? '#e74c3c' : current > 1 ? '#f39c12' : '#2ecc71';
+
+  const limEl = $('fbLimit');
+  limEl.textContent = limit === 0 ? 'OK' : limit === 1 ? '+90° HIT' : '-90° HIT';
+  limEl.style.color = limit === 0 ? '#2ecc71' : '#e74c3c';
+  limEl.classList.remove('zero');
+
+  $('flipToggle').classList.toggle('on', flipped);
+  setFB('fbFlip', flipped ? 'YES' : 'NO', flipped);
+
+  // Chart: record when motor is moving or current is non-zero
+  if (current > 0.05 || dir > 0) {
+    if (!chartStart) chartStart = Date.now();
+    const t = (Date.now() - chartStart) / 1000;
+    chartData.push({ t, current, power, baseDeg });
+    if (chartData.length > MAX_POINTS) chartData.shift();
+    drawChart();
+    updateStats();
+  }
+}
+
+function setFB(id, text, active) {
+  const el = $(id);
+  el.textContent = text;
+  el.classList.toggle('zero', !active);
+}
+
+// ── Canvas Chart ──
+function clearChart() {
+  chartData = [];
+  chartStart = null;
+  drawChart();
+  $('statPkI').textContent = '—';
+  $('statAvgI').textContent = '—';
+  $('statPkP').textContent = '—';
+  $('statAvgP').textContent = '—';
+}
+
+function drawChart() {
+  const canvas = $('chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#111118';
+  ctx.fillRect(0, 0, w, h);
+
+  if (chartData.length < 2) return;
+
+  const pad = { l: 40, r: 10, t: 10, b: 24 };
+  const cw = w - pad.l - pad.r;
+  const ch = h - pad.t - pad.b;
+
+  // Time range
+  const tMin = chartData[0].t;
+  const tMax = chartData[chartData.length - 1].t;
+  const tRange = Math.max(tMax - tMin, 1);
+
+  // Auto-scale Y axes
+  const maxI = Math.max(0.5, ...chartData.map(d => d.current)) * 1.15;
+  const maxP = Math.max(10, ...chartData.map(d => d.power)) * 1.15;
+
+  // Grid
+  ctx.strokeStyle = '#222230';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + (ch * i / 4);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cw, y); ctx.stroke();
+  }
+
+  // Y labels (current)
+  ctx.fillStyle = '#e74c3c88';
+  ctx.font = '10px Courier New';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + (ch * i / 4);
+    const val = maxI * (1 - i / 4);
+    ctx.fillText(val.toFixed(1) + 'A', pad.l - 4, y + 3);
+  }
+
+  // Time labels
+  ctx.fillStyle = '#555';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const x = pad.l + (cw * i / 4);
+    const t = tMin + tRange * i / 4;
+    ctx.fillText(t.toFixed(1) + 's', x, h - 4);
+  }
+
+  const toX = t => pad.l + ((t - tMin) / tRange) * cw;
+
+  // Position trace (subtle blue fill)
+  ctx.beginPath();
+  ctx.moveTo(toX(chartData[0].t), pad.t + ch / 2);
+  for (const d of chartData) {
+    const x = toX(d.t);
+    const y = pad.t + ch / 2 - (d.baseDeg / 90) * (ch / 2);  // scale to ±90° range
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(toX(chartData[chartData.length-1].t), pad.t + ch / 2);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(52, 152, 219, 0.08)';
+  ctx.fill();
+
+  // Position line
+  drawLine(ctx, chartData, d => pad.t + ch / 2 - (d.baseDeg / 90) * (ch / 2), '#3498db55', 1);
+
+  // Power line (scaled to maxP → chart height)
+  drawLine(ctx, chartData, d => pad.t + ch - (d.power / maxP) * ch, '#f39c12', 1.5);
+
+  // Current line (scaled to maxI → chart height)
+  drawLine(ctx, chartData, d => pad.t + ch - (d.current / maxI) * ch, '#e74c3c', 2);
+}
+
+function drawLine(ctx, data, yFn, color, width) {
+  const tMin = data[0].t;
+  const tMax = data[data.length - 1].t;
+  const tRange = Math.max(tMax - tMin, 1);
+  const canvas = $('chart');
+  const w = canvas.clientWidth;
+  const pad = { l: 40, r: 10 };
+  const cw = w - pad.l - pad.r;
+  const toX = t => pad.l + ((t - tMin) / tRange) * cw;
+
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineJoin = 'round';
+  for (let i = 0; i < data.length; i++) {
+    const x = toX(data[i].t);
+    const y = yFn(data[i]);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+function updateStats() {
+  if (chartData.length === 0) return;
+  const currents = chartData.map(d => d.current);
+  const powers = chartData.map(d => d.power);
+  const pkI = Math.max(...currents);
+  const avgI = currents.reduce((a, b) => a + b, 0) / currents.length;
+  const pkP = Math.max(...powers);
+  const avgP = powers.reduce((a, b) => a + b, 0) / powers.length;
+  $('statPkI').textContent = pkI.toFixed(2) + 'A';
+  $('statAvgI').textContent = avgI.toFixed(2) + 'A';
+  $('statPkP').textContent = pkP.toFixed(1) + 'W';
+  $('statAvgP').textContent = avgP.toFixed(1) + 'W';
+}
+</script>
+</body>
+</html>
