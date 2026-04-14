@@ -1060,64 +1060,54 @@
  <!-- 5.3.4.8 LIMITATIONS -->
  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="test-limits" style="margin:0;">5.3.4.8 Limitations</h2></div>
 
- <p>All requirements were met, but several limitations remain that scope out the natural
- next direction for the system. The rows highlighted below are the <strong>principal
- limitations</strong>, the ones that most shape what the system can and cannot do
- today, and the ones carried forward into the overall project discussion in
- <a href="../index.html#future-work">Section 6.2</a>.</p>
+ <p>All requirements were met, but the limitations below scope out the natural next
+ direction for the system. Each is carried forward into the project-wide
+ discussion in <a href="../sections/6-discussion-and-future-work.html#limitations">Section 6.2</a>,
+ with the corresponding future-work items in
+ <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.</p>
 
- <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+ <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.93rem;">
  <thead>
- <tr style="background:#f0f0f0;">
- <th style="padding:8px; border:1px solid #ddd;">Limitation</th>
- <th style="padding:8px; border:1px solid #ddd;">Impact</th>
- <th style="padding:8px; border:1px solid #ddd;">Mitigation / Future Work</th>
+ <tr style="background:#f8f9fa;">
+ <th style="padding:10px 14px; border:1px solid #ccc; text-align:left; width:26%;">Limitation</th>
+ <th style="padding:10px 14px; border:1px solid #ccc; text-align:left; width:37%;">Impact</th>
+ <th style="padding:10px 14px; border:1px solid #ccc; text-align:left;">Mitigation / Future Work</th>
  </tr>
  </thead>
  <tbody>
- <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Annotation excludes retraction</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">Punch annotations end at full extension, so the model wobbles during the retraction phase, the IMU + pad-constraint filter in <a href="robot-intelligence-integration.html">5.3.2.1</a> currently absorbs these misclassifications</td>
- <td style="padding:8px; border:1px solid #ddd;">Add an explicit <strong>retraction class</strong> so predictions stay correct end-to-end and the IMU filter becomes redundant rather than load-bearing</td>
- </tr>
- <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>CV model has a limited action vocabulary</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">The action prediction model only classifies 8 actions (jab, cross, left/right hook, left/right uppercut, block, idle), no slips, no head-vs-torso target distinction, no defensive footwork. Downstream coaching insight is bounded by what these 8 labels can express</td>
- <td style="padding:8px; border:1px solid #ddd;">Expand the CV model's class set with <strong>slips, head/body target variants, and defensive movements</strong>, richer labels feed every other part of the system (sparring AI, analytics, LLM coach) and unlock more dynamic feedback</td>
- </tr>
- <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Pose estimator not trained for boxing</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">YOLO Pose is pretrained on COCO, where hands and wrists are bare and clearly visible. It has no concept of what a gloved hand looks like and no training on this camera angle, so wrist keypoints are unreliable exactly when they matter most. The voxel branch currently compensates for this</td>
- <td style="padding:8px; border:1px solid #ddd;"><strong>Fine-tune a custom pose estimator</strong> on our own recorded boxing footage with manually annotated keypoints, gloved hands, this camera viewpoint, our pose set. A pose model that was actually trained for the context would lift the load off the voxel branch and improve accuracy further. This was scoped out for the current prototype because it requires recording a large volume of boxing footage and manually annotating keypoints frame-by-frame, effort that the voxel branch currently compensates for well enough; it is the natural next investment once the 8-class action set is itself extended</td>
- </tr>
- <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>CV model depends on user framing</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">The training dataset was collected with users visible in the upper half of the frame, so accuracy drops sharply when the user is not height-aligned to the camera (shown in <a href="#test-validation">5.3.4.1, Height-alignment dependency</a>). This currently depends on a manual height adjustment before a session, and rules out realistic sparring against opponents of different heights without re-aligning the robot</td>
- <td style="padding:8px; border:1px solid #ddd;">Expand the training data with simulated user-height variation (multiple camera pitches and mount offsets), and, longer-term, <strong>estimate user height from CV and drive the height mechanism automatically</strong> so the alignment step disappears entirely from the user flow</td>
- </tr>
- <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Camera field of view</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">The RealSense D435i's field of view at the robot-mounted distance only captures the upper body. When the user steps in or extends a punch, hands can leave the frame, and the lower body (footwork, stance width, weight transfer) is never visible. These are critical coaching signals that the CV pipeline currently cannot provide</td>
- <td style="padding:8px; border:1px solid #ddd;">Move to a wider field-of-view depth camera (or a slightly different mount angle) to capture the full body, unlocking lower-body analytics and full punch travel without giving up the simplicity of a single camera. Multi-camera was deliberately ruled out as impractical for a portable system</td>
- </tr>
- <tr style="background:#fffbe6;">
- <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>No structured user-pilot study yet</strong></td>
- <td style="padding:8px; border:1px solid #ddd;">The integrated-system behaviours validated observationally in 5.3.4.5 (fusion, reaction-time drill, yaw tracking) and the LLM Coach's post-session analysis were not tested against a diverse user sample under controlled conditions. Coaching-tip relevance across skill levels, fusion precision against a labelled ground truth, tracking angular error across body types, and false-positive rates on the reaction-time drill therefore remain qualitatively rather than quantitatively characterised</td>
- <td style="padding:8px; border:1px solid #ddd;">Run a <strong>structured pilot with boxers of mixed skill levels</strong> using a scripted protocol: labelled punch ground-truth for fusion precision/recall, timed stimulus sequences for reaction-time false-positive rate, and post-session interviews for coaching-tip relevance. Outputs of that pilot would replace the observational statements in 5.3.4.5 with hard numbers</td>
+ <tr>
+ <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;"><strong>CV model training scope is narrow (8 classes, no retraction)</strong></td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">The action prediction model only labels 6 punch types, block, and idle, and its annotations stop at full extension. This caps what can be recognised (no slips, no head-vs-body targets, no footwork) and forces the IMU + pad-constraint filter in <a href="robot-intelligence-integration.html#int-fusion">5.3.2.1</a> to absorb retraction-phase wobble rather than the CV model being correct end-to-end</td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> and extend the action set with <strong>slips, head/body targets, and defensive footwork</strong>. Richer labels feed every downstream module (sparring AI, analytics, LLM Coach)</td>
  </tr>
  <tr>
- <td style="padding:8px; border:1px solid #ddd;">Manual camera tilt calibration</td>
- <td style="padding:8px; border:1px solid #ddd;">The D435i's built-in IMU requires the <code>hid_sensor_hub</code> kernel module which isn't in the Tegra kernel, so the camera's tilt has to be set manually at launch via <code>--camera-pitch</code></td>
- <td style="padding:8px; border:1px solid #ddd;">Mount a small external IMU on the camera bracket (e.g. an MPU6050 wired through the existing Teensy) to read the tilt automatically and feed it into the CV node</td>
+ <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;"><strong>Pose estimator not trained for boxing</strong></td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO (bare hands) and has no concept of gloved hands or this camera angle, so wrist keypoints become unreliable at punch extension. The voxel branch currently compensates for this</td>
+ <td style="padding:10px 14px; border:1px solid #ccc;"><strong>Fine-tune a custom pose estimator</strong> on our own gloved-hand footage. Scoped out of the current prototype because it requires a large volume of recorded footage and frame-by-frame keypoint annotation; natural next investment once the 8-class action set is extended</td>
+ </tr>
+ <tr>
+ <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;"><strong>Camera field of view limits full-body analysis</strong></td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">The RealSense D435i's mounted field of view only captures the upper body. Footwork, stance width, and weight transfer, all critical coaching signals, are invisible to the CV pipeline</td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">Move to a wider-angle depth camera (or adjusted mount angle) to capture the full body while keeping the single-camera portability of the current design</td>
+ </tr>
+ <tr>
+ <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;"><strong>CV accuracy depends on user framing</strong></td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">Accuracy drops sharply when the user is not height-aligned to the camera (see <a href="#test-validation">5.3.4.1</a>). The height mechanism must be manually re-aligned per user, and sparring against differently-heighted opponents is not possible without re-aligning between rounds</td>
+ <td style="padding:10px 14px; border:1px solid #ccc;">Diversify training footage across camera pitches and mount offsets, and longer-term, estimate user height from CV and drive the height mechanism automatically, removing the manual alignment step</td>
  </tr>
  </tbody>
  </table>
 
- <p style="font-size:0.88rem; color:#666; font-style:italic; margin-top:-4px;">
- Highlighted rows are the principal limitations carried into the project-wide
- discussion in <a href="../index.html#future-work">Section 6.2</a>. The two unhighlighted
- rows below are smaller, more contained engineering opportunities that don't materially
- gate the system's current capability.
+ <p style="background:#fff8e1; border-left:3px solid #f9a825; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+ <strong>Validation gap (not a system limitation).</strong> Separately from the
+ table above, the integrated-system behaviours validated observationally in
+ <a href="#test-integration">5.3.4.5</a> (fusion, yaw tracking, reaction-time
+ drill) and the LLM Coach's post-session analysis have not yet been tested
+ against a diverse user sample under controlled conditions. Coaching-tip
+ relevance, fusion precision, tracking angular error, and reaction-time
+ false-positive rates therefore remain qualitatively rather than quantitatively
+ characterised. The proposed structured pilot to close this gap is in
+ <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
  </p>
 
  <sl-divider></sl-divider>

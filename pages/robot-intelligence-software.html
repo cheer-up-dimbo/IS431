@@ -122,6 +122,35 @@
  </div>
  </div>
 
+ <h3 style="margin-top:18px;">How the dashboard was built</h3>
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; border-radius:6px; padding:14px 16px; margin:12px 0; font-size:0.93rem;">
+ <div style="font-weight:700; color:#1b5e20; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #e6e6e6;">Stack &amp; design approach</div>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6;">
+ <strong>Frontend (phone).</strong> <strong>Vue&nbsp;3</strong> for reactive views,
+ <strong>Pinia</strong> for state management, <strong>Tailwind CSS</strong> for
+ rapid styling, and <strong>Chart.js</strong> for the analytics visualisations.
+ Vue 3's composition API kept the five views (Home, Performance, Training, Chat,
+ Profile) modular without a heavy framework footprint on a phone browser.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6;">
+ <strong>Backend.</strong> <strong>FastAPI</strong> on the Jetson for the
+ REST + WebSocket layer and <strong>SQLite</strong> for the two-tier database
+ (detailed in 5.3.3.5). FastAPI was chosen for native async support (live
+ WebSocket updates to the phone) and first-class Pydantic validation on every
+ endpoint.
+ </p>
+ <p style="margin:0 0 6px;">
+ <strong>Design approach.</strong> The phone is a <em>companion</em> to the
+ touchscreen, not a replacement, shared colour language and iconography so
+ moving between the two never means re-learning the product. They split
+ responsibility by when they're used:
+ </p>
+ <ul style="margin:0; padding-left:20px; line-height:1.55;">
+ <li><strong>Touchscreen, during training.</strong> Only the high-level mid-round info: current round, timer, confirmed-punch counts, and real-time coaching tips.</li>
+ <li><strong>Phone dashboard, before and after.</strong> Detailed analytics, trend charts, AI Coach chat, and preset configuration, comfortably browsable from the user's hand instead of bent over the robot's base-mounted screen.</li>
+ </ul>
+ </div>
+
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.1 COMMUNICATION ARCHITECTURE -->
@@ -323,12 +352,11 @@
  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-flows" style="margin:0;">5.3.3.4 Two Backend Flows in Detail</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-5, RI-7</sl-badge></div>
 
  <p>
- The frontend stack (Vue 3 + Pinia + Tailwind + Chart.js) and the 5 user-facing views
- are introduced in <a href="gui/implementation.html">5.1 Implementation</a>.
- Two of those views, <strong>AI Coach Chat</strong> and <strong>Training Remote</strong>
- , are the most technically interesting on the backend side because they cross
- every layer of the stack (HTTP &rarr; FastAPI &rarr; ROS 2 &rarr; touchscreen GUI). Both
- run over the robot's own WiFi access point with no external network required.
+ Of the five phone views introduced in the dashboard walkthrough above, two are
+ the most technically interesting on the backend side because they cross every
+ layer of the stack (HTTP &rarr; FastAPI &rarr; ROS&nbsp;2 &rarr; touchscreen GUI):
+ <strong>AI Coach Chat</strong> and <strong>Training Remote</strong>. Both run
+ over the robot's own WiFi access point with no external network required.
  </p>
 
  <h3>AI Coach Chat, Phone &rarr; FastAPI &rarr; ROS &rarr; LLM</h3>

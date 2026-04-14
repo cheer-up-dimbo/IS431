@@ -1005,138 +1005,29 @@
  <image-component tag="image" source="../assets/robot_intelligence/cv/data_quality.svg" subtitle="Figure: Data curation had the largest impact on accuracy, larger than any architecture change"></image-component>
 
  <h3>Training</h3>
-
- <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
- <thead>
- <tr style="background:#f0f0f0;">
- <th style="padding:8px; border:1px solid #ddd; width:140px;">Parameter</th>
- <th style="padding:8px; border:1px solid #ddd; width:240px;">Value</th>
- <th style="padding:8px; border:1px solid #ddd;">What it does</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Epochs</td>
- <td style="padding:8px; border:1px solid #ddd;">300 (early stop patience 60)</td>
- <td style="padding:8px; border:1px solid #ddd;">Max training passes; stops early if validation accuracy plateaus for 60 epochs to avoid overfitting.</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Batch size</td>
- <td style="padding:8px; border:1px solid #ddd;">16</td>
- <td style="padding:8px; border:1px solid #ddd;">Samples per weight update, sized to fit GPU memory while keeping a stable gradient.</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Optimiser</td>
- <td style="padding:8px; border:1px solid #ddd;">AdamW (LR 0.0005, weight decay 0.01)</td>
- <td style="padding:8px; border:1px solid #ddd;">Standard Transformer optimiser; weight decay regularises unused weights.</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">LR schedule</td>
- <td style="padding:8px; border:1px solid #ddd;">Warmup 20 epochs &rarr; cosine decay to 1e-6</td>
- <td style="padding:8px; border:1px solid #ddd;">Warmup stabilises early training; cosine decay makes later steps finer.</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Loss</td>
- <td style="padding:8px; border:1px solid #ddd;">Focal loss (&gamma;=1.5) + label smoothing (0.03)</td>
- <td style="padding:8px; border:1px solid #ddd;">Focal loss focuses on hard/rare classes; label smoothing curbs overconfidence.</td>
- </tr>
- <tr>
- <td style="padding:8px; border:1px solid #ddd;">Best epoch</td>
- <td style="padding:8px; border:1px solid #ddd;">73 / 133 trained</td>
- <td style="padding:8px; border:1px solid #ddd;">Epoch 73's checkpoint was saved and deployed; training continued to 133.</td>
- </tr>
- </tbody>
- </table>
-
  <p>
- <strong>Key augmentation, horizontal flip</strong> (50%): exploits boxing's left/right symmetry by flipping the
- voxel X-axis, swapping left/right pose features, and swapping labels (jab&harr;cross, left_hook&harr;right_hook,
- left_uppercut&harr;right_uppercut), effectively doubling the dataset. Other augmentations: speed (0.8-1.2&times;),
- voxel shift/cutout/stretch, multi-window (9, 12 frames).
- </p>
-
- <p>
- The end-to-end pipeline below shows how raw recordings move through annotation,
- feature extraction (voxel + pose), training on the workstation, and finally TensorRT
- deployment to the Jetson.
+ The model was trained for 133 epochs with <strong>AdamW</strong> (LR 0.0005,
+ weight decay 0.01), a <strong>warmup + cosine</strong> learning-rate schedule,
+ and <strong>focal loss + label smoothing</strong> to handle class imbalance.
+ The deployed checkpoint came from epoch 73, the best validation accuracy point.
+ Horizontal flip (50%) was the key augmentation, exploiting boxing's
+ left/right symmetry to effectively double the dataset; training used a fixed
+ seed of 42 for reproducibility. Full hyperparameter table in
+ <a href="appendix-robot-intelligence.html#app-training">Appendix 7.I</a>.
  </p>
 
  <image-component tag="image" source="../assets/robot_intelligence/cv/pipeline.svg" subtitle="Figure: Training and deployment pipeline"></image-component>
 
  <h3>Architecture Search</h3>
  <p>
- Before finalising the model configuration, 8 variants were tested systematically to find the
- optimal balance of architecture, augmentation, and attention mode:
- </p>
-
- <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:0.88rem;">
- <thead>
- <tr style="background:#f0f0f0;">
- <th style="padding:6px 8px; border:1px solid #ddd;">Variant</th>
- <th style="padding:6px 8px; border:1px solid #ddd;">Architecture</th>
- <th style="padding:6px 8px; border:1px solid #ddd;">Key Change</th>
- <th style="padding:6px 8px; border:1px solid #ddd; text-align:center;">Accuracy</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v1</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Causal, d=192</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Heavy augmentation (all maxed)</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">86.0%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v2</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Causal, d=192</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Moderate augmentation</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">91.0%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v3</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Causal, d=192</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">No horizontal flip</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">90.1%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v4</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Causal, d=128, 2 layers</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Smaller model + mixup</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">88.7%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v5</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Bidirectional, d=192</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Non-causal attention</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">92.8%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v6</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Causal, d=192</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Temporal stats features</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">88.2%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v7</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Causal, d=192</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Explicit pose velocity</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">87.3%</td>
- </tr>
- <tr>
- <td style="padding:6px 8px; border:1px solid #ddd;">v8</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Conv1D temporal</td>
- <td style="padding:6px 8px; border:1px solid #ddd;">Replace attention with convolution</td>
- <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">90.9%</td>
- </tr>
- </tbody>
- </table>
- <p style="text-align:center; font-style:italic; font-size:0.9rem; color:#666; margin-top:8px;">
- Table: Architecture search, all variants tested before data curation
- </p>
-
- <p>
- Key findings: heavy augmentation causes underfitting (v1 vs v2), smaller models underfit (v4),
- and Transformer attention outperforms Conv1D temporal encoding (v8). These results preceded the
- +4.5% data curation improvement, which pushed the final model to 97.3%.
+ Before finalising the configuration, 8 variants were tested to find the best
+ balance of attention mode, model size, and augmentation strength. Key takeaways:
+ <strong>heavy augmentation underfits</strong> (v1 86.0% vs v2 91.0%),
+ <strong>smaller models underfit</strong> (v4 88.7%), and
+ <strong>Transformer attention outperforms Conv1D temporal encoding</strong>
+ (v8 90.9%). These architecture sweeps preceded the +4.5% data-curation
+ improvement that pushed the final model to 97.3%. Full 8-variant table in
+ <a href="appendix-robot-intelligence.html#app-training">Appendix 7.I</a>.
  </p>
 
  <sl-divider></sl-divider>
