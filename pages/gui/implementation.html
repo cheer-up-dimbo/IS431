@@ -1450,6 +1450,217 @@
         \]
       </p>
 
+      <!-- MARKOV CHAIN WORKED EXAMPLE -->
+      <h5>End-to-End Worked Example</h5>
+
+      <p>
+        The following example traces one complete session cycle from raw punch counts
+        through to a modified transition matrix and a generated combo. The Counter
+        Puncher style is used throughout, as its matrix is shown in the table above.
+        All numbers are carried to two decimal places.
+      </p>
+
+      <p><strong>Setup.</strong>
+        The user has completed 4 previous sparring sessions. Their stored weakness
+        profile after those sessions is:
+      </p>
+
+      <table style="width:60%; border-collapse:collapse; margin:12px 0; font-size:0.9rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:6px 10px; border:1px solid #ddd;">Punch type</th>
+            <th style="padding:6px 10px; border:1px solid #ddd;">Stored frequency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Jab</td><td style="padding:6px 10px; border:1px solid #ddd;">0.40</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Cross</td><td style="padding:6px 10px; border:1px solid #ddd;">0.30</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Lead Hook</td><td style="padding:6px 10px; border:1px solid #ddd;">0.15</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Rear Hook</td><td style="padding:6px 10px; border:1px solid #ddd;">0.10</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Lead Upper</td><td style="padding:6px 10px; border:1px solid #ddd;">0.03</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Rear Upper</td><td style="padding:6px 10px; border:1px solid #ddd;">0.02</td></tr>
+        </tbody>
+      </table>
+
+      <p>
+        This profile shows a jab-heavy user who rarely uses uppercuts.
+      </p>
+
+      <!-- PHASE 1 -->
+      <p><strong>Phase 1: Compute alpha.</strong>
+        The user has completed \(n = 4\) sessions.
+      </p>
+      <p>
+        \[
+          \alpha = \min(0.4,\; 4 \times 0.05) = \min(0.4,\; 0.20) = 0.20
+        \]
+      </p>
+
+      <!-- PHASE 2 -->
+      <p><strong>Phase 2: Normalise the current session's punch counts.</strong>
+        The CV system reports the following raw counts from the session just completed:
+      </p>
+
+      <table style="width:60%; border-collapse:collapse; margin:12px 0; font-size:0.9rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:6px 10px; border:1px solid #ddd;">Punch type</th>
+            <th style="padding:6px 10px; border:1px solid #ddd;">Count \(c_i\)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Jab</td><td style="padding:6px 10px; border:1px solid #ddd;">24</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Cross</td><td style="padding:6px 10px; border:1px solid #ddd;">16</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Lead Hook</td><td style="padding:6px 10px; border:1px solid #ddd;">8</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Rear Hook</td><td style="padding:6px 10px; border:1px solid #ddd;">8</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Lead Upper</td><td style="padding:6px 10px; border:1px solid #ddd;">2</td></tr>
+          <tr><td style="padding:6px 10px; border:1px solid #ddd;">Rear Upper</td><td style="padding:6px 10px; border:1px solid #ddd;">2</td></tr>
+        </tbody>
+      </table>
+
+      <p>
+        Total punches: \(\sum_j c_j = 24 + 16 + 8 + 8 + 2 + 2 = 60\).
+        Applying equation (2):
+      </p>
+      <p>
+        \[
+          f_{\text{jab}} = \frac{24}{60} = 0.40, \quad
+          f_{\text{cross}} = \frac{16}{60} = 0.27, \quad
+          f_{\text{lead hook}} = \frac{8}{60} = 0.13
+        \]
+        \[
+          f_{\text{rear hook}} = \frac{8}{60} = 0.13, \quad
+          f_{\text{lead upper}} = \frac{2}{60} = 0.03, \quad
+          f_{\text{rear upper}} = \frac{2}{60} = 0.03
+        \]
+      </p>
+
+      <!-- PHASE 3 -->
+      <p><strong>Phase 3: Update the weakness profile.</strong>
+        Applying equation (3) with \(\alpha = 0.20\) to each punch type.
+        Shown for jab and cross; the same calculation applies to all six types.
+      </p>
+      <p>
+        \[
+          f_{\text{jab}}^{\,\text{new}}
+            = (1 - 0.20) \times 0.40 + 0.20 \times 0.40
+            = 0.32 + 0.08 = 0.40
+        \]
+        \[
+          f_{\text{cross}}^{\,\text{new}}
+            = (1 - 0.20) \times 0.30 + 0.20 \times 0.27
+            = 0.24 + 0.054 = 0.29
+        \]
+      </p>
+      <p>
+        The jab frequency is unchanged because the current session matches the stored
+        value exactly. The cross frequency nudges slightly downward from 0.30 to 0.29
+        because the current session cross rate (0.27) is marginally lower than the stored
+        value.
+      </p>
+
+      <!-- PHASE 4 -->
+      <p><strong>Phase 4: Compute weakness multipliers.</strong>
+        Using the updated profile values and equation (4).
+      </p>
+      <p>
+        For <em>left-side robot punches</em> (punch types 1, 3, 5 &mdash; Jab, Lead Hook,
+        Lead Uppercut), the multiplier is the sum of the user's right-hand frequencies,
+        because a frequent right-hand puncher tends to leave their right side open:
+      </p>
+      <p>
+        \[
+          w_{1,3,5}
+            = f_{\text{cross}} + f_{\text{rear hook}} + f_{\text{rear upper}}
+            = 0.29 + 0.10 + 0.02 = 0.41
+        \]
+      </p>
+      <p>
+        For <em>right-side robot punches</em> (punch types 2, 4, 6 &mdash; Cross, Rear Hook,
+        Rear Uppercut), the multiplier is the sum of the user's left-hand frequencies:
+      </p>
+      <p>
+        \[
+          w_{2,4,6}
+            = f_{\text{jab}} + f_{\text{lead hook}} + f_{\text{lead upper}}
+            = 0.40 + 0.13 + 0.03 = 0.56
+        \]
+      </p>
+      <p>
+        The right-side multiplier (0.56) is higher than the left-side multiplier (0.41)
+        because the user throws more left-hand punches overall, exposing their right side
+        more often.
+      </p>
+
+      <!-- PHASE 5 -->
+      <p><strong>Phase 5: Blend the transition matrix.</strong>
+        Applying equation (5) to the <strong>start</strong> row of the Counter Puncher
+        matrix. The base weights from the table above are: Jab = 0.30, Cross = 0.30,
+        End = 0.40 (all other cells in this row are zero).
+      </p>
+      <p>
+        \[
+          \tilde{m}_{\text{start},\,1}
+            = (1 - 0.20) \times 0.30 + 0.20 \times 0.41
+            = 0.24 + 0.082 = 0.322
+        \]
+        \[
+          \tilde{m}_{\text{start},\,2}
+            = (1 - 0.20) \times 0.30 + 0.20 \times 0.56
+            = 0.24 + 0.112 = 0.352
+        \]
+        \[
+          \tilde{m}_{\text{start},\,\text{end}}
+            = (1 - 0.20) \times 0.40 + 0.20 \times 0
+            = 0.32 + 0 = 0.320
+        \]
+      </p>
+      <p>
+        The end state has no weakness multiplier because it is not a punch type, so it
+        receives only the scaled base weight.
+      </p>
+
+      <!-- PHASE 6 -->
+      <p><strong>Phase 6: Normalise the blended row.</strong>
+        The blended weights sum to \(0.322 + 0.352 + 0.320 = 0.994\), which is not
+        exactly 1.0. Applying equation (6):
+      </p>
+      <p>
+        \[
+          m_{\text{start},\,1}^{\,\text{final}}
+            = \frac{0.322}{0.994} = 0.324
+        \]
+        \[
+          m_{\text{start},\,2}^{\,\text{final}}
+            = \frac{0.352}{0.994} = 0.354
+        \]
+        \[
+          m_{\text{start},\,\text{end}}^{\,\text{final}}
+            = \frac{0.320}{0.994} = 0.322
+        \]
+      </p>
+      <p>
+        The three values now sum to \(0.324 + 0.354 + 0.322 = 1.000\). Compared to
+        the original Counter Puncher start row (Jab 0.30, Cross 0.30, End 0.40), the
+        cross probability has increased most because the user's left-hand dominance
+        makes them more susceptible to right-hand counters, and the end probability
+        has decreased slightly, meaning the robot is marginally more likely to begin
+        a combo at all.
+      </p>
+
+      <!-- PHASE 7 -->
+      <p><strong>Phase 7: Generate a combo from the modified matrix.</strong>
+        With the normalised start row (Jab 0.324, Cross 0.354, End 0.322), the system
+        performs a weighted random draw. Suppose the draw selects <strong>Cross</strong>.
+        Moving to the Cross row of the (now blended) matrix, a second draw selects
+        <strong>Lead Hook</strong>. A third draw from the Lead Hook row selects
+        <strong>End</strong>. The generated combo is <strong>2&ndash;3</strong>
+        (Cross, Lead Hook). This two-punch combo reflects the Counter Puncher style's
+        tendency toward short, precise combinations, while the elevated cross probability
+        in the start row reflects the system's adaptation to this user's left-hand
+        dominance.
+      </p>
+
       <div style="margin-top:16px;">
         <image-component
           tag="gui-sparring-styles"
