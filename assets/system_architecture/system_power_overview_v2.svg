@@ -1,0 +1,257 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="960" viewBox="0 0 1240 960">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 2L8 5L1 8" fill="none" stroke="#888888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arr_amb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 2L8 5L1 8" fill="none" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arr_blu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 2L8 5L1 8" fill="none" stroke="#378ADD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arr_red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 2L8 5L1 8" fill="none" stroke="#C0392B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arr_org" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 2L8 5L1 8" fill="none" stroke="#D4600A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Background -->
+<rect width="1240" height="960" fill="#ffffff"/>
+
+<!-- ═══ DOMAIN ENCLOSURES (behind everything) ═════════════════════ -->
+<!-- 24V Domain: center=320, x=40→600 -->
+<rect x="40" y="184" width="560" height="580" rx="14"
+      fill="#FDF5E4" fill-opacity="0.18" stroke="#BA7517" stroke-width="1.5" stroke-dasharray="8,4"/>
+<!-- 12V Domain: center=930, x=655→1205 -->
+<rect x="655" y="184" width="550" height="330" rx="14"
+      fill="#E6F1FB" fill-opacity="0.18" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="8,4"/>
+
+<!-- Domain bottom labels -->
+<text x="50" y="780" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="10" font-weight="bold" fill="#BA7517" letter-spacing="0.5">24V POWER DOMAIN</text>
+<text x="1197" y="528" text-anchor="end" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="10" font-weight="bold" fill="#378ADD" letter-spacing="0.5">12V LOGIC DOMAIN (ISOLATED)</text>
+
+
+
+
+<!-- AC Mains (cx=625, midpoint between 320 and 930) -->
+<rect x="485" y="88" width="280" height="52" rx="26" fill="#1e2235" stroke="#1e2235" stroke-width="1.5"/>
+<text x="625" y="114" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="14" font-weight="bold" fill="#ffffff">AC Mains</text>
+
+<!-- Split wiring: (625,140) → T-junction → (320,178) and (930,178) -->
+<line x1="625" y1="140" x2="625" y2="158" stroke="#888888" stroke-width="1.5"/>
+<line x1="320" y1="158" x2="930" y2="158" stroke="#888888" stroke-width="1.5"/>
+<line x1="320" y1="158" x2="320" y2="178" stroke="#888888" stroke-width="1.5" marker-end="url(#arr)"/>
+<line x1="930" y1="158" x2="930" y2="178" stroke="#888888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ═══ SECTION: POWER SUPPLIES ═══════════════════════════════════ -->
+<text x="40" y="168" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="9" font-weight="bold" fill="#aaaaaa" letter-spacing="1.5">POWER SUPPLIES</text>
+<line x1="40" y1="176" x2="1200" y2="176" stroke="#e0e0e0" stroke-width="1"/>
+
+<!-- 24V PSU (cx=320) -->
+<rect x="170" y="188" width="300" height="62" rx="8" fill="#FDF5E4" stroke="#BA7517" stroke-width="1.5"/>
+<text x="320" y="219" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="13" font-weight="bold" fill="#BA7517">Mean Well 24V PSU</text>
+
+<!-- 12V PSU (cx=930) -->
+<rect x="780" y="188" width="300" height="62" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="1.5"/>
+<text x="930" y="219" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="13" font-weight="bold" fill="#185FA5">Mean Well 12V PSU</text>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     24V DOMAIN — SAFETY CHAIN (all nodes cx=320)
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- Section label (text only, no rule line to avoid crossing arrows) -->
+<text x="50" y="270" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="9" font-weight="bold" fill="#aaaaaa" letter-spacing="1.5">SAFETY CHAIN</text>
+<line x1="40" y1="278" x2="600" y2="278" stroke="#e0e0e0" stroke-width="1"/>
+
+<!-- 24V PSU → E-STOP (cx=320) -->
+<line x1="320" y1="250" x2="320" y2="314" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr_red)"/>
+
+<!-- E-STOP (pill shape, solid red) -->
+<rect x="170" y="314" width="300" height="54" rx="27" fill="#C0392B" stroke="#922B21" stroke-width="2"/>
+<text x="320" y="339" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="13" font-weight="bold" fill="#ffffff">Mushroom E-STOP</text>
+<text x="320" y="357" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#FFD5D0">NC safety chain</text>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     24V DOMAIN — ACTUATOR BUS (busbar cx=320)
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- Section label (text only) -->
+<text x="50" y="390" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="9" font-weight="bold" fill="#aaaaaa" letter-spacing="1.5">ACTUATOR BUS</text>
+<line x1="40" y1="398" x2="600" y2="398" stroke="#e0e0e0" stroke-width="1"/>
+
+<!-- E-STOP → Busbar (cx=320) -->
+<line x1="320" y1="368" x2="320" y2="404" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr_amb)"/>
+
+<!-- 24V Distribution Busbar (cx=320, x=50..590) -->
+<rect x="50" y="404" width="540" height="46" rx="8" fill="#FDF5E4" stroke="#BA7517" stroke-width="2"/>
+<text x="320" y="432" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="14" font-weight="bold" fill="#BA7517">24V Distribution Busbar</text>
+
+<!-- Branch tap line from busbar bottom (y=450) -->
+<line x1="135" y1="450" x2="505" y2="450" stroke="#BA7517" stroke-width="1.5"/>
+<!-- Drop arrows from tap to nodes (drawn BEFORE labels so labels mask them) -->
+<line x1="135" y1="450" x2="135" y2="492" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr_amb)"/>
+<line x1="320" y1="450" x2="320" y2="492" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr_amb)"/>
+<line x1="505" y1="450" x2="505" y2="492" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr_amb)"/>
+
+<!-- Branch labels: opaque white bg rects mask the arrows behind them -->
+<rect x="72" y="463" width="126" height="16" rx="2" fill="#ffffff"/>
+<text x="135" y="475" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="8" font-weight="bold" fill="#BA7517" letter-spacing="0.5">BRANCH 1 — ARMS</text>
+<rect x="255" y="463" width="130" height="16" rx="2" fill="#ffffff"/>
+<text x="320" y="475" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="8" font-weight="bold" fill="#BA7517" letter-spacing="0.5">BRANCH 2 — HEIGHT</text>
+<rect x="442" y="463" width="126" height="16" rx="2" fill="#ffffff"/>
+<text x="505" y="475" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="8" font-weight="bold" fill="#BA7517" letter-spacing="0.5">BRANCH 3 — BASE</text>
+
+<!-- ── Branch 1: Arm Motors (cx=135) ───────────────────────────── -->
+<rect x="50" y="492" width="170" height="66" rx="8" fill="#FDF5E4" stroke="#BA7517" stroke-width="1.5"/>
+<text x="135" y="522" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#BA7517">4x Damiao</text>
+<text x="135" y="540" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#555555">Arm Motors</text>
+
+<!-- ── Branch 2: Height chain (cx=320) ─────────────────────────── -->
+<rect x="235" y="492" width="170" height="62" rx="8" fill="#FEF0E6" stroke="#D4600A" stroke-width="1.5"/>
+<text x="320" y="523" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#7D3809">RegenClamp V0.3</text>
+
+<line x1="320" y1="554" x2="320" y2="588" stroke="#D4600A" stroke-width="1.5" marker-end="url(#arr_org)"/>
+
+<rect x="235" y="588" width="170" height="62" rx="8" fill="#F2F2F0" stroke="#AAAAAA" stroke-width="1.5"/>
+<text x="320" y="613" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#444444">Cytron MDDS10</text>
+<text x="320" y="631" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#666666">Sign-Mag PWM driver</text>
+
+<line x1="320" y1="650" x2="320" y2="684" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr_amb)"/>
+
+<rect x="235" y="684" width="170" height="70" rx="8" fill="#FDF5E4" stroke="#BA7517" stroke-width="1.5"/>
+<text x="320" y="711" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#BA7517">CHP-36GP-555</text>
+<text x="320" y="728" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#555555">DC Motor</text>
+<text x="320" y="744" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#555555">Height Actuator</text>
+
+<!-- ── Branch 3: Base chain (cx=505) ───────────────────────────── -->
+<rect x="420" y="492" width="170" height="62" rx="8" fill="#FEF0E6" stroke="#D4600A" stroke-width="1.5"/>
+<text x="505" y="523" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#7D3809">RegenClamp V0.3</text>
+
+<line x1="505" y1="554" x2="505" y2="588" stroke="#D4600A" stroke-width="1.5" marker-end="url(#arr_org)"/>
+
+<rect x="420" y="588" width="170" height="62" rx="8" fill="#F2F2F0" stroke="#AAAAAA" stroke-width="1.5"/>
+<text x="505" y="613" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#444444">ZBLD C20-800LRC</text>
+<text x="505" y="631" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#666666">CAN 125 kbps driver</text>
+
+<line x1="505" y1="650" x2="505" y2="684" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr_amb)"/>
+
+<rect x="420" y="684" width="170" height="70" rx="8" fill="#FDF5E4" stroke="#BA7517" stroke-width="1.5"/>
+<text x="505" y="711" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#BA7517">Z55BLD400-24GU</text>
+<text x="505" y="728" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#555555">BLDC Motor</text>
+<text x="505" y="744" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#555555">Base Rotation</text>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     12V LOGIC DOMAIN (PSU cx=930, Jetson cx=810, Buck cx=1060)
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- Section label (text only) -->
+<text x="670" y="270" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="9" font-weight="bold" fill="#aaaaaa" letter-spacing="1.5">LOGIC CHAIN</text>
+<line x1="655" y1="278" x2="1205" y2="278" stroke="#e0e0e0" stroke-width="1"/>
+
+<!-- 12V PSU → split at y=282 (below section text) -->
+<line x1="930" y1="250" x2="930" y2="282" stroke="#378ADD" stroke-width="1.5"/>
+<line x1="810" y1="282" x2="1060" y2="282" stroke="#378ADD" stroke-width="1.5"/>
+<line x1="810" y1="282" x2="810" y2="298" stroke="#378ADD" stroke-width="1.5" marker-end="url(#arr_blu)"/>
+<line x1="1060" y1="282" x2="1060" y2="298" stroke="#378ADD" stroke-width="1.5" marker-end="url(#arr_blu)"/>
+
+<!-- Jetson Orin NX (cx=810) -->
+<rect x="670" y="298" width="280" height="76" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="1.5"/>
+<text x="810" y="326" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="14" font-weight="bold" fill="#185FA5">Jetson Orin NX</text>
+<text x="810" y="344" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#333333">16 GB · ROS 2 Humble</text>
+<text x="810" y="362" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#378ADD">CV + LLM inference on-device</text>
+
+<!-- HW-140 Buck (cx=1060) -->
+<rect x="960" y="298" width="200" height="76" rx="8" fill="#F2F2F0" stroke="#AAAAAA" stroke-width="1.5"/>
+<text x="1060" y="330" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#444444">HW-140 Buck</text>
+<text x="1060" y="348" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#666666">12V → 6V converter</text>
+<text x="1060" y="366" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#666666">for Arduino VIN</text>
+
+<!-- Jetson → Teensy USB (dashed data line, cx=810) -->
+<line x1="810" y1="374" x2="810" y2="438" stroke="#378ADD" stroke-width="1.5"
+      stroke-dasharray="6,3" marker-end="url(#arr_blu)"/>
+<!-- USB badge: centered ON the line with white bg to break the dash -->
+<rect x="792" y="397" width="36" height="16" rx="3" fill="#ffffff"/>
+<rect x="792" y="397" width="36" height="16" rx="3" fill="#E6F1FB" stroke="#378ADD" stroke-width="1"/>
+<text x="810" y="409" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="9" font-weight="bold" fill="#378ADD">USB</text>
+
+<!-- Teensy 4.0 (cx=810) -->
+<rect x="710" y="438" width="200" height="62" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="1.5"/>
+<text x="810" y="465" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="13" font-weight="bold" fill="#185FA5">Teensy 4.0</text>
+<text x="810" y="483" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#333333">Firmware V4</text>
+
+<!-- Buck → Arduino (cx=1060) -->
+<line x1="1060" y1="374" x2="1060" y2="438" stroke="#378ADD" stroke-width="1.5" marker-end="url(#arr_blu)"/>
+
+<!-- Arduino Uno R4 (cx=1060) -->
+<rect x="960" y="438" width="200" height="62" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="1.5"/>
+<text x="1060" y="465" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="12" font-weight="bold" fill="#185FA5">Arduino Uno R4 WiFi</text>
+<text x="1060" y="483" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+      font-size="11" fill="#555555">via VIN</text>
+
+
+
+<!-- ═══ LEGEND ════════════════════════════════════════════════════ -->
+<rect x="84" y="800" width="13" height="13" rx="2" fill="#FDF5E4" stroke="#BA7517" stroke-width="1.5"/>
+<text x="102" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">24V Actuator</text>
+
+<rect x="204" y="800" width="13" height="13" rx="2" fill="#E6F1FB" stroke="#378ADD" stroke-width="1.5"/>
+<text x="222" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">12V Logic</text>
+
+<rect x="304" y="800" width="13" height="13" rx="2" fill="#FCEAEA" stroke="#C0392B" stroke-width="1.5"/>
+<text x="322" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">Safety</text>
+
+<rect x="394" y="800" width="13" height="13" rx="2" fill="#FEF0E6" stroke="#D4600A" stroke-width="1.5"/>
+<text x="412" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">Regen Brake</text>
+
+<rect x="524" y="800" width="13" height="13" rx="2" fill="#F2F2F0" stroke="#AAAAAA" stroke-width="1.5"/>
+<text x="542" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">Driver / Converter</text>
+
+<line x1="684" y1="806" x2="714" y2="806" stroke="#888888" stroke-width="1.5" marker-end="url(#arr)"/>
+<text x="720" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">Power</text>
+
+<line x1="790" y1="806" x2="820" y2="806" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr_blu)"/>
+<text x="826" y="811" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="11" fill="#555555">Signal / Data</text>
+
+
+</svg>
