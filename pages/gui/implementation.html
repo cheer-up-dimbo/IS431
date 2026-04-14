@@ -255,6 +255,16 @@
     }
   </style>
   <script src="../../components/report-nav/report-nav.js" defer></script>
+  <!-- MathJax for equation rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
   <div class="content">
@@ -1339,6 +1349,105 @@
         transition weights are blended with a bias multiplier. The blending factor
         <em>alpha</em> increases gradually with session count (capped at 0.4), so the
         adaptation strengthens over time without fully overriding the style's character.
+      </p>
+
+      <!-- MARKOV CHAIN MATH -->
+      <h5>Formal Definition of the Adaptation Mechanism</h5>
+
+      <p>
+        The adaptation mechanism has six components. Each is defined below with its
+        purpose stated in plain terms before the formal expression.
+      </p>
+
+      <p>
+        <strong>Adaptation strength.</strong>
+        The parameter \(\alpha\) controls how much weight the system gives to the
+        user's recent history versus the base style matrix. It grows by 0.05 per
+        completed sparring session and is capped at 0.4, meaning the robot's style
+        character is always preserved by at least 60 percent.
+      </p>
+      <p>
+        \[
+          \alpha = \min(0.4,\; n \times 0.05)
+        \]
+        where \(n\) is the number of completed sparring sessions.
+      </p>
+
+      <p>
+        <strong>Session frequency normalisation.</strong>
+        After each session, the CV system returns raw counts of each punch type the
+        user threw. These are converted to proportions so that sessions of different
+        lengths are comparable. Each count \(c_i\) for punch type \(i\) is divided
+        by the total number of punches thrown in that session.
+      </p>
+      <p>
+        \[
+          f_i = \frac{c_i}{\displaystyle\sum_{j} c_j}
+        \]
+      </p>
+
+      <p>
+        <strong>Rolling weighted average (weakness profile update).</strong>
+        The stored weakness profile is updated after each session using an exponential
+        moving average. The old profile is weighted by \(1 - \alpha\) and the current
+        session frequencies are weighted by \(\alpha\). Because \(\alpha\) is small
+        early on, a single unusual session does not distort the profile. As \(\alpha\)
+        grows toward 0.4 with more sessions, recent performance carries increasing
+        influence.
+      </p>
+      <p>
+        \[
+          f_i^{\,\text{new}} = (1 - \alpha)\, f_i^{\,\text{old}} + \alpha\, f_i^{\,\text{current}}
+        \]
+      </p>
+
+      <p>
+        <strong>Weakness multiplier.</strong>
+        The weakness multiplier \(w_p\) for a given robot punch \(p\) is derived from
+        the user's opposite-hand punch frequencies. The reasoning is that a boxer who
+        frequently throws left-hand punches is likely to leave their left side exposed,
+        making them susceptible to right-hand counters from the robot, and vice versa.
+      </p>
+      <p>
+        \[
+          w_p =
+          \begin{cases}
+            f_{\text{cross}} + f_{\text{rear hook}} + f_{\text{rear upper}}
+              &amp; \text{if } p \in \{1,\, 3,\, 5\} \text{ (left-side robot punch)} \\[8pt]
+            f_{\text{jab}} + f_{\text{lead hook}} + f_{\text{lead upper}}
+              &amp; \text{if } p \in \{2,\, 4,\, 6\} \text{ (right-side robot punch)}
+          \end{cases}
+        \]
+      </p>
+
+      <p>
+        <strong>Blended transition weight.</strong>
+        Each cell \(m_{s,p}\) in the transition matrix represents the base probability
+        of moving from state \(s\) to punch \(p\) under the chosen style. The blended
+        weight \(\tilde{m}_{s,p}\) is formed by mixing this base probability with the
+        weakness multiplier using \(\alpha\) as the blend factor. At \(\alpha = 0\) the
+        output is the pure base style. At the cap of \(\alpha = 0.4\) the output is
+        60 percent base style and 40 percent weakness bias.
+      </p>
+      <p>
+        \[
+          \tilde{m}_{s,p} = (1 - \alpha)\, m_{s,p} + \alpha\, w_p
+        \]
+      </p>
+
+      <p>
+        <strong>Row normalisation.</strong>
+        After blending, the weights in each row of the modified matrix no longer
+        necessarily sum to 1.0. The final step rescales every weight in a row by
+        the row total so that each row forms a valid probability distribution. This
+        is required for the weighted random draw that selects the next punch to
+        operate correctly.
+      </p>
+      <p>
+        \[
+          m_{s,p}^{\,\text{final}} =
+          \frac{\tilde{m}_{s,p}}{\displaystyle\sum_{p'} \tilde{m}_{s,p'}}
+        \]
       </p>
 
       <div style="margin-top:16px;">
