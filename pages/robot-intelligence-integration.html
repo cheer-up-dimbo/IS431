@@ -87,9 +87,11 @@
  <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:12px 0 20px; padding:0; padding:10px 0 14px; border-bottom:1px solid #e5e7eb;"><a class="stepper-link" href="#int-fusion" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Fusion</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-inference" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Inference</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sparring" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sparring</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-llm" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">LLM</a> <span style="color:#ba68c8; font-size:1.1rem;">&#9656;</span> <a class="stepper-link" href="#int-sessions" style="background:#f3e5f5; color:#6a1b9a; font-weight:600; font-size:0.88rem; padding:5px 14px; border-radius:5px; border:1px solid #ce93d8; text-decoration:none; transition:background 0.15s,color 0.15s; cursor:pointer;">Sessions</a></div>
 
  <p>
- All intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on the Jetson,
- communicating via custom message types and services. Together they form the decision-making
- layer between the CV perception pipeline (<a href="robot-intelligence-cv.html">5.3.1</a>)
+ The CV model from <a href="robot-intelligence-cv.html">5.3.1</a> produces a stream
+ of action predictions; this section covers what happens to that stream next. All
+ intelligent behaviour runs as a network of <strong>ROS 2 Humble</strong> nodes on
+ the Jetson that fuse the CV predictions with IMU pad impacts, feed them into an
+ adaptive sparring engine, and hand the resulting session data to the LLM Coach
  and the dashboard (<a href="robot-intelligence-software.html">5.3.3</a>).
  </p>
 
@@ -157,6 +159,14 @@
  </p>
 
  <image-component tag="image" source="../assets/robot_intelligence/ros/fusion_pipeline.svg" subtitle="Figure: CV + IMU Sensor Fusion Pipeline"></image-component>
+
+ <p style="font-size:0.92rem; color:#444;">
+ End-to-end behaviour of this pipeline is validated in
+ <a href="robot-intelligence-testing.html#test-integration">5.3.4.5</a>, where
+ the three-panel clip shows raw CV predictions (bottom-left), IMU pad impacts
+ (right, via the Teensy simulator), and the fusion-filtered punch stream
+ (top-left) running together.
+ </p>
 
  <sl-divider></sl-divider>
 
@@ -444,9 +454,9 @@
  </dl>
 
  <p style="font-size:0.92rem; color:#444;">
- The CV pipeline also shares the Jetson's GPU with the LLM coach introduced in
- <a href="#int-llm">Section 5.3.2.4</a>. How the two coexist (adaptive frame rate
- and memory budgeting) is addressed there once the LLM architecture has been introduced.
+ The CV pipeline shares the Jetson's GPU with the LLM Coach; the adaptive frame
+ rate and memory budgeting that make this coexistence possible are detailed in
+ <a href="#int-llm">5.3.2.4</a>.
  </p>
 
  <p style="font-size:0.92rem; color:#444;">
@@ -516,20 +526,15 @@
  <p>
  Difficulty levels alone make sparring harder; they don't make it <em>smarter</em>.
  The <code>sparring_weakness_profile</code> database table records, for every punch
- type, how often the user successfully blocked it versus how often they were hit.
- These stats persist across sessions, so returning to the robot the next day
- continues from where the user left off.
+ type, how often the user successfully blocked it versus how often they were hit,
+ and these stats persist across sessions so the robot concentrates on the gaps
+ each time the user returns rather than feeding them openings they already handle.
  </p>
  <div style="background:#f5f5f5; border-left:3px solid #f9a825; padding:10px 14px; margin:10px 0; font-size:0.92rem;">
  <strong>Example:</strong> A user blocks 90% of jabs but only 40% of hooks. The engine
  will throw more hooks and fewer jabs in subsequent rounds, forcing the user to
  practise defending the punch type they struggle with most.
  </div>
- <p>
- Over time the robot stops feeding the user openings they already handle well and
- concentrates on the gaps, forcing continuous improvement instead of comfortable
- repetition.
- </p>
 
  <h3>3. Staying safe, engine safeguards</h3>
  <p>

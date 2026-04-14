@@ -251,48 +251,6 @@
  </tbody>
  </table>
 
- <h3>The Pose Estimation Paradox</h3>
-
- <p>
- The natural approach to recognising body movements is pose estimation. But off-the-shelf
- models like YOLO Pose are trained on <strong>COCO</strong> (a dataset where hands are
- bare and clearly visible). Boxing gloves remove everything the model expects to see:
- </p>
-
- <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0;">
-   <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px; border-radius:4px;">
-     <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">What YOLO expects</div>
-     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Bare skin, fingers, fine joint contours. Wrists are always visible.</div>
-   </div>
-   <div style="background:#ffebee; border-left:3px solid #c62828; padding:10px 14px; border-radius:4px;">
-     <div style="font-size:0.78rem; font-weight:700; color:#c62828; text-transform:uppercase; letter-spacing:0.5px;">What boxing gives it</div>
-     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Thick padded gloves burying the wrists. Nothing recognisable to lock onto at punch extension.</div>
-   </div>
- </div>
-
- <p>
- The skeleton breaks or jumps at exactly the wrong moment: <strong>during punch
- extension</strong>, when the discriminative motion is happening. Pose estimation alone
- peaked at <strong>~67% accuracy</strong> in early iterations.
- </p>
-
- <div class="video-row two-up">
- <div class="video-box">
- <image-component tag="image" source="../assets/robot_intelligence/cv/pose_fail_1.png" subtitle="Figure: Wrist keypoints lost under glove occlusion" width="100%"></image-component>
- </div>
- <div class="video-box">
- <image-component tag="image" source="../assets/robot_intelligence/cv/pose_fail_2.png" subtitle="Figure: Pose skeleton breaks during punch extension" width="100%"></image-component>
- </div>
- </div>
-
- <dl style="margin:14px 0; line-height:1.55;">
-   <dt style="font-weight:600; color:#1565c0; margin-top:10px;">Fix 1: Confidence gating</dt>
-   <dd style="margin:2px 0 0 18px;">YOLO reports a confidence for each joint. When confidence drops (as it does during extension), the model automatically scales down the pose signal and leans on the <strong>voxel branch</strong> instead. Without this, broken skeleton data would actively mislead the network.</dd>
-
-   <dt style="font-weight:600; color:#1565c0; margin-top:10px;">Fix 2: The key insight, pose fails during extension, not preparation</dt>
-   <dd style="margin:2px 0 0 18px;">In the first <strong>100&ndash;200 ms</strong> before the arm extends, the joints are still visible and they reliably reveal <strong>which hand is moving</strong>, information voxels alone cannot provide. The model gets the critical left/right call early from pose, then smoothly transitions to voxel-only reasoning as the punch extends. This is the core idea behind the <strong>dual-branch fusion architecture</strong>.</dd>
- </dl>
-
  <p>
  The model classifies <strong>8 actions</strong>: jab, cross, left hook, right hook,
  left uppercut, right uppercut, block, and idle (the neutral baseline that prevents
@@ -447,11 +405,55 @@
  mismatch between the two.
  </p>
 
+ <h4 style="margin-top:18px;">The Pose Estimation Paradox</h4>
+
  <p>
- As described in the Pose Estimation Paradox above, the pose signal is scaled by YOLO's
- joint confidence (confidence gating) so the model automatically falls back to voxel-only
- when pose becomes unreliable. This is reinforced during training by dropping the pose
- input entirely for 15% of clips and zeroing individual joints 10% of the time.
+ With both branches now defined, the natural question is why the model needs both
+ at all, rather than relying on pose alone (the standard approach for body-movement
+ recognition). Off-the-shelf YOLO Pose is trained on <strong>COCO</strong>, a dataset
+ where hands are bare and clearly visible. Boxing gloves remove everything the model
+ expects to see:
+ </p>
+
+ <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0;">
+   <div style="background:#e8f5e9; border-left:3px solid #2e7d32; padding:10px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#2e7d32; text-transform:uppercase; letter-spacing:0.5px;">What YOLO expects</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Bare skin, fingers, fine joint contours. Wrists are always visible.</div>
+   </div>
+   <div style="background:#ffebee; border-left:3px solid #c62828; padding:10px 14px; border-radius:4px;">
+     <div style="font-size:0.78rem; font-weight:700; color:#c62828; text-transform:uppercase; letter-spacing:0.5px;">What boxing gives it</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Thick padded gloves burying the wrists. Nothing recognisable to lock onto at punch extension.</div>
+   </div>
+ </div>
+
+ <p>
+ The skeleton breaks or jumps at exactly the wrong moment: <strong>during punch
+ extension</strong>, when the discriminative motion is happening. Pose estimation
+ alone peaked at <strong>~67% accuracy</strong> in early iterations.
+ </p>
+
+ <div class="video-row two-up">
+ <div class="video-box">
+ <image-component tag="image" source="../assets/robot_intelligence/cv/pose_fail_1.png" subtitle="Figure: Wrist keypoints lost under glove occlusion" width="100%"></image-component>
+ </div>
+ <div class="video-box">
+ <image-component tag="image" source="../assets/robot_intelligence/cv/pose_fail_2.png" subtitle="Figure: Pose skeleton breaks during punch extension" width="100%"></image-component>
+ </div>
+ </div>
+
+ <dl style="margin:14px 0; line-height:1.55;">
+   <dt style="font-weight:600; color:#1565c0; margin-top:10px;">Fix 1: Confidence gating</dt>
+   <dd style="margin:2px 0 0 18px;">YOLO reports a confidence for each joint. When confidence drops (as it does during extension), the model automatically scales down the pose signal and leans on the voxel branch instead, so broken skeleton data never actively misleads the network.</dd>
+
+   <dt style="font-weight:600; color:#1565c0; margin-top:10px;">Fix 2: The key insight, pose fails during extension, not preparation</dt>
+   <dd style="margin:2px 0 0 18px;">In the first <strong>100&ndash;200 ms</strong> before the arm extends, the joints are still visible and they reliably reveal <strong>which hand is moving</strong>, information voxels alone cannot provide. The model gets the critical left/right call early from pose, then smoothly transitions to voxel-only reasoning as the punch extends, which is precisely what the dual-branch fusion below is designed to exploit.</dd>
+ </dl>
+
+ <p>
+ In practice the confidence gating above is reinforced during training by dropping
+ the pose input entirely for 15% of clips and zeroing individual joints 10% of the
+ time, so the network never becomes dependent on a pose signal it cannot trust at
+ inference.
  </p>
 
  <p>
@@ -1016,32 +1018,32 @@
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Epochs</td>
  <td style="padding:8px; border:1px solid #ddd;">300 (early stop patience 60)</td>
- <td style="padding:8px; border:1px solid #ddd;">How many full passes over the training data the model is allowed; training stops automatically if validation accuracy hasn't improved in 60 epochs to avoid wasted compute and overfitting.</td>
+ <td style="padding:8px; border:1px solid #ddd;">Max training passes; stops early if validation accuracy plateaus for 60 epochs to avoid overfitting.</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Batch size</td>
  <td style="padding:8px; border:1px solid #ddd;">16</td>
- <td style="padding:8px; border:1px solid #ddd;">Number of training samples processed together before updating the model weights, small enough to fit in GPU memory, large enough to give a stable gradient signal.</td>
+ <td style="padding:8px; border:1px solid #ddd;">Samples per weight update, sized to fit GPU memory while keeping a stable gradient.</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Optimiser</td>
  <td style="padding:8px; border:1px solid #ddd;">AdamW (LR 0.0005, weight decay 0.01)</td>
- <td style="padding:8px; border:1px solid #ddd;">The algorithm that adjusts the model weights each step. AdamW is a strong default for Transformers; weight decay gently shrinks unused weights to prevent overfitting.</td>
+ <td style="padding:8px; border:1px solid #ddd;">Standard Transformer optimiser; weight decay regularises unused weights.</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">LR schedule</td>
  <td style="padding:8px; border:1px solid #ddd;">Warmup 20 epochs &rarr; cosine decay to 1e-6</td>
- <td style="padding:8px; border:1px solid #ddd;">How the learning rate changes over time. Starts small (warmup) so early steps don't destabilise the model, then smoothly decays so later steps make finer and finer adjustments.</td>
+ <td style="padding:8px; border:1px solid #ddd;">Warmup stabilises early training; cosine decay makes later steps finer.</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Loss</td>
  <td style="padding:8px; border:1px solid #ddd;">Focal loss (&gamma;=1.5) + label smoothing (0.03)</td>
- <td style="padding:8px; border:1px solid #ddd;">The function the model is trying to minimise. Focal loss down-weights easy examples so training focuses on hard/rare classes; label smoothing makes the model less overconfident, which improves generalisation.</td>
+ <td style="padding:8px; border:1px solid #ddd;">Focal loss focuses on hard/rare classes; label smoothing curbs overconfidence.</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Best epoch</td>
  <td style="padding:8px; border:1px solid #ddd;">73 / 133 trained</td>
- <td style="padding:8px; border:1px solid #ddd;">The epoch at which validation accuracy peaked. The model trained for 133 epochs total but the checkpoint from epoch 73 was the one saved and deployed.</td>
+ <td style="padding:8px; border:1px solid #ddd;">Epoch 73's checkpoint was saved and deployed; training continued to 133.</td>
  </tr>
  </tbody>
  </table>
@@ -1194,21 +1196,27 @@
  <li>
  <strong>Human Tracking</strong>, bounding box centre, width, depth, and
  lateral/depth displacement are published each frame as a <code>UserTracking</code>
- message. Downstream nodes use this to drive the <strong>yaw motor</strong> so the robot
- continuously faces the user as they move laterally, provide <strong>height data</strong>
- so the user can adjust the robot's height via the phone or GUI, and classify
- <strong>slips and dodges</strong> for defence detection. The yaw and height motor command pipelines
- were validated end-to-end using the
- <a href="robot-intelligence-testing.html">Teensy simulator</a> (5.3.4.6), where
- the robot status row displays the live motor commands being sent, confirming
- correct tracking behaviour without requiring physical hardware.
+ message. Downstream nodes use this to drive the <strong>yaw motor</strong> so the
+ robot continuously faces the user as they move laterally, and to classify
+ <strong>slips and dodges</strong> for defence detection. Height adjustment is
+ manual in the current system; using CV-derived user height to drive the height
+ mechanism automatically is discussed as future work in
+ <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
+ The yaw pipeline was validated both off-hardware via the
+ <a href="robot-intelligence-testing.html">Teensy simulator</a> (5.3.4.6) and
+ on-hardware with the <a href="robot-intelligence-testing.html#test-integration">yaw
+ tracking integration video</a> in 5.3.4.5, which shows the robot rotating to face
+ the user at a deliberately safe speed.
  </li>
  <li>
  <strong>Reaction Time Detection</strong>, depth-based proximity replaces the
  velocity thresholds that proved unreliable at the
  <a href="robot-intelligence-testing.html">CDE Fair</a>. When a stimulus fires, the
  system timestamps the moment the user's hand depth crosses a calibrated threshold
- toward the robot, giving millisecond-accurate reaction times.
+ toward the robot, giving millisecond-accurate reaction times. The
+ <a href="robot-intelligence-testing.html#test-integration">reaction-time drill
+ validation video</a> in 5.3.4.5 shows this end-to-end and also demonstrates the
+ sensitivity tuning that correctly ignores small body movements.
  </li>
  </ul>
 

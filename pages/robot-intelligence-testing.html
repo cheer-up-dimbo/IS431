@@ -289,33 +289,30 @@
 
  <h3>Height-alignment dependency</h3>
  <p>
- The training data was collected with the camera mounted at a fixed height
- relative to the user, so the user's upper body fills the top half of the frame.
- The two clips below compare live inference when the user is aligned to this
- trained framing against when they are not.
+ Training data was collected with users filling the top half of the frame, so
+ the two clips below compare live inference inside and outside that trained
+ framing.
  </p>
 
  <div class="video-row" style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:12px 0;">
  <div class="video-box">
  <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/aligned_height_cv_prediction.mp4" style="width:100%;"></video>
- <sub>Figure: Aligned height, user within trained framing, predictions are accurate</sub>
+ <sub>Figure: Aligned, predictions are accurate</sub>
  </div>
  <div class="video-box">
  <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/unaligned_height_cv_predictions.mp4" style="width:100%;"></video>
- <sub>Figure: Unaligned height, user outside trained framing, accuracy drops sharply</sub>
+ <sub>Figure: Unaligned, accuracy drops sharply</sub>
  </div>
  </div>
 
  <p>
- Predictions remain accurate when the user fits the trained frame range, but
- accuracy drops sharply when they do not. This reinforces the role of the
- adjustable height mechanism in <a href="robot-mechanism.html">5.2</a>:
- correct camera height is not only a comfort feature, it is a precondition for
- the CV model to operate inside its trained distribution. The corollary is also
- a limitation, real boxing involves opponents of different heights, so a
- production system should be robust to framing variation on its own. This is
- captured as a limitation in <a href="#test-limits">5.3.4.8</a> and carried
- forward as future work in <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
+ Correct camera height is therefore not a comfort feature but a precondition for
+ the CV model to operate inside its trained distribution, reinforcing the role
+ of the adjustable height mechanism in <a href="robot-mechanism.html">5.2</a>.
+ Real boxing involves opponents of different heights, so robustness to framing
+ variation is carried forward as a limitation
+ (<a href="#test-limits">5.3.4.8</a>) and as future work
+ (<a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>).
  </p>
 
 
@@ -585,7 +582,7 @@
  <sl-divider></sl-divider>
 
  <!-- 5.3.4.5 INTEGRATION TESTING -->
- <h2>5.3.4.5 Integration Testing</h2>
+ <h2 id="test-integration">5.3.4.5 Integration Testing</h2>
 
  <p>
  28 cross-module tests verify that components work correctly together:
@@ -818,7 +815,6 @@
  that bench testing alone cannot catch. These are discussed further in
  <a href="../index.html#future-work">Section 6</a>.
  </p>
- </p>
 
  <h3>Master Notebook (<code>boxbunny_runner.ipynb</code>)</h3>
 
@@ -1039,7 +1035,7 @@
  <tr style="background:#fffbe6;">
  <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Pose estimator not trained for boxing</strong></td>
  <td style="padding:8px; border:1px solid #ddd;">YOLO Pose is pretrained on COCO, where hands and wrists are bare and clearly visible. It has no concept of what a gloved hand looks like and no training on this camera angle, so wrist keypoints are unreliable exactly when they matter most. The voxel branch currently compensates for this</td>
- <td style="padding:8px; border:1px solid #ddd;"><strong>Fine-tune a custom pose estimator</strong> on our own recorded boxing footage with manually annotated keypoints, gloved hands, this camera viewpoint, our pose set. A pose model that was actually trained for the context would lift the load off the voxel branch and improve accuracy further</td>
+ <td style="padding:8px; border:1px solid #ddd;"><strong>Fine-tune a custom pose estimator</strong> on our own recorded boxing footage with manually annotated keypoints, gloved hands, this camera viewpoint, our pose set. A pose model that was actually trained for the context would lift the load off the voxel branch and improve accuracy further. This was scoped out for the current prototype because it requires recording a large volume of boxing footage and manually annotating keypoints frame-by-frame, effort that the voxel branch currently compensates for well enough; it is the natural next investment once the 8-class action set is itself extended</td>
  </tr>
  <tr style="background:#fffbe6;">
  <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>CV model depends on user framing</strong></td>

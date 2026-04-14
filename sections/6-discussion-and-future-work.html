@@ -77,7 +77,7 @@
             <td style="padding:10px 14px; border:1px solid #ccc;">Robot cannot advance or retreat to maintain realistic sparring distance; limits footwork simulation</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="3"><strong>Robot Intelligence</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="4"><strong>Robot Intelligence</strong></td>
             <td style="padding:10px 14px; border:1px solid #ccc;">CV model training scope is narrow (8 classes, no retraction)</td>
             <td style="padding:10px 14px; border:1px solid #ccc;">The action prediction model only labels 6 punch types, block, and idle, and its punch annotations stop at full extension. This caps what the system can recognise (no slips, no head-vs-body targets, no footwork) and forces the IMU + pad-constraint filter to absorb the model's wobble during the retraction phase rather than the CV model being correct end-to-end</td>
           </tr>
@@ -88,6 +88,10 @@
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Camera field of view limits full-body analysis</td>
             <td style="padding:10px 14px; border:1px solid #ccc;">The RealSense D435i's field of view at the robot-mounted distance only captures the upper body. Footwork, stance width, and weight transfer, all critical to boxing coaching, are invisible to the CV pipeline. A wider-angle or multi-camera setup would unlock lower-body analytics, but adds mechanical and calibration complexity</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">CV accuracy depends on user framing</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The action-prediction model was trained with users visible in the upper half of the frame, so accuracy drops sharply when the user is not height-aligned to the camera (see <a href="../pages/robot-intelligence-testing.html#test-validation">5.3.4.1</a>). In practice this means the height mechanism must be manually aligned before each session, and realistic sparring against opponents of different heights is not possible without re-aligning the robot between rounds</td>
           </tr>
         </tbody>
       </table>
