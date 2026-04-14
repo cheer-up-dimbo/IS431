@@ -93,16 +93,53 @@
  final system validation on the full robot with real hardware.
  </p>
 
- <p style="background:#f8f9fa; border-left:3px solid #7b1fa2; padding:10px 14px; margin:14px 0; font-size:0.93rem;">
- <strong>V-Model alignment.</strong> Following the Systems Engineering V-Model introduced in
- <a href="../index.html#design-methodology">Section 3.2</a>, this page corresponds to the
- <strong>right side of the V</strong>, where each Robot Intelligence requirement (RI-1 through
- RI-7) is closed against a concrete verification activity. Unit and integration tests verify
- the lower levels of the V (individual components and cross-module communication), the
- CDE AI Fair served as an integration-level test that surfaced real-world issues, and the
- full robot test with real camera, IMU, and motors closes the system-level verification. Section <strong>5.3.4.7 Verification Summary</strong>
- ties every requirement to its result.
+ <div style="background:#f8f9fa; border-left:3px solid #7b1fa2; padding:12px 16px; margin:14px 0; font-size:0.93rem;">
+ <div style="font-weight:700; color:#4a148c; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #e6d8ee;">V-Model alignment</div>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6d8ee;">
+ Following the Systems Engineering V-Model introduced in
+ <a href="../index.html#design-methodology">Section 3.2</a>, this page covers the
+ <strong>right side of the V</strong>, closing each RI-1 to RI-7 requirement against
+ a concrete verification activity at three levels:
  </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6d8ee;">
+ <strong>Component &amp; cross-module.</strong> 146 unit + 28 integration tests
+ (5.3.4.3&ndash;5.3.4.5).
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6d8ee;">
+ <strong>Integration in the field.</strong> CDE AI Fair deployment (5.3.4.2)
+ surfaced real-world issues on an earlier prototype.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6d8ee;">
+ <strong>System-level.</strong> Full robot test with real camera, IMU, and motors
+ (5.3.4.6).
+ </p>
+ <p style="margin:0;">
+ <strong>Closure.</strong> Section <strong>5.3.4.7</strong> ties every requirement
+ to its result.
+ </p>
+ </div>
+
+ <div style="background:#fff8e1; border-left:3px solid #f9a825; padding:12px 16px; margin:14px 0; font-size:0.93rem;">
+ <div style="font-weight:700; color:#8a6d00; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f3e2a3;">Validation methodology and its limits</div>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f3e2a3;">
+ <strong>Quantitative evidence.</strong> Model graded with hard numbers: 96.8%
+ accuracy on an unseen person, 94.2% macro F1, ~120&nbsp;ms end-to-end latency,
+ 30&nbsp;fps throughput, and 146 unit + 28 integration tests with reproducible
+ pass/fail.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #f3e2a3;">
+ <strong>Observational evidence.</strong> Integrated behaviours (fusion, yaw
+ tracking, reaction-time drill) validated by running the full system end-to-end
+ and checking it matches the design. Evidence lives in the 5.3.4.5 video clips.
+ </p>
+ <p style="margin:0;">
+ <strong>Out of scope.</strong> Product-grade validation (coaching-tip
+ relevance, fusion precision against labelled ground truth, tracking angular
+ error across users) requires a structured pilot study, flagged as future
+ work in <a href="#test-limits">5.3.4.8</a> and
+ <a href="../sections/6-discussion-and-future-work.html#recommendations">Section&nbsp;6.3</a>.
+ </p>
+ </div>
 
  <sl-divider></sl-divider>
 
@@ -627,17 +664,20 @@
 
  <h3>CV + IMU fusion validation</h3>
  <p>
- The automated tests above check that the fusion module's inputs, outputs, and
- temporal matching are wired correctly, but the end-to-end behaviour is easier
- to see live. The clip below runs the full sensor-fusion pipeline designed in
- <a href="robot-intelligence-integration.html#int-fusion">5.3.2.1</a> against
- the Teensy simulator (detailed in 5.3.4.6 below) so both the
- CV stream and the IMU impact stream can be exercised without physical hardware.
- The window is split into three panels: the right half is the Teensy simulator
- with each IMU pad lighting up as it is hit, the bottom-left panel shows raw CV
- predictions before fusion, and the top-left panel shows the fusion-filtered
- punch stream. Confirmed punches only emerge when the CV prediction and the IMU
- impact agree, which is exactly what the fusion design from 5.3.2.1 specifies.
+ The clip below runs the full sensor-fusion pipeline from
+ <a href="robot-intelligence-integration.html#int-fusion">5.3.2.1</a> live,
+ with the Teensy simulator in <strong>hardware mode</strong>: the pads shown
+ on-screen mirror real IMU impacts on the physical pads, not synthetic events.
+ Screen layout:
+ </p>
+ <ul style="margin:6px 0 10px; line-height:1.6; font-size:0.93rem;">
+ <li><strong>Right:</strong> Teensy GUI, pads light up from live IMU hits.</li>
+ <li><strong>Bottom-left:</strong> raw CV predictions, before fusion.</li>
+ <li><strong>Top-left:</strong> fusion-filtered punch stream, the output.</li>
+ </ul>
+ <p>
+ A confirmed punch only emerges when a CV prediction and an IMU impact agree,
+ which is exactly what the fusion rules in 5.3.2.1 specify.
  </p>
 
  <div class="video-row single" style="margin:12px 0;">
@@ -646,6 +686,19 @@
  <sub>Figure: CV + IMU fusion validation, right panel = Teensy simulator (IMU), top-left = fusion-filtered punches, bottom-left = raw CV predictions</sub>
  </div>
  </div>
+
+ <p>
+ This run is easy to quantify because the input is scripted: a fixed number of
+ punches is thrown, and the fused output at the end of the clip shows exactly
+ that count with no spurious additions. The IMU stream registers only the
+ intended strikes on the pads, post-impact pad oscillation is correctly rejected
+ as noise rather than counted as extra hits, so fusion yields
+ <strong>100% agreement</strong> between the scripted input and the confirmed
+ punch output for this run. The scope is a scripted bench test rather than a
+ user study, so this is evidence of correct end-to-end behaviour rather than a
+ precision/recall figure across a diverse user sample (see
+ <a href="#test-limits">5.3.4.8</a>).
+ </p>
 
  <h3>Reaction-time drill validation</h3>
  <p>
@@ -1046,6 +1099,11 @@
  <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Camera field of view</strong></td>
  <td style="padding:8px; border:1px solid #ddd;">The RealSense D435i's field of view at the robot-mounted distance only captures the upper body. When the user steps in or extends a punch, hands can leave the frame, and the lower body (footwork, stance width, weight transfer) is never visible. These are critical coaching signals that the CV pipeline currently cannot provide</td>
  <td style="padding:8px; border:1px solid #ddd;">Move to a wider field-of-view depth camera (or a slightly different mount angle) to capture the full body, unlocking lower-body analytics and full punch travel without giving up the simplicity of a single camera. Multi-camera was deliberately ruled out as impractical for a portable system</td>
+ </tr>
+ <tr style="background:#fffbe6;">
+ <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>No structured user-pilot study yet</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">The integrated-system behaviours validated observationally in 5.3.4.5 (fusion, reaction-time drill, yaw tracking) and the LLM Coach's post-session analysis were not tested against a diverse user sample under controlled conditions. Coaching-tip relevance across skill levels, fusion precision against a labelled ground truth, tracking angular error across body types, and false-positive rates on the reaction-time drill therefore remain qualitatively rather than quantitatively characterised</td>
+ <td style="padding:8px; border:1px solid #ddd;">Run a <strong>structured pilot with boxers of mixed skill levels</strong> using a scripted protocol: labelled punch ground-truth for fusion precision/recall, timed stimulus sequences for reaction-time false-positive rate, and post-session interviews for coaching-tip relevance. Outputs of that pilot would replace the observational statements in 5.3.4.5 with hard numbers</td>
  </tr>
  <tr>
  <td style="padding:8px; border:1px solid #ddd;">Manual camera tilt calibration</td>

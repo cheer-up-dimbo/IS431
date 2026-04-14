@@ -79,19 +79,19 @@
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="4"><strong>Robot Intelligence</strong></td>
             <td style="padding:10px 14px; border:1px solid #ccc;">CV model training scope is narrow (8 classes, no retraction)</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">The action prediction model only labels 6 punch types, block, and idle, and its punch annotations stop at full extension. This caps what the system can recognise (no slips, no head-vs-body targets, no footwork) and forces the IMU + pad-constraint filter to absorb the model's wobble during the retraction phase rather than the CV model being correct end-to-end</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Only 8 actions are labelled and annotations stop at full extension. No slips, no head-vs-body targets, no footwork, and the IMU + pad-constraint filter has to cover the model's retraction-phase wobble</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Pose estimator not trained for boxing</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO where hands are bare, so it has no concept of gloved hands or this camera angle. The wrist keypoints become unreliable exactly when they matter most (at punch extension), and the model is forced to lean on the voxel branch instead of getting two strong signals, capping how much further the fused architecture can be pushed</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">YOLO Pose is pretrained on COCO (bare hands). Wrist keypoints become unreliable at punch extension, forcing the voxel branch to compensate and capping fused-architecture accuracy</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Camera field of view limits full-body analysis</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">The RealSense D435i's field of view at the robot-mounted distance only captures the upper body. Footwork, stance width, and weight transfer, all critical to boxing coaching, are invisible to the CV pipeline. A wider-angle or multi-camera setup would unlock lower-body analytics, but adds mechanical and calibration complexity</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The RealSense D435i's mounted field of view captures only the upper body. Footwork, stance width, and weight transfer are invisible to the CV pipeline</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">CV accuracy depends on user framing</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">The action-prediction model was trained with users visible in the upper half of the frame, so accuracy drops sharply when the user is not height-aligned to the camera (see <a href="../pages/robot-intelligence-testing.html#test-validation">5.3.4.1</a>). In practice this means the height mechanism must be manually aligned before each session, and realistic sparring against opponents of different heights is not possible without re-aligning the robot between rounds</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Accuracy drops sharply when the user is not height-aligned to the camera (see <a href="../pages/robot-intelligence-testing.html#test-validation">5.3.4.1</a>). The height mechanism must be manually re-aligned per user, and sparring against differently-heighted opponents is not possible without re-aligning between rounds</td>
           </tr>
         </tbody>
       </table>
@@ -129,21 +129,25 @@
             <td style="padding:10px 14px; border:1px solid #ccc;">Enables the robot to maintain or close distance, replicating a real opponent's ring movement and creating pressure-based training scenarios</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="4"><strong>Robot Intelligence</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="5"><strong>Robot Intelligence</strong></td>
             <td style="padding:10px 14px; border:1px solid #ccc;">Expand the CV model's training scope</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> so the CV model is correct end-to-end and the IMU filter no longer has to absorb the retraction wobble. Then expand the action set with <strong>slips, head/body targets, and defensive footwork</strong>, since richer labels feed every other part of the system (sparring AI, analytics, LLM Coach) and unlock more dynamic feedback</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Add a <strong>retraction class</strong> so the CV model is correct end-to-end, then extend the action set with <strong>slips, head/body targets, and defensive footwork</strong>. Richer labels feed every downstream module (sparring AI, analytics, LLM Coach)</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Fine-tune a custom pose estimator on boxing footage</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Manually annotate keypoints on our own recorded footage (gloved hands, this camera viewpoint) and fine-tune YOLO Pose on it. A pose model that was actually trained for the context would let the pose stream pull its own weight instead of relying on the voxel branch to compensate, lifting the ceiling on the fused architecture</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Annotate keypoints on our own gloved-hand footage and fine-tune YOLO Pose on it. An in-domain pose model lets the pose branch pull its own weight rather than relying on the voxel branch to cover for it</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Wider camera field of view</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">A wider-angle depth camera (or adjusted mount angle) would capture the full body including legs and feet, unlocking footwork analysis, stance width tracking, and weight transfer detection. These are critical coaching signals that the current upper-body-only view cannot provide. A single wider camera preserves the portability of the system without the complexity of multi-camera calibration</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">A wider-angle depth camera (or adjusted mount angle) captures the full body, unlocking footwork, stance width, and weight-transfer analytics while keeping the single-camera portability of the current design</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Remove the height-alignment dependency</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">The aligned vs. unaligned comparison in <a href="../pages/robot-intelligence-testing.html#test-validation">5.3.4.1</a> shows the current model's accuracy falls sharply when the user is outside the trained framing, and realistic sparring against opponents of different heights is not possible without re-aligning the robot. Two complementary fixes: (1) diversify the training set with footage at varying camera pitches and mount offsets so the model tolerates framing variation on its own, and (2) estimate the user's height from the CV pipeline at session start and drive the screw-jack height mechanism automatically, removing the manual alignment step from the user flow entirely</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Two complementary fixes: (1) diversify training footage across camera pitches and mount offsets so the model tolerates framing variation, and (2) estimate user height from CV at session start and drive the screw-jack automatically, removing the manual alignment step entirely (see <a href="../pages/robot-intelligence-testing.html#test-validation">5.3.4.1</a>)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Structured user-pilot study</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Controlled pilot with boxers of mixed skill: labelled ground-truth for fusion precision/recall, timed stimulus sequences for reaction-time false-positive rate, interviews for coaching-tip relevance. Replaces the observational evidence in <a href="../pages/robot-intelligence-testing.html#test-integration">5.3.4.5</a> with hard numbers</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #555;"><strong>System-Level</strong></td>

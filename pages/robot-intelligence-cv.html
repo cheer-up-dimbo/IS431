@@ -209,10 +209,10 @@
    <li><strong>Depth-based motion detection</strong>: the voxel branch uses the depth
    camera to sense the hand moving forward in 3D, which is the earliest physical
    signal that a punch is starting, regardless of speed.</li>
-   <li><strong>Dual-speed temporal channels</strong>: the voxel grid compares snapshots
-   at two timescales: a <strong>fast channel</strong> (2-frame / ~67 ms) that catches
-   the sharp onset and a <strong>slow channel</strong> (8-frame / ~267 ms) that captures
-   the full arc. Together they cover both quick jabs and slow hooks.</li>
+   <li><strong>Dual-speed temporal channels</strong>: the voxel branch reads motion
+   at two timescales, one sensitive to a sudden punch onset and one that captures
+   the full arc, so fast jabs and slow hooks are both resolved (details in
+   <a href="#cv-architecture">5.3.1.1 Voxel Branch</a>).</li>
    <li><strong>Causal Transformer + multi-window training</strong>: a
    <strong>causal Transformer</strong> (Vaswani et al., 2017) lets the attention
    mechanism dynamically weigh recent vs. earlier frames instead of relying on a
@@ -1187,45 +1187,62 @@
  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="cv-results" style="margin:0;">5.3.1.5 Secondary CV Functions</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-1, RI-2</sl-badge></div>
 
  <p>
- The same YOLO pose output and depth bounding box that feed the action model are reused
- by two lighter-weight functions, neither runs an independent perception stack,
- so they add negligible compute on top of what the action model already costs.
+ Two lighter-weight functions reuse the same per-frame YOLO pose output and depth
+ bounding box that feed the action model, so they add negligible compute on top of
+ what the action model already costs.
  </p>
 
- <ul style="line-height:1.7;">
- <li>
- <strong>Human Tracking</strong>, bounding box centre, width, depth, and
- lateral/depth displacement are published each frame as a <code>UserTracking</code>
- message. Downstream nodes use this to drive the <strong>yaw motor</strong> so the
- robot continuously faces the user as they move laterally, and to classify
- <strong>slips and dodges</strong> for defence detection. Height adjustment is
- manual in the current system; using CV-derived user height to drive the height
- mechanism automatically is discussed as future work in
- <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
- The yaw pipeline was validated both off-hardware via the
- <a href="robot-intelligence-testing.html">Teensy simulator</a> (5.3.4.6) and
- on-hardware with the <a href="robot-intelligence-testing.html#test-integration">yaw
- tracking integration video</a> in 5.3.4.5, which shows the robot rotating to face
- the user at a deliberately safe speed.
- </li>
- <li>
- <strong>Reaction Time Detection</strong>, depth-based proximity replaces the
+ <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation, bounding box + 7 upper-body keypoints reused by both human tracking and reaction-time detection" width="25%"></image-component>
+
+ <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:14px 0;">
+
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; border-radius:6px; padding:14px 16px;">
+ <div style="font-weight:700; color:#0d47a1; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #e6e6e6;">Human Tracking</div>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6; font-size:0.92rem;">
+ <strong>What it publishes.</strong> Bounding-box centre, width, depth, and
+ lateral/depth displacement, emitted every frame as a <code>UserTracking</code>
+ message.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6; font-size:0.92rem;">
+ <strong>What uses it.</strong> The <strong>yaw motor</strong> rotates to face
+ the user as they move laterally, and the <strong>slips / dodges</strong>
+ classifier uses the same displacement signal for defence detection.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6; font-size:0.92rem;">
+ <strong>Height adjustment.</strong> Manual in the current system; using
+ CV-derived user height to drive the height mechanism automatically is future
+ work in <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
+ </p>
+ <p style="margin:0; font-size:0.92rem;">
+ <strong>Validation.</strong> Off-hardware via the
+ <a href="robot-intelligence-testing.html">Teensy simulator</a> (5.3.4.6),
+ on-hardware via the
+ <a href="robot-intelligence-testing.html#test-integration">yaw-tracking
+ video</a> in 5.3.4.5 (safe rotation speed demonstrated).
+ </p>
+ </div>
+
+ <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #2e7d32; border-radius:6px; padding:14px 16px;">
+ <div style="font-weight:700; color:#1b5e20; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #e6e6e6;">Reaction-Time Detection</div>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6; font-size:0.92rem;">
+ <strong>How it works.</strong> When a stimulus fires, the system timestamps
+ the moment the user's hand depth crosses a calibrated threshold toward the
+ robot, giving millisecond-accurate reaction times.
+ </p>
+ <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6; font-size:0.92rem;">
+ <strong>Why depth-based.</strong> Depth-based proximity replaces the
  velocity thresholds that proved unreliable at the
- <a href="robot-intelligence-testing.html">CDE Fair</a>. When a stimulus fires, the
- system timestamps the moment the user's hand depth crosses a calibrated threshold
- toward the robot, giving millisecond-accurate reaction times. The
- <a href="robot-intelligence-testing.html#test-integration">reaction-time drill
- validation video</a> in 5.3.4.5 shows this end-to-end and also demonstrates the
- sensitivity tuning that correctly ignores small body movements.
- </li>
- </ul>
-
- <p>
- Both functions read directly off the bounding box and 7 upper-body keypoints shown below
- , the same per-frame YOLO output the action model already consumes.
+ <a href="robot-intelligence-testing.html">CDE Fair</a>.
  </p>
+ <p style="margin:0; font-size:0.92rem;">
+ <strong>Validation.</strong> The
+ <a href="robot-intelligence-testing.html#test-integration">reaction-time
+ drill video</a> in 5.3.4.5 shows end-to-end behaviour and sensitivity tuning
+ that correctly ignores small body movements.
+ </p>
+ </div>
 
- <image-component tag="image" source="../assets/robot_intelligence/pose_estimation_model.jpg" subtitle="Figure: YOLO pose estimation, bounding box + 7 upper-body keypoints reused by both human tracking and reaction time detection" width="25%"></image-component>
+ </div>
 
  <sl-divider></sl-divider>
 

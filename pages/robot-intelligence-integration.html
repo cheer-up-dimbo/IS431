@@ -177,12 +177,16 @@
  </div>
 
  <p>
- Getting the action model from <em>"works on a recorded clip"</em> to <em>"works live
- on the robot"</em> required four things in sequence: a frame rate the model could
- trust, enough per-frame compute to actually hit it, output that didn't flicker between
- classes, and a resource budget that left room for the LLM coach to run on the same GPU.
- Each subsection below tackles one of those four problems, in order.
+ Getting the action model from <em>"works on a recorded clip"</em> to <em>"works
+ live on the robot"</em> required four things in sequence, each addressed in turn
+ below:
  </p>
+ <ol style="margin:6px 0 14px; line-height:1.65; font-size:0.93rem;">
+ <li><strong>Frame rate</strong> the model could trust.</li>
+ <li><strong>Per-frame compute</strong> to actually hit it.</li>
+ <li><strong>Output stability</strong> so predictions didn't flicker between classes.</li>
+ <li><strong>Resource budget</strong> to leave room for the LLM Coach on the same GPU.</li>
+ </ol>
 
  <h3>1. Frame rate, why 30fps matters</h3>
  <p>
@@ -1120,7 +1124,7 @@
  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0;">
    <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #757575; padding:12px 14px; border-radius:4px;">
      <div style="font-size:0.78rem; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">1. Idle</div>
-     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Default state between sessions. CV frame rate drops to ~6&nbsp;fps to free GPU headroom for the LLM. <code>imu_node</code> switches to navigation mode (pad hits become menu navigation, not punch events). No data is recorded.</div>
+     <div style="font-size:0.9rem; margin-top:6px; color:#555;">Default state between sessions. CV runs at the idle ~6&nbsp;fps (see adaptive frame rate above). <code>imu_node</code> switches to navigation mode (pad hits become menu navigation, not punch events). No data is recorded.</div>
    </div>
    <div style="background:#fafafa; border:1px solid #e0e0e0; border-top:3px solid #1565c0; padding:12px 14px; border-radius:4px;">
      <div style="font-size:0.78rem; font-weight:700; color:#1565c0; text-transform:uppercase; letter-spacing:0.5px;">2. Countdown</div>
