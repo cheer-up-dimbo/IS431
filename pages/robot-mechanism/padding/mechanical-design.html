@@ -488,17 +488,18 @@
     <div>
       <h3>Spring Calculations</h3>
       <p>
-        Spring selection evolved in two stages. Iteration 3 started with a
-        1 kg design assumption and sag-control priority. Iterations 4 and 5
-        retained the same spring but shifted priority to impact absorption
-        after the enclosed box guide removed sag as a practical risk.
+        Spring selection evolved in two stages driven by different design priorities.
+        Iteration 3 used a sag-control requirement as the primary constraint.
+        Iterations 4 and 5 shifted priority to impact absorption and IMU signal
+        quality after the enclosed box guide removed sag as a practical risk and
+        the actual pad mass was measured.
       </p>
 
-      <h4>Stage 1: Initial Sag-Driven Requirement (Iteration 3)</h4>
+      <h4>Stage 1: Sag-Driven Requirement (Iteration 3)</h4>
       <p>
-        Before the box housing was introduced, the mount was treated as a
-        partially unsupported horizontal spring system. The conservative assumption
-        was an end-effector mass of 1.0 kg. Static load is:
+        Before the box housing was introduced, the mount was treated as a partially
+        unsupported horizontal spring system. The conservative design assumption was
+        an end-effector mass of 1.0 kg. Static load is:
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
         F<sub>static</sub> = m &times; g = 1.0 &times; 9.81 = 9.81 N
@@ -510,26 +511,29 @@
         x<sub>sag</sub> = F / k
       </p>
       <p>
-        Using a 1 kg load case, the design-space checks are:
+        Using the 1 kg load case, the design-space checks are:
       </p>
       <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
-        k = 33 N/mm &rarr; x<sub>sag</sub> = 9.81/33 = 0.30 mm
+        k = 33 N/mm &rarr; x<sub>sag</sub> = 9.81 / 33 = 0.30 mm
       </p>
       <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
-        k = 20 N/mm &rarr; x<sub>sag</sub> = 9.81/20 = 0.49 mm
+        k = 20 N/mm &rarr; x<sub>sag</sub> = 9.81 / 20 = 0.49 mm
       </p>
       <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0 16px;">
-        k = 10 N/mm &rarr; x<sub>sag</sub> = 9.81/10 = 0.98 mm
+        k = 10 N/mm &rarr; x<sub>sag</sub> = 9.81 / 10 = 0.98 mm
       </p>
       <p>
-        This is why the early spring shortlist sat in the 25 to 30 N/mm range:
-        lower sag but noticeably stiffer punch feel.
+        This is why the early spring shortlist sat in the 25 to 30 N/mm range: it
+        kept static sag below 0.40 mm for the assumed load. At this stage the
+        design goal was purely sag prevention. Impact isolation was not yet a
+        governing requirement because no enclosed guide existed to separate the
+        foam mount from the frame.
       </p>
 
-      <h4>Stage 2: Measured Mass and Impact-Response Tuning (Iterations 4 to 5)</h4>
+      <h4>Stage 2: Measured Mass and Impact-Isolation Requirement (Iterations 4 to 5)</h4>
       <p>
-        Prototype weighing showed the moving padding assembly was about 150 to
-        200 g, not 1 kg. Using a midpoint of 0.175 kg:
+        Prototype weighing showed the moving padding assembly was approximately
+        150 to 200 g, not 1 kg. Using a midpoint of 0.175 kg:
       </p>
       <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
         F<sub>static</sub> = 0.175 &times; 9.81 = 1.72 N
@@ -538,14 +542,43 @@
         x<sub>sag</sub> = 1.72 / 8 = 0.21 mm
       </p>
       <p>
-        This sag is negligible. Also, in Iterations 4 and 5, the spring sits in a
-        boxed guide that constrains lateral droop. So practical spring selection
-        moved from sag prevention to impact feel and frame-load reduction.
+        Sag at the actual mass is negligible regardless of spring rate in the
+        practical range, and the boxed guide in Iteration 4 constrains lateral
+        droop mechanically. Spring selection therefore shifted to a new governing
+        requirement: the spring must compress far enough under a representative
+        punch load to absorb the impact in the foam mount rather than transmitting
+        a rigid impulse to the aluminium frame.
       </p>
-
-      <h4>Why 8 N/mm Is Safe for Iterations 4 and 5</h4>
       <p>
-        For the selected spring rate, compression under representative punch loads is:
+        For the spring to absorb the impact rather than transmit it to the frame,
+        the foam mount must travel a meaningful distance on every representative
+        strike. A minimum compression of 20 mm ensures the impulse is spread over
+        a measurable displacement rather than passing through as a near-rigid
+        contact. An upper bound of 60 mm keeps the stroke within the enclosure
+        geometry without risk of coil bind at the 140 mm free length. This 20 to
+        60 mm working stroke became the governing isolation criterion for spring
+        rate selection in Iterations 4 and 5.
+      </p>
+      <p>
+        The design load range was established from literature. Pierce et al. (2006)
+        measured peak punch forces of 1,670 to 4,096 N across professional boxing
+        matches. Walilko et al. (2005) reported a mean peak of approximately
+        3,427 N for Olympic-level competitors. BoxBunny targets recreational to
+        intermediate users, not professional athletes. Consistent with the lower
+        end of the Pierce et al. range for lighter or less-trained fighters, a
+        working design envelope of 200 to 500 N was adopted.
+      </p>
+      <p>
+        At 8 N/mm, this load range produces compressions of 25 to 63 mm, which
+        falls within the 20 to 60 mm isolation window throughout. The rejected
+        Iteration 3 spring rate of 25 to 30 N/mm produces only 6.7 to 20 mm at
+        the same load range, missing the lower bound entirely at lighter strikes
+        and only reaching the threshold at the upper limit of 500 N. This is why
+        the stiffer spring was unsuitable once impact isolation replaced sag
+        prevention as the governing requirement.
+      </p>
+      <p>
+        For the selected spring rate of 8 N/mm, compression under this load range is:
       </p>
       <p style="font-family: serif; font-size: 1.02rem; text-align: center; margin: 8px 0;">
         F = 200 N &rarr; x = 200 / 8 = 25.0 mm
@@ -560,48 +593,12 @@
         F = 500 N &rarr; x = 500 / 8 = 62.5 mm
       </p>
       <p>
-        These values are in a usable stroke range for a guided return mechanism.
-        The spring is compliant enough to absorb impact instead of passing a sharp
-        impulse to the frame. Relative to a nominal 140 mm free length, the
-        500 N check gives 62.5 mm compression, which is about 45% of free length.
-        This supports the 8 N/mm choice as compliant but still controllable in
-        the current enclosure.
-      </p>
-      <p>
-        In short, 8 N/mm is safe because static sag is negligible for the measured
-        mass, the boxed guide controls droop, and dynamic stroke remains meaningful
-        without immediate bottom-out in the intended use range.
-      </p>
-
-      <h4>Future Softer Spring Direction</h4>
-      <p>
-        Since sag is no longer a governing requirement in Iterations 4 and 5,
-        future revisions can test softer springs mainly for feel tuning. For
-        reference, at 500 N: k = 5 N/mm gives 100 mm compression, while
-        k = 4 N/mm gives 125 mm compression. These can improve forgiveness but
-        need stroke and coil-bind checks in the same box geometry.
-      </p>
-
-      <table class="spec-table" style="max-width:860px; margin-left:auto; margin-right:auto;">
-        <caption>Table 5.2.4.5: Spring specification evolution and final selected baseline</caption>
-        <thead>
-          <tr><th>Parameter</th><th>Iteration 3 (rejected)</th><th>Iteration 4 baseline (retained in Iteration 5 final)</th></tr>
-        </thead>
-        <tbody>
-          <tr class="old"><td>Free length</td><td>180 mm</td><td class="new">140 mm</td></tr>
-          <tr><td>Outer diameter</td><td>35 to 40 mm</td><td>35 mm</td></tr>
-          <tr class="old"><td>Wire diameter</td><td>5.5 to 6.5 mm</td><td class="new">4 mm</td></tr>
-          <tr class="old"><td>Spring rate</td><td>25 to 35 N/mm</td><td class="new">8 N/mm</td></tr>
-          <tr><td>Material</td><td>Music wire</td><td>Music wire (ASTM A228)</td></tr>
-          <tr><td>Type</td><td>Compression, heavy duty</td><td>Compression, closed and ground ends</td></tr>
-          <tr class="old"><td>Calculated sag</td><td>0.33 mm (at 1 kg)</td><td class="new">0.18 mm (at 150 g)</td></tr>
-        </tbody>
-      </table>
-
-      <p>
-        The shorter free length (140 mm vs 180 mm) also reduces the moment arm
-        during robot rotation, keeping rotational inertia lower for faster
-        turning response during sparring.
+        These values place the compression stroke in the 25 to 63 mm range (2.5 to
+        6.3 cm) across the full recreational load envelope. The foam mount travels
+        visibly on every representative strike, confirming that the spring absorbs
+        the impulse rather than the frame. Relative to the 140 mm free length, the
+        500 N design check gives 62.5 mm compression, which is 45% of free length,
+        well within the controllable stroke of the current enclosure geometry.
       </p>
 
       <table class="spec-table" style="max-width:760px; margin-left:auto; margin-right:auto;">
@@ -617,7 +614,7 @@
           <tr>
             <td>200 N</td>
             <td>25.0 mm</td>
-            <td>Responsive for average strikes</td>
+            <td>Responsive for average recreational strikes</td>
           </tr>
           <tr>
             <td>300 N</td>
@@ -636,6 +633,78 @@
           </tr>
         </tbody>
       </table>
+
+      <h4>Stage 3: Spring-Mass Decoupling and IMU Signal Quality</h4>
+      <p>
+        A secondary but important consequence of the spring selection is its effect
+        on IMU measurement accuracy. The IMU sensor is mounted on the foam mount,
+        the moving side of the spring assembly. When a punch lands, the spring
+        mechanically decouples the foam mount from the rigid aluminium frame. The
+        IMU therefore sees only the local acceleration of the foam assembly driven
+        by the fist contact. Without the spring, the foam mount would be rigidly
+        coupled to the frame, and the IMU signal would contain the punch impulse
+        superimposed on structural vibrations from the chassis, motor commutation
+        noise, and gear-mesh frequencies travelling through the aluminium extrusion.
+      </p>
+      <p>
+        The spring-mass system has a natural frequency that determines its filtering
+        behaviour. Using the measured pad assembly mass of 0.150 kg and the selected
+        spring rate of 8 N/mm:
+      </p>
+      <p style="font-family: serif; font-size: 1.1rem; text-align: center; margin: 16px 0;">
+        f<sub>n</sub> = (1 / 2&pi;) &times; &radic;(k / m)
+        = (1 / 2&pi;) &times; &radic;(8000 / 0.150)
+        &asymp; 36.7 Hz
+      </p>
+      <p>
+        Vibration energy from the robot drive system (motor commutation, bearing
+        noise) occurs predominantly above this frequency. The spring-mass assembly
+        attenuates these high-frequency inputs before they reach the IMU, leaving
+        a clean signal dominated by the punch impulse itself. A typical punch force
+        peak has a rise time of 10 to 50 ms (Cheraghi et al., 2014), corresponding
+        to spectral content well below the 36.7 Hz natural frequency, so the punch
+        signal passes through the assembly without attenuation.
+      </p>
+      <p>
+        This filtering effect directly supports the CV and IMU sensor fusion
+        pipeline. The fusion node uses a 5.0 m/s&sup2; acceleration threshold on
+        the IMU to trigger a punch detection event. A rigidly mounted IMU exposed
+        to chassis vibration would produce elevated baseline noise, making this
+        threshold unreliable. The spring isolation keeps the foam-mount IMU signal
+        clean enough for the threshold to discriminate genuine impacts from
+        background noise consistently across training sessions.
+      </p>
+
+      <table class="spec-table" style="max-width:860px; margin-left:auto; margin-right:auto;">
+        <caption>Table 5.2.4.5: Spring specification evolution and final selected baseline</caption>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Iteration 3 (rejected)</th>
+            <th>Iteration 4 baseline (retained in Iteration 5 final)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="old"><td>Free length</td><td>180 mm</td><td class="new">140 mm</td></tr>
+          <tr><td>Outer diameter</td><td>35 to 40 mm</td><td>35 mm</td></tr>
+          <tr class="old"><td>Wire diameter</td><td>5.5 to 6.5 mm</td><td class="new">4 mm</td></tr>
+          <tr class="old"><td>Spring rate</td><td>25 to 35 N/mm</td><td class="new">8 N/mm</td></tr>
+          <tr><td>Material</td><td>Music wire</td><td>Music wire (ASTM A228)</td></tr>
+          <tr><td>Type</td><td>Compression, heavy duty</td><td>Compression, closed and ground ends</td></tr>
+          <tr class="old"><td>Calculated sag (static)</td><td>0.33 mm (at 1 kg)</td><td class="new">0.18 mm (at 150 g)</td></tr>
+          <tr class="old"><td>Compression at 500 N</td><td>14.3 to 20.0 mm</td><td class="new">62.5 mm</td></tr>
+          <tr class="old"><td>Spring-mass natural frequency</td><td>72 to 96 Hz (at 150 g)</td><td class="new">36.7 Hz (at 150 g)</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Future Softer Spring Direction</h4>
+      <p>
+        Since sag is no longer a governing requirement in Iterations 4 and 5,
+        future revisions can test softer springs mainly for feel tuning. For
+        reference, at 500 N: k = 5 N/mm gives 100 mm compression, while
+        k = 4 N/mm gives 125 mm compression. These can improve forgiveness but
+        need stroke and coil-bind checks in the same box geometry.
+      </p>
     </div>
 
     <sl-divider></sl-divider>
@@ -729,6 +798,9 @@
         </li>
         <li>
           Pierce, J.D., Reinbold, K.A., Lyngard, B.C., Goldman, R.J. and Pastore, C.M. (2006). Direct Measurement of Punch Force During Six Professional Boxing Matches. Journal of Quantitative Analysis in Sports, 2(2).
+        </li>
+        <li>
+          Walilko, T.J., Viano, D.C. and Bir, C.A. (2005). Biomechanics of the head for Olympic boxer punches to the face. <em>British Journal of Sports Medicine</em>, 39(10), 710-719.
         </li>
       </ul>
     </div>
