@@ -672,8 +672,18 @@
  actionable, personalised guidance grounded in boxing domain knowledge.
  </p>
  <p>
- A local AI coach running entirely on the Jetson meets this requirement without
- cloud dependency. Building one that is actually useful inside a real-time boxing
+ A local <strong>LLM Coach</strong> running entirely on the Jetson meets this
+ requirement without cloud dependency. (The same system is surfaced to users on
+ the phone dashboard under the label <strong>AI Coach</strong>, see
+ <a href="robot-intelligence-software.html#sw-coach">5.3.3.3</a>; the two names
+ refer to the same model.) The coach appears in two places in the product:
+ real-time tips on the robot's touchscreen during active rounds, and post-session
+ analysis plus interactive chat on the phone dashboard. This subsection covers
+ the on-device model itself; the dashboard-side plumbing that exposes it over
+ FastAPI is documented in 5.3.3.
+ </p>
+ <p>
+ Building an on-device coach that is actually useful inside a real-time boxing
  system means answering five questions in order: <strong>why local at all</strong>,
  <strong>which model fits</strong>, <strong>how to make it sound like a coach</strong>,
  <strong>what happens when it fails</strong>, and <strong>how to share the GPU with

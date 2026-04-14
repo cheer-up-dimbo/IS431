@@ -254,6 +254,70 @@
 
  <image-component tag="image" source="../assets/robot_intelligence/cv/interpretability/temporal_importance.png" subtitle="Figure: Temporal Importance, later frames contribute most to the model's prediction"></image-component>
 
+ <h3>Robustness to glove presence</h3>
+ <p>
+ The training dataset was recorded with users wearing boxing gloves. A natural
+ concern is whether the model generalises to users <em>without</em> gloves, since
+ a deployed system cannot assume every user will be gloved. The two clips below
+ run live inference on the deployed model with and without gloves to test this
+ directly.
+ </p>
+
+ <div class="video-row" style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:12px 0;">
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/glove.mp4" style="width:100%;"></video>
+ <sub>Figure: Live inference with gloves (in-distribution)</sub>
+ </div>
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/without_gloves.mp4" style="width:100%;"></video>
+ <sub>Figure: Live inference without gloves (out-of-distribution)</sub>
+ </div>
+ </div>
+
+ <p>
+ Because the pipeline is built on pose estimation rather than colour-based glove
+ tracking, inference still produces reasonable predictions on a bare-handed user
+ despite that configuration never appearing in the training set. Accuracy does
+ drop slightly without gloves, the glove's larger visible footprint evidently
+ gave the model a useful cue during training, but the degradation is graceful
+ rather than catastrophic. This validates the choice to move away from the
+ HSV glove-tracking approach used at the <a href="#test-fair">CDE AI Fair</a>:
+ the pose-based model is robust to the thing that prototype was most brittle to.
+ A straightforward expansion of the dataset with glove-less footage would
+ almost certainly close the remaining gap.
+ </p>
+
+ <h3>Height-alignment dependency</h3>
+ <p>
+ The training data was collected with the camera mounted at a fixed height
+ relative to the user, so the user's upper body fills the top half of the frame.
+ The two clips below compare live inference when the user is aligned to this
+ trained framing against when they are not.
+ </p>
+
+ <div class="video-row" style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:12px 0;">
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/aligned_height_cv_prediction.mp4" style="width:100%;"></video>
+ <sub>Figure: Aligned height, user within trained framing, predictions are accurate</sub>
+ </div>
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/unaligned_height_cv_predictions.mp4" style="width:100%;"></video>
+ <sub>Figure: Unaligned height, user outside trained framing, accuracy drops sharply</sub>
+ </div>
+ </div>
+
+ <p>
+ Predictions remain accurate when the user fits the trained frame range, but
+ accuracy drops sharply when they do not. This reinforces the role of the
+ adjustable height mechanism in <a href="robot-mechanism.html">5.2</a>:
+ correct camera height is not only a comfort feature, it is a precondition for
+ the CV model to operate inside its trained distribution. The corollary is also
+ a limitation, real boxing involves opponents of different heights, so a
+ production system should be robust to framing variation on its own. This is
+ captured as a limitation in <a href="#test-limits">5.3.4.8</a> and carried
+ forward as future work in <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
+ </p>
+
 
  <sl-divider></sl-divider>
 
@@ -563,6 +627,80 @@
  </table>
 
  <pre style="background:#1e1e1e; color:#d4d4d4; padding:12px 16px; border-radius:6px; font-size:0.88rem; overflow-x:auto;">python3 notebooks/scripts/test_integration.py</pre>
+
+ <h3>CV + IMU fusion validation</h3>
+ <p>
+ The automated tests above check that the fusion module's inputs, outputs, and
+ temporal matching are wired correctly, but the end-to-end behaviour is easier
+ to see live. The clip below runs the full sensor-fusion pipeline designed in
+ <a href="robot-intelligence-integration.html#int-fusion">5.3.2.1</a> against
+ the Teensy simulator (detailed in 5.3.4.6 below) so both the
+ CV stream and the IMU impact stream can be exercised without physical hardware.
+ The window is split into three panels: the right half is the Teensy simulator
+ with each IMU pad lighting up as it is hit, the bottom-left panel shows raw CV
+ predictions before fusion, and the top-left panel shows the fusion-filtered
+ punch stream. Confirmed punches only emerge when the CV prediction and the IMU
+ impact agree, which is exactly what the fusion design from 5.3.2.1 specifies.
+ </p>
+
+ <div class="video-row single" style="margin:12px 0;">
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/fusion_test.mp4" style="max-width:720px; width:100%;"></video>
+ <sub>Figure: CV + IMU fusion validation, right panel = Teensy simulator (IMU), top-left = fusion-filtered punches, bottom-left = raw CV predictions</sub>
+ </div>
+ </div>
+
+ <h3>Reaction-time drill validation</h3>
+ <p>
+ The reaction-time drill needs to know when the user has actually committed to
+ a punch, not just shifted their weight or moved their guard. Rather than
+ building a separate detection pipeline for this, the same pose-estimation
+ stream that drives the action-prediction model is reused to derive reaction
+ time, keeping the system to a single perception pipeline.
+ The clip below shows this in action and also serves as a sensitivity test:
+ genuine punches trigger the drill, but small body movements, guard
+ adjustments, and deliberate no-moves do <em>not</em>, confirming the threshold
+ is tuned well enough to separate committed punch intent from incidental motion.
+ </p>
+
+ <div class="video-row single" style="margin:12px 0;">
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/reaction_time_val.mp4" style="max-width:720px; width:100%;"></video>
+ <sub>Figure: Reaction-time drill, pose pipeline reuse + sensitivity limit-testing (small movements correctly do not trigger)</sub>
+ </div>
+ </div>
+
+ <div style="background:#f8f9fa; border-left:3px solid #1565c0; padding:10px 14px; margin:14px 0; font-size:0.92rem;">
+ <strong style="color:#0d47a1;">Bonus in the same clip: head-pad preset shortcut.</strong>
+ The clip also shows the reaction-time drill being launched hands-free through
+ the head-pad shortcut: hitting the <strong>head pad</strong> pops open the preset
+ window, <strong>left / right pads</strong> scroll through saved presets,
+ <strong>centre pad</strong> confirms and starts the drill, and hitting the head
+ pad again hides the window. This lets a gloved user start a session without
+ touching the touchscreen. The same shortcut is documented in more depth under
+ 5.3.4.6 Teensy Simulator below, which shows the underlying pad-input flow being
+ driven by the simulator.
+ </div>
+
+ <h3>Person-tracking with yaw rotation</h3>
+ <p>
+ CV-based person tracking is integrated with the lower-mechanism yaw motor so
+ that the robot can turn to face the user as they move around it. The clip
+ below demonstrates the full loop, pose detection drives a yaw target, and the
+ robot rotates smoothly to face the detected user. The rotation speed is
+ deliberately tuned on the slow side: fast enough that a user pivoting around
+ the robot to find a new angle is still faced by the robot naturally, but slow
+ enough to remain safe for a user standing close in a boxing stance. This
+ matches the safety stance taken in the lower-mechanism design
+ (<a href="robot-mechanism.html">5.2</a>).
+ </p>
+
+ <div class="video-row single" style="margin:12px 0;">
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/validation/tracking_validation.mp4" style="max-width:720px; width:100%;"></video>
+ <sub>Figure: Person-tracking integrated with yaw motor, safe rotation speed lets the robot face the user as they move</sub>
+ </div>
+ </div>
 
  <sl-divider></sl-divider>
 
@@ -902,6 +1040,11 @@
  <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Pose estimator not trained for boxing</strong></td>
  <td style="padding:8px; border:1px solid #ddd;">YOLO Pose is pretrained on COCO, where hands and wrists are bare and clearly visible. It has no concept of what a gloved hand looks like and no training on this camera angle, so wrist keypoints are unreliable exactly when they matter most. The voxel branch currently compensates for this</td>
  <td style="padding:8px; border:1px solid #ddd;"><strong>Fine-tune a custom pose estimator</strong> on our own recorded boxing footage with manually annotated keypoints, gloved hands, this camera viewpoint, our pose set. A pose model that was actually trained for the context would lift the load off the voxel branch and improve accuracy further</td>
+ </tr>
+ <tr style="background:#fffbe6;">
+ <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>CV model depends on user framing</strong></td>
+ <td style="padding:8px; border:1px solid #ddd;">The training dataset was collected with users visible in the upper half of the frame, so accuracy drops sharply when the user is not height-aligned to the camera (shown in <a href="#test-validation">5.3.4.1, Height-alignment dependency</a>). This currently depends on a manual height adjustment before a session, and rules out realistic sparring against opponents of different heights without re-aligning the robot</td>
+ <td style="padding:8px; border:1px solid #ddd;">Expand the training data with simulated user-height variation (multiple camera pitches and mount offsets), and, longer-term, <strong>estimate user height from CV and drive the height mechanism automatically</strong> so the alignment step disappears entirely from the user flow</td>
  </tr>
  <tr style="background:#fffbe6;">
  <td style="padding:8px; border:1px solid #ddd; border-left:3px solid #f9a825;"><strong>Camera field of view</strong></td>

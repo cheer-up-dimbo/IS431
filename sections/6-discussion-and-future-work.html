@@ -36,7 +36,7 @@
         target (RI-3, 96.8% on an unseen person) and met the 150 ms
         end-to-end latency requirement (RI-2, ~120 ms). CV+IMU sensor
         fusion (RI-4), all five adaptive sparring styles (RI-6), and the
-        on-device Gemma 4 E2B LLM coach (RI-7) were validated through both
+        on-device Gemma 4 E2B LLM Coach (RI-7) were validated through both
         automated tests and the CDE AI Fair real-world deployment. The
         fair also drove the largest design pivot of the project: the
         unreliable HSV colour-tracking prototype was replaced from
@@ -125,9 +125,9 @@
             <td style="padding:10px 14px; border:1px solid #ccc;">Enables the robot to maintain or close distance, replicating a real opponent's ring movement and creating pressure-based training scenarios</td>
           </tr>
           <tr>
-            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="3"><strong>Robot Intelligence</strong></td>
+            <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #7b1fa2;" rowspan="4"><strong>Robot Intelligence</strong></td>
             <td style="padding:10px 14px; border:1px solid #ccc;">Expand the CV model's training scope</td>
-            <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> so the CV model is correct end-to-end and the IMU filter no longer has to absorb the retraction wobble. Then expand the action set with <strong>slips, head/body targets, and defensive footwork</strong>, since richer labels feed every other part of the system (sparring AI, analytics, LLM coach) and unlock more dynamic feedback</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Add an explicit <strong>retraction class</strong> so the CV model is correct end-to-end and the IMU filter no longer has to absorb the retraction wobble. Then expand the action set with <strong>slips, head/body targets, and defensive footwork</strong>, since richer labels feed every other part of the system (sparring AI, analytics, LLM Coach) and unlock more dynamic feedback</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Fine-tune a custom pose estimator on boxing footage</td>
@@ -136,6 +136,10 @@
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc;">Wider camera field of view</td>
             <td style="padding:10px 14px; border:1px solid #ccc;">A wider-angle depth camera (or adjusted mount angle) would capture the full body including legs and feet, unlocking footwork analysis, stance width tracking, and weight transfer detection. These are critical coaching signals that the current upper-body-only view cannot provide. A single wider camera preserves the portability of the system without the complexity of multi-camera calibration</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px; border:1px solid #ccc;">Remove the height-alignment dependency</td>
+            <td style="padding:10px 14px; border:1px solid #ccc;">The aligned vs. unaligned comparison in <a href="../pages/robot-intelligence-testing.html#test-validation">5.3.4.1</a> shows the current model's accuracy falls sharply when the user is outside the trained framing, and realistic sparring against opponents of different heights is not possible without re-aligning the robot. Two complementary fixes: (1) diversify the training set with footage at varying camera pitches and mount offsets so the model tolerates framing variation on its own, and (2) estimate the user's height from the CV pipeline at session start and drive the screw-jack height mechanism automatically, removing the manual alignment step from the user flow entirely</td>
           </tr>
           <tr>
             <td style="padding:10px 14px; border:1px solid #ccc; border-left:4px solid #555;"><strong>System-Level</strong></td>
@@ -191,7 +195,7 @@
         dual-branch (voxel + pose) Transformer classifies 8 punch types at
         96.8% on an unseen person and 30&nbsp;fps, fused with IMU pad
         impacts for confirmed punches; five adaptive sparring styles drive
-        the robot's behaviour; a local Gemma 4 E2B LLM coach delivers
+        the robot's behaviour; a local Gemma 4 E2B LLM Coach delivers
         real-time tips and post-session analysis; and a Vue&nbsp;3 + FastAPI
         phone dashboard surfaces all of it without leaving the device.
       </p>
@@ -202,7 +206,7 @@
         turns ambiguous CV predictions into confirmed events through
         pad-constraint filtering; the Markov-chain sparring engine with
         weakness-biased opponent AI; and the fully on-device architecture
-        (CV inference, LLM coaching, dashboard backend) that runs the entire
+        (CV inference, LLM Coach, dashboard backend) that runs the entire
         training stack with zero internet dependency.
       </p>
     </div>

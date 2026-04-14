@@ -108,6 +108,22 @@
  </div>
  </div>
 
+ <h3 style="margin-top:18px;">Dashboard at a glance</h3>
+ <p>
+ Before zooming into each backend layer, the short walkthrough below shows the
+ full phone dashboard in action, the five views, live session updates, AI Coach
+ chat, and training remote, so the subsections that follow (communication,
+ analytics, AI coach integration, backend flows, API &amp; database, gamification)
+ can be read as zoom-ins on something already seen end-to-end.
+ </p>
+
+ <div class="video-row single">
+ <div class="video-box">
+ <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/dashboard/walkthrough.mp4" style="max-width:400px;"></video>
+ <sub>Figure: Full phone dashboard walkthrough</sub>
+ </div>
+ </div>
+
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.1 COMMUNICATION ARCHITECTURE -->
@@ -251,8 +267,14 @@
  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><h2 id="sw-coach" style="margin:0;">5.3.3.3 AI Coach on the Dashboard</h2><sl-badge variant="primary" pill style="font-size:0.75rem;">RI-7</sl-badge></div>
 
  <p>
- The LLM coaching system (described in <a href="robot-intelligence-integration.html">Section 5.3.2</a>)
- surfaces on the phone dashboard through two features:
+ The same <strong>LLM Coach</strong> introduced in
+ <a href="robot-intelligence-integration.html#int-llm">5.3.2.4</a>
+ (Gemma 4 E2B running on the Jetson) is exposed to the phone dashboard via
+ FastAPI. This subsection focuses only on the two dashboard-side surfaces,
+ post-session analysis and interactive chat, while the on-device model,
+ prompt design, and fallback logic remain in 5.3.2.4. On the dashboard the
+ coach is labelled "AI Coach" for users; the two names refer to the same
+ system.
  </p>
 
  <h3>Post-Session Analysis</h3>
@@ -421,18 +443,6 @@
  </div>
  </div>
 
- <h3>Full Dashboard Walkthrough</h3>
- <p>
- The video below shows all dashboard views in action:
- </p>
-
- <div class="video-row single">
- <div class="video-box">
- <video autoplay loop muted playsinline controls src="../assets/robot_intelligence/dashboard/walkthrough.mp4" style="max-width:400px;"></video>
- <sub>Phone dashboard walkthrough</sub>
- </div>
- </div>
-
  <sl-divider></sl-divider>
 
  <!-- 5.3.3.5 API & DATABASE DESIGN -->
@@ -489,6 +499,12 @@
  </tr>
  </tbody>
  </table>
+ <p style="font-size:0.88rem; color:#555; font-style:italic; margin-top:-4px;">
+ Note: the <code>coach</code> router and role above refer to a <strong>human
+ gym-instructor account</strong> that manages multiple training stations, and
+ is distinct from the <strong>AI Coach</strong> feature in 5.3.3.3, which is
+ the on-device LLM exposed via the <code>chat</code> router.
+ </p>
 
  <h3>Two-Tier Database</h3>
 
