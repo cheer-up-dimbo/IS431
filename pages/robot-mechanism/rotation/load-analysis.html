@@ -61,95 +61,11 @@
         BoxBunny distinguishes between a <strong>characteristic training load (F<sub>char</sub> = 1.8 kN)</strong> for normal operation and a conservative <strong>structural design load (F<sub>design</sub> = 2.7 kN)</strong> for safety. A <strong>service factor (SF)</strong> is applied to nominal punch forces to account for dynamic impacts, ensuring components are sized with sufficient margin. The bearing, rotating support structure, and frame are checked against F<sub>design</sub>, while the motor and transmission are selected primarily from F<sub>char</sub> and motion demands.
       </p>
       
-      <div style="display: flex; flex-direction: column; align-items: center; margin: 24px 0;">
-        <div style="width: 80%; max-width: 600px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; background: #fff;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
-            <defs>
-              <!-- Red Arrow for Applied Loads -->
-              <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#d32f2f" />
-              </marker>
-              <!-- Blue Arrow for Reaction/Weight/Friction -->
-              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#1976d2" />
-              </marker>
-              <!-- Dimension Line Arrows -->
-              <marker id="dim-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-                <path d="M 10 0 L 0 5 L 10 10 z" fill="#757575" />
-              </marker>
-              <marker id="dim-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#757575" />
-              </marker>
-            </defs>
-
-            <!-- Background -->
-            <rect width="100%" height="100%" fill="#ffffff" />
-            
-            <!-- Ground Line & Hatching -->
-            <line x1="50" y1="400" x2="550" y2="400" stroke="#9e9e9e" stroke-width="3" />
-            <path d="M 70 400 L 60 410 M 110 400 L 100 410 M 150 400 L 140 410 M 190 400 L 180 410 M 230 400 L 220 410 M 270 400 L 260 410 M 310 400 L 300 410 M 350 400 L 340 410 M 390 400 L 380 410 M 430 400 L 420 410 M 470 400 L 460 410 M 510 400 L 500 410 M 550 400 L 540 410" stroke="#9e9e9e" stroke-width="1.5" />
-
-            <!-- Centerline -->
-            <line x1="300" y1="40" x2="300" y2="420" stroke="#bdbdbd" stroke-width="1.5" stroke-dasharray="10,5,2,5" />
-
-            <!-- Horizontal Axis -->
-            <line x1="80" y1="355" x2="520" y2="355" stroke="#bdbdbd" stroke-width="1.5" stroke-dasharray="10,5,2,5" />
-            <text x="80" y="345" font-family="sans-serif" font-size="12" fill="#757575">Horizontal Axis</text>
-
-            <!-- Base Structure -->
-            <rect x="210" y="370" width="180" height="30" fill="#eceff1" stroke="#424242" stroke-width="2" rx="2"/>
-
-            <!-- Slewing Bearing -->
-            <!-- Outer Rings (Fixed to base) -->
-            <rect x="230" y="340" width="20" height="30" fill="#cfd8dc" stroke="#424242" stroke-width="2"/>
-            <rect x="350" y="340" width="20" height="30" fill="#cfd8dc" stroke="#424242" stroke-width="2"/>
-            <!-- Inner Ring (Rotating) -->
-            <rect x="250" y="340" width="100" height="30" fill="#b0bec5" stroke="#424242" stroke-width="2"/>
-            <!-- Rolling Elements (Balls) -->
-            <circle cx="250" cy="355" r="5" fill="#ffffff" stroke="#424242" stroke-width="1.5"/>
-            <circle cx="350" cy="355" r="5" fill="#ffffff" stroke="#424242" stroke-width="1.5"/>
-
-            <!-- Ring Labels -->
-            <text x="140" y="315" font-family="sans-serif" font-size="12" fill="#424242">Outer Ring</text>
-            <line x1="190" y1="310" x2="235" y2="340" stroke="#757575" stroke-width="1"/>
-            <text x="375" y="315" font-family="sans-serif" font-size="12" fill="#424242">Inner Ring</text>
-            <line x1="370" y1="310" x2="340" y2="340" stroke="#757575" stroke-width="1"/>
-
-            <!-- Upper Body / Mast -->
-            <rect x="270" y="120" width="60" height="220" fill="#ffcc80" stroke="#f57c00" stroke-width="2" rx="4"/>
-            <!-- Target Area (Head/Torso) -->
-            <rect x="250" y="60" width="100" height="60" fill="#ffe0b2" stroke="#f57c00" stroke-width="2" rx="8"/>
-
-            <!-- Forces -->
-            <!-- F_design (Punch) -->
-            <line x1="90" y1="90" x2="240" y2="90" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
-            <text x="130" y="80" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">design</tspan></text>
-            
-            <!-- F_a (Axial Load / Weight) -->
-            <line x1="300" y1="180" x2="300" y2="330" stroke="#1976d2" stroke-width="4" marker-end="url(#arrow-blue)" />
-            <text x="310" y="260" font-family="sans-serif" font-size="18" fill="#1976d2" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">a</tspan></text>
-
-            <!-- F_r (Radial Load) -->
-            <line x1="150" y1="355" x2="220" y2="355" stroke="#d32f2f" stroke-width="4" marker-end="url(#arrow-red)" />
-            <text x="120" y="360" font-family="sans-serif" font-size="18" fill="#d32f2f" font-weight="bold">F<tspan baseline-shift="sub" font-size="12">r</tspan></text>
-
-            <!-- M_k (Tilting Moment) -->
-            <path d="M 200 240 A 120 120 0 0 1 400 240" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-red)" />
-            <text x="410" y="220" font-family="sans-serif" font-size="20" fill="#d32f2f" font-weight="bold">M<tspan baseline-shift="sub" font-size="14">k</tspan></text>
-
-            <!-- Dimensions -->
-            <!-- d (Lever arm) -->
-            <line x1="480" y1="90" x2="480" y2="355" stroke="#757575" stroke-width="1.5" marker-start="url(#dim-start)" marker-end="url(#dim-end)" />
-            <text x="495" y="230" font-family="sans-serif" font-size="16" fill="#757575" font-style="italic">d</text>
-            <!-- Extension lines -->
-            <line x1="360" y1="90" x2="490" y2="90" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
-            <line x1="380" y1="355" x2="490" y2="355" stroke="#757575" stroke-width="1" stroke-dasharray="4,4" />
-          </svg>
-        </div>
-        <sub style="display: block; margin-top: 12px; font-style: italic; color: #555; text-align: center;">
-          Figure: Free-Body Diagram of loads acting on the slewing bearing.
-        </sub>
-      </div>
+      <image-component
+        tag="image"
+        source="../../../assets/robot_mechanism/slewing_bearing_fbd.svg"
+        subtitle="Figure: Free-Body Diagram of loads acting on the slewing bearing.">
+      </image-component>
 
       <h4>Structural Loading of the Yaw Stage</h4>
       <p>The yaw stage bearing and frame experience three main loads that dictate their design:</p>
