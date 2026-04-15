@@ -651,31 +651,11 @@
         with mode, date, and key metric.
       </p>
 
-      <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:700px; margin:16px auto; display:block;">
-        <text x="350" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Home Dashboard Layout Zones</text>
-        <rect x="40" y="40" width="620" height="310" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-
-        <rect x="55" y="55" width="590" height="45" rx="6" fill="#e0f2fe" stroke="#0284c7"/>
-        <text x="350" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#0c4a6e">Header: Display Name · Rank Tier · Active Streak</text>
-
-        <rect x="55" y="110" width="590" height="40" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
-        <text x="350" y="134" text-anchor="middle" font-size="12" font-weight="bold" fill="#4c1d95">Gamification Row: Cumulative XP · Tier Progress Bar</text>
-
-        <text x="60" y="175" font-size="11" font-weight="bold" fill="#475569">Mode Selection Grid</text>
-        <g font-size="11" text-anchor="middle" fill="#1e293b">
-          <rect x="55"  y="185" width="140" height="70" rx="6" fill="#dcfce7" stroke="#16a34a"/><text x="125" y="225">Training</text>
-          <rect x="205" y="185" width="140" height="70" rx="6" fill="#fee2e2" stroke="#dc2626"/><text x="275" y="225">Sparring</text>
-          <rect x="355" y="185" width="140" height="70" rx="6" fill="#fef3c7" stroke="#d97706"/><text x="425" y="225">Free Training</text>
-          <rect x="505" y="185" width="140" height="70" rx="6" fill="#e0e7ff" stroke="#4f46e5"/><text x="575" y="225">Performance Tests</text>
-        </g>
-
-        <text x="60" y="280" font-size="11" font-weight="bold" fill="#475569">Recent Sessions (5 most recent)</text>
-        <g font-size="10" fill="#334155">
-          <rect x="55" y="290" width="590" height="18" rx="3" fill="#f1f5f9"/><text x="65" y="303">Training · 2026-04-13 · Accuracy 82%</text>
-          <rect x="55" y="310" width="590" height="18" rx="3" fill="#f1f5f9"/><text x="65" y="323">Sparring · 2026-04-12 · Defense 71%</text>
-          <rect x="55" y="330" width="590" height="18" rx="3" fill="#f1f5f9"/><text x="65" y="343">Training · 2026-04-11 · Accuracy 78%</text>
-        </g>
-      </svg>
+      <image-component
+        tag="image"
+        source="../../assets/gui/screenshots/guest_welcome_page.png"
+        subtitle="Home dashboard interface">
+      </image-component>
 
       <h4>Preset Quick-Start</h4>
       <p>
@@ -687,6 +667,11 @@
         what they want to do. The full preset library is accessible via a separate
         Presets page linked from the header.
       </p>
+      <image-component
+        tag="image"
+        source="../../assets/gui/screenshots/preset.png"
+        subtitle="Preset quick-start interface">
+      </image-component>
 
       <h4>Recent Sessions</h4>
       <p>
@@ -698,6 +683,11 @@
         users a quick reference for their last session without navigating to the
         history page.
       </p>
+      <image-component
+        tag="image"
+        source="../../assets/gui/screenshots/history.png"
+        subtitle="Recent sessions interface">
+      </image-component>
 
       <h4>Coach Station View</h4>
       <p>
@@ -709,6 +699,11 @@
         idle station. This view was designed for a gym context where one coach
         manages several simultaneous users on separate BoxBunny units.
       </p>
+      <image-component
+        tag="image"
+        source="../../assets/gui/screenshots/coach_welcome_page.png"
+        subtitle="Coach station home interface">
+      </image-component>
     </div>
 
     <sl-divider></sl-divider>
@@ -758,6 +753,11 @@
         configuration. The custom combination is held in memory for the session
         and is not persisted unless the user explicitly saves it as a preset.
       </p>
+      <image-component
+        tag="image"
+        source="../../assets/gui/screenshots/custom_sequence_technique_drill.png"
+        subtitle="Custom combo builder interface">
+      </image-component>
 
       <h4>Live Session HUD</h4>
       <p>
@@ -1757,11 +1757,140 @@ class CustomPage(ButtonNavigationMixin, QWidget):
       <table-component id="gui-feature-set" subtitle="Table 5.1.2-7: Complete Feature Set"></table-component>
     </div>
 
+    <sl-divider></sl-divider>
+
+    <!-- PERFORMANCE-ORIENTED DESIGN DECISIONS -->
+    <div>
+      <h3>Performance-Oriented Design Decisions</h3>
+      <p>
+        The benchmark results presented in the Testing and Evaluation section are a direct
+        consequence of specific data structure and architectural choices made during
+        implementation. Five decisions are identified below, each with its theoretical
+        basis and measurable effect.
+      </p>
+
+      <h4>Hash Table Page Routing</h4>
+      <p>
+        The <code>PageRouter</code> stores registered pages in a Python dictionary
+        (<code>self._pages: Dict[str, QWidget]</code>), which is implemented as a hash
+        table. Page existence checks and widget retrieval are therefore O(1) average-case
+        operations regardless of how many pages are registered (Cormen et al., 2009).
+        With 25 pages registered at startup, any navigation call resolves the target widget
+        in constant time. This is the primary reason page transition times are independent
+        of application size.
+      </p>
+      <div style="margin: 14px 0 18px; overflow-x: auto;">
+        <svg viewBox="0 0 860 150" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:700px; height:auto; display:block;" aria-label="Hash table routing flow">
+          <rect x="0" y="0" width="860" height="150" rx="12" fill="#f8fafc"/>
+          <text x="430" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Hash Table Page Routing</text>
+          <rect x="40" y="50" width="180" height="64" rx="12" fill="#dbeafe" stroke="#93c5fd"/>
+          <text x="130" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">Navigation Call</text>
+          <text x="130" y="95" text-anchor="middle" font-size="10" fill="#1e40af">page_id string</text>
+          <rect x="330" y="50" width="200" height="64" rx="12" fill="#dcfce7" stroke="#86efac"/>
+          <text x="430" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">dict hash lookup</text>
+          <text x="430" y="95" text-anchor="middle" font-size="10" fill="#166534">self._pages[page_id]</text>
+          <rect x="640" y="50" width="180" height="64" rx="12" fill="#fff7ed" stroke="#fdba74"/>
+          <text x="730" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">Target QWidget</text>
+          <text x="730" y="95" text-anchor="middle" font-size="10" fill="#9a3412">immediate resolution</text>
+          <line x1="220" y1="82" x2="330" y2="82" stroke="#64748b" stroke-width="2.2"/>
+          <line x1="530" y1="82" x2="640" y2="82" stroke="#64748b" stroke-width="2.2"/>
+          <text x="430" y="136" text-anchor="middle" font-size="11" fill="#334155">Average-case lookup cost remains O(1) as page count grows.</text>
+        </svg>
+      </div>
+
+      <h4>Stack-Based Navigation History</h4>
+      <p>
+        Back navigation is implemented using a Python list as a stack
+        (<code>self._history.append</code> to push, <code>self._history.pop()</code> to
+        return). Python list append is amortised O(1) due to dynamic array doubling
+        (Cormen et al., 2009). This gives the back-navigation system constant-time cost
+        at any navigation depth, avoiding the need to traverse or rebuild a navigation
+        tree on each back press.
+      </p>
+
+      <h4>Lazy Module Loading</h4>
+      <p>
+        Pages are loaded via <code>importlib.import_module</code> inside
+        <code>_try_load_page</code> at registration time rather than at package import
+        time. All page package <code>__init__.py</code> files are intentionally empty,
+        and many pages use <code>TYPE_CHECKING</code>-only imports and function-local
+        imports for heavy or optional dependencies such as OpenCV and database helpers.
+        This implements the lazy initialisation pattern (Gamma et al., 1994), deferring
+        import cost from the startup critical path to first feature activation. The
+        result is that startup time reflects only the cost of constructing the active
+        page, not the cumulative import cost of all 25 page modules.
+      </p>
+      <div style="margin: 14px 0 18px; overflow-x: auto;">
+        <svg viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:760px; height:auto; display:block;" aria-label="Lazy module loading comparison">
+          <rect x="0" y="0" width="900" height="190" rx="12" fill="#f8fafc"/>
+          <text x="450" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Lazy Loading Reduces Startup Critical Path</text>
+
+          <text x="145" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">Eager import path</text>
+          <rect x="30" y="66" width="230" height="24" rx="6" fill="#fecaca"/>
+          <rect x="30" y="96" width="170" height="24" rx="6" fill="#fed7aa"/>
+          <rect x="30" y="126" width="210" height="24" rx="6" fill="#fde68a"/>
+          <text x="145" y="82" text-anchor="middle" font-size="10" fill="#7f1d1d">Import all page modules</text>
+          <text x="115" y="112" text-anchor="middle" font-size="10" fill="#9a3412">Heavy dependencies</text>
+          <text x="135" y="142" text-anchor="middle" font-size="10" fill="#854d0e">Construct first page</text>
+
+          <text x="620" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">Lazy import path</text>
+          <rect x="500" y="66" width="180" height="24" rx="6" fill="#bfdbfe"/>
+          <rect x="500" y="96" width="130" height="24" rx="6" fill="#bbf7d0"/>
+          <rect x="500" y="126" width="230" height="24" rx="6" fill="#ddd6fe"/>
+          <text x="590" y="82" text-anchor="middle" font-size="10" fill="#1e3a8a">Register routes</text>
+          <text x="565" y="112" text-anchor="middle" font-size="10" fill="#166534">Render active page</text>
+          <text x="615" y="142" text-anchor="middle" font-size="10" fill="#5b21b6">Import other pages on first use</text>
+
+          <text x="450" y="174" text-anchor="middle" font-size="11" fill="#334155">Startup cost is shifted from global import time to feature activation time.</text>
+        </svg>
+      </div>
+
+      <h4>Connection-Per-Call Database Pattern</h4>
+      <p>
+        The database helper (<code>db_helper._conn()</code>) creates a new SQLite
+        connection per call via a context manager rather than maintaining a shared
+        long-lived connection. This follows the connection factory pattern (Fowler,
+        2002), which avoids idle memory retention from open cursors and prevents
+        connection state corruption across sequential operations. The trade-off is a
+        small per-query setup cost, which is acceptable given SQLite's sub-millisecond
+        connection overhead on local storage.
+      </p>
+
+      <h4>Bounded History Materialisation</h4>
+      <p>
+        Session history retrieval is capped at 50 rows at the query level. This makes
+        memory consumption and parse time O(k) where k is fixed at 50, rather than O(n)
+        where n grows unboundedly with user history. Bounding query results at the data
+        layer is a standard technique for preventing unbounded memory growth in
+        interactive applications (Fowler, 2002) and directly contributes to the stable
+        memory footprint observed across all three checkpoints in the memory benchmark.
+      </p>
+      <div style="margin: 14px 0 6px; overflow-x: auto;">
+        <svg viewBox="0 0 860 170" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:700px; height:auto; display:block;" aria-label="Bounded versus unbounded history growth">
+          <rect x="0" y="0" width="860" height="170" rx="12" fill="#f8fafc"/>
+          <text x="430" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Bounded History Materialisation</text>
+
+          <line x1="80" y1="130" x2="780" y2="130" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="80" y1="50" x2="80" y2="130" stroke="#94a3b8" stroke-width="2"/>
+
+          <polyline points="90,122 200,112 310,98 420,82 530,64 640,52 750,42" fill="none" stroke="#ef4444" stroke-width="3"/>
+          <line x1="90" y1="92" x2="750" y2="92" stroke="#22c55e" stroke-width="3"/>
+
+          <text x="756" y="45" font-size="10" fill="#991b1b">Unbounded O(n)</text>
+          <text x="756" y="95" font-size="10" fill="#166534">Bounded O(50)</text>
+          <text x="430" y="146" text-anchor="middle" font-size="11" fill="#334155">Row cap at query time keeps memory and parse cost stable across long-term usage.</text>
+        </svg>
+      </div>
+    </div>
+
     <!-- REFERENCES -->
     <div>
       <h3>References</h3>
       <ul style="list-style:none; padding-left:0; font-size:0.92rem; line-height:1.7;">
         <li>Bloom, B.S. (1984). The 2 Sigma Problem: The Search for Methods of Group Instruction as Effective as One-to-One Tutoring. <em>Educational Researcher</em>, 13(6), 4-16.</li>
+        <li>Cormen, T.H., Leiserson, C.E., Rivest, R.L. and Stein, C. (2009). <em>Introduction to Algorithms</em> (3rd ed.). MIT Press.</li>
+        <li>Fowler, M. (2002). <em>Patterns of Enterprise Application Architecture</em>. Addison-Wesley.</li>
+        <li>Gamma, E., Helm, R., Johnson, R. and Vlissides, J. (1994). <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>. Addison-Wesley.</li>
         <li>Gaver, W.W. (1989). The SonicFinder: An interface that uses auditory icons. <em>Human-Computer Interaction</em>, 4(1), 67-94.</li>
         <li>Hamari, J., Koivisto, J. and Sarsa, H. (2014). Does gamification work? A literature review of empirical studies on gamification. <em>Proceedings of the 47th Hawaii International Conference on System Sciences</em>, 3025-3034.</li>
         <li>Kosinski, R.J. (2008). A literature review on reaction time. <em>Clemson University</em>, 10, 1-19.</li>

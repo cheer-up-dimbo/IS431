@@ -757,6 +757,212 @@
 
     <sl-divider></sl-divider>
 
+    <!-- AUTOMATED PERFORMANCE BENCHMARKS -->
+    <div>
+      <h3>Automated Performance Benchmarks</h3>
+
+      <h4>Scope and Test Environment</h4>
+      <p>
+        To complement the functional test cases above, a dedicated benchmark script
+        (<code>tests/benchmark_gui.py</code>) was written to instrument five quantitative
+        performance targets defined during design. The script was executed on the development
+        machine (Windows 10, PySide6 offscreen mode) prior to integration with the Jetson
+        Orin NX, Teensy, and Ubuntu production environment. This is consistent with the
+        subsystem-independent development strategy used throughout the project: because the
+        GUI communicates with all hardware subsystems through an abstracted integration layer,
+        its core performance characteristics can be verified in isolation. Full system-level
+        performance under live hardware conditions was not captured within the project
+        timeline and is noted as a limitation below. The specific data structure and
+        architectural choices that underpin these results are documented in the
+        <a href="implementation.html">Implementation section</a>.
+      </p>
+
+      <h4>Response Time Target Rationale</h4>
+      <p>
+        Response time targets were grounded in Nielsen's (1993) three response time limits
+        for interactive systems. Nielsen established that 1.0 second is the upper boundary
+        for maintaining uninterrupted user flow, and 10 seconds is the limit before a user's
+        attention is lost entirely. For a training interface where users are actively
+        mid-session, page transitions must remain well below the 1-second threshold to avoid
+        disrupting the training experience. The 500 ms target for page transitions and the
+        3000 ms startup target were set accordingly. Database query latency was bounded at
+        200 ms, consistent with the sub-second flow maintenance threshold: queries that feed
+        into page rendering must resolve before the user perceives any delay (Nielsen, 1993).
+      </p>
+
+      <h4>Measurement Methodology</h4>
+      <p>
+        Each test was run for a fixed number of repetitions with mean, standard deviation,
+        and maximum reported. The first startup run was discarded as a warmup due to cold
+        Python import cache effects. Navigation transition times resolved within a single
+        Qt event loop tick on the offscreen renderer, producing sub-millisecond values;
+        these are reported as &lt;1 ms and confirm the target is met, though exact
+        on-device values under a live framebuffer will differ. Memory consumption was
+        measured using <code>psutil</code> process RSS at three checkpoints.
+      </p>
+
+      <h4>Benchmark Results</h4>
+
+      <div style="overflow-x:auto; margin: 16px 0;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">Test</th>
+            <th style="padding:8px; border:1px solid #ddd;">Metric</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">n</th>
+            <th style="padding:8px; border:1px solid #ddd;">Mean</th>
+            <th style="padding:8px; border:1px solid #ddd;">Std</th>
+            <th style="padding:8px; border:1px solid #ddd;">Max</th>
+            <th style="padding:8px; border:1px solid #ddd;">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Application startup time</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;3000 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">5</td>
+            <td style="padding:8px; border:1px solid #ddd;">758 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">33 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">811 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;" rowspan="4">2</td>
+            <td style="padding:8px; border:1px solid #ddd;">home &rarr; training session</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">10</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">home &rarr; coach station</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">10</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">home &rarr; history</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">10</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">home &rarr; settings</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">10</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">2 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;" rowspan="3">3</td>
+            <td style="padding:8px; border:1px solid #ddd;">Auth lookup</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;200 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">20</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.0 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.2 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Session history (50 rows)</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;200 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">20</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.3 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.6 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">Combo lookup</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;200 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">20</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.1 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.0 ms</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.2 ms</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;" rowspan="3">4</td>
+            <td style="padding:8px; border:1px solid #ddd;">Memory: idle baseline</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 MB</td>
+            <td style="padding:8px; border:1px solid #ddd;">1</td>
+            <td style="padding:8px; border:1px solid #ddd;">123 MB</td>
+            <td style="padding:8px; border:1px solid #ddd;">--</td>
+            <td style="padding:8px; border:1px solid #ddd;">--</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">Memory: after page traversal</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 MB</td>
+            <td style="padding:8px; border:1px solid #ddd;">1</td>
+            <td style="padding:8px; border:1px solid #ddd;">126 MB</td>
+            <td style="padding:8px; border:1px solid #ddd;">--</td>
+            <td style="padding:8px; border:1px solid #ddd;">--</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td style="padding:8px; border:1px solid #ddd;">Memory: after session simulation</td>
+            <td style="padding:8px; border:1px solid #ddd;">&lt;500 MB</td>
+            <td style="padding:8px; border:1px solid #ddd;">1</td>
+            <td style="padding:8px; border:1px solid #ddd;">126 MB</td>
+            <td style="padding:8px; border:1px solid #ddd;">--</td>
+            <td style="padding:8px; border:1px solid #ddd;">--</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Data isolation (5 users, 25 assertions)</td>
+            <td style="padding:8px; border:1px solid #ddd;">0 contamination</td>
+            <td style="padding:8px; border:1px solid #ddd;">25</td>
+            <td style="padding:8px; border:1px solid #ddd;" colspan="3">0 cross-user records detected</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:600;">PASS</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="text-align:center; font-style:italic; font-size:0.9rem; margin-top:4px;">
+        Table 5.1.3-3: Automated performance benchmark results. Run on Windows 10 development
+        machine, PySide6 offscreen mode, prior to Jetson hardware integration.
+        Navigation values of &lt;1 ms reflect offscreen rendering resolution limits
+        and confirm the target is met; on-device framebuffer values are expected to
+        be higher but remain within the 500 ms threshold (Nielsen, 1993).
+      </p>
+
+      <h4>Benchmark Limitations</h4>
+      <p>
+        All five tests passed on the development machine. Two limitations apply to the
+        interpretation of these results. First, startup time was measured against a warm
+        Python environment; the first run was discarded as a warmup, so the reported 758 ms
+        mean reflects cached-import conditions. Cold startup on the Jetson at power-on may
+        be higher. Second, page transition times resolved within a single Qt event loop tick
+        on the offscreen renderer. The sub-millisecond values confirm the target is satisfied
+        but do not represent the true on-device rendering latency under a live display.
+        Re-running the benchmark script on the Jetson with a connected display will yield
+        more representative transition figures.
+      </p>
+
+      <div>
+        <h4>References</h4>
+        <ul style="list-style:none; padding-left:0; font-size:0.92rem; line-height:1.7;">
+          <li>Nielsen, J. (1993). <em>Usability Engineering</em>. Academic Press.</li>
+        </ul>
+      </div>
+    </div>
+
+    <sl-divider></sl-divider>
+
     <!-- PERFORMANCE CRITERIA ASSESSMENT -->
     <div>
       <h3>Performance Criteria Assessment</h3>
