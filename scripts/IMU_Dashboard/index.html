@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMU Telemetry Dashboard</title>
-    <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts for premium typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="background-mesh"></div>
     <div class="dashboard-container">
-        <!-- Header -->
         <header>
             <div class="logo">
                 <div class="pulse-ring"></div>
@@ -28,10 +25,9 @@
             </div>
         </header>
 
-        <!-- Metrics Grid -->
         <section class="metrics-grid">
             <div class="card metric-card glass">
-                <h3>Live <span class="highlight-blue">Strike Velocity</span></h3>
+                <h3>Base <span class="highlight-blue">Sliding Velocity</span></h3>
                 <div class="metric-value">
                     <span id="strikeVal">0.00</span>
                     <span class="unit">m/s</span>
@@ -49,7 +45,7 @@
             </div>
 
             <div class="card metric-card glass">
-                <h3>Structure <span class="highlight-emerald">Stability</span></h3>
+                <h3>Impact <span class="highlight-emerald">Vibration</span></h3>
                 <div class="metric-value shake-value">
                     <span id="shakeVal">0.000</span>
                     <span class="unit">Var</span>
@@ -58,7 +54,6 @@
             </div>
         </section>
 
-        <!-- Charts Area -->
         <section class="charts-section">
             <div class="card chart-card glass">
                 <h3>Acceleration Vectors</h3>
