@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMU Telemetry Dashboard</title>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <div class="pulse-ring"></div>
+                <h1>CDE4301 IMU <span>Telemetry</span></h1>
+            </div>
+            <div class="controls">
+                <span class="status-indicator disconnected" id="connectionStatus">Disconnected</span>
+                <button id="btnConnect" class="btn primary">Connect</button>
+                <button id="btnCalibrate" class="btn secondary">Calibrate (0g)</button>
+                <button id="btnRecord" class="btn secondary">Start Record</button>
+                <button id="btnExport" class="btn action" disabled>Export CSV</button>
+            </div>
+        </header>
+
+        <!-- Metrics Grid -->
+        <section class="metrics-grid">
+            <div class="card metric-card glass">
+                <h3>Live <span class="highlight-blue">Strike Velocity</span></h3>
+                <div class="metric-value">
+                    <span id="strikeVal">0.00</span>
+                    <span class="unit">m/s</span>
+                </div>
+                <p>Peak Accel: <span id="peakAccelVal">0.0</span> g</p>
+            </div>
+            
+            <div class="card metric-card glass">
+                <h3>Base <span class="highlight-purple">Rotation Speed</span></h3>
+                <div class="metric-value">
+                    <span id="rotationVal">0</span>
+                    <span class="unit">RPM</span>
+                </div>
+                <p>Gyro Z-Axis</p>
+            </div>
+
+            <div class="card metric-card glass">
+                <h3>Structure <span class="highlight-emerald">Stability</span></h3>
+                <div class="metric-value shake-value">
+                    <span id="shakeVal">0.000</span>
+                    <span class="unit">Var</span>
+                </div>
+                <p>Tilt: Pitch <span id="pitchVal">0°</span> / Roll <span id="rollVal">0°</span></p>
+            </div>
+        </section>
+
+        <!-- Charts Area -->
+        <section class="charts-section">
+            <div class="card chart-card glass">
+                <h3>Acceleration Vectors</h3>
+                <div class="canvas-container">
+                    <canvas id="accelChart"></canvas>
+                </div>
+            </div>
+            <div class="card chart-card glass">
+                <h3>Gyroscopic Rotation</h3>
+                <div class="canvas-container">
+                    <canvas id="gyroChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
