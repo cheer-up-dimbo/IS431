@@ -704,9 +704,9 @@
  <h3>Inference Results Across Iterations</h3>
 
  <p>
- The videos below show two key earlier iterations side by side. They are doing
- <strong>different tasks</strong> (see the recognition vs. prediction distinction at
- the top of this page), so their accuracies are not directly comparable.
+ The videos below show two key earlier iterations side by side. The RGBD model
+ (left) is too heavy to run live on the Jetson, so inference is shown offline on
+ recorded clips; the lighter voxel+colour model (right) runs live on-device.
  </p>
 
  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;">
@@ -1102,7 +1102,7 @@
  <p style="margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid #e6e6e6; font-size:0.92rem;">
  <strong>Height adjustment.</strong> Manual in the current system; using
  CV-derived user height to drive the height mechanism automatically is future
- work in <a href="../sections/6-discussion-and-future-work.html#recommendations">Section 6.3</a>.
+ work in <a href="../index.html#recommendations">Section 6.3</a>.
  </p>
  <p style="margin:0; font-size:0.92rem;">
  <strong>Validation.</strong> Off-hardware via the
