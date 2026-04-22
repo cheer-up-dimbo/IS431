@@ -323,14 +323,8 @@
       </p>
 
       <div class="model-viewer-container" style="margin: 24px 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
-          <span style="font-size: 0.95rem; color: #555;">
-            <sl-icon name="info-circle" style="vertical-align: middle; margin-right: 4px;"></sl-icon>
-            Interact with the 3D model to explore its structure. Toggle annotations to view key components.
-          </span>
-          <sl-button id="toggle-hotspots" size="small" variant="default" pill>Hide Annotations</sl-button>
-        </div>
         <model-viewer
+          id="rot-viewer"
           src="../../assets/3d_models/v7_fab_assem_base_rotating.glb"
           alt="Interactive 3D Model: Rotational motion mechanism"
           camera-controls
@@ -376,49 +370,23 @@
           <div id="ar-prompt">
               <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
           </div>
+          <sl-button id="toggle-annotations-rot" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Show/Hide Annotations</sl-button>
         </model-viewer>
         <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
-          Interactive 3D Model: Rotational motion mechanism showing slewing bearing, drive system, and motor.
+          Interactive 3D Model: Rotational motion mechanism showing slewing bearing, drive system, and motor.<br>
+          <span style="color: #666; font-size: 0.85rem;">Click and drag to rotate; scroll to zoom; right-click to pan. Toggle annotations to view key components.</span>
         </sub>
         <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('toggle-hotspots');
-            const viewer = document.querySelector('model-viewer');
-            let hotspotsVisible = true;
-            
-            if(toggleBtn && viewer) {
-              toggleBtn.addEventListener('click', () => {
-                hotspotsVisible = !hotspotsVisible;
-                if (hotspotsVisible) {
-                  viewer.classList.remove('hide-hotspots');
-                  toggleBtn.textContent = 'Hide Annotations';
-                } else {
-                  viewer.classList.add('hide-hotspots');
-                  toggleBtn.textContent = 'Show Annotations';
-                }
-              });
-            }
+          document.getElementById('toggle-annotations-rot').addEventListener('click', function() {
+            document.getElementById('rot-viewer').classList.toggle('hide-hotspots');
           });
         </script>
       </div>
-
       <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
-        Non-Geared Slewing Ring
-        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">High Stiffness + Compact</sl-badge>
+        Timing-Belt Transmission
+        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Drive System</sl-badge>
       </h4>
-      <p>
-        Another major design decision was the move away from the earlier <strong>large integrated geared slewing ring (011.25.400)</strong>. Although that concept was structurally strong, it was too heavy, too expensive, too difficult to handle, and too demanding in motor power relative to the actual needs of the robot. The final selected <strong>010.10.120 non-geared slewing ring</strong> still provides the required combined-load capacity, but with much better design appropriateness. This change also forced the drive system to become an explicitly designed subassembly rather than something inherited from the bearing.
-      </p>
-
-      <h4 style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
-        Modular Timing-Belt Drive
-        <sl-badge variant="primary" pill style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 500;">Flexible Ratio Tuning</sl-badge>
-      </h4>
-      <p>
-        The timing-belt drive was selected because it gives <strong>positive torque transmission</strong>, keeps the motor on the fixed structure, offers flexible ratio selection through pulley sizing, and is easier to package into the welded base than a bulky direct-drive or integrated gear solution. In the current design, the timing-belt transmission converged to the following selected parameters:
-      </p>
-      
-      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem;">
+      <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; margin-top: 8px;">
         <thead>
           <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
             <th style="padding: 12px; text-align: left;">Parameter</th>

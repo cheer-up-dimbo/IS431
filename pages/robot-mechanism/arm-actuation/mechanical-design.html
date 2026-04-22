@@ -155,19 +155,15 @@
 
       <!-- 3D Model Viewer with Hotspot Annotations -->
       <div class="model-viewer-container" style="margin: 24px 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
-          <span style="font-size: 0.95rem; color: #555;">
-            <sl-icon name="info-circle" style="vertical-align: middle; margin-right: 4px;"></sl-icon>
-            Interact with the 3D model to explore the arm joint assembly. Toggle annotations to view key components.
-          </span>
-          <sl-button id="toggle-hotspots" size="small" variant="default" pill>Hide Annotations</sl-button>
-        </div>
         <model-viewer
+          id="arm-md-viewer"
           src="../../../assets/3d_models/arm_joint_V5.glb"
           alt="Interactive 3D Model: V5 Arm Joint Assembly — Coaxial differential drivetrain with side-mounted Damiao motors, helical gear reduction, and bevel gear coupling."
           camera-controls
           touch-action="pan-y"
           auto-rotate
+          ar
+          ar-modes="webxr scene-viewer quick-look"
           tone-mapping="neutral"
           shadow-intensity="0.66"
           shadow-softness="1"
@@ -196,25 +192,17 @@
           <div class="progress-bar hide" slot="progress-bar">
               <div class="update-bar"></div>
           </div>
+          <button slot="ar-button" id="ar-button">View in your space</button>
+          <div id="ar-prompt"><img src="https://modelviewer.dev/shared-assets/icons/hand.png"></div>
+          <sl-button id="toggle-annotations-arm-md" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Show/Hide Annotations</sl-button>
         </model-viewer>
         <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
-          Interactive 3D Model: V5 Coaxial Differential Arm Joint Assembly
+          Interactive 3D Model: V5 Coaxial Differential Arm Joint Assembly<br>
+          <span style="color: #666; font-size: 0.85rem;">Click and drag to rotate; scroll to zoom; right-click to pan. Toggle annotations to view key components.</span>
         </sub>
         <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('toggle-hotspots');
-            const viewer = document.querySelector('model-viewer');
-            let hotspotsVisible = true;
-            toggleBtn.addEventListener('click', () => {
-              hotspotsVisible = !hotspotsVisible;
-              if (hotspotsVisible) {
-                viewer.classList.remove('hide-hotspots');
-                toggleBtn.textContent = 'Hide Annotations';
-              } else {
-                viewer.classList.add('hide-hotspots');
-                toggleBtn.textContent = 'Show Annotations';
-              }
-            });
+          document.getElementById('toggle-annotations-arm-md').addEventListener('click', function() {
+            document.getElementById('arm-md-viewer').classList.toggle('hide-hotspots');
           });
         </script>
       </div>

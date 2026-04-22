@@ -404,6 +404,25 @@
       document.head.appendChild(link);
     }
 
+    // Inject override styles to ensure the toggle button is always visible on desktop
+    // and allow the sidebar to slide out smoothly while expanding the content area.
+    if (!document.getElementById('report-nav-desktop-toggle-style')) {
+      const style = document.createElement('style');
+      style.id = 'report-nav-desktop-toggle-style';
+      style.textContent = `
+        .report-nav__toggle { display: block !important; z-index: 10000; }
+        .report-nav { transition: transform 0.3s ease; }
+        body, .content { transition: margin-left 0.3s ease, padding-left 0.3s ease; }
+        body.nav-collapsed .report-nav { transform: translateX(-100%) !important; }
+        body.nav-collapsed { padding-left: 0 !important; margin-left: 0 !important; }
+        body.nav-collapsed .content { 
+          margin-left: auto !important; 
+          margin-right: auto !important; 
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
     const nav = buildNav();
     const toggle = buildToggle(nav);
 

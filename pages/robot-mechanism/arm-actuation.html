@@ -476,14 +476,8 @@
         for impact detection.
       </p>
       <div class="model-viewer-container" style="margin: 24px 0;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 4px;">
-          <span style="font-size:0.95rem; color:#555;">
-            <sl-icon name="info-circle" style="vertical-align:middle; margin-right:4px;"></sl-icon>
-            Interact with the 3D model to explore the arm joint assembly. Toggle annotations to view key components.
-          </span>
-          <sl-button id="toggle-hotspots-front" size="small" variant="default" pill>Hide Annotations</sl-button>
-        </div>
         <model-viewer
+          id="arm-viewer"
           src="../../assets/3d_models/arm_joint_V5.glb"
           alt="Interactive 3D Model: V5 Arm Joint Assembly"
           camera-controls
@@ -515,27 +509,16 @@
             <div class="HotspotAnnotation">Stainless Steel D-Shaft (6 mm)</div>
           </button>
           <div class="progress-bar hide" slot="progress-bar"><div class="update-bar"></div></div>
+          <sl-button id="toggle-annotations-arm" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Show/Hide Annotations</sl-button>
         </model-viewer>
         <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
           Interactive 3D Model: V5 Coaxial Differential Arm Joint Assembly. Full annotated view in
-          <a href="arm-actuation/mechanical-design.html">Section 5.2.5.2 Mechanical Design</a>.
+          <a href="arm-actuation/mechanical-design.html">Section 5.2. Mechanical Design</a>.<br>
+          <span style="color: #666; font-size: 0.85rem;">Click and drag to rotate; scroll to zoom; right-click to pan. Toggle annotations to view key components.</span>
         </sub>
         <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('toggle-hotspots-front');
-            const viewer = document.querySelector('#front-model-viewer');
-            let hotspotsVisible = true;
-            toggleBtn.addEventListener('click', () => {
-              hotspotsVisible = !hotspotsVisible;
-              const mv = document.querySelector('model-viewer');
-              if (hotspotsVisible) {
-                mv.classList.remove('hide-hotspots');
-                toggleBtn.textContent = 'Hide Annotations';
-              } else {
-                mv.classList.add('hide-hotspots');
-                toggleBtn.textContent = 'Show Annotations';
-              }
-            });
+          document.getElementById('toggle-annotations-arm').addEventListener('click', function() {
+            document.getElementById('arm-viewer').classList.toggle('hide-hotspots');
           });
         </script>
     </div>

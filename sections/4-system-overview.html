@@ -11,7 +11,7 @@
         Prior to finalising the architecture, concept alternatives were evaluated for two key subsystems:
         the arm actuation joint and the lower mechanism base. For each subsystem, candidate concepts were
         scored against weighted engineering criteria and the concept yielding the highest composite score
-        was selected. The full evaluations, including requirements tables, benefits/limitations analyses,
+        was selected. The initial evaluations, including requirements tables, benefits/limitations analyses,
         and decision matrices, are documented in
         <a href="pages/appendix-upper.html">Appendix 1: Upper Mechanisms</a> and
         <a href="pages/appendix-lower.html">Appendix 2: Lower Mechanisms</a>.
@@ -34,7 +34,7 @@
         for yaw rotation. Omnidirectional wheels were penalised by low stiffness under punching impact
         and performance degradation on the foam and rubber surfaces prevalent in Singapore gym facilities.
         The decoupled-axis architecture was selected for its positional stiffness and repeatability under
-        repeated impulse loads, with a ball-screw drive and four-point contact slewing ring bearing
+        repeated impulse loads, with a packaged linear guide rail and rotating slewing ring bearing
         confirmed via separate decision matrices for the linear and yaw stages respectively.
       </p>
 
@@ -47,7 +47,7 @@
 
 
       <table class="report-table">
-        <caption>Table 5: BoxBunny System Architecture: Subsystems, Components, and Functions</caption>
+        <caption>Table 6: BoxBunny System Architecture: Subsystems, Components, and Functions</caption>
         <thead>
           <tr>
             <th style="width:22%">Subsystem</th>
@@ -194,9 +194,6 @@
       </style>
 
       <div style="margin: 24px 0; position: relative;">
-        <sl-button id="toggle-hotspots-sys" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 10;" onclick="document.getElementById('sys-model-viewer').classList.toggle('hide-hotspots'); this.textContent = document.getElementById('sys-model-viewer').classList.contains('hide-hotspots') ? 'Show Annotations' : 'Hide Annotations';">
-          Hide Annotations
-        </sl-button>
         <model-viewer
           id="sys-model-viewer"
           src="assets/3d_models/1Full_Assembly.glb"
@@ -229,9 +226,17 @@
           <button class="Hotspot" slot="hotspot-10" data-position="-0.16742454100698803m 0.6834125517217602m 0.16874547393576503m" data-normal="-0.3907311661431458m -1.6159021614455214e-16m 0.920504837469319m" data-visibility-attribute="visible">
               <div class="HotspotAnnotation">Striking Points / User Tracking</div>
           </button>
+          <sl-button id="toggle-annotations-sys" variant="default" size="small" style="position: absolute; top: 16px; right: 16px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Show/Hide Annotations</sl-button>
         </model-viewer>
-        <sub class="fig-caption">Figure 6: Interactive 3D Model — BoxBunny Full Assembly (Interim Concept).<br>
-          Click and drag to rotate; scroll to zoom; right-click to pan. Show/Hide Annotations for labelling.</sub>
+        <sub style="display:block; text-align:center; margin-top:8px; font-style:italic; font-size:0.9rem;">
+          Figure 5: Interactive 3D Model — BoxBunny Full Assembly (Conceptual Design).<br>
+          <span style="color: #666; font-size: 0.85rem;">Click and drag to rotate; scroll to zoom; right-click to pan. Toggle annotations to view key components.</span>
+        </sub>
+        <script>
+          document.getElementById('toggle-annotations-sys').addEventListener('click', function() {
+            document.getElementById('sys-model-viewer').classList.toggle('hide-hotspots');
+          });
+        </script>
       </div>
     </div>
 
@@ -239,7 +244,7 @@
     <div id="user-journey">
       <h3>4.3 User Journey</h3>
       <p>
-        Figure 7 presents a swim-lane diagram illustrating how the three subsystems collaborate across
+        Figure 6 presents a swim-lane diagram illustrating how the three subsystems collaborate across
         the five phases of a structured training session. During the Setup phase, only the User Interface
         is active: the boxer logs in, completes a proficiency assessment, and selects training mode and
         parameters. At the Countdown phase, all three subsystems initialise concurrently: Robot
@@ -382,7 +387,7 @@
         </svg>
       </div>
       <sub class="fig-caption">
-        Figure 7: BoxBunny user journey swim-lane diagram illustrating subsystem collaboration across the five
+        Figure 6: BoxBunny user journey swim-lane diagram illustrating subsystem collaboration across the five
         phases of a training session. Dashed lines indicate inter-subsystem data flows.
       </sub>
     </div>
