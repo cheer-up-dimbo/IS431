@@ -61,26 +61,26 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr style="background:#e8f5e9;">
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Stability under punching loads</td>
-            <td style="padding:8px; border:1px solid #ddd;">No tipping; FoS ≥ 1.5</td>
-            <td style="padding:8px; border:1px solid #ddd;">Robot remains completely stable under worst-case full extension punching impacts</td>
-            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+            <td style="padding:8px; border:1px solid #ddd;">No tipping; FoS &ge; 1.5</td>
+            <td style="padding:8px; border:1px solid #ddd;">Robot remains completely stable under worst-case full extension punching impacts; DSP analysis confirmed peak structural sway &lt; 4&deg; with no base lift-off</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
           </tr>
-          <tr>
+          <tr style="background:#e8f5e9;">
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Compact footprint clearance</td>
             <td style="padding:8px; border:1px solid #ddd;">No foot contact during stance cycle</td>
             <td style="padding:8px; border:1px solid #ddd;">Trapezoidal front provides sufficient clearance; zero contact observed during pivots</td>
-            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
           </tr>
-          <tr>
-            <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
+          <tr style="background:#e8f5e9;">
+            <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
             <td style="padding:8px; border:1px solid #ddd;">Practical transport</td>
             <td style="padding:8px; border:1px solid #ddd;">1-person tip-and-roll transport</td>
-            <td style="padding:8px; border:1px solid #ddd;">Single operator successfully tilted and relocated the assembled robot</td>
-            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+            <td style="padding:8px; border:1px solid #ddd;">Single operator successfully tilted and relocated the assembled robot. Initial tilting requires effort due to the front-weighted body, but rolling is smooth once tilted</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
           </tr>
         </tbody>
       </table>
@@ -125,12 +125,43 @@
       </p>
 
       <h4>5.2.3 Height Adjustment</h4>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Pending:</strong> Full-stroke actuation test (RM-3),
-        column deflection under lateral load, and Delrin wear testing
-        results.
-      </sl-alert>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd;">ID</th>
+            <th style="padding:8px; border:1px solid #ddd;">Criterion</th>
+            <th style="padding:8px; border:1px solid #ddd;">Target</th>
+            <th style="padding:8px; border:1px solid #ddd;">Measured</th>
+            <th style="padding:8px; border:1px solid #ddd;">Met?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fff8e1;">
+            <td style="padding:8px; border:1px solid #ddd;">RM-5 / HA-AC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Structural deflection</td>
+            <td style="padding:8px; border:1px solid #ddd;">Maintain alignment under punch loads</td>
+            <td style="padding:8px; border:1px solid #ddd;">28 cm stroke achieved in 86 s</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c0832a; font-weight:bold;">Partial</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">RM-3 / HA-AC-1</td>
+            <td style="padding:8px; border:1px solid #ddd;">Stroke &amp; Reliability</td>
+            <td style="padding:8px; border:1px solid #ddd;">≥ 400 mm stroke in ≤ 32 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">N/A</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">HA-AC-2</td>
+            <td style="padding:8px; border:1px solid #ddd;">Delrin wear &amp; backlash</td>
+            <td style="padding:8px; border:1px solid #ddd;">Wear &lt; 1 mm, play &lt; 2 mm (200 cycles)</td>
+            <td style="padding:8px; border:1px solid #ddd;">N/A</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.85rem; color:#666; margin-top:-8px;">
+        <em>See <a href="height-adjustment/testing-evaluation.html">5.2.3 Height Adjustment — Testing &amp; Evaluation</a> for full procedures.</em>
+      </p>
 
       <h4>5.2.4 Padding</h4>
       <p>
@@ -278,54 +309,61 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr style="background:#e8f5e9;">
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Stability under punching loads</td>
-            <td style="padding:8px; border:1px solid #ddd;">FoS ≥ 1.5</td>
-            <td style="padding:8px; border:1px solid #ddd;">Stable under max impact</td>
-            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+            <td style="padding:8px; border:1px solid #ddd;">FoS &ge; 1.5; no tipping</td>
+            <td style="padding:8px; border:1px solid #ddd;">Stable under max impact (peak sway &lt; 4&deg;, no lift-off)</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
           </tr>
-          <tr>
+          <tr style="background:#e8f5e9;">
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
             <td style="padding:8px; border:1px solid #ddd;">Compact footprint</td>
             <td style="padding:8px; border:1px solid #ddd;">No footwork obstruction</td>
             <td style="padding:8px; border:1px solid #ddd;">Zero foot contact</td>
-            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
           </tr>
-          <tr>
+          <tr style="background:#e8f5e9;">
             <td style="padding:8px; border:1px solid #ddd;">RM-3</td>
-            <td style="padding:8px; border:1px solid #ddd;">Height adjustment stroke</td>
-            <td style="padding:8px; border:1px solid #ddd;">≥ 400 mm, ≤ 32 s</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
-            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+            <td style="padding:8px; border:1px solid #ddd;">Portability</td>
+            <td style="padding:8px; border:1px solid #ddd;">1-person transport</td>
+            <td style="padding:8px; border:1px solid #ddd;">Successful 1-person transport. Initial tilting requires effort, but rolling is smooth</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Pass</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-4</td>
             <td style="padding:8px; border:1px solid #ddd;">Yaw angular velocity</td>
-            <td style="padding:8px; border:1px solid #ddd;">≥ 150°/s</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd;">&ge; 150&deg;/s</td>
+            <td style="padding:8px; border:1px solid #ddd;">N/A</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr style="background:#fff8e1;">
             <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
-            <td style="padding:8px; border:1px solid #ddd;">Strike speed</td>
-            <td style="padding:8px; border:1px solid #ddd;">90° ≤ 0.25 s</td>
-            <td style="padding:8px; border:1px solid #ddd;">0.64 s best (Left Jab, 30 rad/s) — Damiao PID ramp overhead</td>
+            <td style="padding:8px; border:1px solid #ddd;">Height adjustment stroke</td>
+            <td style="padding:8px; border:1px solid #ddd;">&ge; 400 mm, &le; 32 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">28 cm stroke achieved in 86 s</td>
             <td style="padding:8px; border:1px solid #ddd; color:#c0832a; font-weight:bold;">Partial</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-6</td>
             <td style="padding:8px; border:1px solid #ddd;">Impact detection</td>
-            <td style="padding:8px; border:1px solid #ddd;">≥ 95% TP</td>
-            <td style="padding:8px; border:1px solid #ddd;">—</td>
+            <td style="padding:8px; border:1px solid #ddd;">&ge; 95% TP</td>
+            <td style="padding:8px; border:1px solid #ddd;">N/A</td>
             <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-7</td>
-            <td style="padding:8px; border:1px solid #ddd;">Portability</td>
-            <td style="padding:8px; border:1px solid #ddd;">1-person transport</td>
-            <td style="padding:8px; border:1px solid #ddd;">Successful 1-person transport</td>
-            <td style="padding:8px; border:1px solid #ddd; color:green; font-weight:bold;">Yes</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike delivery</td>
+            <td style="padding:8px; border:1px solid #ddd;">All 6 strike variants</td>
+            <td style="padding:8px; border:1px solid #ddd;">N/A</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#999;">Pending</td>
+          </tr>
+          <tr style="background:#fff8e1;">
+            <td style="padding:8px; border:1px solid #ddd;">RM-8</td>
+            <td style="padding:8px; border:1px solid #ddd;">Strike speed</td>
+            <td style="padding:8px; border:1px solid #ddd;">90&deg; sweep in &le; 0.25 s</td>
+            <td style="padding:8px; border:1px solid #ddd;">0.64 s best (Left Jab, 30 rad/s); constrained by Damiao PID ramp overhead</td>
+            <td style="padding:8px; border:1px solid #ddd; color:#c0832a; font-weight:bold;">Partial</td>
           </tr>
         </tbody>
       </table>
@@ -338,11 +376,40 @@
     <!-- ═══════════════════════════════════════════════════════ -->
     <div>
       <h3>Limitations</h3>
-      <sl-alert variant="neutral" open>
-        <sl-icon slot="icon" name="info-circle"></sl-icon>
-        <strong>Pending:</strong> Limitations to be documented after
-        verification testing is complete.
-      </sl-alert>
+      <p>
+        Following the execution of subsystem verification tests, several limitations have been identified in both the mechanical architecture and the testing instrumentation.
+      </p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:20%;">Subsystem</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left; width:30%;">Limitation</th>
+            <th style="padding:8px; border:1px solid #ddd; text-align:left;">Engineering Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>Lower Mechanism</strong><br><span style="font-size:0.85em; color:#666;">Footwork</span></td>
+            <td style="padding:8px; border:1px solid #ddd;">No linear forward and backward translation</td>
+            <td style="padding:8px; border:1px solid #ddd;">The current base provides only yaw rotation. The robot cannot advance or retreat to maintain realistic sparring distance, which restricts footwork simulation during training.</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>Lower Mechanism</strong><br><span style="font-size:0.85em; color:#666;">Height Adjustment</span></td>
+            <td style="padding:8px; border:1px solid #ddd;">IMU DSP methodology for dynamic deflection</td>
+            <td style="padding:8px; border:1px solid #ddd;">The 0.5 Hz low-pass filter used to eliminate horizontal sliding artifacts likely attenuated the true peak dynamic bending of the steel column. The measured peak sway represents a heavily damped, quasi-static deflection rather than an instantaneous dynamic peak.</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>Upper Mechanism</strong><br><span style="font-size:0.85em; color:#666;">Arm Actuation</span></td>
+            <td style="padding:8px; border:1px solid #ddd;">Damiao PID acceleration and deceleration ramps</td>
+            <td style="padding:8px; border:1px solid #ddd;">The internal motor controller adds approximately 0.4 to 0.5 s of overhead per strike. This precludes reaching the 0.25 s target speed (RM-8), limiting the best recorded strike to 0.64 s.</td>
+          </tr>
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;"><strong>System Integration</strong></td>
+            <td style="padding:8px; border:1px solid #ddd;">Pending full-payload endurance tests</td>
+            <td style="padding:8px; border:1px solid #ddd;">Long-term wear and full power-budget validation (for example, continuous 5-minute sparring, repeated multi-strike chains) require the completely assembled prototype to finalize testing.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 

@@ -83,28 +83,28 @@
     <div>
       <h3>2. Test Procedures</h3>
       
-      <h4>Test 1: Angular Velocity Measurement (RM-4)</h4>
+      <h4 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">Test 1: Angular Velocity Measurement <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-4</sl-badge></h4>
       <ul>
         <li><strong>Setup:</strong> Robot fully assembled to ensure rotation motor is moving the accurate real-world inertia.</li>
         <li><strong>Procedure:</strong> Issue a 90&deg; step command to the yaw motor via the wireless interface. Measure the time-to-target using the encoder feedback logs.</li>
         <li><strong>Success Criteria:</strong> The robot completes the 90&deg; rotation in &le; 0.6 seconds, confirming a sustained angular velocity of at least 150&deg;/s.</li>
       </ul>
 
-      <h4>Test 2: Position Hold &amp; Disturbance Rejection (RM-1)</h4>
+      <h4 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">Test 2: Position Hold &amp; Disturbance Rejection <sl-badge variant="primary" pill style="font-size: 0.75rem;">RM-1</sl-badge></h4>
       <ul>
         <li><strong>Setup:</strong> Robot powered on and holding a commanded zero-degree yaw angle.</li>
         <li><strong>Procedure:</strong> Apply a 50 N lateral punch to the upper padding. Record the yaw axis angular deviation using the AS5047P encoder logs.</li>
         <li><strong>Success Criteria:</strong> Maximum angular deflection &le; 5&deg;, with the system returning to the commanded position within 500 ms without extended oscillation.</li>
       </ul>
 
-      <h4>Test 3: Transmission &amp; Outboard Support Integrity (ROT-AC-1)</h4>
+      <h4 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">Test 3: Transmission &amp; Outboard Support Integrity <sl-badge variant="primary" pill style="font-size: 0.75rem;">ROT-AC-1</sl-badge></h4>
       <ul>
         <li><strong>Setup:</strong> Assembled timing belt drive system and cam-follower supports.</li>
         <li><strong>Procedure:</strong> Command rapid acceleration and direction reversals. Apply off-axis loads (hooks) to the torso.</li>
         <li><strong>Success Criteria:</strong> Zero observed tooth-skip on the S8M belt. Cam followers maintain contact with the track, preventing visible plate tilt without binding or overconstraint.</li>
       </ul>
 
-      <h4>Test 4: Communication Reliability (ROT-AC-2)</h4>
+      <h4 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">Test 4: Communication Reliability <sl-badge variant="primary" pill style="font-size: 0.75rem;">ROT-AC-2</sl-badge></h4>
       <ul>
         <li><strong>Setup:</strong> Arduino Uno R4 WiFi connected to the local network alongside the Jetson host.</li>
         <li><strong>Procedure:</strong> Transmit 1,000 sequential yaw command frames via UDP at the target 20 Hz GUI refresh rate.</li>

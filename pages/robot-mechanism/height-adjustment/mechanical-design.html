@@ -60,6 +60,16 @@
       convenience feature.
     </p>
 
+    <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+      <h4 style="margin-top:0; color:#1e40af; display: flex; align-items: center; gap: 8px;">
+        <sl-icon name="rulers"></sl-icon>
+        Design Consideration: Stroke Requirement &amp; Overall Height Range
+      </h4>
+      <p style="margin-bottom:0;">
+        The fundamental requirement to provide a <strong>400 mm vertical stroke</strong> ensures that the robot's striking targets (head, liver, solar plexus) align anatomically with users ranging from 150 cm to 190 cm in stature. This 400 mm travel distance dictates the minimum required length of the inner sliding column and the effective thread length of the screw jack mechanism. Proper target-zone placement is critical to anthropometric validity, ensuring every user trains against a realistic opponent.
+      </p>
+    </div>
+
     <h3>Phase 2: Rear linear-guide plus central screw-jack concept</h3>
     <p>
       The first serious structural concept used <strong>two rear-mounted vertical
@@ -105,6 +115,23 @@
       and makes the structure more robust for prototype conditions and repeated handling.
     </p>
 
+    <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+      <h4 style="margin-top:0; color:#1e40af; display: flex; align-items: center; gap: 8px;">
+        <sl-icon name="shield-shaded"></sl-icon>
+        Design Consideration: Structural Stability Under Eccentric Loading
+      </h4>
+      <p>
+        The height-adjustment column does not only carry the vertical gravitational payload of the upper structure; it acts as the main structural spine of the robot. It experiences massive side loading and overturning moments transferred from boxing impacts. The nested tube design effectively channels these violent lateral and bending forces away from the fragile internal screw jack, reacting them safely into the base structure.
+      </p>
+      <h4 style="margin-top:16px; color:#1e40af; display: flex; align-items: center; gap: 8px;">
+        <sl-icon name="layers"></sl-icon>
+        Design Consideration: Guide Surface &amp; Wear Pad Interfaces
+      </h4>
+      <p style="margin-bottom:0;">
+        <strong>Delrin (POM) wear pads</strong> are utilized at the interface between the moving aluminium inner column and the fixed steel outer tube. These low-friction polymer pads serve multiple crucial functions: they reduce sliding friction, eliminate harsh metal-to-metal contact, and compensate for minor manufacturing misalignments. More importantly, they distribute localized contact loads over a wider area and act as a dampening layer to reduce wear, chatter, and vibration travelling down the frame when the robot is struck.
+      </p>
+    </div>
+
     <h3>Phase 4: Screw-jack integration</h3>
     <p>
       Once the telescopic guide structure had been defined, the screw jack was
@@ -115,6 +142,16 @@
       bending loads; it acts as a lifting device only. That makes the
       subsystem mechanically safer and easier to reason about.
     </p>
+
+    <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+      <h4 style="margin-top:0; color:#1e40af; display: flex; align-items: center; gap: 8px;">
+        <sl-icon name="exclamation-triangle"></sl-icon>
+        Design Consideration: Safety &amp; End-of-Travel Control
+      </h4>
+      <p style="margin-bottom:0;">
+        Because the column houses a powerful motorized screw jack with high mechanical advantage, end-of-travel safety features were considered paramount. While physical limit switches were initially planned to prevent overtravel at the top and bottom of the 400 mm stroke, they were ultimately not implemented in the final prototype. Instead, robust motor control logic and operator awareness are required to prevent the travelling nut from crashing into the mechanical hard stops, which would risk jamming the column, stalling the motor, or causing electrical damage.
+      </p>
+    </div>
 
     <h3>Phase 5: Fabrication-driven refinement</h3>
     <p>
@@ -128,6 +165,25 @@
       concept, but also on whether the surrounding structure preserves
       alignment under load.
     </p>
+
+    <div style="background:#f4f7fa; border-left:4px solid #3b82f6; padding:16px 20px; margin:20px 0; border-radius:0 8px 8px 0;">
+      <h4 style="margin-top:0; color:#1e40af; display: flex; align-items: center; gap: 8px;">
+        <sl-icon name="arrows-vertical"></sl-icon>
+        Design Consideration: Outer Guide Tube Height Derivation
+      </h4>
+      <p>
+        The required height of the outer steel tube cannot be based on the 400 mm stroke alone, because the moving inner member must remain fully supported even at maximum extension. The final height is derived as:<br>
+        <code style="font-size: 0.9em;">H<sub>outer_tube</sub> = stroke + minimum_retained_overlap</code><br>
+        <code style="font-size: 0.9em;">H<sub>outer_tube</sub> = 400 mm + 200 mm = 600 mm</code>
+      </p>
+      <h4 style="margin-top:16px; color:#1e40af; display: flex; align-items: center; gap: 8px;">
+        <sl-icon name="symmetry-vertical"></sl-icon>
+        Design Consideration: Overlap Region Between Inner &amp; Outer Members
+      </h4>
+      <p style="margin-bottom:0;">
+        The <strong>200 mm retained overlap</strong> within the 600 mm outer tube was deliberately selected to fulfill strict structural guidance requirements. This generous overlap ensures sufficient guided engagement at full extension, drastically improving bending restraint. By maximizing the lever arm between the upper and lower Delrin pads, it reduces wobble and angular misalignment, lowers the risk of the column binding, and ensures a superior distribution of impact loads through the guide region.
+      </p>
+    </div>
 
     <h3>Final mechanical design state</h3>
     <p>The final height-adjustment subsystem can therefore be summarised as follows:</p>
@@ -149,9 +205,9 @@
           Back: Design Ideation
         </sl-button>
       </a>
-      <a href="lift-structure-separation.html">
+      <a href="load-analysis.html">
         <sl-button variant="default" size="medium">
-          Next: Lift-Structure Separation
+          Next: Load Analysis
           <sl-icon slot="suffix" name="arrow-right"></sl-icon>
         </sl-button>
       </a>

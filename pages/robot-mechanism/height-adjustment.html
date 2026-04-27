@@ -493,15 +493,15 @@
             <td style="padding:8px; border:1px solid #ddd;">RM-5</td>
             <td style="padding:8px; border:1px solid #ddd;">Provide &ge; 400 mm vertical stroke; full stroke &le; 32 s</td>
             <td style="padding:8px; border:1px solid #ddd;">Timed full-stroke test under 22.5 kg design load</td>
-            <td style="padding:8px; border:1px solid #ddd;">400 mm stroke confirmed by design sizing; timed physical test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd;">28 cm stroke achieved in 86 s. Constrained by alternative motor and internal cable length.</td>
             <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Remain upright under punch loads; lift/structure load path separation</td>
-            <td style="padding:8px; border:1px solid #ddd;">Load-path design review; lateral deflection inspection under 2.7 kN design load</td>
-            <td style="padding:8px; border:1px solid #ddd;">Lift/structure separation confirmed by design (screw jack axial only, column carries lateral); quantitative deflection test pending</td>
-            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
+            <td style="padding:8px; border:1px solid #ddd;">Load-path design review; lateral deflection inspection via IMU analysis</td>
+            <td style="padding:8px; border:1px solid #ddd;">DSP analysis confirmed acceptable stability. Peak quasi-static structural sway &lt; 4&deg; at top tube under hard punching.</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="success" pill>Pass</sl-badge></td>
           </tr>
           <tr>
             <td style="padding:8px; border:1px solid #ddd;">RM-2</td>
@@ -514,7 +514,7 @@
             <td style="padding:8px; border:1px solid #ddd;">HA-AC-1</td>
             <td style="padding:8px; border:1px solid #ddd;">Full stroke &le; 32 s under load; no stall over 5 cycles</td>
             <td style="padding:8px; border:1px solid #ddd;">5-cycle timed stroke test with 22.5 kg payload</td>
-            <td style="padding:8px; border:1px solid #ddd;">Motor speed requirement back-calculated at ~800 rpm; selected motor meets spec; physical cycle test not yet conducted</td>
+            <td style="padding:8px; border:1px solid #ddd;">1 min 26 s (86 s) duration for 28 cm stroke. 5 continuous full cycles not achievable due to cable constraints.</td>
             <td style="padding:8px; border:1px solid #ddd; text-align:center;"><sl-badge variant="warning" pill>Partial</sl-badge></td>
           </tr>
           <tr>
@@ -537,7 +537,7 @@
         The architecture also meets the <strong>400 mm stroke requirement</strong>, and the current movement target of approximately <strong>32 seconds for full stroke</strong> is consistent with the inferred jack-speed requirement and the current actuation logic. This means the subsystem is functionally adequate for the current prototype, even if it does not yet achieve the more desirable 10-second user-experience target.
       </p>
       <p>
-        The main gaps in validation are: quantitative measurement of column deflection under lateral load, long-term wear monitoring of the Delrin interfaces, full repeated-cycle testing of the telescopic stage, and confirmation of whether future motor revisions can move the stroke time closer to the ideal target.
+        The main gaps in validation are: long-term wear monitoring of the Delrin interfaces, full repeated-cycle testing of the telescopic stage, and confirmation of whether future motor revisions can move the stroke time closer to the 32-second target while achieving the full 400 mm stroke.
       </p>
 
       <table class="is431-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; margin-top: 16px;">
@@ -551,8 +551,13 @@
         <tbody>
           <tr style="border-bottom: 1px solid #ddd;">
             <td style="padding: 12px;">400 mm stroke provision</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">28 cm stroke achieved; constrained by internal cable length</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px;">Quantitative deflection under lateral load</td>
             <td style="padding: 12px;">Pass</td>
-            <td style="padding: 12px;">Final concept sized around full required stroke</td>
+            <td style="padding: 12px;">Peak sway &lt; 4&deg; measured via IMU under hard punches</td>
           </tr>
           <tr style="border-bottom: 1px solid #ddd;">
             <td style="padding: 12px;">Separation of lifting and structural functions</td>
@@ -565,9 +570,9 @@
             <td style="padding: 12px;">Cleaner load path and lower part count than earlier rail-based design</td>
           </tr>
           <tr style="border-bottom: 1px solid #ddd;">
-            <td style="padding: 12px;">Current actuation speed (~32 s full stroke)</td>
-            <td style="padding: 12px;">Pass (functional)</td>
-            <td style="padding: 12px;">Meets present implementation target</td>
+            <td style="padding: 12px;">Current actuation speed (target &le; 32 s)</td>
+            <td style="padding: 12px;">Partial</td>
+            <td style="padding: 12px;">86 s descent recorded; constrained by alternative motor</td>
           </tr>
           <tr style="border-bottom: 1px solid #ddd;">
             <td style="padding: 12px;">Ideal user preference (~10 s full stroke)</td>
